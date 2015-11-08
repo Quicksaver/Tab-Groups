@@ -1,0 +1,7 @@
+content   tabgroups                    chrome/content/
+resource  tabgroups                    resource/
+
+locale    tabgroups-en   en-US         chrome/locale/en-US/
+locale    tabgroups      en-US         chrome/locale/en-US/
+
+skin      tabgroups      classic/1.0   chrome/skin/common/
