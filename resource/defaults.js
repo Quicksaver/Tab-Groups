@@ -1,4 +1,4 @@
-// VERSION 1.3
+// VERSION 1.3.1
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -14,5 +14,29 @@ addonUris = {
 	development: ''
 };
 
-prefList = {};
+prefList = {
+	animate_zoom: true,
+	session_restore_enabled_once: false
+};
+
 paneList = [];
+
+function startAddon(window) {
+	prepareObject(window);
+	window[objName].Modules.load('TabView', window.gBrowserInit);
+}
+
+function stopAddon(window) {
+	removeObject(window);
+}
+
+function onStartup(aReason) {
+	// Apply the add-on to every window opened and to be opened
+	Windows.callOnAll(startAddon, 'navigator:browser');
+	Windows.register(startAddon, 'domwindowopened', 'navigator:browser');
+}
+
+function onShutdown(aReason) {
+	// remove the add-on from all windows
+	Windows.callOnAll(stopAddon, null, null, true);
+}

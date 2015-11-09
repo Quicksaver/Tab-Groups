@@ -1,4 +1,4 @@
-// VERSION 1.5.3
+// VERSION 1.5.4
 
 // This script should be loaded by defaultsContent.js, which is in turn loaded directly by the Messenger module.
 // defaultsContent.js should set this object's objName and objPathString properties and call its .init() method.
@@ -14,7 +14,10 @@
 //	aListener - (function) the listener that will respond to the message. Expects (message) as its only argument; see https://developer.mozilla.org/en-US/docs/The_message_manager
 // unlisten(aMessage, aListener) - stops aListener from responding to aMessage.
 //	see listen()
-// message(aMessage, aListener) - sends a message to chrome to be handled through Messenger
+// message(aMessage, aData, aCPOW, bSync) - sends a message to chrome to be handled through Messenger
+//	aData - to be sent with the message
+//	(optional) aCPOW - object to be sent with the message; may cause performance issues, so avoid at all costs; defaults to undefined.
+//	(optional) bSync - (bool) true sends the message synchronously; may cause performance issues, so avoid at all costs; defaults to false.
 //	see listen()
 // handleDeadObject(ex) - 	expects [nsIScriptError object] ex. Shows dead object notices as warnings only in the console.
 //				If the code can handle them accordingly and firefox does its thing, they shouldn't cause any problems.
@@ -180,9 +183,14 @@ this.__contentEnvironment = {
 	},
 	
 	// send a message to chrome
-	message: function(aMessage, aData, aCPOW) {
+	message: function(aMessage, aData, aCPOW, bSync) {
 		// prevents console messages on e10s closing windows (i.e. view-source), there's no point in sending messages from here if "here" doesn't exist anymore
 		if(!content) { return; }
+		
+		if(bSync) {
+			sendSyncMessage(this.objName+':'+aMessage, aData, aCPOW);
+			return;
+		}
 		
 		sendAsyncMessage(this.objName+':'+aMessage, aData, aCPOW);
 	},
@@ -219,19 +227,21 @@ this.__contentEnvironment = {
 	// Apparently if removing a listener that hasn't been added (or maybe it's something else?) this will throw,
 	// the error should be reported but it's probably ok to continue with the process, this shouldn't block modules from being (un)loaded.
 	WebProgress: {
-		nsI: null,
+		_nsI: null,
+		get nsI() {
+			if(!this._nsI) {
+				this._nsI = docShell.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIWebProgress);
+			}
+			return this._nsI;
+		},
 		
 		add: function(aListener, aNotifyMask) {
-			if(!this.nsI) {
-				this.nsI = docShell.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIWebProgress);
-			}
-			
 			try { this.nsI.addProgressListener(aListener, aNotifyMask); }
 			catch(ex) { Cu.reportError(ex); }
 		},
 		
 		remove: function(aListener, aNotifyMask) {
-			if(!this.nsI) { return; }
+			if(!this._nsI) { return; }
 			
 			try { this.nsI.removeProgressListener(aListener, aNotifyMask); }
 			catch(ex) { Cu.reportError(ex); }

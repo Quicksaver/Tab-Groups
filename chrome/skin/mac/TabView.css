@@ -1,0 +1,42 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+@media not all and (min-resolution: 1.1dppx) {
+	#tabview-button:hover:active:not([disabled="true"]):not([cui-areatype="menu-panel"]) {
+		-moz-image-region: rect(18px, 648px, 36px, 630px);
+	}
+}
+
+@media (min-resolution: 1.1dppx) {
+	#tabview-button:hover:active:not([disabled="true"]):not([cui-areatype="menu-panel"]) {
+		-moz-image-region: rect(36px, 1296px, 72px, 1260px);
+	}
+}
+
+/* tabview menu item */
+
+#tabGroups-menu_tabview {
+	-moz-image-region: rect(2px, 98px, 18px, 82px);
+}
+
+#tabGroups-menu_tabview[groups="0"] {
+	-moz-image-region: rect(2px, 18px, 18px, 2px);
+}
+
+#tabGroups-menu_tabview[groups="1"] {
+	-moz-image-region: rect(2px, 38px, 18px, 22px);
+}
+
+#tabGroups-menu_tabview[groups="2"] {
+	-moz-image-region: rect(2px, 58px, 18px, 42px);
+}
+
+#tabGroups-menu_tabview[groups="3"] {
+	-moz-image-region: rect(2px, 78px, 18px, 62px);
+}
+
+/* tabview yosemite vibrancy background */
+@media (-moz-mac-yosemite-theme) {
+	#tabGroups-tab-view {
+		-moz-appearance: -moz-mac-vibrancy-light;
+	}
+}

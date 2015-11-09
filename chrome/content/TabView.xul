@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://tabgroups/skin/TabView.css" type="text/css"?>
+<?xml-stylesheet href="chrome://tabgroups-os/skin/TabView.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://tabgroups/locale/TabView.dtd">
+<overlay id="TabView_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	
+	<menupopup id="tabContextMenu">
+		<menu id="objName-context_tabViewMenu"
+			label="&moveToGroup.label;"
+			accesskey="&moveToGroup.accesskey;"
+			insertbefore="context_openTabInWindow">
+			
+			<menupopup id="objName-context_tabViewMenuPopup">
+				<menuseparator id="objName-context_tabViewNamedGroups" hidden="true"/>
+				<menuitem id="context_tabViewNewGroup"
+					label="&moveToNewGroup.label;"
+					oncommand="objName.TabView.moveTabTo(TabContextMenu.contextTab, null);"/>
+			</menupopup>
+		</menu>
+	</menupopup>
+		
+	<popupset id="mainPopupSet">
+		<tooltip id="objName-tab-view-tooltip"/>
+	</popupset>
+	
+	<menupopup id="alltabs-popup">
+		<menuitem id="objName-menu_tabview"
+			class="menuitem-iconic"
+			key="objName-key_tabview"
+			label="&viewTabGroups.label;"
+			command="objName:ToggleTabView"
+			observes="objName-tabviewGroupsNumber"
+			insertbefore="alltabs_undoCloseTab"/>
+	</menupopup>
+	
+	<toolbarpalette id="BrowserToolbarPalette">
+		<toolbarbutton id="objName-tabview-button"
+			defaultArea="TabsToolbar"
+			class="toolbarbutton-1 chromeclass-toolbar-additional"
+			label="&viewTabGroups.label;"
+			command="objName:ToggleTabView"
+			tooltip="dynamic-shortcut-tooltip"
+			observes="objName-tabviewGroupsNumber"/>
+	</toolbarpalette>
+	
+	<commandset id="mainCommandSet">
+		<command id="objName:ToggleTabView" oncommand="objName.TabView.toggle();"/>
+	</commandset>
+	
+	<broadcasterset id="mainBroadcasterSet">
+		<broadcaster id="objName-tabviewGroupsNumber" groups="1"/>
+	</broadcasterset>
+	
+	<keyset id="mainKeyset">
+		<key id="objName-key_tabview" key="&tabView.commandkey;" command="objName:ToggleTabView" modifiers="accel,shift"/>
+	</keyset>
+	
+</overlay>

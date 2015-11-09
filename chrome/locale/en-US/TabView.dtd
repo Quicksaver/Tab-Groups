@@ -1,0 +1,8 @@
+<!ENTITY moveToGroup.label "Move to Group">
+<!ENTITY moveToGroup.accesskey "M">
+<!ENTITY moveToNewGroup.label "New Group">
+
+<!ENTITY viewTabGroups.label "Tab Groups">
+<!ENTITY viewTabGroups.accesskey "G">
+
+<!ENTITY tabView.commandkey "e">
