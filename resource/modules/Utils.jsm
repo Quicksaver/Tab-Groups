@@ -408,7 +408,7 @@ this.MRUList.prototype = {
 		}
 	},
 	
-	// Returns the most recently used entry.  If a filter exists, gets the most recently used entry which matches the filter.
+	// Returns the most recently used entry. If a filter exists, gets the most recently used entry which matches the filter.
 	peek: function(filter) {
 		let match = null;
 		if(filter && typeof filter == "function") {
