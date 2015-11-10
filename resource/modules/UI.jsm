@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.Keys = { meta: false };
 
@@ -94,9 +94,6 @@ this.UI = {
 		try {
 			// initialize the direction of the page
 			this._initPageDirection();
-			
-			// ___ storage
-			Storage.init();
 			
 			if(Storage.readWindowBusyState(gWindow)) {
 				this.storageBusy();
@@ -243,7 +240,6 @@ this.UI = {
 		// additional clean up
 		TabItems.uninit();
 		GroupItems.uninit();
-		Storage.uninit();
 		
 		this._removeTabActionHandlers();
 		this._currentTab = null;

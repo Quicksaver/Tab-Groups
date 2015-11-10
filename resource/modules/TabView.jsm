@@ -1,8 +1,7 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
-this.__defineGetter__('SessionStore', function() { return window.SessionStore; });
 this.__defineGetter__('TabContextMenu', function() { return window.TabContextMenu; });
 
 this.TabView = {
@@ -14,9 +13,6 @@ this.TabView = {
 	_isFrameLoading: false,
 	
 	_initFrameCallbacks: [],
-	
-	kGroupsIdentifier: "tabview-groups",
-	kVisibilityIdentifier: "tabview-visibility",
 	
 	kTooltipId: objName+'-tab-view-tooltip',
 	kTabMenuPopupId: objName+'-context_tabViewMenuPopup',
@@ -142,12 +138,12 @@ this.TabView = {
 		
 		if(!window.toolbar.visible || this._initialized) { return; }
 		
-		let data = SessionStore.getWindowValue(window, this.kVisibilityIdentifier);
+		let data = Storage._service.getWindowValue(window, Storage.kVisibilityIdentifier);
 		if(data == "true") {
 			this.show();
 		} else {
 			try {
-				data = SessionStore.getWindowValue(window, this.kGroupsIdentifier);
+				data = Storage._service.getWindowValue(window, Storage.kGroupsIdentifier);
 				if(data) {
 					data = JSON.parse(data);
 					this.updateGroupNumberBroadcaster(data.totalNumber || 1);
@@ -177,7 +173,7 @@ this.TabView = {
 		
 		Piggyback.add('TabView', window, 'undoCloseTab', (aIndex) => {
 			let tab = null;
-			if(SessionStore.getClosedTabCount(window) > (aIndex || 0)) {
+			if(Storage._service.getClosedTabCount(window) > (aIndex || 0)) {
 				// wallpaper patch to prevent an unnecessary blank tab (bug 343895)
 				let blankTabToRemove = null;
 				if(gBrowser.tabs.length == 1 && window.isTabEmpty(gBrowser.selectedTab)) {
@@ -185,7 +181,7 @@ this.TabView = {
 				}
 				
 				this.prepareUndoCloseTab(blankTabToRemove);
-				tab = SessionStore.undoCloseTab(window, aIndex || 0);
+				tab = Storage._service.undoCloseTab(window, aIndex || 0);
 				this.afterUndoCloseTab();
 				
 				if(blankTabToRemove) {
@@ -420,7 +416,7 @@ this.TabView = {
 	},
 	
 	onLoad: function() {
-		SessionStore.promiseInitialized.then(function() {
+		window.SessionStore.promiseInitialized.then(function() {
 			if(UNLOADED) { return; }
 			
 			TabView.init();

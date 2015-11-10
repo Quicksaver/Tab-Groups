@@ -1,4 +1,4 @@
-// VERSION 1.3.1
+// VERSION 1.3.2
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -31,6 +31,8 @@ function stopAddon(window) {
 }
 
 function onStartup(aReason) {
+	Modules.load('Storage');
+	
 	// Apply the add-on to every window opened and to be opened
 	Windows.callOnAll(startAddon, 'navigator:browser');
 	Windows.register(startAddon, 'domwindowopened', 'navigator:browser');
@@ -39,4 +41,6 @@ function onStartup(aReason) {
 function onShutdown(aReason) {
 	// remove the add-on from all windows
 	Windows.callOnAll(stopAddon, null, null, true);
+	
+	Modules.unload('Storage');
 }

@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -45,7 +45,6 @@ this.AllTabs = {
 Modules.LOADMODULE = function() {
 	Modules.load('Utils');
 	Modules.load('iQ');
-	Modules.load('Storage');
 	Modules.load('Items');
 	Modules.load('GroupItems');
 	Modules.load('TabItems');
@@ -65,7 +64,6 @@ Modules.UNLOADMODULE = function() {
 	Modules.unload('TabItems');
 	Modules.unload('GroupItems');
 	Modules.unload('Items');
-	Modules.unload('Storage');
 	Modules.unload('iQ');
 	Modules.unload('Utils');
 };
