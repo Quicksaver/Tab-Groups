@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 // The Drag that's currently in process.
 this.drag = {
@@ -20,8 +20,6 @@ this.resize = {
 //   item - The <Item> being dragged
 //   event - The DOM event that kicks off the drag
 this.Drag = function(item, event) {
-	Utils.assert(item && (item.isAnItem || item.isAFauxItem), 'must be an item, or at least a faux item');
-	
 	this.item = item;
 	this.el = item.container;
 	this.$el = iQ(this.el);
@@ -38,11 +36,6 @@ this.Drag = function(item, event) {
 };
 
 this.Drag.prototype = {
-	// Prints [Drag (item)] for debug use
-	toString: function() {
-		return "[Drag (" + this.item + ")]";
-	},
-	
 	// Adjusts the given bounds according to the currently active trenches. Used by <Drag.snap>
 	// Parameters:
 	//   bounds             - (<Rect>) bounds

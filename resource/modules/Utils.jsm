@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.1.0
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -14,11 +14,6 @@ this.Point = function(a, y) {
 };
 
 this.Point.prototype = {
-	// Prints [Point (x,y)] for debug use
-	toString: function() {
-		return "[Point (" + this.x + "," + this.y + ")]";
-	},
-	
 	// Returns the distance from this point to the given <Point>.
 	distance: function(point) {
 		let ax = this.x - point.x;
@@ -46,11 +41,6 @@ this.Rect = function(a, top, width, height) {
 };
 
 this.Rect.prototype = {
-	// Prints [Rect (left,top,width,height)] for debug use
-	toString: function() {
-		return "[Rect (" + this.left + "," + this.top + "," + this.width + "," + this.height + ")]";
-	},
-	
 	get right() {
 		return this.left + this.width;
 	},
@@ -191,11 +181,6 @@ this.Range = function(min, max) {
 };
 
 this.Range.prototype = {
-	// Prints [Range (min,max)] for debug use
-	toString: function() {
-		return "[Range (" + this.min + "," + this.max + ")]";
-	},
-	
 	// Equivalent to max-min
 	get extent() {
 		return (this.max - this.min);
@@ -304,147 +289,14 @@ this.Subscribable.prototype = {
 		
 		let subscribers = this.subscribers.get(eventName);
 		for(let callback of subscribers) {
-			try { callback(this, eventInfo); }
-			catch(ex) { Utils.log(ex); }
+			try { callback(eventInfo); }
+			catch(ex) { Cu.reportError(ex); }
 		}
 	}
 };
 
 // Class: Utils - Singelton with common utility functions.
 this.Utils = {
-	// Prints [Utils] for debug use
-	toString: function() {
-		return "[Utils]";
-	},
-	
-	// ___ Logging
-	useConsole: true, // as opposed to dump
-	showTime: false,
-	
-	// Prints the given arguments to the JavaScript error console as a message.
-	// Pass as many arguments as you want, it'll print them all.
-	log: function() {
-		let text = this.expandArgumentsForLog(arguments);
-		let prefix = this.showTime ? Date.now() + ': ' : '';
-		if(this.useConsole) {
-			Services.console.logStringMessage(prefix + text);
-		} else {
-			dump(prefix + text + '\n');
-		}
-	},
-	
-	// Prints the given arguments to the JavaScript error console as an error.
-	// Pass as many arguments as you want, it'll print them all.
-	error: function() {
-		let text = this.expandArgumentsForLog(arguments);
-		let prefix = this.showTime ? Date.now() + ': ' : '';
-		if(this.useConsole) {
-			Cu.reportError(prefix + "tabview error: " + text);
-		} else {
-			dump(prefix + "TABVIEW ERROR: " + text + '\n');
-		}
-	},
-	
-	// Prints the given arguments to the JavaScript error console as a message, along with a full stack trace.
-	// Pass as many arguments as you want, it'll print them all.
-	trace: function() {
-		let text = this.expandArgumentsForLog(arguments);
-		
-		// cut off the first line of the stack trace, because that's just this function.
-		let stack = window.Error().stack.split("\n").slice(1);
-		
-		// if the caller was assert, cut out the line for the assert function as well.
-		if(stack[0].startsWith("Utils_assert(")) {
-			stack.splice(0, 1);
-		}
-		
-		this.log('trace: ' + text + '\n' + stack.join("\n"));
-	},
-	
-	// Prints a stack trace along with label (as a console message) if condition is false.
-	assert: function(condition, label) {
-		if(!condition) {
-			let text;
-			if(typeof label != 'string') {
-				text = 'badly formed assert';
-			} else {
-				text = "tabview assert: " + label;
-			}
-			
-			this.trace(text);
-		}
-	},
-	
-	// Throws label as an exception if condition is false.
-	assertThrow: function(condition, label) {
-		if(!condition) {
-			let text;
-			if(typeof label != 'string') {
-				text = 'badly formed assert';
-			} else {
-				text = "tabview assert: " + label;
-			}
-			
-			// cut off the first line of the stack trace, because that's just this function.
-			let stack = window.Error().stack.split("\n").slice(1);
-			
-			throw text + "\n" + stack.join("\n");
-		}
-	},
-	
-	// Prints the given object to a string, including all of its properties.
-	expandObject: function(obj) {
-		var s = obj + ' = {';
-		for(let prop in obj) {
-			let value;
-			try {
-				value = obj[prop];
-			}
-			catch(e) {
-				value = '[!!error retrieving property]';
-			}
-			
-			s += prop + ': ';
-			if(typeof value == 'string') {
-				s += '\'' + value + '\'';
-			} else if (typeof value == 'function') {
-				s += 'function';
-			} else {
-				s += value;
-			}
-			
-			s += ', ';
-		}
-		return s + '}';
-	},
-	
-	// Expands all of the given args (an array) into a single string.
-	expandArgumentsForLog: function(args) {
-		return Array.map(args, (arg) => {
-			return (typeof(arg) == 'object') ? this.expandObject(arg) : arg;
-		}).join('; ');
-	},
-	
-	// Given a DOM mouse event, returns true if it was for the left mouse button.
-	isLeftClick: function(event) {
-		return event.button == 0;
-	},
-	
-	// Given a DOM mouse event, returns true if it was for the middle mouse button.
-	isMiddleClick: function(event) {
-		return event.button == 1;
-	},
-	
-	// Given a DOM mouse event, returns true if it was for the right mouse button.
-	isRightClick: function(event) {
-		return event.button == 2;
-	},
-	
-	// Returns true if the given object is a DOM element.
-	isDOMElement: function(object) {
-		return object instanceof Ci.nsIDOMElement;
-	},
-	
 	// A xulTab is valid if it has not been closed, and it has not been removed from the DOM.
 	// Returns true if the tab is valid.
 	isValidXULTab: function(xulTab) {
@@ -469,26 +321,6 @@ this.Utils = {
 	// Returns true if the given object (p) looks like a <Point>.
 	isPoint: function(p) {
 		return (p && this.isNumber(p.x) && this.isNumber(p.y));
-	},
-	
-	// Check to see if an object is a plain object (created using "{}" or "new Object").
-	isPlainObject: function(obj) {
-		// Must be an Object. Make sure that DOM nodes and window objects don't pass through, as well
-		if(!obj || Object.prototype.toString.call(obj) !== "[object Object]" || obj.nodeType || obj.setInterval) {
-			return false;
-		}
-		
-		// Not own constructor property must be Object
-		let hasOwnProperty = Object.prototype.hasOwnProperty;
-		
-		if(obj.constructor && !hasOwnProperty.call(obj, "constructor") && !hasOwnProperty.call(obj.constructor.prototype, "isPrototypeOf")) {
-			return false;
-		}
-		
-		// Own properties are enumerated firstly, so to speed up, if last one is own, then all properties are own.
-		let key;
-		for(key in obj) {}
-		return key === undefined || hasOwnProperty.call(obj, key);
 	},
 	
 	// Returns true if the given object has no members.
@@ -521,25 +353,13 @@ this.Utils = {
 	extend: function() {
 		// copy reference to target object
 		let target = arguments[0] || {};
-		// Deep copy is not supported
-		if(typeof(target) === "boolean") {
-			this.assert(false, "The first argument of extend cannot be a boolean. Deep copy is not supported.");
-			return target;
-		}
-		
-		// Back when this was in iQ + iQ.fn, so you could extend iQ objects with it.
-		// This is no longer supported.
-		let length = arguments.length;
-		if(length === 1) {
-			this.assert(false, "Extending the iQ prototype using extend is not supported.");
-			return target;
-		}
 		
 		// Handle case when target is a string or something
 		if(typeof(target) != "object" && typeof(target) != "function") {
 			target = {};
 		}
 		
+		let length = arguments.length;
 		for(let i = 1; i < length; i++) {
 			// Only deal with non-null/undefined values
 			let options = arguments[i];
@@ -560,19 +380,6 @@ this.Utils = {
 		
 		// Return the modified object
 		return target;
-	},
-	
-	// Tries to execute a number of functions.
-	// Returns immediately the return value of the first non-failed function without executing successive functions, or null.
-	attempt: function() {
-		let args = arguments;
-		
-		for(let i = 0; i < args.length; i++) {
-			try { return args[i](); }
-			catch(ex) {}
-		}
-		
-		return null;
 	}
 };
 
@@ -587,11 +394,6 @@ this.MRUList = function(a) {
 };
 
 this.MRUList.prototype = {
-	// Prints [List (entry1, entry2, ...)] for debug use
-	toString: function() {
-		return "[List (" + this._list.join(", ") + ")]";
-	},
-	
 	// Updates/inserts the given entry as the most recently used one in the list.
 	update: function(entry) {
 		this.remove(entry);

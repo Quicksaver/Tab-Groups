@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 this.Keys = { meta: false };
 
@@ -34,9 +34,6 @@ this.UI = {
 	// Keeps track of event listeners added to the AllTabs object.
 	_eventListeners: {},
 	
-	// An array of functions to be called at uninit time
-	_cleanupFunctions: [],
-	
 	// If the UI is in the middle of an operation, this is the max amount of milliseconds to wait between input events before we no longer consider the operation interactive.
 	_maxInteractiveWait: 250,
 	
@@ -61,11 +58,6 @@ this.UI = {
 	// Used to keep track of the tab strip smooth scroll value.
 	_originalSmoothScroll: null,
 	
-	// Prints [UI] for debug use
-	toString: function() {
-		return "[UI]";
-	},
-	
 	// Called when a web page is about to show a modal dialog.
 	receiveMessage: function(m) {
 		if(!this.isTabViewVisible()) { return; }
@@ -79,6 +71,33 @@ this.UI = {
 		// When a modal dialog is shown for currently selected tab the onTabSelect event handler is not called, so we need to do it.
 		if(tab.selected && this._currentTab == tab) {
 			this.onTabSelect(tab);
+		}
+	},
+	
+	handleEvent: function(e) {
+		switch(e.type) {
+			// ___ setup event listener to save canvas images
+			case 'SSWindowClosing':
+				Listeners.remove(gWindow, "SSWindowClosing", this);
+				
+				// XXX bug #635975 - don't unlink the tab if the dom window is closing.
+				this.isDOMWindowClosing = true;
+				
+				if(this.isTabViewVisible()) {
+					GroupItems.removeHiddenGroups();
+				}
+				
+				TabItems.saveAll();
+				this._save();
+				break;
+			
+			case 'SSWindowStateBusy':
+				this.storageBusy();
+				break;
+			
+			case 'SSWindowStateReady':
+				this.storageReady();
+				break;
 		}
 	},
 	
@@ -119,7 +138,7 @@ this.UI = {
 						}
 					});
 				}
-				if(e.originalTarget.id == "content" && Utils.isLeftClick(e) && e.detail == 1) {
+				if(e.originalTarget.id == "content" && e.button == 0 && e.detail == 1) {
 					this._createGroupItemOnDrag(e);
 				}
 			});
@@ -141,10 +160,6 @@ this.UI = {
 			});
 			
 			Messenger.listenWindow(gWindow, "DOMWillOpenModalDialog", this);
-			
-			this._cleanupFunctions.push(function() {
-				Messenger.unlistenWindow(gWindow, "DOMWillOpenModalDialog", this);
-			});
 			
 			// ___ setup key handlers
 			this._setTabViewFrameKeyHandlers();
@@ -179,26 +194,7 @@ this.UI = {
 				this._resize();
 			});
 			
-			// ___ setup event listener to save canvas images
-			let onWindowClosing = () => {
-				gWindow.removeEventListener("SSWindowClosing", onWindowClosing, false);
-				
-				// XXX bug #635975 - don't unlink the tab if the dom window is closing.
-				this.isDOMWindowClosing = true;
-				
-				if(this.isTabViewVisible()) {
-					GroupItems.removeHiddenGroups();
-				}
-				
-				TabItems.saveAll();
-				
-				this._save();
-			};
-			
-			gWindow.addEventListener("SSWindowClosing", onWindowClosing);
-			this._cleanupFunctions.push(function () {
-				gWindow.removeEventListener("SSWindowClosing", onWindowClosing);
-			});
+			gWindow.addEventListener("SSWindowClosing", this);
 			
 			// ___ load frame script
 			Messenger.loadInWindow(gWindow, 'TabView');
@@ -213,7 +209,7 @@ this.UI = {
 			dispatchEvent(event);
 		}
 		catch(ex) {
-			Utils.log(ex);
+			Cu.reportError(ex);
 		}
 		finally {
 			GroupItems.resumeArrange();
@@ -222,12 +218,11 @@ this.UI = {
 	
 	// Should be called when window is unloaded.
 	uninit: function() {
-		// call our cleanup functions
-		this._cleanupFunctions.forEach(function(func) {
-			func();
-		});
-		this._cleanupFunctions = [];
+		Listeners.remove(gWindow, "SSWindowClosing", this);
+		Listeners.remove(gWindow, "SSWindowStateBusy", this);
+		Listeners.remove(gWindow, "SSWindowStateReady", this);
 		
+		Messenger.unlistenWindow(gWindow, "DOMWillOpenModalDialog", this);
 		Messenger.unloadFromWindow(gWindow, 'TabView');
 		
 		// additional clean up
@@ -342,8 +337,6 @@ this.UI = {
 	// options
 	//  dontSetActiveTabInGroup bool for not setting active tab in group
 	setActive: function(item, options) {
-		Utils.assert(item, "item must be given");
-		
 		if(item.isATabItem) {
 			if(item.parent) {
 				GroupItems.setActiveGroupItem(item.parent);
@@ -547,13 +540,8 @@ this.UI = {
 			this.storageReady();
 		}
 		
-		gWindow.addEventListener("SSWindowStateBusy", handleSSWindowStateBusy, false);
-		gWindow.addEventListener("SSWindowStateReady", handleSSWindowStateReady, false);
-		
-		this._cleanupFunctions.push(function() {
-			gWindow.removeEventListener("SSWindowStateBusy", handleSSWindowStateBusy, false);
-			gWindow.removeEventListener("SSWindowStateReady", handleSSWindowStateReady, false);
-		});
+		Listeners.add(gWindow, "SSWindowStateBusy", this);
+		Listeners.add(gWindow, "SSWindowStateReady", this);
 		
 		// TabOpen
 		this._eventListeners.open = (e) => {
@@ -1332,7 +1320,6 @@ this.UI = {
 		}
 		
 		if(!Utils.isRect(data.pageBounds)) {
-			Utils.log("UI.storageSanity: bad pageBounds", data.pageBounds);
 			data.pageBounds = null;
 			return false;
 		}
@@ -1376,7 +1363,7 @@ this.UI = {
 		};
 		
 		let onFadeIn = function() {
-			setTimeout(function() {
+			aSync(function() {
 				banner.animate({ opacity: 0 }, { duration: 1500, complete: onFadeOut });
 			}, 5000);
 		};

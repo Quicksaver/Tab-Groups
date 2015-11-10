@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -34,11 +34,11 @@ this.AllTabs = {
 	},
 	
 	register: function(eventName, callback) {
-		gBrowser.tabContainer.addEventListener(this._events[eventName], callback, false);
+		Listeners.add(gBrowser.tabContainer, this._events[eventName], callback);
 	},
 	
 	unregister: function(eventName, callback) {
-		gBrowser.tabContainer.removeEventListener(this._events[eventName], callback, false);
+		Listeners.remove(gBrowser.tabContainer, this._events[eventName], callback);
 	}
 };
 

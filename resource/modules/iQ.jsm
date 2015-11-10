@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 // Returns an iQClass object which represents an individual element or a group of elements. It works pretty much like jQuery(), with a few exceptions,
 // most notably that you can't use strings with complex html, just simple tags like '<div>'.
@@ -43,23 +43,13 @@ this.iQClass = function(selector, context) {
 		
 		// Verify a match, and that no context was specified for #id
 		if(match && (match[1] || !context)) {
-			// HANDLE iQ(html) -> iQ(array)
+			// HANDLE iQ(html). single tags only!
 			if(match[1]) {
 				let doc = (context ? context.ownerDocument || context : document);
 				
 				// If a single string is passed in and it's a single tag just do a createElement and skip the rest
 				let ret = rsingleTag.exec(selector);
-				
-				if(ret) {
-					if(Utils.isPlainObject(context)) {
-						Utils.assert(false, 'does not support HTML creation with context');
-					} else {
-						selector = [ doc.createElement(ret[1]) ];
-					}
-				} else {
-					Utils.assert(false, 'does not support complex HTML creation');
-				}
-				
+				selector = [ doc.createElement(ret[1]) ];
 				return Utils.merge(this, selector);
 			}
 			// HANDLE iQ("#id")
@@ -96,12 +86,6 @@ this.iQClass = function(selector, context) {
 			return iQ(context).find(selector);
 		}
 	}
-	// HANDLE iQ(function)
-	// Shortcut for document ready
-	else if(typeof selector == "function") {
-		Utils.log('iQ does not support ready functions');
-		return null;
-	}
 	
 	if("selector" in selector) {
 		this.selector = selector.selector;
@@ -121,23 +105,6 @@ this.iQClass = function(selector, context) {
 };
 
 this.iQClass.prototype = {
-	// Prints [iQ...] for debug use
-	toString: function() {
-		if(this.length > 1) {
-			if(this.selector) {
-				return "[iQ (" + this.selector + ")]";
-			} else {
-				return "[iQ multi-object]";
-			}
-		}
-		
-		if(this.length == 1) {
-			return "[iQ (" + this[0].toString() + ")]";
-		}
-		
-		return "[iQ non-object]";
-	},
-	
 	// Start with an empty selector
 	selector: "",
 	
@@ -146,26 +113,22 @@ this.iQClass.prototype = {
 	
 	// Execute a callback for every element in the matched set.
 	each: function(callback) {
-		if(typeof(callback) != "function") {
-			Utils.assert(false, "each's argument must be a function");
-			return null;
+		for(let i = 0; i < this.length; i++) {
+			if(callback(this[i]) !== false) {
+				return this;
+			}
 		}
-		for(let i = 0; this[i] != null && callback(this[i]) !== false; i++) {}
 		return this;
 	},
 	
 	// Adds the given class(es) to the receiver.
 	addClass: function(value) {
-		Utils.assertThrow(typeof value == "string" && value, 'requires a valid string argument');
-		
-		let length = this.length;
-		for(let i = 0; i < length; i++) {
-			let elem = this[i];
-			if(elem.nodeType === 1) {
-				value.split(/\s+/).forEach(function(className) {
-					elem.classList.add(className);
-				});
-			}
+		for(let i = 0; i < this.length; i++) {
+			if(this[i].nodeType !== 1) { continue; }
+			
+			value.split(/\s+/).forEach((className) => {
+				this[i].classList.add(className);
+			});
 		}
 		
 		return this;
@@ -173,19 +136,12 @@ this.iQClass.prototype = {
 	
 	// Removes the given class(es) from the receiver.
 	removeClass: function(value) {
-		if(typeof value != "string" || !value) {
-			Utils.assert(false, 'does not support function argument');
-			return null;
-		}
-		
-		let length = this.length;
-		for(let i = 0; i < length; i++) {
-			let elem = this[i];
-			if(elem.nodeType === 1 && elem.className) {
-				value.split(/\s+/).forEach(function(className) {
-					elem.classList.remove(className);
-				});
-			}
+		for(let i = 0; i < this.length; i++) {
+			if(this[i].nodeType !== 1) { continue; }
+			
+			value.split(/\s+/).forEach((className) => {
+				this[i].classList.remove(className);
+			});
 		}
 		
 		return this;
@@ -193,8 +149,9 @@ this.iQClass.prototype = {
 	
 	// Returns true is the receiver has the given css class.
 	hasClass: function(singleClassName) {
-		let length = this.length;
-		for(let i = 0; i < length; i++) {
+		for(let i = 0; i < this.length; i++) {
+			if(this[i].nodeType !== 1) { continue; }
+			
 			if(this[i].classList.contains(singleClassName)) {
 				return true;
 			}
@@ -207,25 +164,11 @@ this.iQClass.prototype = {
 		let ret = [];
 		let length = 0;
 		
-		let l = this.length;
-		for(let i = 0; i < l; i++) {
-			length = ret.length;
-			try {
-				Utils.merge(ret, this[i].querySelectorAll(selector));
-			}
-			catch(ex) {
-				Utils.log('iQ.find error (bad selector)', ex);
-			}
-			
-			if(i > 0) {
-				// Make sure that the results are unique
-				for(let n = length; n < ret.length; n++) {
-					for(let r = 0; r < length; r++) {
-						if(ret[r] === ret[n]) {
-							ret.splice(n--, 1);
-							break;
-						}
-					}
+		for(let i = 0; i < this.length; i++) {
+			let found = $$(selector, this[i]);
+			for(let node of found) {
+				if(ret.indexOf(node) == -1) {
+					ret.push(node);
 				}
 			}
 		}
@@ -235,27 +178,8 @@ this.iQClass.prototype = {
 	
 	// Check to see if a given DOM node descends from the receiver.
 	contains: function(selector) {
-		Utils.assert(this.length == 1, 'does not yet support multi-objects (or null objects)');
-		
-		// fast path when querySelector() can be used
-		if('string' == typeof selector) {
-			return null != this[0].querySelector(selector);
-		}
-		
 		let object = iQ(selector);
-		Utils.assert(object.length <= 1, 'does not yet support multi-objects');
-		
-		let elem = object[0];
-		if(!elem || !elem.parentNode) {
-			return false;
-		}
-		
-		do {
-			elem = elem.parentNode;
-		}
-		while (elem && this[0] != elem);
-		
-		return this[0] == elem;
+		return isAncestor(object[0], this[0]);
 	},
 	
 	// Removes the receiver from the DOM.
@@ -265,8 +189,7 @@ this.iQClass.prototype = {
 		}
 		
 		for(let i = 0; this[i] != null; i++) {
-			let elem = this[i];
-			elem.remove();
+			this[i].remove();
 		}
 		return this;
 	},
@@ -301,7 +224,6 @@ this.iQClass.prototype = {
 	
 	// Returns a <Rect> with the receiver's bounds.
 	bounds: function() {
-		Utils.assert(this.length == 1, 'does not yet support multi-objects (or null objects)');
 		let rect = this[0].getBoundingClientRect();
 		return new Rect(Math.floor(rect.left), Math.floor(rect.top), Math.floor(rect.width), Math.floor(rect.height));
 	},
@@ -311,13 +233,8 @@ this.iQClass.prototype = {
 	data: function(key, value) {
 		let data = null;
 		if(value === undefined) {
-			Utils.assert(this.length == 1, 'does not yet support multi-objects (or null objects)');
 			data = this[0].iQData;
-			if(data) {
-				return data[key];
-			} else {
-				return null;
-			}
+			return (data) ? data[key] : null;
 		}
 		
 		for(let i = 0; this[i] != null; i++) {
@@ -334,20 +251,8 @@ this.iQClass.prototype = {
 		return this;
 	},
 	
-	// Given a value, sets the receiver's innerHTML to it; otherwise returns what's already there.
-	html: function(value) {
-		Utils.assert(this.length == 1, 'does not yet support multi-objects (or null objects)');
-		if(value === undefined) {
-			return this[0].innerHTML;
-		}
-		
-		this[0].innerHTML = value;
-		return this;
-	},
-	
 	// Given a value, sets the receiver's textContent to it; otherwise returns what's already there.
 	text: function(value) {
-		Utils.assert(this.length == 1, 'does not yet support multi-objects (or null objects)');
 		if(value === undefined) {
 			return this[0].textContent;
 		}
@@ -357,7 +262,6 @@ this.iQClass.prototype = {
 	
 	// Given a value, sets the receiver's value to it; otherwise returns what's already there.
 	val: function(value) {
-		Utils.assert(this.length == 1, 'does not yet support multi-objects (or null objects)');
 		if(value === undefined) {
 			return this[0].value;
 		}
@@ -368,7 +272,6 @@ this.iQClass.prototype = {
 	
 	// Appends the receiver to the result of iQ(selector).
 	appendTo: function(selector) {
-		Utils.assert(this.length == 1, 'does not yet support multi-objects (or null objects)');
 		iQ(selector).append(this);
 		return this;
 	},
@@ -376,16 +279,13 @@ this.iQClass.prototype = {
 	// Appends the result of iQ(selector) to the receiver.
 	append: function(selector) {
 		let object = iQ(selector);
-		Utils.assert(object.length == 1 && this.length == 1, 'does not yet support multi-objects (or null objects)');
 		this[0].appendChild(object[0]);
 		return this;
 	},
 	
 	// Sets or gets an attribute on the element(s).
 	attr: function(key, value) {
-		Utils.assert(typeof key === 'string', 'string key');
 		if(value === undefined) {
-			Utils.assert(this.length == 1, 'retrieval does not support multi-objects (or null objects)');
 			return this[0].getAttribute(key);
 		}
 		
@@ -408,8 +308,6 @@ this.iQClass.prototype = {
 		if(typeof a === 'string') {
 			let key = a;
 			if(b === undefined) {
-				Utils.assert(this.length == 1, 'retrieval does not support multi-objects (or null objects)');
-				
 				return getComputedStyle(this[0]).getPropertyValue(key);
 			}
 			properties = {};
@@ -468,8 +366,6 @@ this.iQClass.prototype = {
 	//   complete - function to call once the animation is done, takes nothing
 	//     in, but "this" is set to the element that was animated.
 	animate: function(css, options) {
-		Utils.assert(this.length == 1, 'does not yet support multi-objects (or null objects)');
-		
 		if(!options) {
 			options = {};
 		}
@@ -512,7 +408,7 @@ this.iQClass.prototype = {
 		
 		this.css(css);
 		
-		setTimeout(() => {
+		aSync(() => {
 			this.css({
 				'transition-property': 'none',
 				'transition-duration': '',
@@ -529,8 +425,6 @@ this.iQClass.prototype = {
 	
 	// Animates the receiver to full transparency. Calls callback on completion.
 	fadeOut: function(callback) {
-		Utils.assert(typeof callback == "function" || callback === undefined, 'does not yet support duration');
-		
 		this.animate({
 			opacity: 0
 		}, {
@@ -570,8 +464,7 @@ this.iQClass.prototype = {
 		return this;
 	},
 	
-	// Binds the given function to the given event type.
-	// Also wraps the function in a try/catch block that does a Utils.log on any errors.
+	// Binds the given function to the given event type. Also wraps the function in a try/catch so it doesn't block on any errors.
 	bind: function(type, func) {
 		let handler = function(event) {
 			return func.apply(this, [event]);
@@ -601,8 +494,6 @@ this.iQClass.prototype = {
 	// Binds the given function to the given event type, but only for one call;
 	// automatically unbinds after the event fires once.
 	one: function(type, func) {
-		Utils.assert(typeof func == "function", 'does not support eventData argument');
-		
 		let handler = function(e) {
 			iQ(this).unbind(type, handler);
 			return func.apply(this, [e]);
@@ -613,8 +504,6 @@ this.iQClass.prototype = {
 	
 	// Unbinds the given function from the given event type.
 	unbind: function(type, func) {
-		Utils.assert(typeof func == "function", 'Must provide a function');
-		
 		for(let i = 0; this[i] != null; i++) {
 			let elem = this[i];
 			let handler = func;
@@ -688,8 +577,4 @@ Modules.LOADMODULE = function() {
 			return this.bind(event, func);
 		};
 	});
-};
-
-Modules.UNLOADMODULE = function() {
-
 };

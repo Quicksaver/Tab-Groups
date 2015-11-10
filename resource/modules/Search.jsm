@@ -1,13 +1,8 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
 this.TabUtils = {
-	// Prints [TabUtils] for debug use.
-	toString: function() {
-		return "[TabUtils]";
-	},
-	
 	// Given a <TabItem> or a <xul:tab> returns the tab's name.
 	nameOf: function(tab) {
 		// We can have two types of tabs: A <TabItem> or a <xul:tab> because we have to deal with both tabs represented inside
@@ -47,11 +42,6 @@ this.TabMatcher = function(term) {
 };
 
 this.TabMatcher.prototype = {
-	// Prints [TabMatcher (term)] for debug use.
-	toString: function() {
-		return "[TabMatcher (" + this.term + ")]";
-	},
-	
 	// Given an array of <TabItem>s and <xul:tab>s returns a new array of tabs whose name matched the search term, sorted by lexical closeness.
 	_filterAndSortForMatches: function(tabs) {
 		tabs = tabs.filter((tab) => {
@@ -278,7 +268,7 @@ this.TabHandlers = {
 		iQ("#searchbox")[0].focus();
 		
 		// Marshal the search.
-		setTimeout(Search.perform, 0);
+		aSync(Search.perform, 0);
 	}
 };
 
@@ -287,11 +277,6 @@ this.Search = {
 	_initiatedBy: "",
 	_blockClick: false,
 	_currentHandler: null,
-	
-	// Prints [Search] for debug use.
-	toString: function() {
-		return "[Search]";
-	},
 	
 	// Initializes the searchbox to be focused, and everything else to be hidden, and to have everything have the appropriate event handlers.
 	init: function() {
@@ -316,7 +301,7 @@ this.Search = {
 		window.addEventListener("focus", () => {
 			if(this.isEnabled()) {
 				this._blockClick = true;
-				setTimeout(() => {
+				aSync(() => {
 					this._blockClick = false;
 				}, 0);
 			}
@@ -488,7 +473,7 @@ this.Search = {
 				dispatchTabViewSearchEnabledEvent();
 			} else {
 				// marshal the focusing, otherwise it ends up with searchbox[0].focus gets called before the search button gets the focus after being pressed.
-				setTimeout(function() {
+				aSync(function() {
 					$searchbox[0].focus();
 					dispatchTabViewSearchEnabledEvent();
 				}, 0);

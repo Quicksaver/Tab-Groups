@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 // Class: Trench - Class for drag-snapping regions; called "trenches" as they are long and narrow.
 // Parameters:
@@ -46,11 +46,6 @@ this.Trench = function(element, xory, type, edge) {
 };
 
 this.Trench.prototype = {
-	// Prints [Trench edge type (parentItem)] for debug use
-	toString: function Trench_toString() {
-		return "[Trench " + this.edge + " " + this.type + (this.parentItem ? " (" + this.parentItem + ")" : "") + "]";
-	},
-	
 	// (integer) radius is how far away we should snap from
 	get radius() {
 		return this.customRadius || Trenches.defaultRadius;
@@ -58,7 +53,6 @@ this.Trench.prototype = {
 	
 	setParentItem: function(item) {
 		if(!item.isAnItem) {
-			Utils.assert(false, "parentItem must be an Item");
 			return false;
 		}
 		this.parentItem = item;
@@ -123,10 +117,6 @@ this.Trench.prototype = {
 	// Parameters:
 	//   rect - (<Rect>)
 	setWithRect: function(rect) {
-		if(!Utils.isRect(rect)) {
-			Utils.error('argument must be Rect');
-		}
-		
 		// First, calculate the range for this trench.
 		// Border trenches are always only active for the length of this range.
 		// Guide trenches, however, still use this value as its minRange.
@@ -185,7 +175,7 @@ this.Trench.prototype = {
 	show: function() { // DEBUG
 		if(this.active && this.showGuide) {
 			if(!this.dom.guideTrench) {
-				this.dom.guideTrench = iQ("<div/>").addClass('guideTrench').css({id: 'guideTrench'+this.id});
+				this.dom.guideTrench = iQ("<div/>").addClass('guideTrench').css({ id: 'guideTrench'+this.id });
 			}
 			let guideTrench = this.dom.guideTrench;
 			guideTrench.css(this.guideRect);
@@ -438,11 +428,6 @@ this.Trenches = {
 	get preferLeft() { return !UI.rtl; },
 	
 	trenches: [],
-	
-	// Prints [Trenches count=count] for debug use
-	toString: function() {
-		return "[Trenches count=" + this.trenches.length + "]";
-	},
 	
 	// Return the specified <Trench>.
 	// Parameters:

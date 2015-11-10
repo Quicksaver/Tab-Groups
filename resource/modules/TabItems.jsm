@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -6,8 +6,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modul
 // Parameters:
 //   tab - a xul:tab
 this.TabItem = function(tab, options) {
-	Utils.assert(tab, "tab");
-	
 	this.tab = tab;
 	// register this as the tab's tabItem
 	this.tab._tabViewTabItem = this;
@@ -67,7 +65,7 @@ this.TabItem = function(tab, options) {
 	
 	// ___ more div setup
 	$div.mousedown(function(e) {
-		if(!Utils.isRightClick(e)) {
+		if(e.button != 2) {
 			this.lastMouseDownTarget = e.target;
 		}
 	});
@@ -78,7 +76,7 @@ this.TabItem = function(tab, options) {
 		if(!same) { return; }
 		
 		// press close button or middle mouse click
-		if(iQ(e.target).hasClass("close") || Utils.isMiddleClick(e)) {
+		if(iQ(e.target).hasClass("close") || e.button == 1) {
 			this.closedManually = true;
 			this.close();
 		} else {
@@ -101,11 +99,6 @@ this.TabItem = function(tab, options) {
 };
 
 this.TabItem.prototype = Utils.extend(new Item(), new Subscribable(), {
-	// Prints [TabItem (tab)] for debug use
-	toString: function() {
-		return "[TabItem (" + this.tab + ")]";
-	},
-	
 	// Repaints the thumbnail with the given resolution, and forces it to stay that resolution until unforceCanvasSize is called.
 	forceCanvasSize: function(w, h) {
 		this.canvasSizeForced = true;
@@ -169,7 +162,7 @@ this.TabItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 			}
 		}
 		catch(ex) {
-			Utils.log("Error in saving tab value: "+ex);
+			Cu.reportError(ex);
 		}
 	},
 	
@@ -212,9 +205,6 @@ this.TabItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 	// Possible options:
 	//   groupItemId - if the tab doesn't have any data associated with it and groupItemId is available, add the tab to that group.
 	_reconnect: function(options) {
-		Utils.assertThrow(!this._reconnected, "shouldn't already be reconnected");
-		Utils.assertThrow(this.tab, "should have a xul:tab");
-		
 		let tabData = Storage.getTabData(this.tab);
 		let groupItem;
 		
@@ -234,7 +224,7 @@ this.TabItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 			}
 			
 			if(groupItem) {
-				groupItem.add(this, {immediately: true});
+				groupItem.add(this, { immediately: true });
 				
 				// restore the active tab for each group between browser sessions
 				if(tabData.active) {
@@ -288,8 +278,6 @@ this.TabItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 	// Possible options:
 	//   force - true to always update the DOM even if the bounds haven't changed; default false
 	setBounds: function(inRect, immediately, options) {
-		Utils.assert(Utils.isRect(inRect), 'TabItem.setBounds: rect is not a real rectangle!');
-		
 		if(!options) {
 			options = {};
 		}
@@ -392,8 +380,6 @@ this.TabItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 		UI.clearShouldResizeItems();
 		
 		rect = this.getBounds(); // ensure that it's a <Rect>
-		
-		Utils.assert(Utils.isRect(this.bounds), 'TabItem.setBounds: this.bounds is not a real rectangle!');
 		
 		if(!this.parent && Utils.isValidXULTab(this.tab)) {
 			this.setTrenches(rect);
@@ -513,13 +499,13 @@ this.TabItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 					complete: function() {
 						onZoomDone();
 						
-						setTimeout(function() {
+						aSync(function() {
 							TabItems.resumePainting();
 						}, 0);
 					}
 				});
 		} else {
-			setTimeout(onZoomDone, 0);
+			aSync(onZoomDone, 0);
 		}
 	},
 	
@@ -639,7 +625,6 @@ this.TabItems = {
 	items: [],
 	paintingPaused: 0,
 	_tabsWaitingForUpdate: null,
-	_heartbeat: null, // see explanation at startHeartbeat() below
 	_heartbeatTiming: 200, // milliseconds between calls
 	_maxTimeForUpdating: 200, // milliseconds that consecutive updates can take
 	_lastUpdateTime: Date.now(),
@@ -647,11 +632,6 @@ this.TabItems = {
 	_pauseUpdateForTest: false,
 	_reconnectingPaused: false,
 	tabItemPadding: {},
-	
-	// Prints [TabItems count=count] for debug use
-	toString: function() {
-		return "[TabItems count=" + this.items.length + "]";
-	},
 	
 	// Called when a web page is painted.
 	receiveMessage: function(m) {
@@ -666,8 +646,6 @@ this.TabItems = {
 	
 	// Set up the necessary tracking to maintain the <TabItems>s.
 	init: function() {
-		Utils.assert(window.AllTabs, "AllTabs must be initialized first");
-		
 		// Set up tab priority queue
 		this._tabsWaitingForUpdate = new TabPriorityQueue();
 		this.minTabHeight = this.minTabWidth * this.tabHeight / this.tabWidth;
@@ -771,12 +749,10 @@ this.TabItems = {
 	
 	// Checks whether the xul:tab has fully loaded and calls a callback with a boolean indicates whether the tab is loaded or not.
 	_isComplete: function(tab, callback) {
-		Utils.assertThrow(tab, "tab");
-		
 		return new Promise(function(resolve, reject) {
 			// A pending tab can't be complete, yet.
 			if(tab.hasAttribute("pending")) {
-				setTimeout(() => resolve(false));
+				aSync(() => resolve(false));
 				return;
 			}
 			
@@ -793,10 +769,6 @@ this.TabItems = {
 	// Takes in a xul:tab.
 	update: function(tab) {
 		try {
-			Utils.assertThrow(tab, "tab");
-			Utils.assertThrow(!tab.pinned, "shouldn't be an app tab");
-			Utils.assertThrow(tab._tabViewTabItem, "should already be linked");
-			
 			let shouldDefer =	this.isPaintingPaused()
 						|| this._tabsWaitingForUpdate.hasItems()
 						|| Date.now() - this._lastUpdateTime < this._heartbeatTiming;
@@ -809,7 +781,7 @@ this.TabItems = {
 			}
 		}
 		catch(ex) {
-			Utils.log(ex);
+			Cu.reportError(ex);
 		}
 	},
 	
@@ -823,10 +795,7 @@ this.TabItems = {
 		try {
 			if(this._pauseUpdateForTest) { return; }
 			
-			Utils.assertThrow(tab, "tab");
-			
 			// ___ get the TabItem
-			Utils.assertThrow(tab._tabViewTabItem, "must already be linked");
 			let tabItem = tab._tabViewTabItem;
 			
 			// Even if the page hasn't loaded, display the favicon and title
@@ -880,28 +849,23 @@ this.TabItems = {
 			}
 		}
 		catch(ex) {
-			Utils.log(ex);
+			Cu.reportError(ex);
 		}
 	},
 	
 	// Takes in a xul:tab, creates a TabItem for it and adds it to the scene. 
 	link: function(tab, options) {
 		try {
-			Utils.assertThrow(tab, "tab");
-			Utils.assertThrow(!tab.pinned, "shouldn't be an app tab");
-			Utils.assertThrow(!tab._tabViewTabItem, "shouldn't already be linked");
 			new TabItem(tab, options); // sets tab._tabViewTabItem to itself
 		}
 		catch(ex) {
-			Utils.log(ex);
+			Cu.reportError(ex);
 		}
 	},
 	
 	// Takes in a xul:tab and destroys the TabItem associated with it. 
 	unlink: function(tab) {
 		try {
-			Utils.assertThrow(tab, "tab");
-			Utils.assertThrow(tab._tabViewTabItem, "should already be linked");
 			// note that it's ok to unlink an app tab; see .handleTabUnpin
 			
 			this.unregister(tab._tabViewTabItem);
@@ -919,7 +883,7 @@ this.TabItems = {
 			this._tabsWaitingForUpdate.remove(tab);
 		}
 		catch(ex) {
-			Utils.log(ex);
+			Cu.reportError(ex);
 		}
 	},
 	
@@ -934,11 +898,11 @@ this.TabItems = {
 		this.update(xulTab);
 	},
 	
-	// Start a new heartbeat if there isn't one already started. The heartbeat is a chain of setTimeout calls that allows us to spread
-	// out update calls over a period of time. _heartbeat is used to make sure that we don't add multiple setTimeout chains.
+	// Start a new heartbeat if there isn't one already started. The heartbeat is a chain of aSync calls that allows us to spread
+	// out update calls over a period of time. We make sure not to add multiple aSync chains.
 	startHeartbeat: function() {
-		if(!this._heartbeat) {
-			this._heartbeat = setTimeout(() => {
+		if(!Timers.heartbeat) {
+			Timers.init('heartbeat', () => {
 				this._checkHeartbeat();
 			}, this._heartbeatTiming);
 		}
@@ -947,8 +911,6 @@ this.TabItems = {
 	// This periodically checks for tabs waiting to be updated, and calls _update on them.
 	// Should only be called by startHeartbeat and resumePainting.
 	_checkHeartbeat: function() {
-		this._heartbeat = null;
-		
 		if(this.isPaintingPaused()) { return; }
 		
 		// restart the heartbeat to update all waiting tabs once the UI becomes idle
@@ -980,9 +942,8 @@ this.TabItems = {
 	// pausePainting can be called multiple times, but every call to pausePainting needs to be mirrored with a call to <resumePainting>.
 	pausePainting: function() {
 		this.paintingPaused++;
-		if(this._heartbeat) {
-			clearTimeout(this._heartbeat);
-			this._heartbeat = null;
+		if(Timers.heartbeat) {
+			Timers.cancel('heartbeat');
 		}
 	},
 	
@@ -990,7 +951,6 @@ this.TabItems = {
 	// three times before TabItems will start updating thumbnails again.
 	resumePainting: function() {
 		this.paintingPaused--;
-		Utils.assert(this.paintingPaused > -1, "paintingPaused should not go below zero");
 		if(!this.isPaintingPaused()) {
 			this.startHeartbeat();
 		}
@@ -1003,15 +963,11 @@ this.TabItems = {
 	
 	// Don't reconnect any new tabs until resume is called.
 	pauseReconnecting: function() {
-		Utils.assertThrow(!this._reconnectingPaused, "shouldn't already be paused");
-		
 		this._reconnectingPaused = true;
 	},
 	
 	// Reconnect all of the tabs that were created since we paused.
 	resumeReconnecting: function() {
-		Utils.assertThrow(this._reconnectingPaused, "should already be paused");
-		
 		this._reconnectingPaused = false;
 		this.items.forEach(function(item) {
 			if(!item._reconnected) {
@@ -1027,8 +983,6 @@ this.TabItems = {
 	
 	// Adds the given <TabItem> to the master list.
 	register: function(item) {
-		Utils.assert(item && item.isAnItem, 'item must be a TabItem');
-		Utils.assert(this.items.indexOf(item) == -1, 'only register once per item');
 		this.items.push(item);
 	},
 	
@@ -1080,8 +1034,6 @@ this.TabItems = {
 	
 	// Pass in a desired size, and receive a size based on proper title size and aspect ratio.
 	calcValidSize: function(size, options) {
-		Utils.assert(Utils.isPoint(size), 'input is a Point');
-		
 		let width = Math.max(TabItems.minTabWidth, size.x);
 		let showTitle = !options || !options.hideTitle;
 		let titleSize = showTitle ? TabItems.fontSizeRange.max : 0;
@@ -1119,11 +1071,6 @@ this.TabPriorityQueue = function() {};
 this.TabPriorityQueue.prototype = {
 	_low: [], // low priority queue
 	_high: [], // high priority queue
-	
-	// Prints [TabPriorityQueue count=count] for debug use
-	toString: function() {
-		return "[TabPriorityQueue count=" + (this._low.length + this._high.length) + "]";
-	},
 	
 	// Empty the update queue
 	clear: function() {
@@ -1211,11 +1158,6 @@ this.TabCanvas = function(tab, canvas) {
 };
 
 this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
-	// Prints [TabCanvas (tab)] for debug use
-	toString: function() {
-		return "[TabCanvas (" + this.tab + ")]";
-	},
-	
 	paint: function(evt) {
 		let w = this.canvas.width;
 		let h = this.canvas.height;

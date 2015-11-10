@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 // Class: Item - Superclass for all visible objects (<TabItem>s and <GroupItem>s).
 // If you subclass, in addition to the things Item provides, you need to also provide these methods:
@@ -61,17 +61,6 @@ this.Item.prototype = {
 	// Parameters:
 	//   container - the outermost DOM element that describes this item onscreen.
 	_init: function(container) {
-		Utils.assert(	typeof this.addSubscriber == 'function'
-				&& typeof this.removeSubscriber == 'function'
-				&& typeof this._sendToSubscribers == 'function',
-			'Subclass must implement the Subscribable interface');
-		Utils.assert(Utils.isDOMElement(container), 'container must be a DOM element');
-		Utils.assert(typeof this.setBounds == 'function', 'Subclass must provide setBounds');
-		Utils.assert(typeof this.setZ == 'function', 'Subclass must provide setZ');
-		Utils.assert(typeof this.close == 'function', 'Subclass must provide close');
-		Utils.assert(typeof this.save == 'function', 'Subclass must provide save');
-		Utils.assert(Utils.isRect(this.bounds), 'Subclass must provide bounds');
-		
 		this.container = container;
 		this.$container = iQ(container);
 		
@@ -118,7 +107,7 @@ this.Item.prototype = {
 			out: function() {
 				let groupItem = drag.info.item.parent;
 				if(groupItem) {
-					groupItem.remove(drag.info.$el, {dontClose: true});
+					groupItem.remove(drag.info.$el, { dontClose: true });
 				}
 				iQ(this.container).removeClass("acceptsDrop");
 			},
@@ -135,16 +124,16 @@ this.Item.prototype = {
 		
 		// ___ resize
 		this.resizeOptions = {
-			aspectRatio: self.keepProportional,
+			aspectRatio: this.keepProportional,
 			minWidth: 90,
 			minHeight: 90,
 			
-			start: function(e, ui) {
+			start: (e) => {
 				UI.setActive(this);
 				resize.info = new Drag(this, e);
 			},
 			
-			resize: (e, ui) => {
+			resize: () => {
 				resize.info.snap(UI.rtl ? 'topright' : 'topleft', false, this.keepProportional);
 			},
 			
@@ -159,7 +148,6 @@ this.Item.prototype = {
 	
 	// Returns a copy of the Item's bounds as a <Rect>.
 	getBounds: function() {
-		Utils.assert(Utils.isRect(this.bounds), 'this.bounds should be a rect');
 		return new Rect(this.bounds);
 	},
 	
@@ -182,7 +170,6 @@ this.Item.prototype = {
 	//   top - the new top coordinate relative to the window
 	//   immediately - if false or omitted, animates to the new position; otherwise goes there immediately
 	setPosition: function(left, top, immediately) {
-		Utils.assert(Utils.isRect(this.bounds), 'this.bounds');
 		this.setBounds(new Rect(left, top, this.bounds.width, this.bounds.height), immediately);
 	},
 	
@@ -192,13 +179,11 @@ this.Item.prototype = {
 	//   height - the new height in pixels
 	//   immediately - if false or omitted, animates to the new size; otherwise resizes immediately
 	setSize: function(width, height, immediately) {
-		Utils.assert(Utils.isRect(this.bounds), 'this.bounds');
 		this.setBounds(new Rect(this.bounds.left, this.bounds.top, width, height), immediately);
 	},
 	
 	// Remembers the current size as one the user has chosen.
 	setUserSize: function() {
-		Utils.assert(Utils.isRect(this.bounds), 'this.bounds');
 		this.userSize = new Point(this.bounds.width, this.bounds.height);
 		this.save();
 	},
@@ -467,8 +452,6 @@ this.Item.prototype = {
 	// Enables dragging on this item. Note: not to be called multiple times on the same item!
 	draggable: function() {
 		try {
-			Utils.assert(this.dragOptions, 'dragOptions');
-			
 			let cancelClasses = [];
 			if(typeof this.dragOptions.cancelClass == 'string') {
 				cancelClasses = this.dragOptions.cancelClass.split(' ');
@@ -530,7 +513,7 @@ this.Item.prototype = {
 				}
 				if(startSent) {
 					// drag events
-					let box = self.getBounds();
+					let box = this.getBounds();
 					box.left = startPos.x + (mouse.x - startMouse.x);
 					box.top = startPos.y + (mouse.y - startMouse.y);
 					this.setBounds(box, true);
@@ -590,7 +573,7 @@ this.Item.prototype = {
 			
 			// ___ mousedown
 			$container.mousedown((e) => {
-				if(!Utils.isLeftClick(e)) { return; }
+				if(e.button != 0) { return; }
 				
 				let cancel = false;
 				let $target = iQ(e.target);
@@ -613,7 +596,7 @@ this.Item.prototype = {
 				
 				droppables = [];
 				iQ('.iq-droppable').each(function(elem) {
-					if(elem != self.container) {
+					if(elem != this.container) {
 						let item = Items.item(elem);
 						droppables.push({
 							item: item,
@@ -630,7 +613,7 @@ this.Item.prototype = {
 			});
 		}
 		catch(ex) {
-			Utils.log(ex);
+			Cu.reportError(ex);
 		}
 	},
 	
@@ -639,14 +622,13 @@ this.Item.prototype = {
 		try {
 			let $container = iQ(this.container);
 			if(value) {
-				Utils.assert(this.dropOptions, 'dropOptions');
 				$container.addClass('iq-droppable');
 			} else {
 				$container.removeClass('iq-droppable');
 			}
 		}
 		catch(ex) {
-			Utils.log(ex);
+			Cu.reportError(ex);
 		}
 	},
 	
@@ -659,8 +641,6 @@ this.Item.prototype = {
 			if(!value) {
 				$container.removeClass('iq-resizable');
 			} else {
-				Utils.assert(this.resizeOptions, 'resizeOptions');
-				
 				$container.addClass('iq-resizable');
 				
 				let startMouse;
@@ -686,7 +666,7 @@ this.Item.prototype = {
 					}
 					box.height = Math.max(this.resizeOptions.minHeight || 0, startSize.y + (mouse.y - startMouse.y));
 					
-					if(self.resizeOptions.aspectRatio) {
+					if(this.resizeOptions.aspectRatio) {
 						if(startAspect < 1) {
 							box.height = box.width * startAspect;
 						} else {
@@ -697,7 +677,7 @@ this.Item.prototype = {
 					this.setBounds(box, true);
 					
 					if(typeof this.resizeOptions.resize == "function") {
-						this.resizeOptions.resize.apply(this, [e]);
+						this.resizeOptions.resize(e);
 					}
 					
 					e.preventDefault();
@@ -709,7 +689,7 @@ this.Item.prototype = {
 					iQ(gWindow).unbind('mousemove', handleMouseMove).unbind('mouseup', handleMouseUp);
 					
 					if(typeof this.resizeOptions.stop == "function") {
-						this.resizeOptions.stop.apply(self, [e]);
+						this.resizeOptions.stop(e);
 					}
 					
 					e.preventDefault();
@@ -721,14 +701,14 @@ this.Item.prototype = {
 					.addClass('iq-resizable-handle iq-resizable-se')
 					.appendTo($container)
 					.mousedown((e) => {
-						if(!Utils.isLeftClick(e)) { return; }
+						if(e.button != 0) { return; }
 						
 						startMouse = new Point(e.pageX, e.pageY);
 						startSize = this.getBounds().size();
 						startAspect = startSize.y / startSize.x;
 						
 						if(typeof this.resizeOptions.start == "function") {
-							this.resizeOptions.start.apply(this, [e]);						
+							this.resizeOptions.start(e);						
 						}
 						
 						iQ(gWindow).mousemove(handleMouseMove).mouseup(handleMouseUp);
@@ -739,18 +719,13 @@ this.Item.prototype = {
 			}
 		}
 		catch(ex) {
-			Utils.log(ex);
+			Cu.reportError(ex);
 		}
 	}
 };
 
 // Class: Items - Keeps track of all Items.
 this.Items = {
-	// Prints [Items] for debug use
-	toString: function() {
-		return "[Items]";
-	},
-	
 	// How far apart Items should be from each other and from bounds
 	defaultGutter: 15,
 	
