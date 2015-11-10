@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -655,19 +655,12 @@ this.TabItems = {
 	
 	// Called when a web page is painted.
 	receiveMessage: function(m) {
-		// +1 is for the ':' after objName
-		let name = m.name.substr(objName.length +1);
+		let index = gBrowser.browsers.indexOf(m.target);
+		if(index == -1) { return; }
 		
-		switch(name) {
-			case 'MozAfterPaint':
-				let index = gBrowser.browsers.indexOf(m.target);
-				if(index == -1) { break; }
-				
-				let tab = gBrowser.tabs[index];
-				if(!tab.pinned) {
-					this.update(tab);
-				}
-				break;
+		let tab = gBrowser.tabs[index];
+		if(!tab.pinned) {
+			this.update(tab);
 		}
 	},
 	

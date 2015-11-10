@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.Keys = { meta: false };
 
@@ -68,24 +68,17 @@ this.UI = {
 	
 	// Called when a web page is about to show a modal dialog.
 	receiveMessage: function(m) {
-		// +1 is for the ':' after objName
-		let name = m.name.substr(objName.length +1);
+		if(!this.isTabViewVisible()) { return; }
 		
-		switch(name) {
-			case 'DOMWillOpenModalDialog':
-				if(!this.isTabViewVisible()) { break; }
-				
-				let index = gBrowser.browsers.indexOf(m.target);
-				if(index == -1) { break; }
-				
-				let tab = gBrowser.tabs[index];
-				
-				// When TabView is visible, we need to call onTabSelect to make sure that TabView is hidden and that the correct group is activated.
-				// When a modal dialog is shown for currently selected tab the onTabSelect event handler is not called, so we need to do it.
-				if(tab.selected && this._currentTab == tab) {
-					this.onTabSelect(tab);
-				}
-				break;
+		let index = gBrowser.browsers.indexOf(m.target);
+		if(index == -1) { return; }
+		
+		let tab = gBrowser.tabs[index];
+		
+		// When TabView is visible, we need to call onTabSelect to make sure that TabView is hidden and that the correct group is activated.
+		// When a modal dialog is shown for currently selected tab the onTabSelect event handler is not called, so we need to do it.
+		if(tab.selected && this._currentTab == tab) {
+			this.onTabSelect(tab);
 		}
 	},
 	
