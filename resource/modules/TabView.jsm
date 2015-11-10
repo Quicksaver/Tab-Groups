@@ -1,8 +1,11 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
+this.__defineGetter__('gTaskbarTabGroup', function() { return window.gTaskbarTabGroup; });
 this.__defineGetter__('TabContextMenu', function() { return window.TabContextMenu; });
+	
+XPCOMUtils.defineLazyGetter(this, "AeroPeek", () => { return Cu.import("resource:///modules/WindowsPreviewPerTab.jsm", {}).AeroPeek; });
 
 this.TabView = {
 	_iframe: null,
@@ -129,6 +132,16 @@ this.TabView = {
 						break;
 				}
 				break;
+			
+			case 'tabviewshown':
+				gTaskbarTabGroup.enabled = false;
+				break;
+			
+			case 'tabviewhidden':
+				if(AeroPeek._prefenabled) {
+					gTaskbarTabGroup.enabled = true;
+				}
+				break;
 		}
 	},
 	
@@ -192,14 +205,33 @@ this.TabView = {
 			return tab;
 		});
 		
+		Piggyback.add('TabView', gBrowser, 'updateTitlebar', () => {
+			if(this.isVisible()) {
+				document.title = this.windowTitle;
+				return false;
+			}
+			return true;
+		}, Piggyback.MODE_BEFORE);
+		
+		if(gTaskbarTabGroup) {
+			Listeners.add(window, 'tabviewshown', this);
+			Listeners.add(window, 'tabviewhidden', this);
+		}
+		
 		this._initialized = true;
 	},
 	
 	uninit: function() {
 		if(!this._initialized) { return; }
 		
+		if(gTaskbarTabGroup) {
+			Listeners.remove(window, 'tabviewshown', this);
+			Listeners.remove(window, 'tabviewhidden', this);
+		}
+		
 		Piggyback.revert('TabView', window, 'WindowIsClosing');
 		Piggyback.revert('TabView', window, 'undoCloseTab');
+		Piggyback.revert('TabView', gBrowser, 'updateTitlebar');
 		
 		Listeners.remove(this.tooltip, "popupshowing", this, true);
 		Listeners.remove(this.tabMenuPopup, "popupshowing", this);
