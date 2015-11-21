@@ -1,4 +1,4 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 this.Storage = {
 	kVisibilityIdentifier: "tabview-visibility",
@@ -204,7 +204,7 @@ Modules.LOADMODULE = function() {
 		let url = "about:welcomeback";
 		let formdata = { id: { sessionData: state }, url };
 		return { windows: [ { tabs: [ { entries: [ { url } ], formdata } ] } ] };
-	}):
+	});
 };
 
 Modules.UNLOADMODULE = function() {

@@ -21,3 +21,14 @@
 #tabGroups-menu_tabview[groups="3"] {
 	-moz-image-region: rect(0, 64px, 16px, 48px);
 }
+
+/* tabview toolbar button */
+
+:-moz-any(toolbar, .widget-overflow-list) #tabGroups-tabview-button > .toolbarbutton-icon {
+	max-width: 18px;
+}
+
+:-moz-any(#TabsToolbar, #nav-bar) #tabGroups-tabview-button > .toolbarbutton-icon {
+	padding: 2px 6px;
+	max-width: 32px;
+}

@@ -31,6 +31,21 @@
 
 /* tabview toolbar button */
 
+:-moz-any(toolbar, .widget-overflow-list) #tabGroups-tabview-button > .toolbarbutton-icon {
+	max-width: 18px;
+}
+
+#nav-bar #tabGroups-tabview-button > .toolbarbutton-icon {
+	padding: 2px 6px;
+	max-width: 32px;
+}
+
+@media (-moz-os-version: windows-win10) {
+	#nav-bar #tabGroups-tabview-button > .toolbarbutton-icon {
+		padding: 4px 6px;
+	}
+}
+
 @media (-moz-windows-theme: luna-silver) and (max-resolution: 1dppx) {
 	#tabGroups-tabview-button {
 		list-style-image: url("chrome://tabgroups-os/skin/Toolbar-lunaSilver.png");

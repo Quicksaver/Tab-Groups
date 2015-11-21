@@ -34,6 +34,13 @@
 	-moz-image-region: rect(2px, 78px, 18px, 62px);
 }
 
+/* tabview toolbar button */
+
+:-moz-any(toolbar, .widget-overflow-list) #tabGroups-tabview-button > .toolbarbutton-icon {
+	max-width: 18px;
+	margin: 0;
+}
+
 /* tabview yosemite vibrancy background */
 @media (-moz-mac-yosemite-theme) {
 	#tabGroups-tab-view {

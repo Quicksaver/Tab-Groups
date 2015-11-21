@@ -38,8 +38,8 @@
 			defaultArea="TabsToolbar"
 			class="toolbarbutton-1 chromeclass-toolbar-additional"
 			label="&viewTabGroups.label;"
+			tooltiptext="&viewTabGroups.tooltip;"
 			command="objName:ToggleTabView"
-			tooltip="dynamic-shortcut-tooltip"
 			observes="objName-tabviewGroupsNumber"/>
 	</toolbarpalette>
 	
