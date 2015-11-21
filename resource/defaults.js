@@ -1,4 +1,4 @@
-// VERSION 1.3.3
+// VERSION 1.3.4
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -16,7 +16,10 @@ addonUris = {
 
 prefList = {
 	animate_zoom: true,
-	session_restore_enabled_once: false
+	session_restore_enabled_once: false,
+	
+	// for internal use
+	migratedWidget: false
 };
 
 paneList = [];
@@ -33,6 +36,7 @@ function stopAddon(window) {
 function onStartup(aReason) {
 	Modules.load('Utils');
 	Modules.load('Storage');
+	Modules.load('migrate');
 	
 	// Apply the add-on to every window opened and to be opened
 	Windows.callOnAll(startAddon, 'navigator:browser');
@@ -43,6 +47,7 @@ function onShutdown(aReason) {
 	// remove the add-on from all windows
 	Windows.callOnAll(stopAddon, null, null, true);
 	
+	Modules.unload('migrate');
 	Modules.unload('Storage');
 	Modules.unload('Utils');
 }
