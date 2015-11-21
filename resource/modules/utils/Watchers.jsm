@@ -1,4 +1,4 @@
-// VERSION 2.6.5
+// VERSION 2.6.6
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -25,6 +25,7 @@ Modules.BASEUTILS = true;
 //	prop - (string) name of the property or attribute being set or changed
 //	oldVal - the current value of prop
 //	newVal - the new value of prop
+//	lastCapture - for attribute watchers only, this will be (bool) true on the last attribute mutation in the list, during the capture phase
 // Note: deleting a watched property does not trigger the watchers, so don't do it! Set it to undefined instead if you wish to delete it after removing the watchers.
 this.Watchers = {
 	_obj: '_WATCHERS_'+this.objName,
@@ -57,7 +58,7 @@ this.Watchers = {
 				}
 				propHandler.handling = true;
 				
-				var oldVal = propHandler.value;
+				let oldVal = propHandler.value;
 				for(let h of propHandler.handlers) {
 					if(!h.capture) { continue; }
 					
@@ -231,7 +232,6 @@ this.Watchers = {
 					}
 					
 					if(oldValue === newValue) {
-						newValue = oldValue;
 						muts.splice(m, 1);
 						m--;
 						continue captureMutations_loop;
@@ -240,7 +240,7 @@ this.Watchers = {
 					for(let a of handlers) {
 						if(!a.capture) { continue; }
 						
-						if(Watchers.safeCallHandler(a.handler, 'attr', obj, attr, oldValue, newValue) === false) {
+						if(Watchers.safeCallHandler(a.handler, 'attr', obj, attr, oldValue, newValue, m == muts.length -1) === false) {
 							for(let n = m+1; n < muts.length; n++) {
 								if(muts[n].attributeName == attr) {
 									muts[n].realOldValue = oldValue;
@@ -279,6 +279,7 @@ this.Watchers = {
 						for(let a of handlers) {
 							if(a.capture) { continue; }
 							
+							let lastM = m == muts.length -1;
 							if(a.iterateAll) {
 								Watchers.safeCallHandler(a.handler, 'attr', obj, attr, oldValue, newValue);
 							}
@@ -305,12 +306,12 @@ this.Watchers = {
 		return true;
 	},
 	
-	safeCallHandler: function(handler, method, obj, prop, oldValue, newValue) {
+	safeCallHandler: function(handler, method, obj, prop, oldValue, newValue, lastCapture) {
 		try {
 			if(handler[method+'Watcher']) {
-				return handler[method+'Watcher'](obj, prop, oldValue, newValue);
+				return handler[method+'Watcher'](obj, prop, oldValue, newValue, lastCapture);
 			} else {
-				return handler(obj, prop, oldValue, newValue);
+				return handler(obj, prop, oldValue, newValue, lastCapture);
 			}
 		}
 		catch(ex) {

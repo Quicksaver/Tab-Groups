@@ -9,6 +9,7 @@ Modules.BASEUTILS = true;
 // Isohunt results, which have a lot of frames, can be a little more than as above.
 // Note: an alternative to this would be to crawl through all the childNodes of node and retrive text individually,
 // but I found from my tests that this would be almost 50x slower, probably more if taking into account node visibility, which I didn't test for.
+// Firefox 45 implements innerText at least, making this obsolete.
 this.innerText = function(node) {
 	try {
 		if(!node || !node.ownerDocument || !(node instanceof node.ownerDocument.defaultView.HTMLElement)) {
