@@ -1,4 +1,4 @@
-// VERSION 1.3.4
+// VERSION 1.3.5
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -19,7 +19,8 @@ prefList = {
 	session_restore_enabled_once: false,
 	
 	// for internal use
-	migratedWidget: false
+	migratedWidget: false,
+	migratedPrefs: false,
 };
 
 paneList = [];

@@ -1,6 +1,41 @@
-// VERSION 1.0.0
+// VERSION 1.1.0
 
 this.migrate = {
+	init: function() {
+		this.migratePrefs();
+	},
+	
+	migratePrefs: function() {
+		if(!Prefs.migratedPrefs) {
+			if(Services.prefs.prefHasUserValue('browser.panorama.animate_zoom')) {
+				Prefs.animate_zoom = Services.prefs.getBoolPref('browser.panorama.animate_zoom');
+			}
+			if(Services.prefs.prefHasUserValue('browser.panorama.session_restore_enabled_once')) {
+				Prefs.session_restore_enabled_once = Services.prefs.getBoolPref('browser.panorama.session_restore_enabled_once');
+			}
+			Prefs.migratedPrefs = true;
+		}
+	},
+	
+	// we need to wait until at least one window is finished loading, so that CustomizableUI knows what it's doing
+	migrateWidget: function() {
+		// try to place our widget in the same place where the native widget used to be
+		if(!Prefs.migratedWidget) {
+			for(let area of CustomizableUI.areas) {
+				try {
+					let ids = CustomizableUI.getWidgetIdsInArea(area);
+					let position = ids.indexOf("tabview-button");
+					if(position != -1) {
+						CustomizableUI.addWidgetToArea(objName+'-tabview-button', area, position);
+						break;
+					}
+				}
+				catch(ex) { Cu.reportError(ex); }
+			}
+			Prefs.migratedWidget = true;
+		}
+	},
+	
 	onLoad: function(aWindow) {
 		// we can use our add-on even in builds with Tab View still present, we just have to properly deinitialize it
 		if(aWindow.TabView) {
@@ -32,6 +67,8 @@ Modules.LOADMODULE = function() {
 	//if(Services.vc.compare(Services.appinfo.version, "45.0a1") < 0) {
 		Overlays.overlayURI('chrome://browser/content/browser.xul', 'migrate', migrate);
 	//}
+	
+	migrate.init();
 };
 
 Modules.UNLOADMODULE = function() {

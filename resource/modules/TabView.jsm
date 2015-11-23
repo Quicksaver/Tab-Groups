@@ -1,4 +1,4 @@
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -458,18 +458,7 @@ this.TabView = {
 	},
 	
 	onLoad: function() {
-		// try to place our widget in the same place where native widget used to be
-		if(!Prefs.migratedWidget) {
-			for(let area of CustomizableUI.areas) {
-				let ids = CustomizableUI.getWidgetIdsInArea(area);
-				let position = ids.indexOf("tabview-button");
-				if(position != -1) {
-					CustomizableUI.addWidgetToArea(objName+'-tabview-button', area, position);
-					break;
-				}
-			}
-			Prefs.migratedWidget = true;
-		}
+		migrate.migrateWidget();
 		
 		window.SessionStore.promiseInitialized.then(() => {
 			if(UNLOADED) { return; }
