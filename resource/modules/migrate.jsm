@@ -1,4 +1,4 @@
-// VERSION 1.2.0
+// VERSION 1.2.1
 
 this.migrate = {
 	migratorBackstage: null,
@@ -75,17 +75,28 @@ this.migrate = {
 				aWindow.gTaskbarTabGroup.win.removeEventListener("tabviewshown", aWindow.gTaskbarTabGroup);
 				aWindow.gTaskbarTabGroup.win.removeEventListener("tabviewhidden", aWindow.gTaskbarTabGroup);
 			}
+			
+			aWindow._TabView = aWindow.TabView;
 		}
+		
+		// compatibility shim, for other add-ons to interact with this object more closely to the original if needed
+		aWindow.TabView = aWindow[objName].TabView;
 	},
 	
 	onUnload: function(aWindow) {
-		if(aWindow.TabView) {
+		if(aWindow._TabView) {
+			aWindow.TabView = aWindow._TabView;
+			delete aWindow._TabView;
+			
 			aWindow.TabView.init();
 			
 			if(aWindow.gTaskbarTabGroup) {
 				aWindow.gTaskbarTabGroup.win.addEventListener("tabviewshown", aWindow.gTaskbarTabGroup);
 				aWindow.gTaskbarTabGroup.win.addEventListener("tabviewhidden", aWindow.gTaskbarTabGroup);
 			}
+		}
+		else {
+			delete aWindow.TabView;
 		}
 	}
 };
