@@ -1,8 +1,21 @@
-// VERSION 1.1.0
+// VERSION 1.2.0
 
 this.migrate = {
+	migratorBackstage: null,
+	
 	init: function() {
 		this.migratePrefs();
+		
+		if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
+			this.skipTabGroupsMigrator();
+		}
+	},
+	
+	uninit: function() {
+		if(this.migratorBackstage) {
+			this.migratorBackstage.TabGroupsMigrator = this.migratorBackstage._TabGroupsMigrator;
+			delete this.migratorBackstage._TabGroupsMigrator;
+		}
 	},
 	
 	migratePrefs: function() {
@@ -34,6 +47,22 @@ this.migrate = {
 			}
 			Prefs.migratedWidget = true;
 		}
+	},
+	
+	skipTabGroupsMigrator: function() {
+		try {
+			this.migratorBackstage = Cu.import("resource:///modules/TabGroupsMigrator.jsm", {});
+		}
+		catch(ex) {
+			// this will fail until bug 1221050 lands
+			return;
+		}
+		
+		this.migratorBackstage._TabGroupsMigrator = this.migratorBackstage.TabGroupsMigrator;
+		this.migratorBackstage.TabGroupsMigrator = {
+			// no-op the migration, we'll just keep using the same data in the add-on anyway
+			migrate: function() {}
+		};
 	},
 	
 	onLoad: function(aWindow) {
@@ -72,5 +101,7 @@ Modules.LOADMODULE = function() {
 };
 
 Modules.UNLOADMODULE = function() {
+	migrate.uninit();
+	
 	Overlays.removeOverlayURI('chrome://browser/content/browser.xul', 'migrate');
 };
