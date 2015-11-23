@@ -1,4 +1,4 @@
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 this.Keys = { meta: false };
 
@@ -441,8 +441,6 @@ this.UI = {
 	// Hides TabView and shows the main browser UI.
 	hideTabView: function() {
 		if(!this.isTabViewVisible() || this._isChangingVisibility) { return; }
-		
-		iQ(".banner").remove();
 		
 		// another tab might be select if user decides to stay on a page when a onclose confirmation prompts.
 		GroupItems.removeHiddenGroups();
