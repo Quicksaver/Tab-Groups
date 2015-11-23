@@ -1,11 +1,11 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
-this.__defineGetter__('gTabView', function() { return gWindow.tabGroups.TabView; });
-this.__defineGetter__('gTabViewDeck', function() { return gWindow.tabGroups.gTabViewDeck; });
-this.__defineGetter__('gBrowserPanel', function() { return gWindow.tabGroups.$("browser-panel"); });
-this.__defineGetter__('gTabViewFrame', function() { return gWindow.tabGroups._iframe; });
+this.__defineGetter__('gTabView', function() { return gWindow[objName].TabView; });
+this.__defineGetter__('gTabViewDeck', function() { return gWindow[objName].gTabViewDeck; });
+this.__defineGetter__('gBrowserPanel', function() { return gWindow[objName].$("browser-panel"); });
+this.__defineGetter__('gTabViewFrame', function() { return gTabView._iframe; });
 
 this.TabView = {
 	_browserBundle: null,

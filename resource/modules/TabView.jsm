@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -32,16 +32,16 @@ this.TabView = {
 	
 	handleEvent: function(e) {
 		switch(e.type) {
-			case 'load':
-				Listeners.remove(this._frame, 'load', this);
-				Listeners.add(window, "tabviewframeinitialized", this);
+			case 'DOMContentLoaded':
+				Listeners.remove(this._iframe, 'DOMContentLoaded', this);
+				Listeners.add(this._iframe.contentWindow, "tabviewframeinitialized", this);
 				
-				prepareObject(this._window);
-				this._window[objName].Modules.load('TabView-frame');
+				prepareObject(this._iframe.contentWindow);
+				this._iframe.contentWindow[objName].Modules.load('TabView-frame');
 				break;
 				
 			case 'tabviewframeinitialized':
-				Listeners.remove(window, 'tabviewframeinitialized', this);
+				Listeners.remove(this._iframe.contentWindow, 'tabviewframeinitialized', this);
 				
 				this._isFrameLoading = false;
 				this._window = this._iframe.contentWindow;
@@ -67,7 +67,7 @@ this.TabView = {
 					e.preventDefault();
 					
 					this._initFrame(() => {
-						let groupItems = this._window.GroupItems;
+						let groupItems = this._window[objName].GroupItems;
 						let tabItem = groupItems.getNextGroupItemTab(e.shiftKey);
 						if(!tabItem) { return; }
 						
@@ -85,10 +85,10 @@ this.TabView = {
 				// if a tab is changed from hidden to unhidden and the iframe is not initialized, load the iframe and setup the tab.
 				if(!this._window) {
 					this._initFrame(() => {
-						this._window.UI.onTabSelect(gBrowser.selectedTab);
+						this._window[objName].UI.onTabSelect(gBrowser.selectedTab);
 						if(this._closedLastVisibleTabBeforeFrameInitialized) {
 							this._closedLastVisibleTabBeforeFrameInitialized = false;
-							this._window.UI.showTabView(false);
+							this._window[objName].UI.showTabView(false);
 						}
 					});
 				}
@@ -239,9 +239,9 @@ this.TabView = {
 		Listeners.remove(gBrowser.tabContainer, "TabShow", this);
 		Listeners.remove(gBrowser.tabContainer, "TabClose", this);
 		Listeners.remove(window, "SSWindowStateReady", this);
-		Listeners.remove(window, "tabviewframeinitialized", this);
+		Listeners.remove(this._window, "tabviewframeinitialized", this);
 		Listeners.remove(window, "keypress", this);
-		Listeners.remove(this._frame, "load", this);
+		Listeners.remove(this._iframe, "DOMContentLoaded", this);
 		
 		this._initialized = false;
 		
@@ -285,9 +285,9 @@ this.TabView = {
 		this._iframe.setAttribute("tooltip", this.kTooltipId);
 		this._iframe.flex = 1;
 		
-		Listeners.add(this._frame, "load", this);
+		Listeners.add(this._iframe, "DOMContentLoaded", this);
 		
-		this._iframe.setAttribute("src", "chrome://browser/content/tabview.xhtml");
+		this._iframe.setAttribute("src", "chrome://"+objPathString+"/content/tabview.xhtml");
 		this._deck.appendChild(this._iframe);
 	},
 	
@@ -299,14 +299,16 @@ this.TabView = {
 		if(this.isVisible()) { return; }
 		
 		this._initFrame(() => {
-			this._window.UI.showTabView(true);
+			this._window[objName].UI.showTabView(true);
 		});
 	},
 	
 	hide: function() {
 		if(this.isVisible() && this._window) {
-			this._window.UI.exit();
+			this._window[objName].UI.exit();
+			return true;
 		}
+		return false;
 	},
 	
 	toggle: function() {
@@ -325,13 +327,15 @@ this.TabView = {
 		let separator = $(objName+"-context_tabViewNamedGroups");
 		let isEmpty = true;
 		
-		while(popup.firstChild && popup.firstChild != separator) {
-			popup.removeChild(popup.firstChild);
-		}
+		// empty the menu immediately so old and invalid entries aren't shown
+		this.emptyContextMenu(popup, separator);
 		
 		this._initFrame(() => {
+			// empty the menu again because sometimes this is called twice (on first open, don't know why though), leading to double entries
+			this.emptyContextMenu(popup, separator);
+			
 			let activeGroup = tab._tabViewTabItem.parent;
-			let groupItems = this._window.GroupItems.groupItems;
+			let groupItems = this._window[objName].GroupItems.groupItems;
 			
 			groupItems.forEach((groupItem) => {
 				// if group has title, it's not hidden and there is no active group or the active group id doesn't match the group id,
@@ -346,6 +350,12 @@ this.TabView = {
 			});
 			separator.hidden = isEmpty;
 		});
+	},
+	
+	emptyContextMenu: function(popup, separator) {
+		while(popup.firstChild && popup.firstChild != separator) {
+			popup.firstChild.remove();
+		}
 	},
 	
 	_createGroupMenuItem: function(groupItem) {
@@ -370,7 +380,7 @@ this.TabView = {
 		menuItem.setAttribute("class", "tabview-menuitem");
 		
 		menuItem.handleEvent = (e) => {
-			this.moveTabTo(TabContextMenu.contextTab, "'" + groupItem.id + "'");
+			this.moveTabTo(TabContextMenu.contextTab, groupItem.id);
 		};
 		menuItem.addEventListener("command", menuItem);
 		
@@ -379,14 +389,14 @@ this.TabView = {
 	
 	moveTabTo: function(tab, groupItemId) {
 		this._initFrame(() => {
-			this._window.GroupItems.moveTabToGroupItem(tab, groupItemId);
+			this._window[objName].GroupItems.moveTabToGroupItem(tab, groupItemId);
 		});
 	},
 	
 	// Prepares the tab view for undo close tab.
 	prepareUndoCloseTab: function(blankTabToRemove) {
 		if(this._window) {
-			this._window.UI.restoredClosedTab = true;
+			this._window[objName].UI.restoredClosedTab = true;
 			
 			if(blankTabToRemove && blankTabToRemove._tabViewTabItem) {
 				blankTabToRemove._tabViewTabItem.isRemovedAfterRestore = true;
@@ -397,7 +407,7 @@ this.TabView = {
 	// Cleans up the tab view after undo close tab.
 	afterUndoCloseTab: function() {
 		if(this._window) {
-			this._window.UI.restoredClosedTab = false;
+			this._window[objName].UI.restoredClosedTab = false;
 		}
 	},
 	
@@ -420,7 +430,7 @@ this.TabView = {
 			Prefs.page = 3;
 			
 			// show banner
-			this._window.UI.notifySessionRestoreEnabled();
+			this._window[objName].UI.notifySessionRestoreEnabled();
 		}
 	},
 	
@@ -461,15 +471,15 @@ this.TabView = {
 			Prefs.migratedWidget = true;
 		}
 		
-		window.SessionStore.promiseInitialized.then(function() {
+		window.SessionStore.promiseInitialized.then(() => {
 			if(UNLOADED) { return; }
 			
-			TabView.init();
+			this.init();
 		});
 	},
 	
 	onUnload: function() {
-		TabView.uninit();
+		this.uninit();
 	}
 };
 

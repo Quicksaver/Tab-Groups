@@ -1,4 +1,4 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -280,7 +280,7 @@ this.Subscribable.prototype = {
 		if(!this.subscribers.has(eventName)) { return; }
 		
 		let subscribers = this.subscribers.get(eventName);
-		subscribers.delete(index);
+		subscribers.delete(callback);
 	},
 	
 	// Internal routine. Used by the Subscribable to fire events.

@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 this.Keys = { meta: false };
 
@@ -133,7 +133,7 @@ this.UI = {
 				if(iQ(":focus").length > 0) {
 					iQ(":focus").each(function(element) {
 						// don't fire blur event if the same input element is clicked.
-						if(e.target != element && element.nodeName == "INPUT") {
+						if(e.target != element && element.nodeName == "input") {
 							element.blur();
 						}
 					});
@@ -153,10 +153,6 @@ this.UI = {
 				let opts = { immediately: true, bounds: box };
 				let groupItem = new GroupItem([], opts);
 				groupItem.newTab();
-			});
-			
-			iQ(window).bind("unload", () => {
-				this.uninit();
 			});
 			
 			Messenger.listenWindow(gWindow, "DOMWillOpenModalDialog", this);
@@ -194,7 +190,7 @@ this.UI = {
 				this._resize();
 			});
 			
-			gWindow.addEventListener("SSWindowClosing", this);
+			Listeners.add(gWindow, "SSWindowClosing", this);
 			
 			// ___ load frame script
 			Messenger.loadInWindow(gWindow, 'TabView');
@@ -204,9 +200,7 @@ this.UI = {
 			this._save();
 			
 			// fire an iframe initialized event so everyone knows tab view is initialized.
-			let event = document.createEvent("Events");
-			event.initEvent("tabviewframeinitialized", true, false);
-			dispatchEvent(event);
+			dispatch(window, { type: "tabviewframeinitialized", cancelable: false });
 		}
 		catch(ex) {
 			Cu.reportError(ex);
@@ -284,7 +278,7 @@ this.UI = {
 	},
 	
 	// Blurs any currently focused element
-	blurAll: function UI_blurAll() {
+	blurAll: function() {
 		iQ(":focus").each(function(element) {
 			element.blur();
 		});
@@ -403,9 +397,6 @@ this.UI = {
 		if(DARWIN) {
 			this.setTitlebarColors(true);
 		}
-		let event = document.createEvent("Events");
-		event.initEvent("tabviewshown", true, false);
-		
 		Storage.saveVisibilityData(gWindow, "true");
 		
 		if(zoomOut && currentTab && currentTab._tabViewTabItem) {
@@ -424,7 +415,7 @@ this.UI = {
 				
 				this._resize(true);
 				this._isChangingVisibility = false;
-				dispatchEvent(event);
+				dispatch(window, { type: "tabviewshown", cancelable: false });
 				
 				// Flush pending updates
 				GroupItems.flushAppTabUpdates();
@@ -436,7 +427,7 @@ this.UI = {
 				this.clearActiveTab();
 			}
 			this._isChangingVisibility = false;
-			dispatchEvent(event);
+			dispatch(window, { type: "tabviewshown", cancelable: false });
 			
 			// Flush pending updates
 			GroupItems.flushAppTabUpdates();
@@ -480,9 +471,7 @@ this.UI = {
 		
 		this._isChangingVisibility = false;
 		
-		let event = document.createEvent("Events");
-		event.initEvent("tabviewhidden", true, false);
-		dispatchEvent(event);
+		dispatch(window, { type: "tabviewhidden", cancelable: false });
 	},
 	
 	// Used on the Mac to make the title bar match the gradient in the rest of the TabView UI.
@@ -846,7 +835,7 @@ this.UI = {
 				Keys.meta = true;
 			}
 			
-			let processBrowserKeys = function(e) {
+			let processBrowserKeys = (e) => {
 				// let any keys with alt to pass through
 				if(e.altKey) { return; }
 				
@@ -856,7 +845,7 @@ this.UI = {
 						// when a user presses ctrl+shift+key, upper case letter charCode is passed to processBrowserKeys() so converting back to lower 
 						// case charCode before doing the check
 						let lowercaseCharCode = String.fromCharCode(e.charCode).toLocaleLowerCase().charCodeAt(0);
-						if(lowercaseCharCode in this._browserKeysWithShift) {
+						if(this._browserKeysWithShift.lowercaseCharCode !== undefined) {
 							let key = this._browserKeysWithShift[lowercaseCharCode];
 							if(key == "tabview") {
 								this.exit();
@@ -878,7 +867,9 @@ this.UI = {
 					}
 				}
 			};
-			if((iQ(":focus").length > 0 && iQ(":focus")[0].nodeName == "INPUT") || Search.isEnabled() || this.ignoreKeypressForSearch) {
+			
+			let focused = iQ(":focus");
+			if((focused.length && focused[0].nodeName == "input") || Search.isEnabled() || this.ignoreKeypressForSearch) {
 				this.ignoreKeypressForSearch = false;
 				processBrowserKeys(e);
 				return;
@@ -1165,7 +1156,7 @@ this.UI = {
 		if(newPageBounds.width < this._pageBounds.width && newPageBounds.width > itemBounds.width) {
 			newPageBounds.width = this._pageBounds.width;
 		}
-		if(newPageBounds.height < this._pageBounds.height && newPageBounds.height > itemBounds.height)
+		if(newPageBounds.height < this._pageBounds.height && newPageBounds.height > itemBounds.height) {
 			newPageBounds.height = this._pageBounds.height;
 		}
 		
@@ -1246,7 +1237,7 @@ this.UI = {
 	},
 	
 	// Exits TabView UI.
-	exit: function UI_exit() {
+	exit: function() {
 		let zoomedIn = false;
 		
 		if(Search.isEnabled()) {
@@ -1349,7 +1340,7 @@ this.UI = {
 	
 	// Notify the user that session restore has been automatically enabled by showing a banner that expects no user interaction. It fades out after some seconds.
 	notifySessionRestoreEnabled: function() {
-		let brandBundle = gWindow.tabGroups.$("bundle_brand");
+		let brandBundle = gWindow[objName].$("bundle_brand");
 		let brandShortName = brandBundle.getString("brandShortName");
 		let notificationText = Strings.get('TabView', 'notificationSessionStore', [ [ '$app', brandShortName ] ]);
 		

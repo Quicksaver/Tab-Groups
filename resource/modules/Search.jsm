@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -329,7 +329,7 @@ this.Search = {
 		}
 		
 		// If we are already in an input field, allow typing as normal.
-		if(e.target.nodeName == "INPUT") { return; }
+		if(e.target.nodeName == "input") { return; }
 		
 		// / is used to activate the search feature so the key shouldn't be entered into the search box.
 		if(e.keyCode == e.DOM_VK_SLASH) {
@@ -426,9 +426,7 @@ this.Search = {
 		UI.blurAll();
 		gTabViewFrame.contentWindow.focus();
 		
-		let newEvent = document.createEvent("Events");
-		newEvent.initEvent("tabviewsearchdisabled", false, false);
-		dispatchEvent(newEvent);
+		dispatch(window, { type: "tabviewsearchdisabled", cancelable: false, bubbles: false });
 	},
 	
 	// Performs a search.
@@ -452,13 +450,6 @@ this.Search = {
 		let $searchbox = iQ("#searchbox");
 		iQ("#searchbutton").css({ opacity: 1 });
 		
-		// NOTE: when this function is called by keydown handler, next keypress event or composition events of IME will be fired on the focused editor.
-		let dispatchTabViewSearchEnabledEvent = function() {
-			let newEvent = document.createEvent("Events");
-			newEvent.initEvent("tabviewsearchenabled", false, false);
-			dispatchEvent(newEvent);
-		};
-		
 		if(!this.isEnabled()) {
 			$searchShade.show();
 			$search.show();
@@ -470,12 +461,12 @@ this.Search = {
 			if(activatedByKeypress) {
 				// set the focus so key strokes are entered into the textbox.
 				$searchbox[0].focus();
-				dispatchTabViewSearchEnabledEvent();
+				dispatch(window, { type: "tabviewsearchenabled", cancelable: false, bubbles: false });
 			} else {
 				// marshal the focusing, otherwise it ends up with searchbox[0].focus gets called before the search button gets the focus after being pressed.
 				aSync(function() {
 					$searchbox[0].focus();
-					dispatchTabViewSearchEnabledEvent();
+					dispatch(window, { type: "tabviewsearchenabled", cancelable: false, bubbles: false });
 				}, 0);
 			}
 		}

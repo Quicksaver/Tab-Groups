@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 // Class: Trench - Class for drag-snapping regions; called "trenches" as they are long and narrow.
 // Parameters:
@@ -134,15 +134,15 @@ this.Trench.prototype = {
 					this.setPosition(rect.left - this.gutter, range);
 					break;
 				
-				case "right"
+				case "right":
 					this.setPosition(rect.right + this.gutter, range);
 					break;
 				
-				case "top"
+				case "top":
 					this.setPosition(rect.top - this.gutter, range);
 					break;
 				
-				case "bottom"
+				case "bottom":
 					this.setPosition(rect.bottom + this.gutter, range);
 					break;
 			}
@@ -150,19 +150,19 @@ this.Trench.prototype = {
 		else if(this.type == "guide") {
 			// guide trenches have no range, but do have a minRange.
 			switch(this.edge) {
-				case "left"
+				case "left":
 					this.setPosition(rect.left, false, range);
 					break;
 				
-				case "right"
+				case "right":
 					this.setPosition(rect.right, false, range);
 					break;
 				
-				case "top"
+				case "top":
 					this.setPosition(rect.top, false, range);
 					break;
 				
-				case "bottom"
+				case "bottom":
 					this.setPosition(rect.bottom, false, range);
 					break;
 			}
@@ -206,7 +206,7 @@ this.Trench.prototype = {
 				.addClass(this.type) // border or guide
 				.css({ id: 'activeVisibleTrench'+this.id });
 		}
-		çet activeVisibleTrench = this.dom.activeVisibleTrench;
+		let activeVisibleTrench = this.dom.activeVisibleTrench;
 		
 		if(this.active) {
 			activeVisibleTrench.addClass('activeTrench');
@@ -250,22 +250,22 @@ this.Trench.prototype = {
 		let edgeToCheck;
 		if(this.type == "border") {
 			switch(this.edge) {
-				case "left"
+				case "left":
 					edgeToCheck = "right";
 					break;
 				
-				case "right"
+				case "right":
 					edgeToCheck = "left";
 					break;
 				
-				case "top"
+				case "top":
 					edgeToCheck = "bottom";
 					break;
 				
-				case "bottom"
+				case "bottom":
 					edgeToCheck = "top";
 					break;
-				
+			}
 		} else {
 			// if trench type is guide or barrier...
 			edgeToCheck = this.edge;
@@ -374,7 +374,7 @@ this.Trench.prototype = {
 		if(this.type != 'guide') { return; }
 		
 		let groupItems = GroupItems.groupItems;
-		groupItems.forEach((groupItem) {
+		groupItems.forEach((groupItem) => {
 			// floating groupItems don't block trenches
 			if(groupItem.isDragging) { return; }
 			

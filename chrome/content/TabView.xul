@@ -35,6 +35,7 @@
 	
 	<toolbarpalette id="BrowserToolbarPalette">
 		<toolbarbutton id="objName-tabview-button"
+			type="custom"
 			defaultArea="TabsToolbar"
 			class="toolbarbutton-1 chromeclass-toolbar-additional"
 			label="&viewTabGroups.label;"

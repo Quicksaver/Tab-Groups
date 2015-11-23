@@ -1,9 +1,11 @@
-// VERSION 1.5.3
+// VERSION 1.5.4
 Modules.UTILS = true;
 
 // Messenger - 	Aid object to communicate with browser content scripts (e10s).
 //		Important: this loads the defaults.js file into every browser window, so make sure that everything in it is wrapped in their own methods,
 //		or that at least it won't fail when loaded like this.
+// messageName(aMessage) - to ensure that all receivers respond to messages that come only from this add-on
+//	aMessage - (message object) will return the message name stripped off the add-on's identifier; or (string) returns with the add-on identifier appended
 // messageBrowser(aBrowser, aMessage, aData, aCPOW) - sends a message to content scripts of a browser
 //	aBrowser - (xul element) the browser element to send the message to
 //	aMessage - (string) message to send, will be sent as objName-aMessage
@@ -48,52 +50,72 @@ this.Messenger = {
 	
 	globalMM: Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager),
 	
+	messageName: function(aMessage) {
+		// when supplying a message object, we want to strip it of this add-on's unique identifier to get only the actual message
+		if(aMessage.name) {
+			if(aMessage.name.startsWith(objName+':')) {
+				// +1 is for the ':' after objName
+				return aMessage.name.substr(objName.length +1);
+			}
+			
+			return aMessage.name;
+		}
+		
+		// if supplying a string, we make sure it is appended with this add-on's unique identifier
+		if(!aMessage.startsWith(objName+':')) {
+			return objName+':'+aMessage;
+		}
+		
+		// nothing to do, return as is
+		return aMessage;
+	},
+	
 	messageBrowser: function(aBrowser, aMessage, aData, aCPOW) {
 		if(!aBrowser || !aBrowser.messageManager) { return; }
 		
-		aBrowser.messageManager.sendAsyncMessage(objName+':'+aMessage, aData, aCPOW);
+		aBrowser.messageManager.sendAsyncMessage(this.messageName(aMessage), aData, aCPOW);
 	},
 	
 	messageWindow: function(aWindow, aMessage, aData, aCPOW) {
 		if(!aWindow || !aWindow.messageManager) { return; }
 		
-		aWindow.messageManager.broadcastAsyncMessage(objName+':'+aMessage, aData, aCPOW);
+		aWindow.messageManager.broadcastAsyncMessage(this.messageName(aMessage), aData, aCPOW);
 	},
 	
 	messageAll: function(aMessage, aData, aCPOW) {
-		this.globalMM.broadcastAsyncMessage(objName+':'+aMessage, aData, aCPOW);
+		this.globalMM.broadcastAsyncMessage(this.messageName(aMessage), aData, aCPOW);
 	},
 	
 	listenBrowser: function(aBrowser, aMessage, aListener) {
 		if(!aBrowser || !aBrowser.messageManager) { return; }
 		
-		aBrowser.messageManager.addMessageListener(objName+':'+aMessage, aListener);
+		aBrowser.messageManager.addMessageListener(this.messageName(aMessage), aListener);
 	},
 	
 	unlistenBrowser: function(aBrowser, aMessage, aListener) {
 		if(!aBrowser || !aBrowser.messageManager) { return; }
 		
-		aBrowser.messageManager.removeMessageListener(objName+':'+aMessage, aListener);
+		aBrowser.messageManager.removeMessageListener(this.messageName(aMessage), aListener);
 	},
 	
 	listenWindow: function(aWindow, aMessage, aListener) {
 		if(!aWindow || !aWindow.messageManager) { return; }
 		
-		aWindow.messageManager.addMessageListener(objName+':'+aMessage, aListener);
+		aWindow.messageManager.addMessageListener(this.messageName(aMessage), aListener);
 	},
 	
 	unlistenWindow: function(aWindow, aMessage, aListener) {
 		if(!aWindow || !aWindow.messageManager) { return; }
 		
-		aWindow.messageManager.removeMessageListener(objName+':'+aMessage, aListener);
+		aWindow.messageManager.removeMessageListener(this.messageName(aMessage), aListener);
 	},
 	
 	listenAll: function(aMessage, aListener) {
-		this.globalMM.addMessageListener(objName+':'+aMessage, aListener);
+		this.globalMM.addMessageListener(this.messageName(aMessage), aListener);
 	},
 	
 	unlistenAll: function(aMessage, aListener) {
-		this.globalMM.removeMessageListener(objName+':'+aMessage, aListener);
+		this.globalMM.removeMessageListener(this.messageName(aMessage), aListener);
 	},
 	
 	loadInBrowser: function(aBrowser, aModule) {

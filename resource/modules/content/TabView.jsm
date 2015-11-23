@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.TabView = {
 	handleEvent: function(e) {
@@ -23,7 +23,9 @@ this.TabView = {
 	},
 	
 	receiveMessage: function(m) {
-		switch(m.name) {
+		let name = messageName(m);
+		
+		switch(name) {
 			// Checks if the currently active document is loaded.
 			case 'isDocumentLoaded':
 				let isLoaded = (content && document.readyState != "uninitialized" && !WebProgress.nsI.isLoadingDocument);

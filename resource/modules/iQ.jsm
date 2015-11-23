@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 // Returns an iQClass object which represents an individual element or a group of elements. It works pretty much like jQuery(), with a few exceptions,
 // most notably that you can't use strings with complex html, just simple tags like '<div>'.
@@ -544,7 +544,7 @@ this.iQClass.prototype = {
 				continue;
 			}
 			
-			Object.keys(elem.iQEventData).forEach(function (type) {
+			Object.keys(elem.iQEventData).forEach(function(type) {
 				while(elem.iQEventData && elem.iQEventData[type]) {
 					this.unbind(type, elem.iQEventData[type][0].original);
 				}

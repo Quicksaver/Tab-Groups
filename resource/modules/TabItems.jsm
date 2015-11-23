@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -64,13 +64,13 @@ this.TabItem = function(tab, options) {
 	this.draggable();
 	
 	// ___ more div setup
-	$div.mousedown(function(e) {
+	$div.mousedown((e) => {
 		if(e.button != 2) {
 			this.lastMouseDownTarget = e.target;
 		}
 	});
 	
-	$div.mouseup(function(e) {
+	$div.mouseup((e) => {
 		let same = (e.target == this.lastMouseDownTarget);
 		this.lastMouseDownTarget = null;
 		if(!same) { return; }
@@ -98,7 +98,7 @@ this.TabItem = function(tab, options) {
 	}
 };
 
-this.TabItem.prototype = Utils.extend(new Item(), new Subscribable(), {
+this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subscribable(), {
 	// Repaints the thumbnail with the given resolution, and forces it to stay that resolution until unforceCanvasSize is called.
 	forceCanvasSize: function(w, h) {
 		this.canvasSizeForced = true;
@@ -513,7 +513,8 @@ this.TabItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 	// Parameters:
 	//   complete - a function to call after the zoom down animation
 	zoomOut: function(complete) {
-		let $tab = this.$container, $canvas = this.$canvas;
+		let $tab = this.$container;
+		let $canvas = this.$canvas;
 		
 		let onZoomDone = function() {
 			$tab.removeClass("front");
@@ -629,16 +630,14 @@ this.TabItems = {
 	_maxTimeForUpdating: 200, // milliseconds that consecutive updates can take
 	_lastUpdateTime: Date.now(),
 	_eventListeners: [],
-	_pauseUpdateForTest: false,
 	_reconnectingPaused: false,
 	tabItemPadding: {},
 	
 	// Called when a web page is painted.
 	receiveMessage: function(m) {
-		let index = gBrowser.browsers.indexOf(m.target);
-		if(index == -1) { return; }
+		let tab = gBrowser.getTabForBrowser(m.target);
+		if(!tab) { return; }
 		
-		let tab = gBrowser.tabs[index];
 		if(!tab.pinned) {
 			this.update(tab);
 		}
@@ -736,11 +735,34 @@ this.TabItems = {
 		
 		let div = document.createElement("div");
 		div.classList.add("tab");
-		div.innerHTML = "<div class='thumb'>\
-			<img class='cached-thumb' style='display:none'/><canvas moz-opaque/></div>\
-			<div class='favicon'><img/></div>\
-			<span class='tab-title'>&nbsp;</span>\
-			<div class='close'></div>";
+		
+		let thumb = document.createElement("div");
+		thumb.classList.add('thumb');
+		div.appendChild(thumb);
+		
+		let img = document.createElement('img');
+		img.classList.add('cached-thumb');
+		img.style.display = 'none';
+		thumb.appendChild(img);
+		
+		let canvas = document.createElement('canvas');
+		canvas.setAttribute('moz-opaque', '');
+		thumb.appendChild(canvas);
+		
+		let favicon = document.createElement('div');
+		favicon.classList.add('favicon');
+		favicon.appendChild(document.createElement('img'));
+		div.appendChild(favicon);
+		
+		let span = document.createElement('span');
+		span.classList.add('tab-title');
+		span.textContent = ' ';
+		div.appendChild(span);
+		
+		let close = document.createElement('div');
+		close.classList.add('close');
+		div.appendChild(close);
+		
 		this._fragment = document.createDocumentFragment();
 		this._fragment.appendChild(div);
 		
@@ -793,8 +815,6 @@ this.TabItems = {
 	//   force - true to always update the tab item even if it's incomplete
 	_update: function(tab, options) {
 		try {
-			if(this._pauseUpdateForTest) { return; }
-			
 			// ___ get the TabItem
 			let tabItem = tab._tabViewTabItem;
 			
@@ -869,7 +889,7 @@ this.TabItems = {
 			// note that it's ok to unlink an app tab; see .handleTabUnpin
 			
 			this.unregister(tab._tabViewTabItem);
-			tab._tabViewTabItem._sendToSubscribers("close");
+			tab._tabViewTabItem._sendToSubscribers("close", tab._tabViewTabItem);
 			tab._tabViewTabItem.$container.remove();
 			tab._tabViewTabItem.removeTrenches();
 			Items.unsquish(null, tab._tabViewTabItem);

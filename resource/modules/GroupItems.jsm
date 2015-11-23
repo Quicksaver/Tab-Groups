@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -225,7 +225,7 @@ this.GroupItem = function(listOfEls, options) {
 	GroupItems.updateGroupCloseButtons();
 };
 
-this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
+this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subscribable(), {
 	// The prompt text for the title field.
 	defaultName: Strings.get("TabView", "groupItemDefaultName"),
 	
@@ -565,13 +565,14 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 				iQ(child.container).hide();
 			});
 			
-			iQ(this.container).animate({
+			let container = iQ(this.container);
+			container.animate({
 				opacity: 0,
 				"transform": "scale(.3)",
 			}, {
 				duration: 170,
 				complete: function() {
-					iQ(this).hide();
+					container.hide();
 				}
 			});
 			
@@ -1154,7 +1155,7 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 			// we don't need to observe mouse movement when expanded because the tray is closed when we leave it and collapse causes unfreezing
 			if(!this.expanded) {
 				// unfreeze item size when cursor is moved out of group bounds
-				data.onMouseMove = function (e) {
+				data.onMouseMove = (e) => {
 					let cursor = new Point(e.pageX, e.pageY);
 					if(!this.bounds.contains(cursor)) {
 						this._unfreezeItemSize();
@@ -1356,7 +1357,7 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 		
 		this._columns = columns;
 		let index = 0;
-		childrenToArrange.forEach(function(child, i) {
+		childrenToArrange.forEach((child, i) => {
 			// If dropIndex spacing is active and this is a child after index, bump it up one so we actually use the correct rect (and skip one for the dropPos)
 			if(this._dropSpaceActive && index === dropIndex) {
 				index++;
@@ -1422,7 +1423,7 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 			}, {
 				duration: 200,
 				easing: "tabviewBounce",
-				complete: function() => {
+				complete: () => {
 					this._sendToSubscribers("expanded");
 				}
 			})
@@ -1514,7 +1515,7 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 				lastMouseDownTarget = null;
 			}
 		});
-		container.mouseup(function(e) {
+		container.mouseup((e) => {
 			let same = (e.target == lastMouseDownTarget);
 			lastMouseDownTarget = null;
 			
@@ -1541,8 +1542,7 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 		// When the _dropSpaceActive flag is turned on on a group, and a tab is dragged on top, a space will open up.
 		this._dropSpaceActive = false;
 		
-		let that = this.dropOptions;
-		this.dropOptions.over = function(event) {
+		this.dropOptions.over = (event) => {
 			iQ(this.container).addClass("acceptsDrop");
 		};
 		this.dropOptions.move = (event) => {
@@ -1550,14 +1550,14 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 			let dropPos = drag.info.item.getBounds().center();
 			let options = {
 				dropPos: dropPos,
-				addTab: that._dropSpaceActive && drag.info.item.parent != this,
+				addTab: this._dropSpaceActive && drag.info.item.parent != this,
 				oldDropIndex: oldDropIndex
 			};
-			let newDropIndex = that.arrange(options);
+			let newDropIndex = this.arrange(options);
 			// If this is a new drop index, start a timer!
 			if(newDropIndex !== oldDropIndex) {
 				dropIndex = newDropIndex;
-				if(that._dropSpaceActive) { return; }
+				if(this._dropSpaceActive) { return; }
 				
 				if(dropSpaceTimer) {
 					dropSpaceTimer.cancel();
@@ -1569,7 +1569,7 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 					// Thus, dropIndex may change with other movement events before we come back and check this.
 					// If it's still the same dropIndex, activate drop space display!
 					if(dropIndex === newDropIndex) {
-						that._dropSpaceActive = true;
+						this._dropSpaceActive = true;
 						dropIndex = this.arrange({
 							dropPos: dropPos,
 							addTab: drag.info.item.parent != this,
@@ -1581,15 +1581,16 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 			}
 		};
 		this.dropOptions.drop = (event) => {
-			iQ(that.container).removeClass("acceptsDrop");
+			iQ(this.container).removeClass("acceptsDrop");
 			let options = {};
-			if(that._dropSpaceActive) {
-				that = false;
+			if(this._dropSpaceActive) {
+				this._dropSpaceActive = false;
 			}
 			
 			if(dropSpaceTimer) {
 				dropSpaceTimer.cancel();
 				dropSpaceTimer = null;
+				
 				// If we drop this item before the timed rearrange was executed, we won't have an accurate dropIndex value. Get that now.
 				let dropPos = drag.info.item.getBounds().center();
 				dropIndex = this.arrange({
@@ -1603,25 +1604,25 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 				options = { index: dropIndex };
 			}
 			this.add(drag.info.$el, options);
-			UI.setActive(that);
+			UI.setActive(this);
 			dropIndex = false;
 		};
 		this.dropOptions.out = (event) => {
 			dropIndex = false;
-			if(that._dropSpaceActive) {
-				that._dropSpaceActive = false;
+			if(this._dropSpaceActive) {
+				this._dropSpaceActive = false;
 			}
 			
 			if(dropSpaceTimer) {
 				dropSpaceTimer.cancel();
 				dropSpaceTimer = null;
 			}
-			thid.arrange();
+			this.arrange();
 			let groupItem = drag.info.item.parent;
 			if(groupItem) {
 				groupItem.remove(drag.info.$el, { dontClose: true });
 			}
-			iQ(that.container).removeClass("acceptsDrop");
+			iQ(this.container).removeClass("acceptsDrop");
 		}
 		
 		this.draggable();
@@ -1683,7 +1684,7 @@ this.GroupItem.prototype = Utils.extend(new Item(), new Subscribable(), {
 		let indices;
 		let tabs = this._children.map(tabItem => tabItem.tab);
 		
-		tabs.forEach(function (tab, index) {
+		tabs.forEach(function(tab, index) {
 			if(!indices) {
 				indices = tabs.map(tab => tab._tPos);
 			}
@@ -1955,7 +1956,7 @@ this.GroupItems = {
 				
 				toClose.forEach(function(groupItem) {
 					// all tabs still existing in closed groups will be moved to new groups. prepare them to be reconnected later.
-					groupItem.getChildren().forEach(function (tabItem) {
+					groupItem.getChildren().forEach(function(tabItem) {
 						if(tabItem.parent.hidden) {
 							iQ(tabItem.container).show();
 						}
@@ -2151,7 +2152,7 @@ this.GroupItems = {
 	// Hides and shows tabs in the tab bar based on the active groupItem
 	_updateTabBar: function() {
 		// called too soon
-		if(!window.UI) { return; }
+		if(!window[objName] || !window[objName].UI) { return; }
 		
 		let tabItems = this._activeGroupItem._children;
 		gBrowser.showOnlyTheseTabs(tabItems.map(item => item.tab));
@@ -2161,7 +2162,7 @@ this.GroupItems = {
 	// Parameters:
 	// tabItem - the tab item
 	// options - is passed to UI.setActive() directly
-	updateActiveGroupItemAndTabBar: function (tabItem, options) {
+	updateActiveGroupItemAndTabBar: function(tabItem, options) {
 		UI.setActive(tabItem, options);
 		this._updateTabBar();
 	},
