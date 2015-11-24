@@ -5,5 +5,3 @@
 <!ENTITY viewTabGroups.label "Tab Groups">
 <!ENTITY viewTabGroups.tooltip "Group your tabs">
 <!ENTITY viewTabGroups.accesskey "G">
-
-<!ENTITY tabView.commandkey "e">

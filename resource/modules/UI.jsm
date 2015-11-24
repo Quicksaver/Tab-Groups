@@ -1,4 +1,4 @@
-// VERSION 1.0.6
+// VERSION 1.0.7
 
 this.Keys = { meta: false };
 
@@ -809,7 +809,7 @@ this.UI = {
 		keys = {};
 		// The lower case letters are passed to processBrowserKeys() even with shift key when stimulating a key press using EventUtils.synthesizeKey()
 		// so need to handle both upper and lower cases here.
-		keyArray = [ "closeWindow", "tabview", "undoCloseTab", "undoCloseWindow" ];
+		keyArray = [ "closeWindow", "undoCloseTab", "undoCloseWindow" ];
 		if(!WINNT) {
 			keyArray.push("redo");
 			if(DARWIN) {
@@ -842,6 +842,17 @@ this.UI = {
 			let processBrowserKeys = (e) => {
 				// let any keys with alt to pass through
 				if(e.altKey) { return; }
+				
+				// make sure our keyboard shortcut also works to toggle out of tab view
+				if(Keysets.isRegistered(tabViewKey)) {
+					let keycode = Keysets.translateToConstantCode(tabViewKey.keycode);
+					if(e[keycode] && e[keycode] == e.which
+					&& tabViewKey.shift == e.shiftKey
+					&& tabViewKey.alt == e.altKey
+					&& tabViewKey.accel == (DARWIN ? e.metaKey : e.ctrlKey)) {
+						return;
+					}
+				}
 				
 				if((DARWIN && e.metaKey) || (!DARWIN && e.ctrlKey)) {
 					let preventDefault = true;

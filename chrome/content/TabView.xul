@@ -52,8 +52,4 @@
 		<broadcaster id="objName-tabviewGroupsNumber" groups="1"/>
 	</broadcasterset>
 	
-	<keyset id="mainKeyset">
-		<key id="objName-key_tabview" key="&tabView.commandkey;" command="objName:ToggleTabView" modifiers="accel,shift"/>
-	</keyset>
-	
 </overlay>

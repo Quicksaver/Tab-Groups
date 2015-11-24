@@ -1,4 +1,4 @@
-// VERSION 1.2.2
+// VERSION 1.2.3
 
 this.migrate = {
 	migratorBackstage: null,
@@ -81,9 +81,18 @@ this.migrate = {
 		
 		// compatibility shim, for other add-ons to interact with this object more closely to the original if needed
 		aWindow.TabView = aWindow[objName].TabView;
+		
+		// we can move this directly in the startup method once we no longer load the overlay
+		//if(Services.vc.compare(Services.appinfo.version, "45.0a1") < 0) {
+			Modules.load('keysets');
+		//}
 	},
 	
 	onUnload: function(aWindow) {
+		if(UNLOADED/* && Services.vc.compare(Services.appinfo.version, "45.0a1") < 0*/) {
+			Modules.unload('keysets');
+		}
+		
 		if(aWindow._TabView) {
 			aWindow.TabView = aWindow._TabView;
 			delete aWindow._TabView;

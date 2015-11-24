@@ -19,6 +19,10 @@
 	<prefpane id="mainPrefPane">
 		<preferences>
 			<preference id="pref-animateZoom" name="extensions.tabgroups.animateZoom" type="bool"/>
+			<preference id="pref-tabViewKeycode" name="extensions.tabgroups.tabViewKeycode" type="string"/>
+			<preference id="pref-tabViewAccel" name="extensions.tabgroups.tabViewAccel" type="bool"/>
+			<preference id="pref-tabViewShift" name="extensions.tabgroups.tabViewShift" type="bool"/>
+			<preference id="pref-tabViewAlt" name="extensions.tabgroups.tabViewAlt" type="bool"/>
 		</preferences>
 		
 		<hbox id="header-tabGroups" class="header" collapsed="true" data-category="paneTabGroups">
@@ -31,6 +35,16 @@
 				helptext="&opt.animateZoom.tooltip;"
 				jump="animateZoom"
 				delayPreference="pref-animateZoom"/>
+		</groupbox>
+		
+		<groupbox align="start" id="paneTabGroups-shortcut" collapsed="true" data-category="paneTabGroups">
+			<caption label="&cat.tabViewKeyset.label;"/>
+			<hbox jump="tabViewKeycode,&cat.tabViewKeyset.label;">
+				<checkbox class="smallindent" keysetAccel="tabView" delayPreference="pref-tabViewAccel"/>
+				<checkbox class="smallindent" keysetAlt="tabView" delayPreference="pref-tabViewAlt"/>
+				<checkbox class="smallindent" keysetShift="tabView" delayPreference="pref-tabViewShift"/>
+				<menulist class="smallindent" keyset="tabView" delayPreference="pref-tabViewKeycode"/>
+			</hbox>
 		</groupbox>
 	</prefpane>
 </overlay>

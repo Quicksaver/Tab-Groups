@@ -1,4 +1,4 @@
-// VERSION 1.3.6
+// VERSION 1.3.7
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -18,9 +18,14 @@ prefList = {
 	animateZoom: true,
 	session_restore_enabled_once: false,
 	
+	tabViewKeycode: 'E',
+	tabViewAccel: true,
+	tabViewShift: true,
+	tabViewAlt: false,
+	
 	// for internal use
 	migratedWidget: false,
-	migratedPrefs: false,
+	migratedPrefs: false
 };
 
 paneList = [
@@ -40,6 +45,9 @@ function onStartup(aReason) {
 	Modules.load('Utils');
 	Modules.load('Storage');
 	Modules.load('migrate');
+	//if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
+	//	Modules.load('keysets');
+	//}
 	
 	// Apply the add-on to every window opened and to be opened
 	Windows.callOnAll(startAddon, 'navigator:browser');
@@ -50,6 +58,9 @@ function onShutdown(aReason) {
 	// remove the add-on from all windows
 	Windows.callOnAll(stopAddon, null, null, true);
 	
+	//if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
+	//	Modules.unload('keysets');
+	//}
 	Modules.unload('migrate');
 	Modules.unload('Storage');
 	Modules.unload('Utils');

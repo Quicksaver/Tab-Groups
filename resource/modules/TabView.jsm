@@ -1,4 +1,4 @@
-// VERSION 1.0.7
+// VERSION 1.0.8
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -161,9 +161,6 @@ this.TabView = {
 	init: function(loaded) {
 		// ignore everything if this was called by the native initializer, we need to wait for our overlay to finish loading
 		if(!loaded) { return; }
-		
-		// disable the ToggleTabView command for popup windows
-		toggleAttribute($(objName+":ToggleTabView"), window.toolbar.visible);
 		
 		if(!window.toolbar.visible || this._initialized) { return; }
 		
@@ -328,6 +325,8 @@ this.TabView = {
 	},
 	
 	toggle: function() {
+		if(!window.toolbar.visible) { return; }
+		
 		if(this.isVisible()) {
 			this.hide();
 		} else {
