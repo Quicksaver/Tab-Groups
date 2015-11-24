@@ -1,0 +1,3 @@
+#categories .category image { list-style-image: url("chrome://tabgroups/skin/panes.png"); }
+#categories .category[value="paneAbout"] image { -moz-image-region: rect(0px 24px 24px 0px); }
+#categories .category[value="paneTabGroups"] image { -moz-image-region: rect(0px 48px 24px 24px); }

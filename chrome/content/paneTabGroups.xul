@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://tabgroups/skin/options.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://tabgroups/locale/options.dtd">
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+			
+	<richlistbox id="categories">
+		<richlistitem id="category-tabGroups"
+			class="category"
+			value="paneTabGroups"
+			tooltiptext="&pane.tabGroups.label;"
+			position="1"
+			align="center">
+			
+			<image class="category-icon"/>
+			<label class="category-name" flex="1" value="&pane.tabGroups.label;"/>
+		</richlistitem>
+	</richlistbox>
+	
+	<prefpane id="mainPrefPane">
+		<preferences>
+			<preference id="pref-animateZoom" name="extensions.tabgroups.animateZoom" type="bool"/>
+		</preferences>
+		
+		<hbox id="header-tabGroups" class="header" collapsed="true" data-category="paneTabGroups">
+			<label class="header-name">&pane.tabGroups.label;</label>
+		</hbox>
+		
+		<groupbox align="start" id="paneTabGroups-general" collapsed="true" data-category="paneTabGroups">
+			<caption label="&cat.general.label;"/>
+			<checkbox label="&opt.animateZoom.label;"
+				helptext="&opt.animateZoom.tooltip;"
+				jump="animateZoom"
+				delayPreference="pref-animateZoom"/>
+		</groupbox>
+	</prefpane>
+</overlay>

@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -483,7 +483,7 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 			this._sendToSubscribers("zoomedIn");
 		};
 		
-		if(Prefs.animate_zoom) {
+		if(Prefs.animateZoom) {
 			let transform = this.getZoomTransform();
 			TabItems.pausePainting();
 			
@@ -530,7 +530,7 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 		
 		$tab.addClass("front");
 		
-		if(Prefs.animate_zoom) {
+		if(Prefs.animateZoom) {
 			// The scaleCheat of 2 here is a clever way to speed up the zoom-out code. See getZoomTransform() below.
 			let transform = this.getZoomTransform(2);
 			TabItems.pausePainting();

@@ -1,4 +1,4 @@
-// VERSION 1.3.5
+// VERSION 1.3.6
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -15,7 +15,7 @@ addonUris = {
 };
 
 prefList = {
-	animate_zoom: true,
+	animateZoom: true,
 	session_restore_enabled_once: false,
 	
 	// for internal use
@@ -23,7 +23,9 @@ prefList = {
 	migratedPrefs: false,
 };
 
-paneList = [];
+paneList = [
+	[ "paneTabGroups" ]
+];
 
 function startAddon(window) {
 	prepareObject(window);

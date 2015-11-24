@@ -1,0 +1,6 @@
+<!ENTITY pane.tabGroups.label "Tab Groups">
+
+<!ENTITY cat.general.label "General">
+
+<!ENTITY opt.animateZoom.label "Animate Zoom">
+<!ENTITY opt.animateZoom.tooltip "Smooth transitions when entering and leaving Tab Groups mode, by zooming out of the current tab into groups mode, and zooming back into the tab when leaving groups mode."> 
