@@ -1,4 +1,4 @@
-// VERSION 1.0.6
+// VERSION 1.0.7
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -39,7 +39,7 @@ this.TabView = {
 		delete this.windowTitle;
 		let brandBundle = $("bundle_brand");
 		let brandShortName = brandBundle.getString("brandShortName");
-		let title = Strings.get("TabView", "title", [ [ '$app', brandShortName ] ]);
+		let title = Strings.get("TabView", "windowTitle", [ [ '$app$', brandShortName ] ]);
 		return this.windowTitle = title;
 	},
 	
@@ -125,7 +125,7 @@ this.TabView = {
 				switch(e.target.id) {
 					// for the tooltip
 					case this.kTooltipId:
-						if(!this.fillInTooltip(this.tooltip)) {
+						if(!this.fillInTooltip(document.tooltipNode)) {
 							e.preventDefault();
 							e.stopPropagation();
 						}
@@ -158,7 +158,10 @@ this.TabView = {
 		}
 	},
 	
-	init: function() {
+	init: function(loaded) {
+		// ignore everything if this was called by the native initializer, we need to wait for our overlay to finish loading
+		if(!loaded) { return; }
+		
 		// disable the ToggleTabView command for popup windows
 		toggleAttribute($(objName+":ToggleTabView"), window.toolbar.visible);
 		
@@ -175,7 +178,7 @@ this.TabView = {
 					this.updateGroupNumberBroadcaster(data.totalNumber || 1);
 				}
 			}
-			catch (e) {}
+			catch(ex) {}
 			
 			Listeners.add(this.tooltip, "popupshowing", this, true);
 			Listeners.add(this.tabMenuPopup, "popupshowing", this);
@@ -476,7 +479,7 @@ this.TabView = {
 		window.SessionStore.promiseInitialized.then(() => {
 			if(UNLOADED) { return; }
 			
-			this.init();
+			this.init(true);
 		});
 	},
 	
