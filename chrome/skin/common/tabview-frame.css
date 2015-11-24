@@ -417,7 +417,7 @@ input.name::-moz-placeholder {
 	opacity: 1.0;
 	font-style: italic !important;
 	color: transparent;
-	background-image: url(chrome://tabgroups-os/skin/edit-light.png);
+	background-image: url(chrome://tabgroups/skin/edit-light.png);
 	background-repeat: no-repeat;
 }
 
@@ -532,12 +532,47 @@ html[dir=rtl] .iq-resizable-se {
 	left: 1px;
 }
 
-/* Exit button */
+/* Side buttons */
 
-#exit-button {
-	background-attachment: scroll;
+#actions {
+	position: absolute;
+	top: 0px;
+	right: -3px;
+	padding: 3px 0;
+	-moz-padding-end: 3px;
+	z-index: 1000000;
+	width: 29px;
+	text-align: center;
+	border-radius: 0.4em;
+}
+
+html[dir=rtl] #actions {
+	right: auto;
+	left: -3px;
+}
+
+.tabview-button {
+	background-color: transparent;
 	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-attachment: scroll;
 	border: none;
+	padding: 2px;
+	width: 24px;
+	height: 24px;
+}
+
+.tabview-button:hover {
+	cursor: pointer;
+	background-color: rgba(128,128,128,.15);
+}
+
+#actions #searchbutton {
+	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 20, 20, 0);
+}
+
+#actions #optionsbutton {
+	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 40, 20, 20);
 }
 
 /* Search */
@@ -588,30 +623,6 @@ html[dir=rtl] #search {
 html[dir=rtl] #searchbox {
 	right: auto;
 	left: 20px;
-}
-
-#actions {
-	position: absolute;
-	top: 0px;
-	right: -3px;
-	z-index: 1000000;
-	width: 29px;
-	text-align: center;
-	border-radius: 0.4em;
-}
-
-html[dir=rtl] #actions {
-	right: auto;
-	left: -3px;
-}
-
-#actions #searchbutton {
-	background: transparent url(chrome://tabgroups-os/skin/search.png) no-repeat;
-	border: none;
-	width: 20px;
-	height: 20px;
-	margin-top: 3px;
-	-moz-margin-end: 1px;
 }
 
 .notMainMatch{

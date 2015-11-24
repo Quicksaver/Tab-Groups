@@ -1,4 +1,4 @@
-// VERSION 1.0.5
+// VERSION 1.0.6
 
 this.Keys = { meta: false };
 
@@ -127,6 +127,12 @@ this.UI = {
 				this.blurAll();
 			})
 				.attr("title", Strings.get("TabView", "buttonExitTabGroups"));
+			
+			iQ("#optionsbutton").mousedown(() => {
+				PrefPanes.open(gWindow);
+				this.hideTabView();
+			})
+				.attr("title", Strings.get("TabView", "buttonOptionsTabGroups"));
 			
 			// When you click on the background/empty part of TabView, we create a new groupItem.
 			iQ(gTabViewFrame.contentDocument).mousedown((e) => {

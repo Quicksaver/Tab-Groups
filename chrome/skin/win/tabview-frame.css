@@ -162,13 +162,29 @@ input.name:focus {
 	color: #CCC;
 }
 
-/* Exit button */
+/* Side buttons */
+
+#actions {
+	border: none;
+	background-color: #E0EAF5;
+	box-shadow:
+		0 1px 0 #FFFFFF inset,
+		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
+		1px 0 1px rgba(255, 255, 255, 0.8) inset,
+		-1px 0 1px rgba(255, 255, 255, 0.8) inset,
+		0 1px 3px rgba(4, 38, 60, 0.6);
+}
+
+html[dir=rtl] #actions {
+	box-shadow:
+		0 1px 0 #FFFFFF inset,
+		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
+		-1px 0 1px rgba(255, 255, 255, 0.8) inset,
+		1px 0 1px rgba(255, 255, 255, 0.8) inset,
+		0 1px 3px rgba(4, 38, 60, 0.6);
+}
 
 #exit-button {
-	width: 18px;
-	height: 18px;
-	-moz-margin-end: 4px;
-	margin-top: 2px;
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 90, 18, 72);
 }
 
@@ -192,26 +208,4 @@ input.name:focus {
 
 #searchbox {
 	box-shadow: 0px 1px 0px rgba(255,255,255,.5), 0px -1px 0px rgba(0,0,0,1), 0px 0px 9px rgba(0,0,0,.8);
-}
-
-#actions {
-	top: -3px;
-	padding-top: 3px;
-	border: none;
-	background-color: #E0EAF5;
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
-		1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		-1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		0 1px 3px rgba(4, 38, 60, 0.6);
-}
-
-html[dir=rtl] #actions {
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
-		-1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		0 1px 3px rgba(4, 38, 60, 0.6);
 }

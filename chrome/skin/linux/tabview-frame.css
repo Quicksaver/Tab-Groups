@@ -154,13 +154,19 @@ input.name:focus {
 	color: GrayText;
 }
 
-/* Exit button */
+/* Side buttons */
+
+#actions {
+	border: 1px solid rgba(230,230,230,1);
+	background-color: rgba(248,248,248,1);
+	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) 1px 1px 3px;
+}
+
+html[dir=rtl] #actions {
+	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) -1px 1px 3px;
+}
 
 #exit-button {
-	width: 16px;
-	height: 16px;
-	-moz-margin-end: 8px;
-	margin-top: 5px;
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 80, 16, 64);
 }
 
@@ -184,16 +190,4 @@ input.name:focus {
 
 #searchbox {
 	box-shadow: 0px 1px 0px rgba(255,255,255,.5), 0px -1px 0px rgba(0,0,0,1), 0px 0px 9px rgba(0,0,0,.8);
-}
-
-#actions {
-	top: -3px;
-	padding-top: 3px;
-	border: 1px solid rgba(230,230,230,1);
-	background-color: rgba(248,248,248,1);
-	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) 1px 1px 3px;
-}
-
-html[dir=rtl] #actions {
-	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) -1px 1px 3px;
 }
