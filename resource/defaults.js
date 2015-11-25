@@ -1,4 +1,4 @@
-// VERSION 1.3.8
+// VERSION 1.3.9
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -24,6 +24,7 @@ prefList = {
 	
 	// for internal use
 	pageBackup: -1,
+	pageAutoChanged: false,
 	migratedWidget: false,
 	migratedPrefs: false
 };

@@ -1,4 +1,4 @@
-// VERSION 1.0.8
+// VERSION 1.0.9
 
 this.Keys = { meta: false };
 
@@ -59,6 +59,7 @@ this.UI = {
 	_originalSmoothScroll: null,
 	
 	get sessionRestoreNotice() { return $('sessionRestoreNotice'); },
+	get sessionRestoreAutoChanged() { return $('sessionRestoreAutoChanged'); },
 	
 	// Called when a web page is about to show a modal dialog.
 	receiveMessage: function(m) {
@@ -1379,8 +1380,45 @@ this.UI = {
 	},
 	
 	checkSessionRestore: function() {
+		// first see if we should automaticlaly change this preference, this will happen only on the very first time the add-on is installed AND used,
+		// so that it "just works" right from the start
+		this.enableSessionRestore();
+		
 		// Notify the user if necessary that session restore needs to be enabled by showing a banner at the bottom.
 		this.sessionRestoreNotice.hidden = (Prefs.page == 3);
+	},
+	
+	// Enables automatic session restore when the browser is started. Does nothing if we already did that once in the past.
+	enableSessionRestore: function() {
+		if(Prefs.pageAutoChanged) { return; }
+		Prefs.pageAutoChanged = true;
+		
+		// enable session restore if necessary
+		if(Prefs.page != 3) {
+			pageWatch.enableSessionRestore();
+			
+			// Notify the user that session restore has been automatically enabled by showing a banner that expects no user interaction. It fades out after some seconds.
+			let banner = this.sessionRestoreAutoChanged;
+			
+			let ontransitionend = function() {
+				if(trueAttribute(banner, 'show')) {
+					Timers.init("sessionRestoreAutoChanged", function() {
+						removeAttribute(banner, 'show');
+					}, 5000);
+				} else {
+					banner.hidden = true;
+					Listeners.remove(banner, 'transitionend', ontransitionend);
+				}
+			};
+			
+			Listeners.add(banner, 'transitionend', ontransitionend);
+			banner.hidden = false;
+			
+			// force reflow before setting the show attribute, so it animates
+			banner.clientTop;
+			
+			setAttribute(banner, 'show', 'true');
+		}
 	}
 };
 

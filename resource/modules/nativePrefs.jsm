@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.pageWatch = {
 	observe: function() {
@@ -24,6 +24,7 @@ this.pageWatch = {
 		
 		Prefs.pageBackup = Prefs.page;
 		Prefs.page = 3;
+		this.start();
 	},
 	
 	init: function() {

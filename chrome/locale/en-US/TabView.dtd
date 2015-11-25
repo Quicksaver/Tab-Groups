@@ -10,4 +10,5 @@
 <!ENTITY buttonExitTabGroups.label "Exit tab groups">
 <!ENTITY buttonOptionsTabGroups.label "Change tab groups preferences">
 
-<!ENTITY sessionRestoreNotice.label "Your tab groups will not be saved after you close Firefox! Click here to fix it.">
+<!ENTITY sessionRestoreNotice.label "Your tabs and groups will not be restored the next time you start the browser! Click here to fix it.">
+<!ENTITY sessionRestoreAutoChanged.label "Your tabs and groups will be restored automatically the next time you start the browser.">

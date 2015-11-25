@@ -1,4 +1,4 @@
-// VERSION 1.0.9
+// VERSION 1.0.10
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -23,12 +23,15 @@ this.TabView = {
 	
 	// compatibility shims, for other add-ons to interact with this object more closely to the original if needed
 	PREF_BRANCH: "extensions."+objPathString,
+	PREF_RESTORE_ENABLED_ONCE: "extensions."+objPathString+".pageAutoChanged",
 	PREF_STARTUP_PAGE: "browser.startup.page",
 	get _deck() { return gTabViewDeck; },
 	get GROUPS_IDENTIFIER() { return Storage.kGroupsIdentifier; },
 	get VISIBILITY_IDENTIFIER() { return Storage.kVisibilityIdentifier; },
 	get firstUseExperienced() { return true; },
 	set firstUseExperienced(v) { return true; },
+	get sessionRestoreEnabledOnce() { return Prefs.pageAutoChanged; },
+	set sessionRestoreEnabledOnce(v) { return Prefs.pageAutoChanged = v; },
 	get _browserKeyHandlerInitialized() { return !!Listeners.listening(window, "keypress", this); },
 	getContentWindow: function() { return this._window; },
 	

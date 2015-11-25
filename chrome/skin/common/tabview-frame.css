@@ -497,6 +497,15 @@ html[dir=rtl] .title-shield {
 	cursor: pointer;
 }
 
+#sessionRestoreAutoChanged {
+	pointer-events: none;
+	transition: opacity 1.5s;
+}
+
+#sessionRestoreAutoChanged[show="true"] {
+	opacity: 1;
+}
+
 /* Resizable */
 
 .resizer {

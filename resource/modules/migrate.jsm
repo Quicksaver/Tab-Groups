@@ -1,4 +1,4 @@
-// VERSION 1.2.4
+// VERSION 1.2.5
 
 this.migrate = {
 	migratorBackstage: null,
@@ -22,6 +22,9 @@ this.migrate = {
 		if(!Prefs.migratedPrefs) {
 			if(Services.prefs.prefHasUserValue('browser.panorama.animate_zoom')) {
 				Prefs.animateZoom = Services.prefs.getBoolPref('browser.panorama.animate_zoom');
+			}
+			if(Services.prefs.prefHasUserValue('browser.panorama.session_restore_enabled_once')) {
+				Prefs.pageAutoChanged = Services.prefs.getBoolPref('browser.panorama.session_restore_enabled_once');
 			}
 			Prefs.migratedPrefs = true;
 		}
