@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -288,15 +288,13 @@ this.Search = {
 		
 		iQ("#searchbox").keyup(() => {
 			this.perform();
-		})
-			.attr("title", Strings.get("TabView", "buttonSearchTabs"));
+		});
 		
 		iQ("#searchbutton").mousedown(() => {
 			this._initiatedBy = "buttonclick";
 			this.ensureShown();
 			this.switchToInMode();
-		})
-			.attr("title", Strings.get("TabView", "buttonSearchTabs"));
+		});
 		
 		window.addEventListener("focus", () => {
 			if(this.isEnabled()) {

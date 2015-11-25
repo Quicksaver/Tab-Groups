@@ -1,4 +1,4 @@
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 this.Storage = {
 	kVisibilityIdentifier: "tabview-visibility",
@@ -9,11 +9,10 @@ this.Storage = {
 	
 	_migrationScope: null,
 	_scope: null,
-	_service: null,
 	
 	// Saves the data for a single tab.
 	saveTab: function(tab, data) {
-		this._service.setTabValue(tab, this.kTabIdentifier, JSON.stringify(data));
+		SessionStore.setTabValue(tab, this.kTabIdentifier, JSON.stringify(data));
 	},
 	
 	// Load tab data from session store and return it.
@@ -21,7 +20,7 @@ this.Storage = {
 		let existingData = null;
 		
 		try {
-			let tabData = this._service.getTabValue(tab, this.kTabIdentifier);
+			let tabData = SessionStore.getTabValue(tab, this.kTabIdentifier);
 			if(tabData != "") {
 				existingData = JSON.parse(tabData);
 			}
@@ -38,7 +37,7 @@ this.Storage = {
 		let tabState;
 		
 		try {
-			tabState = JSON.parse(this._service.getTabState(tab));
+			tabState = JSON.parse(SessionStore.getTabState(tab));
 		}
 		catch(ex) {}
 		
@@ -50,14 +49,14 @@ this.Storage = {
 		let id = data.id;
 		let existingData = this.readGroupItemData(win);
 		existingData[id] = data;
-		this._service.setWindowValue(win, this.kGroupIdentifier, JSON.stringify(existingData));
+		SessionStore.setWindowValue(win, this.kGroupIdentifier, JSON.stringify(existingData));
 	},
 	
 	// Deletes the data for a single groupItem from the given window.
 	deleteGroupItem: function(win, id) {
 		let existingData = this.readGroupItemData(win);
 		delete existingData[id];
-		this._service.setWindowValue(win, this.kGroupIdentifier, JSON.stringify(existingData));
+		SessionStore.setWindowValue(win, this.kGroupIdentifier, JSON.stringify(existingData));
 	},
 	
 	// Returns the data for all groupItems associated with the given window.
@@ -65,7 +64,7 @@ this.Storage = {
 		let existingData = {};
 		let data;
 		try {
-			data = this._service.getWindowValue(win, this.kGroupIdentifier);
+			data = SessionStore.getWindowValue(win, this.kGroupIdentifier);
 			if(data) {
 				existingData = JSON.parse(data);
 			}
@@ -81,7 +80,7 @@ this.Storage = {
 		let state;
 		
 		try {
-			let data = this._service.getWindowState(win);
+			let data = SessionStore.getWindowState(win);
 			if(data) {
 				state = JSON.parse(data);
 			}
@@ -113,13 +112,13 @@ this.Storage = {
 	
 	// Saves visibility for the given window.
 	saveVisibilityData: function(win, data) {
-		this._service.setWindowValue(win, this.kVisibilityIdentifier, data);
+		SessionStore.setWindowValue(win, this.kVisibilityIdentifier, data);
 	},
 	
 	// Generic routine for saving data to a window.
 	saveData: function(win, id, data) {
 		try {
-			this._service.setWindowValue(win, id, JSON.stringify(data));
+			SessionStore.setWindowValue(win, id, JSON.stringify(data));
 		}
 		catch(ex) {}
 	},
@@ -128,7 +127,7 @@ this.Storage = {
 	readData: function(win, id) {
 		let existingData = {};
 		try {
-			let data = this._service.getWindowValue(win, id);
+			let data = SessionStore.getWindowValue(win, id);
 			if(data) {
 				existingData = JSON.parse(data);
 			}
@@ -140,9 +139,8 @@ this.Storage = {
 };
 
 Modules.LOADMODULE = function() {
-	Storage._scope = Cu.import("resource:///modules/sessionstore/SessionStore.jsm", {});
+	Storage._scope = Cu.import("resource:///modules/sessionstore/SessionStore.jsm", self);
 	Storage._migrationScope = Cu.import("resource:///modules/sessionstore/SessionMigration.jsm", {});
-	Storage._service = Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore);
 	
 	Piggyback.add('Storage', Storage._scope.SessionStoreInternal, '_prepWindowToRestoreInto', function(aWindow) {
 		if(!aWindow) { return; }

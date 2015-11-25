@@ -1,4 +1,4 @@
-// VERSION 2.4.6
+// VERSION 2.4.7
 Modules.UTILS = true;
 
 // dependsOn - object that adds a dependson attribute functionality to xul preference elements.
@@ -901,6 +901,12 @@ this.controllers = {
 		
 		this.checkButtons();
 		this.initialized = true;
+		
+		// check if we're supposed to jump to a specific preference right away
+		if(window.__jumpTo) {
+			this.jumpto(window.__jumpTo);
+			delete window.__jumpTo;
+		}
 	},
 	
 	uninit: function(prefsOnly) {
@@ -1065,7 +1071,11 @@ this.controllers = {
 		}
 	},
 	
-	jumpto: function() {
+	jumpto: function(override) {
+		if(override) {
+			this.nodes.jumpto.value = override;
+		}
+		
 		let val = this.nodes.jumpto.value;
 		if(!val) {
 			this.clearHighlighted(false);

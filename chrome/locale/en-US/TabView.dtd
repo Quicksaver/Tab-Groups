@@ -5,3 +5,9 @@
 <!ENTITY viewTabGroups.label "Tab Groups">
 <!ENTITY viewTabGroups.tooltip "Group your tabs">
 <!ENTITY viewTabGroups.accesskey "G">
+
+<!ENTITY buttonSearchTabs.label "Search tab groups">
+<!ENTITY buttonExitTabGroups.label "Exit tab groups">
+<!ENTITY buttonOptionsTabGroups.label "Change tab groups preferences">
+
+<!ENTITY sessionRestoreNotice.label "Your tab groups will not be saved after you close Firefox! Click here to fix it.">

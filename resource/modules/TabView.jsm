@@ -1,4 +1,4 @@
-// VERSION 1.0.8
+// VERSION 1.0.9
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -23,15 +23,12 @@ this.TabView = {
 	
 	// compatibility shims, for other add-ons to interact with this object more closely to the original if needed
 	PREF_BRANCH: "extensions."+objPathString,
-	PREF_RESTORE_ENABLED_ONCE: "extensions."+objPathString+".session_restore_enabled_once",
 	PREF_STARTUP_PAGE: "browser.startup.page",
 	get _deck() { return gTabViewDeck; },
 	get GROUPS_IDENTIFIER() { return Storage.kGroupsIdentifier; },
 	get VISIBILITY_IDENTIFIER() { return Storage.kVisibilityIdentifier; },
 	get firstUseExperienced() { return true; },
 	set firstUseExperienced(v) { return true; },
-	get sessionRestoreEnabledOnce() { return Prefs.session_restore_enabled_once; },
-	set sessionRestoreEnabledOnce(v) { return Prefs.session_restore_enabled_once = v; },
 	get _browserKeyHandlerInitialized() { return !!Listeners.listening(window, "keypress", this); },
 	getContentWindow: function() { return this._window; },
 	
@@ -164,12 +161,12 @@ this.TabView = {
 		
 		if(!window.toolbar.visible || this._initialized) { return; }
 		
-		let data = Storage._service.getWindowValue(window, Storage.kVisibilityIdentifier);
+		let data = SessionStore.getWindowValue(window, Storage.kVisibilityIdentifier);
 		if(data == "true") {
 			this.show();
 		} else {
 			try {
-				data = Storage._service.getWindowValue(window, Storage.kGroupsIdentifier);
+				data = SessionStore.getWindowValue(window, Storage.kGroupsIdentifier);
 				if(data) {
 					data = JSON.parse(data);
 					this.updateGroupNumberBroadcaster(data.totalNumber || 1);
@@ -199,7 +196,7 @@ this.TabView = {
 		
 		Piggyback.add('TabView', window, 'undoCloseTab', (aIndex) => {
 			let tab = null;
-			if(Storage._service.getClosedTabCount(window) > (aIndex || 0)) {
+			if(SessionStore.getClosedTabCount(window) > (aIndex || 0)) {
 				// wallpaper patch to prevent an unnecessary blank tab (bug 343895)
 				let blankTabToRemove = null;
 				if(gBrowser.tabs.length == 1 && window.isTabEmpty(gBrowser.selectedTab)) {
@@ -207,7 +204,7 @@ this.TabView = {
 				}
 				
 				this.prepareUndoCloseTab(blankTabToRemove);
-				tab = Storage._service.undoCloseTab(window, aIndex || 0);
+				tab = SessionStore.undoCloseTab(window, aIndex || 0);
 				this.afterUndoCloseTab();
 				
 				if(blankTabToRemove) {
@@ -432,23 +429,6 @@ this.TabView = {
 		setAttribute(groupsNumber, "groups", number);
 	},
 	
-	// Enables automatic session restore when the browser is started. Does nothing if we already did that once in the past.
-	enableSessionRestore: function() {
-		if(!this._window) { return; }
-		
-		// do nothing if we already enabled session restore once
-		if(Prefs.session_restore_enabled_once) { return; }
-		Prefs.session_restore_enabled_once = true;
-		
-		// enable session restore if necessary
-		if(Prefs.page != 3) {
-			Prefs.page = 3;
-			
-			// show banner
-			this._window[objName].UI.notifySessionRestoreEnabled();
-		}
-	},
-	
 	// Fills in the tooltip text.
 	fillInTooltip: function(tipElement) {
 		let retVal = false;
@@ -488,8 +468,6 @@ this.TabView = {
 };
 
 Modules.LOADMODULE = function() {
-	Prefs.setDefaults({ page: 1 }, 'startup', 'browser');
-	
 	Overlays.overlayWindow(window, 'TabView', TabView);
 };
 

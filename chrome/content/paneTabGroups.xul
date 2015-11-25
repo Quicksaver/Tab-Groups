@@ -46,5 +46,22 @@
 				<menulist class="smallindent" keyset="tabView" delayPreference="pref-tabViewKeycode"/>
 			</hbox>
 		</groupbox>
+		
+		<groupbox align="start" id="paneTabGroups-sessionRestore" collapsed="true" data-category="paneTabGroups">
+			<caption label="&sessionRestore.caption;"/>
+			<vbox jump="sessionRestore">
+				<description>&sessionRestore.description;</description>
+				<vbox align="center">
+					<button id="paneTabGroups-sessionRestore-button"
+						class="content-cell-item"
+						label="&sessionRestore.button.label;"
+						helpbox="paneTabGroups-sessionRestore-helptext"/>
+				</vbox>
+			</vbox>
+			<vbox id="paneTabGroups-sessionRestore-helptext" collapsed="true">
+				<description>&sessionRestore.button.tooltip.a;</description>
+				<description>&sessionRestore.button.tooltip.b;</description>
+			</vbox>
+		</groupbox>
 	</prefpane>
 </overlay>

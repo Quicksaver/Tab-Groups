@@ -1,4 +1,4 @@
-// VERSION 1.0.7
+// VERSION 1.0.8
 
 this.Keys = { meta: false };
 
@@ -58,6 +58,8 @@ this.UI = {
 	// Used to keep track of the tab strip smooth scroll value.
 	_originalSmoothScroll: null,
 	
+	get sessionRestoreNotice() { return $('sessionRestoreNotice'); },
+	
 	// Called when a web page is about to show a modal dialog.
 	receiveMessage: function(m) {
 		if(!this.isTabViewVisible()) { return; }
@@ -98,6 +100,19 @@ this.UI = {
 			case 'SSWindowStateReady':
 				this.storageReady();
 				break;
+			
+			// clicking the #sessionRestoreNotice banner
+			case 'mousedown':
+				this.goToPreferences('sessionRestore');
+				break;
+		}
+	},
+	
+	observe: function(aSubject, aTopic, aData) {
+		switch(aTopic) {
+			case 'nsPref:changed':
+				this.checkSessionRestore();
+				break;
 		}
 	},
 	
@@ -125,14 +140,11 @@ this.UI = {
 			iQ("#exit-button").click(() => {
 				this.exit();
 				this.blurAll();
-			})
-				.attr("title", Strings.get("TabView", "buttonExitTabGroups"));
+			});
 			
 			iQ("#optionsbutton").mousedown(() => {
-				PrefPanes.open(gWindow);
-				this.hideTabView();
-			})
-				.attr("title", Strings.get("TabView", "buttonOptionsTabGroups"));
+				this.goToPreferences();
+			});
 			
 			// When you click on the background/empty part of TabView, we create a new groupItem.
 			iQ(gTabViewFrame.contentDocument).mousedown((e) => {
@@ -201,6 +213,9 @@ this.UI = {
 			// ___ load frame script
 			Messenger.loadInWindow(gWindow, 'TabView');
 			
+			Prefs.listen('page', this);
+			Listeners.add(this.sessionRestoreNotice, 'mousedown', this);
+			
 			// ___ Done
 			this._frameInitialized = true;
 			this._save();
@@ -221,6 +236,9 @@ this.UI = {
 		Listeners.remove(gWindow, "SSWindowClosing", this);
 		Listeners.remove(gWindow, "SSWindowStateBusy", this);
 		Listeners.remove(gWindow, "SSWindowStateReady", this);
+		Listeners.remove(this.sessionRestoreNotice, 'mousedown', this);
+		
+		Prefs.unlisten('page', this);
 		
 		Messenger.unlistenWindow(gWindow, "DOMWillOpenModalDialog", this);
 		Messenger.unloadFromWindow(gWindow, 'TabView');
@@ -235,6 +253,13 @@ this.UI = {
 		this._reorderTabItemsOnShow = null;
 		this._reorderTabsOnHide = null;
 		this._frameInitialized = false;
+	},
+	
+	goToPreferences: function(aJumpTo) {
+		PrefPanes.open(gWindow, aJumpTo);
+		
+		// we can't very well see the preferences if we're still in tabview
+		this.hideTabView();
 	},
 	
 	// Returns true if we are in RTL mode, false otherwise
@@ -441,7 +466,7 @@ this.UI = {
 			TabItems.resumePainting();
 		}
 		
-		gTabView.enableSessionRestore();
+		this.checkSessionRestore();
 	},
 	
 	// Hides TabView and shows the main browser UI.
@@ -1187,7 +1212,7 @@ this.UI = {
 		
 		let scale = Math.min(hScale, wScale);
 		let pairs = [];
-		items.forEach(function(item) {
+		items.forEach((item) => {
 			let bounds = item.getBounds();
 			bounds.left += (UI.rtl ? -1 : 1) * (newPageBounds.left - this._pageBounds.left);
 			bounds.left *= scale;
@@ -1353,28 +1378,9 @@ this.UI = {
 		TabItems.saveAll();
 	},
 	
-	// Notify the user that session restore has been automatically enabled by showing a banner that expects no user interaction. It fades out after some seconds.
-	notifySessionRestoreEnabled: function() {
-		let brandBundle = gWindow[objName].$("bundle_brand");
-		let brandShortName = brandBundle.getString("brandShortName");
-		let notificationText = Strings.get('TabView', 'notificationSessionStore', [ [ '$app', brandShortName ] ]);
-		
-		let banner = iQ("<div>")
-			.text(notificationText)
-			.addClass("banner")
-			.appendTo("body");
-		
-		let onFadeOut = function() {
-			banner.remove();
-		};
-		
-		let onFadeIn = function() {
-			aSync(function() {
-				banner.animate({ opacity: 0 }, { duration: 1500, complete: onFadeOut });
-			}, 5000);
-		};
-		
-		banner.animate({ opacity: 0.7 }, { duration: 1500, complete: onFadeIn });
+	checkSessionRestore: function() {
+		// Notify the user if necessary that session restore needs to be enabled by showing a banner at the bottom.
+		this.sessionRestoreNotice.hidden = (Prefs.page == 3);
 	}
 };
 

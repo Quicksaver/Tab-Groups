@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<!DOCTYPE html [
+  <!ENTITY % htmlDTD
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "DTD/xhtml1-strict.dtd">
+  %htmlDTD;
+  <!ENTITY % TabView SYSTEM "chrome://tabgroups/locale/TabView.dtd" >
+  %TabView;
+]>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
 	<head>
 		<title>&nbsp;</title>
@@ -12,19 +19,21 @@
 		<div id="content">
 			<div id="bg"/>
 			<div id="actions">
-				<input id="exit-button" class="tabview-button" type="button" groups="0"/>
-				<input id="optionsbutton" class="tabview-button" type="button"/>
-				<input id="searchbutton" class="tabview-button" type="button"/>
+				<input id="exit-button" class="tabview-button" type="button" title="&buttonExitTabGroups.label;" groups="0"/>
+				<input id="optionsbutton" class="tabview-button" type="button" title="&buttonOptionsTabGroups.label;"/>
+				<input id="searchbutton" class="tabview-button" type="button" title="&buttonSearchTabs.label;"/>
 			</div>
 		</div>  
 		
 		<div id="searchshade"/>
 		<div id="search">
-			<input id="searchbox" type="text"/>
+			<input id="searchbox" type="text" title="&buttonSearchTabs.label;"/>
 			<div id="otherresults">
 				<span class="label"/>
 				<span id="results"/>
 			</div>
 		</div>
+		
+		<div id="sessionRestoreNotice" class="banner" hidden="true">&sessionRestoreNotice.label;</div>
 	</body>
 </html>

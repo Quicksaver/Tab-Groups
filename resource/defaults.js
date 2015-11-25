@@ -1,4 +1,4 @@
-// VERSION 1.3.7
+// VERSION 1.3.8
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -16,7 +16,6 @@ addonUris = {
 
 prefList = {
 	animateZoom: true,
-	session_restore_enabled_once: false,
 	
 	tabViewKeycode: 'E',
 	tabViewAccel: true,
@@ -24,12 +23,13 @@ prefList = {
 	tabViewAlt: false,
 	
 	// for internal use
+	pageBackup: -1,
 	migratedWidget: false,
 	migratedPrefs: false
 };
 
 paneList = [
-	[ "paneTabGroups" ]
+	[ "paneTabGroups", true ]
 ];
 
 function startAddon(window) {
@@ -44,6 +44,7 @@ function stopAddon(window) {
 function onStartup(aReason) {
 	Modules.load('Utils');
 	Modules.load('Storage');
+	Modules.load('nativePrefs');
 	Modules.load('migrate');
 	//if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 	//	Modules.load('keysets');
@@ -62,6 +63,7 @@ function onShutdown(aReason) {
 	//	Modules.unload('keysets');
 	//}
 	Modules.unload('migrate');
+	Modules.unload('nativePrefs');
 	Modules.unload('Storage');
 	Modules.unload('Utils');
 }
