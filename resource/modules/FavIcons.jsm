@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.FavIcons = {
 	get defaultFavicon() {
@@ -60,13 +60,23 @@ this.FavIcons = {
 	// Checks whether an image is loaded into the given tab.
 	_isImageDocument: function(tab, callback) {
 		return new Promise(function(resolve, reject) {
+			let repeat;
+			
 			let receiver = function(m) {
+				if(repeat) {
+					repeat.cancel();
+				}
 				Messenger.unlistenBrowser(tab.linkedBrowser, "isImageDocument", receiver);
 				resolve(m.data);
 			};
-			
 			Messenger.listenBrowser(tab.linkedBrowser, "isImageDocument", receiver);
-			Messenger.messageBrowser(tab.linkedBrowser, "isImageDocument");
+			
+			// sometimes on first open, we don't get a response right away because the message isn't actually sent, although I have no clue why...
+			let ask = function() {
+				Messenger.messageBrowser(tab.linkedBrowser, "isImageDocument");
+				repeat = aSync(ask, 1000);
+			};
+			ask();
 		});
 	},
 	
