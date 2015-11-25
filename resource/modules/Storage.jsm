@@ -1,7 +1,6 @@
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 this.Storage = {
-	kVisibilityIdentifier: "tabview-visibility",
 	kGroupIdentifier: "tabview-group",
 	kGroupsIdentifier: "tabview-groups",
 	kTabIdentifier: "tabview-tab",
@@ -108,11 +107,6 @@ this.Storage = {
 	// Reads the global data for the <UIManager> singleton for the given window.
 	readUIData: function(win) {
 		return this.readData(win, this.kUIIdentifier);
-	},
-	
-	// Saves visibility for the given window.
-	saveVisibilityData: function(win, data) {
-		SessionStore.setWindowValue(win, this.kVisibilityIdentifier, data);
 	},
 	
 	// Generic routine for saving data to a window.

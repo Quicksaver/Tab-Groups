@@ -1,4 +1,4 @@
-// VERSION 1.0.10
+// VERSION 1.0.11
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -27,7 +27,7 @@ this.TabView = {
 	PREF_STARTUP_PAGE: "browser.startup.page",
 	get _deck() { return gTabViewDeck; },
 	get GROUPS_IDENTIFIER() { return Storage.kGroupsIdentifier; },
-	get VISIBILITY_IDENTIFIER() { return Storage.kVisibilityIdentifier; },
+	get VISIBILITY_IDENTIFIER() { return ""; },
 	get firstUseExperienced() { return true; },
 	set firstUseExperienced(v) { return true; },
 	get sessionRestoreEnabledOnce() { return Prefs.pageAutoChanged; },
@@ -164,30 +164,25 @@ this.TabView = {
 		
 		if(!window.toolbar.visible || this._initialized) { return; }
 		
-		let data = SessionStore.getWindowValue(window, Storage.kVisibilityIdentifier);
-		if(data == "true") {
-			this.show();
+		try {
+			data = SessionStore.getWindowValue(window, Storage.kGroupsIdentifier);
+			if(data) {
+				data = JSON.parse(data);
+				this.updateGroupNumberBroadcaster(data.totalNumber || 1);
+			}
+		}
+		catch(ex) {}
+		
+		Listeners.add(this.tooltip, "popupshowing", this, true);
+		Listeners.add(this.tabMenuPopup, "popupshowing", this);
+		Listeners.add($('tabContextMenu'), "popupshowing", this);
+		Listeners.add(gBrowser.tabContainer, "TabShow", this);
+		Listeners.add(gBrowser.tabContainer, "TabClose", this);
+		
+		if(this._tabBrowserHasHiddenTabs()) {
+			Listeners.add(window, "keypress", this);
 		} else {
-			try {
-				data = SessionStore.getWindowValue(window, Storage.kGroupsIdentifier);
-				if(data) {
-					data = JSON.parse(data);
-					this.updateGroupNumberBroadcaster(data.totalNumber || 1);
-				}
-			}
-			catch(ex) {}
-			
-			Listeners.add(this.tooltip, "popupshowing", this, true);
-			Listeners.add(this.tabMenuPopup, "popupshowing", this);
-			Listeners.add($('tabContextMenu'), "popupshowing", this);
-			Listeners.add(gBrowser.tabContainer, "TabShow", this);
-			Listeners.add(gBrowser.tabContainer, "TabClose", this);
-			
-			if(this._tabBrowserHasHiddenTabs()) {
-				Listeners.add(window, "keypress", this);
-			} else {
-				Listeners.add(window, "SSWindowStateReady", this);
-			}
+			Listeners.add(window, "SSWindowStateReady", this);
 		}
 		
 		Piggyback.add('TabView', window, 'WindowIsClosing', () => {

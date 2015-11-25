@@ -1,4 +1,4 @@
-// VERSION 1.0.9
+// VERSION 1.0.10
 
 this.Keys = { meta: false };
 
@@ -429,7 +429,6 @@ this.UI = {
 		if(DARWIN) {
 			this.setTitlebarColors(true);
 		}
-		Storage.saveVisibilityData(gWindow, "true");
 		
 		if(zoomOut && currentTab && currentTab._tabViewTabItem) {
 			let item = currentTab._tabViewTabItem;
@@ -497,7 +496,6 @@ this.UI = {
 		if(DARWIN) {
 			this.setTitlebarColors(false);
 		}
-		Storage.saveVisibilityData(gWindow, "false");
 		
 		this._isChangingVisibility = false;
 		
