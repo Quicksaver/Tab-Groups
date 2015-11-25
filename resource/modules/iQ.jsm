@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 // Returns an iQClass object which represents an individual element or a group of elements. It works pretty much like jQuery(), with a few exceptions,
 // most notably that you can't use strings with complex html, just simple tags like '<div>'.
@@ -114,9 +114,7 @@ this.iQClass.prototype = {
 	// Execute a callback for every element in the matched set.
 	each: function(callback) {
 		for(let i = 0; i < this.length; i++) {
-			if(callback(this[i]) !== false) {
-				return this;
-			}
+			if(callback(this[i]) === false) { break; }
 		}
 		return this;
 	},

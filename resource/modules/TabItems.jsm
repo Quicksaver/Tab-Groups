@@ -1,4 +1,4 @@
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -710,7 +710,7 @@ this.TabItems = {
 		for(let name in this._eventListeners) {
 			AllTabs.unregister(name, this._eventListeners[name]);
 		}
-		this.items.forEach(function(tabItem) {
+		for(let tabItem of this.items) {
 			delete tabItem.tab._tabViewTabItem;
 			
 			for(let x in tabItem) {
@@ -718,11 +718,11 @@ this.TabItems = {
 					tabItem[x] = null;
 				}
 			}
-		});
+		}
 		
-		this.items = null;
-		this._eventListeners = null;
-		this._lastUpdateTime = null;
+		this.items = [];
+		this._eventListeners = [];
+		this._lastUpdateTime = Date.now();
 		this._tabsWaitingForUpdate.clear();
 	},
 	
@@ -884,10 +884,9 @@ this.TabItems = {
 	},
 	
 	// Takes in a xul:tab and destroys the TabItem associated with it. 
+	// note that it's ok to unlink an app tab; see .handleTabUnpin
 	unlink: function(tab) {
 		try {
-			// note that it's ok to unlink an app tab; see .handleTabUnpin
-			
 			this.unregister(tab._tabViewTabItem);
 			tab._tabViewTabItem._sendToSubscribers("close", tab._tabViewTabItem);
 			tab._tabViewTabItem.$container.remove();
@@ -989,11 +988,11 @@ this.TabItems = {
 	// Reconnect all of the tabs that were created since we paused.
 	resumeReconnecting: function() {
 		this._reconnectingPaused = false;
-		this.items.forEach(function(item) {
+		for(let item of this.items) {
 			if(!item._reconnected) {
 				item._reconnect();
 			}
-		});
+		}
 	},
 	
 	// Returns true if reconnecting is paused.
@@ -1003,7 +1002,9 @@ this.TabItems = {
 	
 	// Adds the given <TabItem> to the master list.
 	register: function(item) {
-		this.items.push(item);
+		if(this.items.indexOf(item) == -1) {
+			this.items.push(item);
+		}
 	},
 	
 	// Removes the given <TabItem> from the master list.

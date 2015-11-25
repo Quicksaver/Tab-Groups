@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -465,12 +465,12 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		if(css.width || css.height) {
 			this.arrange({ animate: !immediately });
 		} else if(css.left || css.top) {
-			this._children.forEach(function(child) {
+			for(let child of this._children) {
 				if(!child.getHidden()) {
 					let box = child.getBounds();
 					child.setPosition(box.left + offset.x, box.top + offset.y, immediately);
 				}
-			});
+			}
 		}
 		
 		// ___ Update our representation
@@ -507,14 +507,14 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		if(count) {
 			let topZIndex = value +count +1;
 			let zIndex = topZIndex;
-			this._children.forEach((child) => {
+			for(let child of this._children) {
 				if(child == this.getTopChild()) {
 					child.setZ(topZIndex + 1);
 				} else {
 					child.setZ(zIndex);
 					zIndex--;
 				}
-			});
+			}
 		}
 	},
 	
@@ -561,9 +561,9 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	closeAll: function() {
 		if(this._children.length) {
 			this._unfreezeItemSize();
-			this._children.forEach(function(child) {
+			for(let child of this._children) {
 				iQ(child.container).hide();
-			});
+			}
 			
 			let container = iQ(this.container);
 			container.animate({
@@ -635,9 +635,9 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		this.setTrenches(this.bounds);
 		
 		let finalize = () => {
-			this._children.forEach(function(child) {
+			for(let child of this._children) {
 				iQ(child.container).show();
-			});
+			}
 			
 			UI.setActive(this);
 			this._sendToSubscribers("groupShown");
@@ -705,7 +705,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		// when "TabClose" event is fired, the browser tab is about to close and our item "close" event is fired. And then, the browser tab gets closed.
 		// In other words, the group "close" event is fired before all browser tabs in the group are closed.
 		// The below code would fire the group "close" event only after all browser tabs in that group are closed.
-		this._children.concat().forEach((child) => {
+		for(let child of this._children.concat()) {
 			child.removeSubscriber("close", this._onChildClose);
 			
 			if(child.close(true)) {
@@ -715,7 +715,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				// therefore we call child.addSubscriber() if the tab is not removed.
 				child.addSubscriber("close", this._onChildClose);
 			}
-		});
+		}
 		
 		if(this._children.length) {
 			if(this.hidden) {
@@ -994,7 +994,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			}
 			
 			let closed = options.dontClose ? false : this.closeIfEmpty();
-			if(closed || (this._children.length == 0 && !gBrowser._numPinnedTabs && !item.isDragging)) {
+			if(closed || (!this._children.length && !gBrowser._numPinnedTabs && !item.isDragging)) {
 				this._makeLastActiveGroupItemActive();
 			} else if(!options.dontArrange) {
 				this.arrange({ animate: !options.immediately });
@@ -1015,10 +1015,9 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			Utils.extend(newOptions, options);
 		}
 		
-		let toRemove = this._children.concat();
-		toRemove.forEach((child) => {
+		for(let child of this._children.concat()) {
 			this.remove(child, newOptions);
-		});
+		}
 	},
 	
 	// Adds the given xul:tab as an app tab in this group's apptab tray
@@ -1089,7 +1088,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		let elements = iQ(".appTabIcon", this.$appTabTray);
 		let length = elements.length;
 		
-		elements.each(function(icon) {
+		elements.each((icon) => {
 			let $icon = iQ(icon);
 			if($icon.data("xulTab") != xulTab) {
 				return true;
@@ -1207,13 +1206,13 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		}
 		
 		let childrenToArrange = [];
-		this._children.forEach(function(child) {
+		for(let child of this._children) {
 			if(child.isDragging) {
 				options.addTab = true;
 			} else {
 				childrenToArrange.push(child);
 			}
-		});
+		}
 		
 		if(GroupItems._arrangePaused) {
 			GroupItems.pushArrange(this, options);
@@ -1429,10 +1428,10 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			})
 			.addClass("overlay");
 		
-		this._children.forEach(function(child) {
+		for(let child of this._children) {
 			child.addClass("stack-trayed");
 			child.setHidden(false);
-		});
+		}
 		
 		let $shield = iQ('<div>')
 			.addClass('shield')
@@ -1467,7 +1466,8 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		
 		let z = this.getZ();
 		let box = this.getBounds();
-		this.expanded.$tray
+		let tray = this.expanded.$tray;
+		tray
 			.css({
 				zIndex: z + 1
 			})
@@ -1481,7 +1481,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				duration: 350,
 				easing: "tabviewBounce",
 				complete: () => {
-					iQ(this).remove();
+					iQ(tray).remove();
 					this._sendToSubscribers("collapsed");
 				}
 			});
@@ -1489,9 +1489,9 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		this.expanded.$shield.remove();
 		this.expanded = null;
 		
-		this._children.forEach(function(child) {
+		for(let child of this._children) {
 			child.removeClass("stack-trayed");
-		});
+		}
 		
 		this.arrange({ z: z + 2 });
 		this._unfreezeItemSize({ dontArrange: true });
@@ -1670,7 +1670,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		return gBrowser.loadOneTab(url || gWindow.BROWSER_NEW_TAB_URL, { inBackground: dontZoomIn });
 	},
 	
-	// Reorders the tabs in a groupItem based on the arrangment of the tabs shown in the tab bar.
+	// Reorders the tabs in a groupItem based on the arrangement of the tabs shown in the tab bar.
 	// It does it by sorting the children of the groupItem by the positions of their respective tabs in the tab bar.
 	reorderTabItemsBasedOnTabOrder: function() {
 		this._children.sort((a,b) => a.tab._tPos - b.tab._tPos);

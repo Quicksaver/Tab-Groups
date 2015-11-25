@@ -1,4 +1,4 @@
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -261,12 +261,16 @@ this.Range.prototype = {
 
 // Class: Subscribable - A mix-in for allowing objects to collect subscribers for custom events.
 this.Subscribable = function() {
-	this.subscribers = new Map();
+	// we can't set the map here directly, otherwise that map would be shared across all instances based on this object, for Loki reasons...
+	this.subscribers = null;
 };
 
 this.Subscribable.prototype = {
 	// The given callback will be called when the Subscribable fires the given event.
 	addSubscriber: function(eventName, callback) {
+		if(!this.subscribers) {
+			this.subscribers = new Map();
+		}
 		if(!this.subscribers.has(eventName)) {
 			this.subscribers.set(eventName, new Set());
 		}
@@ -277,7 +281,7 @@ this.Subscribable.prototype = {
 	
 	// Removes the subscriber associated with the event for the given callback.
 	removeSubscriber: function(eventName, callback) {
-		if(!this.subscribers.has(eventName)) { return; }
+		if(!this.subscribers || !this.subscribers.has(eventName)) { return; }
 		
 		let subscribers = this.subscribers.get(eventName);
 		subscribers.delete(callback);
@@ -285,7 +289,7 @@ this.Subscribable.prototype = {
 	
 	// Internal routine. Used by the Subscribable to fire events.
 	_sendToSubscribers: function(eventName, eventInfo) {
-		if(!this.subscribers.has(eventName)) { return; }
+		if(!this.subscribers || !this.subscribers.has(eventName)) { return; }
 		
 		let subscribers = this.subscribers.get(eventName);
 		for(let callback of subscribers) {
