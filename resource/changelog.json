@@ -1,0 +1,14 @@
+{
+	"current":"0.1",
+	"knownissues":[
+		["This is the very first release, so there's bound to be bugs and issues that I haven't found yet. Please let me know of every problem you run into so that I can look into it and fix it for a final release."]
+	],
+	"releases": {
+		"0.1":{
+			"date":"November 26, 2015",
+			"notes":[
+				["","Initial preliminary release"]
+			]
+		}
+	}
+}
