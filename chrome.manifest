@@ -1,4 +1,4 @@
-content   tabgroups                    chrome/content/   contentaccessible=yes
+content   tabgroups                    chrome/content/
 resource  tabgroups                    resource/
 
 locale    tabgroups-en   en-US         chrome/locale/en-US/
