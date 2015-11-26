@@ -1,4 +1,4 @@
-// VERSION 1.0.10
+// VERSION 1.0.11
 
 this.Keys = { meta: false };
 
@@ -104,7 +104,7 @@ this.UI = {
 			
 			// clicking the #sessionRestoreNotice banner
 			case 'mousedown':
-				this.goToPreferences('sessionRestore');
+				this.goToPreferences({ jumpto: 'sessionRestore' });
 				break;
 		}
 	},
@@ -145,6 +145,10 @@ this.UI = {
 			
 			iQ("#optionsbutton").mousedown(() => {
 				this.goToPreferences();
+			});
+			
+			iQ("#helpbutton").mousedown(() => {
+				this.goToPreferences({ pane: 'paneHowTo' });
 			});
 			
 			// When you click on the background/empty part of TabView, we create a new groupItem.
@@ -256,8 +260,8 @@ this.UI = {
 		this._frameInitialized = false;
 	},
 	
-	goToPreferences: function(aJumpTo) {
-		PrefPanes.open(gWindow, aJumpTo);
+	goToPreferences: function(aOptions) {
+		PrefPanes.open(gWindow, aOptions);
 		
 		// we can't very well see the preferences if we're still in tabview
 		this.hideTabView();

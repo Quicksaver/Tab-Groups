@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.sessionRestore = {
 	get button() { return $('paneTabGroups-sessionRestore-button'); },
@@ -31,6 +31,9 @@ this.sessionRestore = {
 	
 	enable: function() {
 		pageWatch.enableSessionRestore();
+		if(controllers.nodes.jumpto.value == 'sessionRestore') {
+			controllers.jumpto('');
+		}
 	}
 };
 

@@ -1,4 +1,4 @@
-// VERSION 1.0.12
+// VERSION 1.0.13
 Modules.UTILS = true;
 
 // PrefPanes - handles the preferences tab and all its contents for the add-on
@@ -12,9 +12,11 @@ Modules.UTILS = true;
 //	see register()
 // setList(list) - register a set of panes at once
 //	list - (iterable) list of arguments to apply to register()
-// open(aWindow, aJumpTo) - tries to switch to an already opened add-on preferences tab; if none is found then a new one is opened
+// open(aWindow, aOptions) - tries to switch to an already opened add-on preferences tab; if none is found then a new one is opened
 //	aWindow - (chrome window) in which the preferences tab will be opened
-//	(optional) aJumpTo - (string) query to insert in the Jump To field, to go to a specific area as soon as the preferences tab is ready
+//	(optional) aOptions - (obj) with any of the following optional properties:
+//		pane - (string) name of the pane that should be shown by default in the preferences tab
+//		jumpto - (string) query to insert in the Jump To field, to go to a specific area as soon as the preferences tab is ready
 //	(don't set) loadOnStartup - for internal use only, used to show the about pane when the add-on is updated
 // closeAll() - closes all the add-on's preferences tab
 this.PrefPanes = {
@@ -170,13 +172,13 @@ this.PrefPanes = {
 		this.open(aWindow, null, true);
 	},
 	
-	open: function(aWindow, aJumpTo, loadOnStartup) {
+	open: function(aWindow, aOptions, loadOnStartup) {
 		// first try to switch to an already opened options tab
 		for(let tab of aWindow.gBrowser.mTabs) {
 			if(this.ours(tab.linkedBrowser.currentURI.spec)) {
 				aWindow.gBrowser.selectedTab = tab;
 				aWindow.focus();
-				this.jumpto(tab, aJumpTo);
+				this.goTos(tab, aOptions);
 				return;
 			}
 		}
@@ -190,28 +192,41 @@ this.PrefPanes = {
 			aWindow.gBrowser.selectedTab = aWindow.gBrowser.addTab(this.aboutUri ? this.aboutUri.spec : this.chromeUri);
 		}
 		aWindow.focus();
-		this.jumpto(aWindow.gBrowser.selectedTab, aJumpTo);
+		this.goTos(aWindow.gBrowser.selectedTab, aOptions);
 	},
 	
-	jumpto: function(aTab, aJumpTo) {
-		if(!aJumpTo) { return; }
+	goTos: function(aTab, aOptions) {
+		if(!aOptions || (!aOptions.jumpto && !aOptions.pane)) { return; }
 		
 		if(aTab.linkedBrowser.contentDocument.readyState != 'complete') {
 			let loader = () => {
 				aTab.linkedBrowser.removeEventListener('load', loader, true);
-				this.jumpto(aTab, aJumpTo);
+				this.goTos(aTab, aOptions);
 			};
 			aTab.linkedBrowser.addEventListener('load', loader, true);
 			return;
 		}
 		
-		try {
-			aTab.linkedBrowser.contentWindow[objName].controllers.jumpto(aJumpTo);
+		if(aOptions.jumpto) {
+			try {
+				aTab.linkedBrowser.contentWindow[objName].controllers.jumpto(aOptions.jumpto);
+			}
+			catch(ex) {
+				// the object either doesn't exist or hasn't been initialized yet,
+				// place our jump to query in a var in the window, and it will be picked up as soon as the object is ready
+				aTab.linkedBrowser.contentWindow.__jumpTo = aOptions.jumpto;
+			}
 		}
-		catch(ex) {
-			// the object either doesn't exist or hasn't been initialized yet,
-			// place our jump to query in a var in the window, and it will be picked up as soon as the object is ready
-			aTab.linkedBrowser.contentWindow.__jumpTo = aJumpTo;
+		
+		if(aOptions.pane) {
+			try {
+				aTab.linkedBrowser.contentWindow[objName].categories.gotoPref(aOptions.pane);
+			}
+			catch(ex) {
+				// the object either doesn't exist or hasn't been initialized yet,
+				// place our jump to query in a var in the window, and it will be picked up as soon as the object is ready
+				aTab.linkedBrowser.contentWindow.__gotoPane = aOptions.pane;
+			}
 		}
 	},
 	

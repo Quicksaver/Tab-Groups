@@ -1,4 +1,4 @@
-// VERSION 2.4.7
+// VERSION 2.4.8
 Modules.UTILS = true;
 
 // dependsOn - object that adds a dependson attribute functionality to xul preference elements.
@@ -435,7 +435,12 @@ this.categories = {
 		Listeners.add(this.categories, "mousedown", this);
 		Listeners.add(window, "hashchange", this);
 		
-		this.gotoPref();
+		if(window.__gotoPane) {
+			this.gotoPref(window.__gotoPane);
+			delete window.__gotoPane;
+		} else {
+			this.gotoPref();
+		}
 		this.dynamicPadding();
 	},
 	
@@ -1072,7 +1077,7 @@ this.controllers = {
 	},
 	
 	jumpto: function(override) {
-		if(override) {
+		if(typeof(override) == 'string') {
 			this.nodes.jumpto.value = override;
 		}
 		
