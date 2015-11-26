@@ -8,8 +8,8 @@
 		
 		<em:creator>Quicksaver</em:creator>
 		<em:optionsURL>about:tabgroups</em:optionsURL>
-		<em:iconURL></em:iconURL>
-		<em:homepageURL></em:homepageURL>
+		<em:iconURL>chrome://tabgroups/skin/icon.png</em:iconURL>
+		<em:homepageURL>https://addons.mozilla.org/firefox/addon/tab-groups-panorama/</em:homepageURL>
 		
 		<em:type>2</em:type>
 		<em:optionsType>3</em:optionsType>
@@ -28,7 +28,7 @@
 			<Description>
 				<em:locale>en-US</em:locale>
 				<em:name>Tab Groups</em:name>
-				<em:description>a test</em:description>
+				<em:description>Tab Groups are an easy way to organize a lot of tabs. You can visually group related tabs, switch between groups, and quickly search through all of your tabs to switch to a specific one.</em:description>
 			</Description>
 		</em:localized>
 	</Description>
