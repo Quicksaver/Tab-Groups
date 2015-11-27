@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -1771,7 +1771,7 @@ this.GroupItems = {
 		AllTabs.unregister("close", this);
 		
 		// additional clean up
-		this.groupItems = null;
+		this.groupItems = [];
 	},
 	
 	// Creates a new empty group.

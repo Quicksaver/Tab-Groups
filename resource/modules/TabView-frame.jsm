@@ -1,4 +1,4 @@
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -15,7 +15,20 @@ this.TabView = {
 			this._browserBundle = Services.strings.createBundle("chrome://browser/locale/tabbrowser.properties");
 		}
 		return this._browserBundle;
-	}
+	},
+	
+	// compatibility shims, for other add-ons to interact with this window more closely to the original if needed
+	shims: [
+		'iQ',
+		'Item', 'Items',
+		'GroupItem', 'GroupItems',
+		'TabItem', 'TabItems', 'TabPriorityQueue', 'TabCanvas',
+		'FavIcons',
+		'drag', 'resize', 'Drag',
+		'Trench', 'Trenches',
+		'TabUtils', 'TabMatcher', 'TabHandlers', 'Search',
+		'Keys', 'UI'
+	]
 };
 
 this.AllTabs = {
@@ -43,6 +56,12 @@ this.AllTabs = {
 };
 
 Modules.LOADMODULE = function() {
+	// compatibility shims, for other add-ons to interact with this window more closely to the original if needed
+	for(let shim of TabView.shims) {
+		let prop = shim;
+		window.__defineGetter__(prop, function() { return self[prop]; });
+	}
+	
 	Modules.load('iQ');
 	Modules.load('Items');
 	Modules.load('GroupItems');
@@ -64,4 +83,8 @@ Modules.UNLOADMODULE = function() {
 	Modules.unload('GroupItems');
 	Modules.unload('Items');
 	Modules.unload('iQ');
+	
+	for(let shim of TabView.shims) {
+		delete window[shim];
+	}
 };

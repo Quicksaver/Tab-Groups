@@ -1,4 +1,4 @@
-// VERSION 1.0.11
+// VERSION 1.0.12
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -368,21 +368,25 @@ this.TabView = {
 		}
 	},
 	
+	getGroupTitle: function(groupItem) {
+		let title = groupItem.getTitle();
+		if(title.trim()) {
+			return title;
+		}
+		
+		let topChildLabel = groupItem.getTopChild().tab.label;
+		let childNum = groupItem.getChildren().length;
+		if(childNum > 1) {
+			let num = childNum -1;
+			return Strings.get('TabView', 'moveToUnnamedGroup', [ [ "$title$", topChildLabel ], [ "$tabs$", num ] ], num);
+		}
+		
+		return topChildLabel;
+	},
+	
 	_createGroupMenuItem: function(groupItem) {
 		let menuItem = document.createElement("menuitem");
-		let title = groupItem.getTitle();
-		
-		if(!title.trim()) {
-			let topChildLabel = groupItem.getTopChild().tab.label;
-			let childNum = groupItem.getChildren().length;
-			
-			if(childNum > 1) {
-				let num = childNum -1;
-				title = Strings.get('TabView', 'moveToUnnamedGroup', [ [ "$title$", topChildLabel ], [ "$tabs", num ] ], num);
-			} else {
-				title = topChildLabel;
-			}
-		}
+		let title = this.getGroupTitle();
 		
 		menuItem.setAttribute("label", title);
 		menuItem.setAttribute("tooltiptext", title);
