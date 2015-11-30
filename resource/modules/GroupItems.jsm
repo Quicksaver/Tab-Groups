@@ -1,4 +1,4 @@
-// VERSION 1.0.5
+// VERSION 1.0.6
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -281,7 +281,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		if(!this._inited || this._uninited) { return; }
 		
 		let data = this.getStorageData();
-		if(GroupItems.groupItemStorageSanity(data)) {
+		if(GroupItems.storageSanityGroupItem(data)) {
 			Storage.saveGroupItem(gWindow, data);
 		}
 	},
@@ -1933,7 +1933,7 @@ this.GroupItems = {
 				let toClose = this.groupItems.concat();
 				for(let id in groupItemData) {
 					let data = groupItemData[id];
-					if(this.groupItemStorageSanity(data)) {
+					if(this.storageSanityGroupItem(data)) {
 						let groupItem = this.groupItem(data.id); 
 						if(groupItem && !groupItem.hidden) {
 							groupItem.userSize = data.userSize;
@@ -1946,7 +1946,9 @@ this.GroupItems = {
 							}
 						} else {
 							let options = {
-								dontPush: true,
+								// we always push when first appending the group, in case new groups (from other add-ons, or imported in prefs)
+								// overlap existing groups
+								dontPush: false,
 								immediately: true
 							};
 							new GroupItem([], Utils.extend({}, data, options));
@@ -2009,12 +2011,23 @@ this.GroupItems = {
 	},
 	
 	// Given persistent storage data for a groupItem, returns true if it appears to not be damaged.
-	groupItemStorageSanity: function(groupItemData) {
-		if(!groupItemData.bounds
-		|| !Utils.isRect(groupItemData.bounds)
-		|| (groupItemData.userSize && !Utils.isPoint(groupItemData.userSize))
-		|| !groupItemData.id) {
+	storageSanityGroupItem: function(groupItemData) {
+		if(!groupItemData.id
+		|| (groupItemData.userSize && !Utils.isPoint(groupItemData.userSize))) {
 			return false;
+		}
+		
+		// For compatibility with other add-ons that might modify (read: create) groups, instead of discarting invalid groups we "fix" them.
+		if(!groupItemData.bounds || !Utils.isRect(groupItemData.bounds)) {
+			let pageBounds = Items.getPageBounds();
+			pageBounds.inset(20, 20);
+			
+			let box = new Rect(pageBounds);
+			box.width = 250;
+			box.height = 200;
+			
+			groupItemData.bounds = box;
+			Storage.saveGroupItem(gWindow, groupItemData);
 		}
 		
 		return true;

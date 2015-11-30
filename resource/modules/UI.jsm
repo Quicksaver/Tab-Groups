@@ -1,4 +1,4 @@
-// VERSION 1.0.11
+// VERSION 1.0.12
 
 this.Keys = { meta: false };
 
@@ -128,7 +128,7 @@ this.UI = {
 			}
 			
 			let data = Storage.readUIData(gWindow);
-			this._storageSanity(data);
+			this.storageSanity(data);
 			this._pageBounds = data.pageBounds;
 			
 			// ___ search
@@ -1348,7 +1348,7 @@ this.UI = {
 	},
 	
 	// Given storage data for this object, returns true if it looks valid.
-	_storageSanity: function(data) {
+	storageSanity: function(data) {
 		if(Utils.isEmptyObject(data)) {
 			return true;
 		}
@@ -1369,7 +1369,7 @@ this.UI = {
 			pageBounds: this._pageBounds
 		};
 		
-		if(this._storageSanity(data)) {
+		if(this.storageSanity(data)) {
 			Storage.saveUIData(gWindow, data);
 		}
 	},

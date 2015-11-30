@@ -1,4 +1,4 @@
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 this.Storage = {
 	kGroupIdentifier: "tabview-group",
@@ -24,9 +24,7 @@ this.Storage = {
 				existingData = JSON.parse(tabData);
 			}
 		}
-		catch(ex) {
-			// getTabValue will fail if the property doesn't exist.
-		}
+		catch(ex) { /* getTabValue will fail if the property doesn't exist. */ }
 		
 		return existingData;
 	},
@@ -61,16 +59,15 @@ this.Storage = {
 	// Returns the data for all groupItems associated with the given window.
 	readGroupItemData: function(win) {
 		let existingData = {};
-		let data;
+		
 		try {
-			data = SessionStore.getWindowValue(win, this.kGroupIdentifier);
+			let data = SessionStore.getWindowValue(win, this.kGroupIdentifier);
 			if(data) {
 				existingData = JSON.parse(data);
 			}
 		}
-		catch(ex) {
-			// getWindowValue will fail if the property doesn't exist
-		}
+		catch(ex) { /* getWindowValue will fail if the property doesn't exist */ }
+		
 		return existingData;
 	},
 	

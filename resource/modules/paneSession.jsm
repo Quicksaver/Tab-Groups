@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.paneSession = {
 	manualAction: false,
@@ -417,6 +417,9 @@ this.paneSession = {
 		// get the next id to be used for the imported groups
 		let groups = Storage.readGroupItemData(root);
 		let groupItems = Storage.readGroupItemsData(root);
+		if(!groupItems) {
+			groupItems = {};
+		}
 		if(!groupItems.nextID) {
 			groupItems.nextID = 1;
 		}
