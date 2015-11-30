@@ -1,4 +1,4 @@
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -1931,7 +1931,7 @@ this.GroupItems = {
 			
 			if(groupItemData) {
 				let toClose = this.groupItems.concat();
-				for(var id in groupItemData) {
+				for(let id in groupItemData) {
 					let data = groupItemData[id];
 					if(this.groupItemStorageSanity(data)) {
 						let groupItem = this.groupItem(data.id); 

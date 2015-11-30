@@ -1,4 +1,4 @@
-// VERSION 2.4.8
+// VERSION 2.4.9
 Modules.UTILS = true;
 
 // dependsOn - object that adds a dependson attribute functionality to xul preference elements.
@@ -983,7 +983,7 @@ this.controllers = {
 	},
 	
 	export: function() {
-		this.showFilePicker(Ci.nsIFilePicker.modeSave, function(aFile) {
+		this.showFilePicker(Ci.nsIFilePicker.modeSave, objPathString+'-prefs', function(aFile) {
 			let { TextEncoder, OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
 			
 			let list = { [objName]: AddonData.version };
@@ -1001,7 +1001,7 @@ this.controllers = {
 	},
 	
 	import: function() {
-		this.showFilePicker(Ci.nsIFilePicker.modeOpen, function(aFile) {
+		this.showFilePicker(Ci.nsIFilePicker.modeOpen, null, function(aFile) {
 			let { TextDecoder, OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
 			
 			OS.File.open(aFile.path, { read: true }).then(function(ref) {
@@ -1027,7 +1027,7 @@ this.controllers = {
 		});
 	},
 	
-	showFilePicker: function(mode, aCallback) {
+	showFilePicker: function(mode, prefix, aCallback) {
 		let fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
 		fp.defaultExtension = 'json';
 		fp.appendFilter('JSON data', '*.json');
@@ -1035,7 +1035,7 @@ this.controllers = {
 		if(mode == Ci.nsIFilePicker.modeSave) {
 			let date = new Date();
 			let dateStr = date.getFullYear()+'-'+date.getMonth()+'-'+date.getDate()+'-'+date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds();
-			fp.defaultString = objPathString+'-'+dateStr;
+			fp.defaultString = prefix+'-'+dateStr;
 		}
 		
 		fp.init(window, null, mode);

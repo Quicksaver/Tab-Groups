@@ -1,4 +1,4 @@
-// VERSION 1.0.12
+// VERSION 1.0.13
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -8,6 +8,7 @@ this.__defineGetter__('TabContextMenu', function() { return window.TabContextMen
 XPCOMUtils.defineLazyGetter(this, "AeroPeek", () => { return Cu.import("resource:///modules/WindowsPreviewPerTab.jsm", {}).AeroPeek; });
 
 this.TabView = {
+	_deck: null,
 	_iframe: null,
 	_window: null,
 	_initialized: false,
@@ -25,7 +26,6 @@ this.TabView = {
 	PREF_BRANCH: "extensions."+objPathString,
 	PREF_RESTORE_ENABLED_ONCE: "extensions."+objPathString+".pageAutoChanged",
 	PREF_STARTUP_PAGE: "browser.startup.page",
-	get _deck() { return gTabViewDeck; },
 	get GROUPS_IDENTIFIER() { return Storage.kGroupsIdentifier; },
 	get VISIBILITY_IDENTIFIER() { return ""; },
 	get firstUseExperienced() { return true; },
@@ -39,7 +39,7 @@ this.TabView = {
 		delete this.windowTitle;
 		let brandBundle = $("bundle_brand");
 		let brandShortName = brandBundle.getString("brandShortName");
-		let title = Strings.get("TabView", "windowTitle", [ [ '$app$', brandShortName ] ]);
+		let title = Strings.get("TabView", "windowTitle", [ [ '$app', brandShortName ] ]);
 		return this.windowTitle = title;
 	},
 	
@@ -244,24 +244,9 @@ this.TabView = {
 		Listeners.remove(this.tooltip, "popupshowing", this, true);
 		Listeners.remove(this.tabMenuPopup, "popupshowing", this);
 		Listeners.remove($('tabContextMenu'), "popupshowing", this);
-		Listeners.remove(gBrowser.tabContainer, "TabShow", this);
-		Listeners.remove(gBrowser.tabContainer, "TabClose", this);
-		Listeners.remove(window, "SSWindowStateReady", this);
-		Listeners.remove(this._window, "tabviewframeinitialized", this);
-		Listeners.remove(window, "keypress", this);
-		Listeners.remove(this._iframe, "DOMContentLoaded", this);
 		
 		this._initialized = false;
-		
-		if(this._window) {
-			removeObject(this._window);
-			this._window = null;
-		}
-		
-		if(this._iframe) {
-			this._iframe.remove();
-			this._iframe = null;
-		}
+		this._deinitFrame();
 	},
 	
 	// Creates the frame and calls the callback once it's loaded. If the frame already exists, calls the callback immediately. 
@@ -297,6 +282,44 @@ this.TabView = {
 		
 		this._iframe.setAttribute("src", "chrome://"+objPathString+"/content/tabview.xhtml");
 		this._deck.appendChild(this._iframe);
+	},
+	
+	_deinitFrame: function() {
+		// nothing to do
+		if(!this._window && !this._iframe && !this._deck) { return; }
+		
+		Listeners.remove(this._window, "tabviewframeinitialized", this);
+		Listeners.remove(this._iframe, "DOMContentLoaded", this);
+		
+		if(this._initialized) {
+			Listeners.add(gBrowser.tabContainer, "TabShow", this);
+			Listeners.add(gBrowser.tabContainer, "TabClose", this);
+			
+			if(this._tabBrowserHasHiddenTabs()) {
+				Listeners.remove(window, "SSWindowStateReady", this);
+				Listeners.add(window, "keypress", this);
+			} else {
+				Listeners.remove(window, "keypress", this);
+				Listeners.add(window, "SSWindowStateReady", this);
+			}
+		} else {
+			Listeners.remove(window, "SSWindowStateReady", this);
+			Listeners.remove(window, "keypress", this);
+			Listeners.remove(gBrowser.tabContainer, "TabShow", this);
+			Listeners.remove(gBrowser.tabContainer, "TabClose", this);
+		}
+		
+		this._deck = null;
+		
+		if(this._window) {
+			removeObject(this._window);
+			this._window = null;
+		}
+		
+		if(this._iframe) {
+			this._iframe.remove();
+			this._iframe = null;
+		}
 	},
 	
 	isVisible: function() {
@@ -378,7 +401,7 @@ this.TabView = {
 		let childNum = groupItem.getChildren().length;
 		if(childNum > 1) {
 			let num = childNum -1;
-			return Strings.get('TabView', 'moveToUnnamedGroup', [ [ "$title$", topChildLabel ], [ "$tabs$", num ] ], num);
+			return Strings.get('TabView', 'moveToUnnamedGroup', [ [ "$title", topChildLabel ], [ "$tabs", num ] ], num);
 		}
 		
 		return topChildLabel;
@@ -386,7 +409,7 @@ this.TabView = {
 	
 	_createGroupMenuItem: function(groupItem) {
 		let menuItem = document.createElement("menuitem");
-		let title = this.getGroupTitle();
+		let title = this.getGroupTitle(groupItem);
 		
 		menuItem.setAttribute("label", title);
 		menuItem.setAttribute("tooltiptext", title);

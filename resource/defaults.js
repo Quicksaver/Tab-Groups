@@ -1,4 +1,4 @@
-// VERSION 1.3.11
+// VERSION 1.3.12
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -31,7 +31,8 @@ prefList = {
 
 paneList = [
 	[ "paneTabGroups", true ],
-	[ "paneHowTo", true ]
+	[ "paneHowTo", true ],
+	[ "paneSession", true ]
 ];
 
 function startAddon(window) {

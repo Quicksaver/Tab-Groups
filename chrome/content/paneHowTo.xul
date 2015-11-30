@@ -15,7 +15,7 @@
 			class="category"
 			value="paneHowTo"
 			tooltiptext="&howto.pane.label;"
-			position="2"
+			position="3"
 			align="center">
 			
 			<image class="category-icon"/>
