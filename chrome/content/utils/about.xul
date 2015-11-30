@@ -111,33 +111,19 @@
 					<html:div id="share" hidden="true">
 						<html:h5>&about.share;</html:h5>
 						<html:p>&about.friends;</html:p>
-						<html:div id="a2a_div" linkname="&about.tryit;">
-							<!-- these links go through directly to the social site instead of relying on a2a to mediate -->
-							<html:a class="a2a_link"
+						<html:div id="share-links" linkname="&about.tryit;">
+							<html:a class="share-link"
 								href="https://www.facebook.com/sharer/sharer.php"
 								target="objPathStringFacebook"
-								title="Facebook"><html:span class="a2a_s_facebook"/></html:a>
-							<html:a class="a2a_link"
+								title="Facebook"><html:div class="share-image share-facebook"/></html:a>
+							<html:a class="share-link"
 								href="https://twitter.com/intent/tweet"
 								target="objPathStringTwitter"
-								title="Twitter"><html:span class="a2a_s_twitter"/></html:a>
-							<html:a class="a2a_link"
+								title="Twitter"><html:div class="share-image share-twitter"/></html:a>
+							<html:a class="share-link"
 								href="https://plus.google.com/share"
 								target="objPathStringGooglePlus"
-								title="Google+"><html:span class="a2a_s_google_plus"/></html:a>
-							<!-- I am using the following links to a2a service with the permission to do so from its author -->
-							<html:a class="a2a_link"
-								href="https://www.addtoany.com/add_to/blogger_post"
-								target="_blank"
-								title="Blogger"><html:span class="a2a_s_blogger"/></html:a>
-							<html:a class="a2a_link"
-								href="https://www.addtoany.com/add_to/wordpress"
-								target="_blank"
-								title="WordPress"><html:span class="a2a_s_wordpress"/></html:a>
-							<html:a class="a2a_link"
-								href="https://www.addtoany.com/share_save"
-								target="objPathStringA2AShare"
-								title="&about.moreshare;"><html:span class="a2a_s_a2a"/></html:a>
+								title="Google+"><html:div class="share-image share-googleplus"/></html:a>
 						</html:div>
 					</html:div>
 				</html:div>

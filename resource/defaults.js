@@ -1,11 +1,11 @@
-// VERSION 1.3.12
+// VERSION 1.3.13
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
 addonUUID = 'd9d0e890-860a-11e5-a837-0800200c9a66';
 
 addonUris = {
-	homepage: 'https://addons.mozilla.org/en-US/firefox/addon/tab-groups-panorama/',
+	homepage: 'https://addons.mozilla.org/firefox/addon/tab-groups-panorama/',
 	support: 'https://github.com/Quicksaver/Tab-Groups/issues',
 	fullchangelog: 'https://github.com/Quicksaver/Tab-Groups/commits/master',
 	email: 'quicksaver@gmail.com',

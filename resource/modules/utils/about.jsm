@@ -1,4 +1,4 @@
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 this.about = {
 	kNS: 'http://www.w3.org/1999/xhtml',
@@ -70,7 +70,7 @@ this.about = {
 		}, 'JSON');
 		
 		// init AddToAny stuff (share buttons)
-		this.A2A();
+		this.shareLinks();
 		
 		// fetch the development hours data and show it
 		this.api();
@@ -257,14 +257,14 @@ this.about = {
 	// Since I can't use a local iframe to load remote content, I have to include and build the buttons myself.
 	// Build the buttons href's with the link to the add-on and the phrase to be used as default when sharing.
 	// These values are defined in defaults.js (overriding the empty originals in bootstrap.js)
-	A2A: function() {
+	shareLinks: function() {
 		if(!addonUris.homepage) { return; }
 		$('share').hidden = false;
 		
 		let linkurl = encodeURIComponent(addonUris.homepage);
-		let linkname = encodeURIComponent($('a2a_div').getAttribute('linkname'));
+		let linkname = encodeURIComponent($('share-links').getAttribute('linkname'));
 		
-		let as = $$('.a2a_link');
+		let as = $$('.share-link');
 		for(let a of as) {
 			let href = a.getAttribute('href');
 			switch(a.title) {
@@ -278,10 +278,6 @@ this.about = {
 				
 				case 'Google+':
 					href += '?url='+linkurl;
-					break;
-				
-				default:
-					href += '?linkurl='+linkurl+'&linkname='+linkname;
 					break;
 			}
 			setAttribute(a, 'href', href);
