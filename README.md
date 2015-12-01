@@ -1,5 +1,5 @@
-# Tab-Groups
-Reimplementation of Firefox Tab Groups as an add-on. Get the latest version at https://addons.mozilla.org/firefox/addon/tab-groups-panorama/
+# Tab Groups
+Reimplementation of Firefox Tab Groups (Panorama) as an add-on. Get the latest version at https://addons.mozilla.org/firefox/addon/tab-groups-panorama/
 
 ## Localization
 
