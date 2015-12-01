@@ -3,6 +3,7 @@ resource  tabgroups                    resource/
 
 locale    tabgroups-en   en-US         chrome/locale/en-US/
 locale    tabgroups      en-US         chrome/locale/en-US/
+locale    tabgroups      pt-PT         chrome/locale/pt-PT/
 
 skin      tabgroups      classic/1.0   chrome/skin/common/
 skin      tabgroups-os   classic/1.0   chrome/skin/linux/

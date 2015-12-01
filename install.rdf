@@ -31,5 +31,13 @@
 				<em:description>Tab Groups are an easy way to organize a lot of tabs. You can visually group related tabs, switch between groups, and quickly search through all of your tabs to switch to a specific one.</em:description>
 			</Description>
 		</em:localized>
+		<em:localized>
+			<Description>
+				<em:locale>pt-PT</em:locale>
+				<em:name>Grupos de Separadores</em:name>
+				<em:description>Grupos de Separadores são uma maneira fácil de organizar muitos separadores. Podes agrupar visualmente separadores relacionados, alternar entre grupos, e procurar rapidamente por um separador em específico.</em:description>
+				<em:translator>Quicksaver</em:translator>
+			</Description>
+		</em:localized>
 	</Description>
 </RDF>
