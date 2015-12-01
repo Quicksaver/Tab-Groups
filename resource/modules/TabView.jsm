@@ -1,4 +1,4 @@
-// VERSION 1.0.13
+// VERSION 1.0.14
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -401,7 +401,10 @@ this.TabView = {
 		let childNum = groupItem.getChildren().length;
 		if(childNum > 1) {
 			let num = childNum -1;
-			return Strings.get('TabView', 'moveToUnnamedGroup', [ [ "$title", topChildLabel ], [ "$tabs", num ] ], num);
+			return Strings.get('TabView', 'moveToUnnamedGroup', [
+				[ "$title", topChildLabel ],
+				[ "$tabs", num ]
+			], num);
 		}
 		
 		return topChildLabel;

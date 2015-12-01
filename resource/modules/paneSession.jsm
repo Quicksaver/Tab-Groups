@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.paneSession = {
 	manualAction: false,
@@ -302,7 +302,7 @@ this.paneSession = {
 				let label = Strings.get('TabView', 'restorePinned', [
 					[ '$idx', ++pinnedGroupIdx ],
 					[ '$tabs', pinned.length ]
-				]);
+				], pinned.length);
 				let groupData = this.createGroupItem(pinnedGroupIdx, label);
 				for(let tab of pinned) {
 					this.createTabItem(groupData, tab);
@@ -328,12 +328,12 @@ this.paneSession = {
 							label = Strings.get('TabView', 'restoreNamedGroup', [
 								[ '$name', label ],
 								[ '$tabs', groupTabs.length ]
-							]);
+							], groupTabs.length);
 						} else {
 							label = Strings.get('TabView', 'restoreUnnamedGroup', [
 								[ '$idx', tabGroupIdx ],
 								[ '$tabs', groupTabs.length ]
-							]);
+							], groupTabs.length);
 						}
 						let groupData = this.createGroupItem(tabGroupIdx, label, group);
 						for(let tab of groupTabs) {

@@ -4,7 +4,7 @@
 
 <!ENTITY howto.create.caption "How do I create a Tab Group?">
 <!ENTITY howto.create.step1 "Enter the Tab Groups view, through either the toolbar button, or the keyboard shortcut.">
-<!ENTITY howto.create.step2a "When you enter the Tab Groups view for the first time, you'll see thumbnail previews of all of your tabs in one group. To make a new group, simply drag one tab out of the group and then drag a second one on top of it. A box will be drawn around them.">
+<!ENTITY howto.create.step2a "When you enter the Tab Groups view for the first time, you'll see thumbnail previews of all of your tabs in one group. To make a new group, simply drag one tab out of the group, a box will be drawn around it.">
 <!ENTITY howto.create.step2b "You can continue adding tabs to that new group and you can create more groups.">
 <!ENTITY howto.create.step3 "When you are done, just click on a tab to exit the view. You will return to Firefox, the tab you clicked on will be active and only the tabs in that group will be visible.">
 
