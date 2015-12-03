@@ -1,4 +1,4 @@
-// VERSION 1.0.14
+// VERSION 1.0.15
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -141,7 +141,7 @@ this.TabView = {
 					
 					// Hide "Move to Group" in tabs context menu if it's a pinned tab.
 					case 'tabContextMenu':
-						$("context_tabViewMenu").hidden = TabContextMenu.contextTab.pinned;
+						$(objName+"-context_tabViewMenu").hidden = TabContextMenu.contextTab.pinned;
 						break;
 				}
 				break;
