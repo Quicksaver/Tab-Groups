@@ -486,6 +486,15 @@ html[dir=rtl] .title-shield {
 	font-weight: 700;
 }
 
+.banner:not(#sessionRestoreNotice) {
+	pointer-events: none;
+	transition: opacity 1.5s;
+}
+
+.banner[show="true"] {
+	opacity: 1;
+}
+
 #sessionRestoreNotice {
 	opacity: 1;
 	background-image: linear-gradient(#ffe13e, #ffc703);
@@ -495,15 +504,6 @@ html[dir=rtl] .title-shield {
 #sessionRestoreNotice:hover {
 	background-image: linear-gradient(#fff14e, #ffd713);
 	cursor: pointer;
-}
-
-#sessionRestoreAutoChanged {
-	pointer-events: none;
-	transition: opacity 1.5s;
-}
-
-#sessionRestoreAutoChanged[show="true"] {
-	opacity: 1;
 }
 
 /* Resizable */

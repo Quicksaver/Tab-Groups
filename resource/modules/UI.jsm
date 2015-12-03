@@ -1,4 +1,4 @@
-// VERSION 1.0.12
+// VERSION 1.0.13
 
 this.Keys = { meta: false };
 
@@ -60,6 +60,7 @@ this.UI = {
 	
 	get sessionRestoreNotice() { return $('sessionRestoreNotice'); },
 	get sessionRestoreAutoChanged() { return $('sessionRestoreAutoChanged'); },
+	get sessionRestorePrivate() { return $('sessionRestorePrivate'); },
 	
 	// Called when a web page is about to show a modal dialog.
 	receiveMessage: function(m) {
@@ -1386,8 +1387,16 @@ this.UI = {
 		// so that it "just works" right from the start
 		this.enableSessionRestore();
 		
-		// Notify the user if necessary that session restore needs to be enabled by showing a banner at the bottom.
-		this.sessionRestoreNotice.hidden = (Prefs.page == 3);
+		if(!PrivateBrowsing.isPrivate(gWindow)) {
+			// Notify the user if necessary that session restore needs to be enabled by showing a banner at the bottom.
+			this.sessionRestoreNotice.hidden = (Prefs.page == 3);
+			this.sessionRestorePrivate.hidden = true;
+		}
+		else {
+			// In private windows it's expected of the groups to be gone after closing it, so the warning is really more of a notice.
+			this.tempShowBanner(this.sessionRestorePrivate);
+			this.sessionRestoreNotice.hidden = true;
+		}
 	},
 	
 	// Enables automatic session restore when the browser is started. Does nothing if we already did that once in the past.
@@ -1400,27 +1409,33 @@ this.UI = {
 			pageWatch.enableSessionRestore();
 			
 			// Notify the user that session restore has been automatically enabled by showing a banner that expects no user interaction. It fades out after some seconds.
-			let banner = this.sessionRestoreAutoChanged;
-			
-			let ontransitionend = function() {
-				if(trueAttribute(banner, 'show')) {
-					Timers.init("sessionRestoreAutoChanged", function() {
-						removeAttribute(banner, 'show');
-					}, 5000);
-				} else {
-					banner.hidden = true;
-					Listeners.remove(banner, 'transitionend', ontransitionend);
-				}
-			};
-			
-			Listeners.add(banner, 'transitionend', ontransitionend);
-			banner.hidden = false;
-			
-			// force reflow before setting the show attribute, so it animates
-			banner.clientTop;
-			
-			setAttribute(banner, 'show', 'true');
+			this.tempShowBanner(this.sessionRestoreAutoChanged);
 		}
+	},
+	
+	tempShowBanner: function(banner, duration) {
+		if(!duration) {
+			duration = 5000;
+		}
+		
+		let ontransitionend = function() {
+			if(trueAttribute(banner, 'show')) {
+				Timers.init("tempShowBanner", function() {
+					removeAttribute(banner, 'show');
+				}, duration);
+			} else {
+				banner.hidden = true;
+				Listeners.remove(banner, 'transitionend', ontransitionend);
+			}
+		};
+		
+		Listeners.add(banner, 'transitionend', ontransitionend);
+		banner.hidden = false;
+		
+		// force reflow before setting the show attribute, so it animates
+		banner.clientTop;
+		
+		setAttribute(banner, 'show', 'true');
 	}
 };
 
