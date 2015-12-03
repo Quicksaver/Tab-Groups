@@ -4,6 +4,10 @@
 <!DOCTYPE overlay SYSTEM "chrome://tabgroups/locale/TabView.dtd">
 <overlay id="TabView_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	
+	<broadcasterset id="mainBroadcasterSet">
+		<broadcaster id="objName-tabviewGroupsNumber" groups="1"/>
+	</broadcasterset>
+	
 	<menupopup id="tabContextMenu">
 		<menu id="objName-context_tabViewMenu"
 			label="&moveToGroup.label;"
@@ -47,9 +51,5 @@
 	<commandset id="mainCommandSet">
 		<command id="objName:ToggleTabView" oncommand="objName.TabView.toggle();"/>
 	</commandset>
-	
-	<broadcasterset id="mainBroadcasterSet">
-		<broadcaster id="objName-tabviewGroupsNumber" groups="1"/>
-	</broadcasterset>
 	
 </overlay>
