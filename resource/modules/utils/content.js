@@ -1,4 +1,4 @@
-// VERSION 1.5.4
+// VERSION 1.5.5
 
 // This script should be loaded by defaultsContent.js, which is in turn loaded directly by the Messenger module.
 // defaultsContent.js should set this object's objName and objPathString properties and call its .init() method.
@@ -57,7 +57,7 @@ this.__contentEnvironment = {
 	get document () { return content.document; },
 	$: function(id) { return content.document.getElementById(id); },
 	$$: function(sel, parent = content.document) { return parent.querySelectorAll(sel); },
-	$ª: function(parent, anonid, anonattr = 'anonid') { return content.document.getAnonymousElementByAttribute(parent, anonattr, anonid); },
+	$Âª: function(parent, anonid, anonattr = 'anonid') { return content.document.getAnonymousElementByAttribute(parent, anonattr, anonid); },
 	
 	// easy and useful helpers for when I'm debugging
 	LOG: function(str) {

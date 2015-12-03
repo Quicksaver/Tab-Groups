@@ -1,4 +1,4 @@
-// VERSION 2.7.0
+// VERSION 2.7.1
 
 // Many times I can't use 'this' to refer to the owning var's context, so I'm setting 'this' as 'self', 
 // I can use 'self' from within functions, timers and listeners easily and to bind those functions to it as well
@@ -78,7 +78,7 @@ this.Modules = {
 				Modules: {},
 				$: function() { return null; },
 				$$: function() { return null; },
-				$ª: function() { return null; }
+				$Âª: function() { return null; }
 			};
 			try { Services.scriptloader.loadSubScript(path, tempScope); }
 			catch(ex) {
@@ -88,7 +88,7 @@ this.Modules = {
 			delete tempScope.Modules;
 			delete tempScope.$;
 			delete tempScope.$$;
-			delete tempScope.$ª;
+			delete tempScope.$Âª;
 			
 			Globals.moduleCache[aModule] = [];
 			for(let v in tempScope) {

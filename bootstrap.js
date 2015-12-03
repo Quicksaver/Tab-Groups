@@ -1,4 +1,4 @@
-// VERSION 1.8.3
+// VERSION 1.8.4
 
 // This looks for file defaults.js in resource folder, expects:
 //	objName - (string) main object name for the add-on, to be added to window element
@@ -126,7 +126,7 @@ function prepareObject(window, aName) {
 		get document () { return window.document; },
 		$: function(id) { return window.document.getElementById(id); },
 		$$: function(sel, parent = window.document) { return parent.querySelectorAll(sel); },
-		$ª: function(parent, anonid, anonattr = 'anonid') { return window.document.getAnonymousElementByAttribute(parent, anonattr, anonid); }
+		$Âª: function(parent, anonid, anonattr = 'anonid') { return window.document.getAnonymousElementByAttribute(parent, anonattr, anonid); }
 	};
 	
 	Services.scriptloader.loadSubScript("resource://"+objPathString+"/modules/utils/Modules.jsm", window[objectName]);
