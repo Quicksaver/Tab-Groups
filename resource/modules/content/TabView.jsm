@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.TabView = {
 	handleEvent: function(e) {
@@ -16,6 +16,14 @@ this.TabView = {
 			case 'MozAfterPaint':
 				// Sends an asynchronous message when the "onMozAfterPaint" event is fired.
 				if(e.clientRects.length) {
+					message("MozAfterPaint");
+				}
+				break;
+			
+			case 'timeupdate':
+				// <video> may not fire paint events during playback.
+				// fake paint events so we can still update thumbnails
+				if(e.target.localName == "video") {
 					message("MozAfterPaint");
 				}
 				break;
@@ -52,6 +60,7 @@ this.TabView = {
 Modules.LOADMODULE = function() {
 	addEventListener("DOMWillOpenModalDialog", TabView);
 	addEventListener("MozAfterPaint", TabView);
+	addEventListener("timeupdate", TabView, true);
 	
 	listen("isDocumentLoaded", TabView);
 	listen("isImageDocument", TabView);
@@ -61,6 +70,7 @@ Modules.LOADMODULE = function() {
 Modules.UNLOADMODULE = function() {
 	removeEventListener("DOMWillOpenModalDialog", TabView);
 	removeEventListener("MozAfterPaint", TabView);
+	removeEventListener("timeupdate", TabView, true);
 	
 	unlisten("isDocumentLoaded", TabView);
 	unlisten("isImageDocument", TabView);
