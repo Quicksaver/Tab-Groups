@@ -1,4 +1,4 @@
-// VERSION 1.8.4
+// VERSION 1.8.5
 
 // This looks for file defaults.js in resource folder, expects:
 //	objName - (string) main object name for the add-on, to be added to window element
@@ -67,7 +67,7 @@ var addonUris = {
 	development: ''
 };
 
-const {classes: Cc, interfaces: Ci, utils: Cu, manager: Cm, results: Cr} = Components;
+var {classes: Cc, interfaces: Ci, utils: Cu, manager: Cm, results: Cr} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
