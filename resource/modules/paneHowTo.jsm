@@ -10,7 +10,7 @@ Modules.LOADMODULE = function() {
 		setAttribute(link, 'target', '_blank');
 		setAttribute(link, 'href', 'https://support.mozilla.org/kb/tab-groups-organize-tabs');
 		link.textContent = 'support.mozilla.org';
-		
+
 		fulltext.firstChild.remove();
 		fulltext.appendChild(first);
 		fulltext.appendChild(link);

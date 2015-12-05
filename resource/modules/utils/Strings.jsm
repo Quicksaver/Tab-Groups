@@ -14,19 +14,19 @@ Modules.BASEUTILS = true;
 //			 untranslated strings, this should be set in chrome.manifest as objPathString-en to the en-US locale.
 this.Strings = {
 	bundles: {},
-	
+
 	getPath: function(aPath, alt) {
 		return "chrome://"+objPathString+((alt) ? '-en' : '')+"/locale/"+aPath+".properties?"+AddonData.initTime;
 	},
-	
+
 	get: function(bundle, string, replace, aNumber, alt) {
 		var bundleObj = bundle;
 		if(alt) { bundleObj += '-en'; }
-		
+
 		if(!this.bundles[bundleObj]) {
 			this.bundles[bundleObj] = Services.strings.createBundle(this.getPath(bundle, alt));
 		}
-		
+
 		try { string = this.bundles[bundleObj].GetStringFromName(string); }
 		catch(ex) {
 			if(!alt) {
@@ -46,7 +46,7 @@ this.Strings = {
 			}
 			else { return null; }
 		}
-		
+
 		// This means we are dealing with a possible Plural Form, so we need to make sure we treat it accordingly
 		if(aNumber != undefined && string.includes(';')) {
 			try {
@@ -55,7 +55,7 @@ this.Strings = {
 			}
 			catch(ex) {} // if there's no "PluralRule" defined, skip this as it might just actually be an intentional semi-colon
 		}
-		
+
 		if(replace) {
 			for(let x of replace) {
 				while(string.includes(x[0])) {
@@ -63,7 +63,7 @@ this.Strings = {
 				}
 			}
 		}
-		
+
 		return string;
 	}
 };

@@ -10,13 +10,13 @@ this.api = {
 			while(doc.defaultView.frameElement) {
 				doc = doc.defaultView.frameElement.ownerDocument;
 			}
-			
+
 			if(doc == document) {
 				this.checkPage();
 			}
 		}
 	},
-	
+
 	checkPage: function() {
 		if(document.readyState != 'complete') {
 			var waiting = () => {
@@ -26,7 +26,7 @@ this.api = {
 			content.addEventListener('load', waiting);
 			return;
 		}
-				
+
 		if(document.documentURI.startsWith(addonUris.development)) {
 			var unwrap = XPCNativeWrapper.unwrap(content);
 			if(unwrap.enable) {
@@ -38,7 +38,7 @@ this.api = {
 
 Modules.LOADMODULE = function() {
 	DOMContentLoaded.add(api);
-	
+
 	api.checkPage();
 };
 

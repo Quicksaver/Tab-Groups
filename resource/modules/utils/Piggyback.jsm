@@ -27,31 +27,31 @@ this.Piggyback = {
 	MODE_REPLACE: 0,
 	MODE_BEFORE: 1,
 	MODE_AFTER: 2,
-	
+
 	add: function(aName, aObj, aMethod, aWith, aMode, aKeep) {
 		if(!aMode) { aMode = this.MODE_REPLACE; }
 		var aMaster = objName;
-		
+
 		if(aKeep) {
 			aMaster = aKeep.master;
-			
+
 			// carrying over from a CUIInternal destruction, this will never be active even if it was before
 			aKeep.active = false;
 		}
-		
+
 		var aId = '_Piggyback_'+aMaster;
 		var ids = aObj.__PiggybackIds ? aObj.__PiggybackIds.split(' ') : [];
-		
+
 		// the same method can't be replaced more than once by the same aName (module)
 		if(aObj[aId] && aObj[aId][aName] && aObj[aId][aName][aMethod]) { return; }
-		
+
 		var commander = aKeep || {
 			master: aMaster,
 			method: aWith,
 			mode: aMode,
 			active: false
 		};
-		
+
 		if(!aObj[aId]) {
 			if(ids.indexOf(aMaster) == -1) {
 				ids.push(aMaster);
@@ -62,15 +62,15 @@ this.Piggyback = {
 		if(!aObj[aId].has(aName)) {
 			aObj[aId].set(aName, new Map());
 		}
-		
+
 		aObj[aId].get(aName).set(aMethod, commander)
-		
+
 		// if we're not replacing the method, we create our Piggybacker that will call the method before/after the original method
 		if(aMode != this.MODE_REPLACE && !aKeep) {
 			commander.Piggybacker = function() {
 				// it's not like I can use a not-live reference to this, and I also can't use an array directly or it'll leave a ZC
 				var ex = aObj.__PiggybackIds.split(' ');
-				
+
 				for(let id of ex) {
 					for(let bName of aObj['_Piggyback_'+id].values()) {
 						let bMethod = bName.get(aMethod);
@@ -79,9 +79,9 @@ this.Piggyback = {
 						}
 					}
 				}
-				
+
 				aObj['_'+aMethod].apply(aObj, arguments);
-				
+
 				for(let id of ex) {
 					for(let bName of aObj['_Piggyback_'+id].values()) {
 						let bMethod = bName.get(aMethod);
@@ -92,7 +92,7 @@ this.Piggyback = {
 				}
 			};
 		}
-		
+
 		// if another add-on already piggybacked this method, we don't re-piggyback it; the custom method is already added to the maps above,
 		// so it will still be called by that add-on's commander method (if MODE_BEFORE or MODE_AFTER is used)
 		for(let id of ids) {
@@ -100,32 +100,32 @@ this.Piggyback = {
 				if(bName.has(aMethod) && bName.get(aMethod).active) { return false; }
 			}
 		}
-		
+
 		aObj['_'+aMethod] = aObj[aMethod];
 		aObj[aMethod] = (aMode == this.MODE_REPLACE) ? commander.method : commander.Piggybacker;
 		commander.active = true;
 		return true;
 	},
-	
+
 	revert: function(aName, aObj, aMethod) {
 		var aId = this._obj;
 		var ids = aObj.__PiggybackIds ? aObj.__PiggybackIds.split(' ') : [];
-		
+
 		if(!aObj[aId] || !aObj[aId].has(aName) || !aObj[aId].get(aName).has(aMethod)) { return false; }
-		
+
 		// is this method the one that had the active commander?
 		// If it is, we'll need to remember this to remove the commander and re-apply another commander later if necessary
 		var active = aObj[aId].get(aName).get(aMethod).active;
-		
+
 		aObj[aId].get(aName).delete(aMethod);
-		
+
 		if(aObj[aId].get(aName).size == 0) {
 			aObj[aId].delete(aName);
-			
+
 			if(aObj[aId].size == 0) {
 				delete aObj[aId];
 				ids.splice(ids.indexOf(objName), 1);
-				
+
 				if(ids.length > 0) {
 					aObj.__PiggybackIds = ids.join(' ');
 				} else {
@@ -133,11 +133,11 @@ this.Piggyback = {
 				}
 			}
 		}
-		
+
 		if(active) {
 			aObj[aMethod] = aObj['_'+aMethod];
 			delete aObj['_'+aMethod];
-			
+
 			// if another add-on or module wants to modify the same method, let it now
 			id_loop: for(let id of ids) {
 				for(let bName of aObj['_Piggyback_'+id].values()) {
@@ -157,16 +157,16 @@ this.Piggyback = {
 Modules.LOADMODULE = function() {
 	// needs to be defined here, because in content processes it wouldn't find objName (inside the same object, loaded directly, would need "this")
 	Piggyback._obj += objName;
-	
+
 	if(self.isContent) { return; }
-	
+
 	// CustomizableUI is a special case, as CustomizableUIInternal is frozen and not exported
 	self.CUIBackstage = Cu.import("resource:///modules/CustomizableUI.jsm", self);
 	CUIBackstage[Piggyback._obj] = {
 		replaceInternal: function(objs) {
 			if(!CUIBackstage.__CustomizableUIInternal) {
 				CUIBackstage.__CustomizableUIInternal = CUIBackstage.CustomizableUIInternal;
-			
+
 				var CUIInternalNew = {};
 				for(var p in CUIBackstage.CustomizableUIInternal) {
 					if(CUIBackstage.CustomizableUIInternal.hasOwnProperty(p)) {
@@ -180,7 +180,7 @@ Modules.LOADMODULE = function() {
 				}
 				CUIBackstage.CustomizableUIInternal = CUIInternalNew;
 				CUIBackstage[Piggyback._obj].active = true;
-				
+
 				// we have to make sure any other modifications from other add-ons stay in place if we're re-replacing CUIInternal
 				if(objs) {
 					for(var id in objs) {
@@ -190,14 +190,14 @@ Modules.LOADMODULE = function() {
 							}
 						}
 					}
-				}		
+				}
 			}
 		},
 		active: false
 	};
-	
+
 	CUIBackstage[Piggyback._obj].replaceInternal();
-	
+
 	if(!CUIBackstage.__PiggybackIds) {
 		CUIBackstage.__PiggybackIds = objName;
 	} else if(CUIBackstage.__PiggybackIds.indexOf(objName) == -1) { // should always be the case if it doesn't exist
@@ -209,13 +209,13 @@ Modules.LOADMODULE = function() {
 
 Modules.UNLOADMODULE = function() {
 	if(self.isContent) { return; }
-	
+
 	var ids = CUIBackstage.__PiggybackIds ? CUIBackstage.__PiggybackIds.split(' ') : [];
-	
+
 	// we really need to put everything back as it was!
 	if(ids.indexOf(objName) > -1) {
 		var active = CUIBackstage[Piggyback._obj].active;
-		
+
 		delete CUIBackstage[Piggyback._obj];
 		ids.splice(ids.indexOf(objName), 1);
 		if(ids.length > 0) {
@@ -223,7 +223,7 @@ Modules.UNLOADMODULE = function() {
 		} else {
 			delete CUIBackstage.__PiggybackIds;
 		}
-		
+
 		var internalObjs = null;
 		if(active) {
 			// we have to make sure any other modifications from other add-ons stay in place
@@ -234,10 +234,10 @@ Modules.UNLOADMODULE = function() {
 					internalObjs[id] = CUIBackstage.CustomizableUIInternal['_Piggyback_'+id];
 				}
 			}
-			
+
 			CUIBackstage.CustomizableUIInternal = CUIBackstage.__CustomizableUIInternal;
 			delete CUIBackstage.__CustomizableUIInternal;
-			
+
 			// if another add-on is still initialized, make sure it redoes this
 			for(var id of ids) {
 				CUIBackstage['_Piggyback_'+id].replaceInternal(internalObjs);

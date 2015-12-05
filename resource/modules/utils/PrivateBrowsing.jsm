@@ -20,11 +20,11 @@ Modules.UTILS = true;
 this.PrivateBrowsing = {
 	get autoStarted () { return PrivateBrowsingUtils.permanentPrivateBrowsing; },
 	get inPrivateBrowsing () { return this.isPrivate(window); },
-	
+
 	isPrivate: function(aWindow) {
 		return PrivateBrowsingUtils.isWindowPrivate(aWindow);
 	},
-	
+
 	prepare: function(aWatcher) {
 		if(!aWatcher.observe) {
 			aWatcher.observe = function(aSubject, aTopic, aData) {
@@ -43,16 +43,16 @@ this.PrivateBrowsing = {
 		if(!aWatcher.addonDisabled) { aWatcher.addonDisabled = null; }
 		if(!aWatcher.onQuit) { aWatcher.onQuit = null; }
 	},
-	
+
 	addWatcher: function(aWatcher) {
 		this.prepare(aWatcher);
 		Observers.add(aWatcher, "quit-application");
-		
+
 		if(aWatcher.init) {
 			try { aWatcher.init(); }
 			catch(ex) { aSync(function() { Cu.reportError(ex); }); }
 		}
-		
+
 		if(this.inPrivateBrowsing) {
 			if(aWatcher.addonEnabled && STARTED != APP_STARTUP) {
 				try { aWatcher.addonEnabled(); }
@@ -63,13 +63,13 @@ this.PrivateBrowsing = {
 			}
 		}
 	},
-	
+
 	removeWatcher: function(aWatcher) {
 		if(aWatcher.addonDisabled && this.inPrivateBrowsing && UNLOADED && UNLOADED != APP_SHUTDOWN) {
 			try { aWatcher.addonDisabled(); }
 			catch(ex) { aSync(function() { Cu.reportError(ex); }); }
 		}
-		
+
 		Observers.remove(aWatcher, "quit-application");
 	}
 };

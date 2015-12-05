@@ -47,29 +47,29 @@ this.Rect.prototype = {
 	set right(value) {
 		this.width = value - this.left;
 	},
-	
+
 	get bottom() {
 		return this.top + this.height;
 	},
 	set bottom(value) {
 		this.height = value - this.top;
 	},
-	
+
 	// Gives you a new <Range> for the horizontal dimension.
 	get xRange() {
 		return new Range(this.left, this.right);
 	},
-	
+
 	// Gives you a new <Range> for the vertical dimension.
 	get yRange() {
 		return new Range(this.top, this.bottom);
 	},
-	
+
 	// Returns true if this rectangle intersects the given <Rect>.
 	intersects: function(rect) {
 		return (rect.right > this.left && rect.left < this.right && rect.bottom > this.top && rect.top < this.bottom);
 	},
-	
+
 	// Returns a new <Rect> with the intersection of this rectangle and the give <Rect>, or null if they don't intersect.
 	intersection: function(rect) {
 		let box = new Rect(Math.max(rect.left, this.left), Math.max(rect.top, this.top), 0, 0);
@@ -78,10 +78,10 @@ this.Rect.prototype = {
 		if(box.width > 0 && box.height > 0) {
 			return box;
 		}
-		
+
 		return null;
 	},
-	
+
 	// Returns a boolean denoting if the <Rect> or <Point> is contained inside this rectangle.
 	// Parameters:
 	//  - A <Rect> or a <Point>
@@ -89,30 +89,30 @@ this.Rect.prototype = {
 		if(Utils.isPoint(a)) {
 			return (a.x > this.left && a.x < this.right && a.y > this.top && a.y < this.bottom);
 		}
-		
+
 		return (a.left >= this.left && a.right <= this.right && a.top >= this.top && a.bottom <= this.bottom);
 	},
-	
+
 	// Returns a new <Point> with the center location of this rectangle.
 	center: function() {
 		return new Point(this.left + (this.width / 2), this.top + (this.height / 2));
 	},
-	
+
 	// Returns a new <Point> with the dimensions of this rectangle.
 	size: function() {
 		return new Point(this.width, this.height);
 	},
-	
+
 	// Returns a new <Point> with the top left of this rectangle.
 	position: function() {
 		return new Point(this.left, this.top);
 	},
-	
+
 	// Returns the area of this rectangle.
 	area: function() {
 		return this.width * this.height;
 	},
-	
+
 	// Makes the rect smaller (if the arguments are positive) as if a margin is added all around the initial rect,
 	// with the margin widths (symmetric) being specified by the arguments.
 	// Paramaters
@@ -122,13 +122,13 @@ this.Rect.prototype = {
 			b = a.y;
 			a = a.x;
 		}
-		
+
 		this.left += a;
 		this.width -= a *2;
 		this.top += b;
 		this.height -= b *2;
 	},
-	
+
 	// Moves (translates) the rect by the given vector.
 	// Paramaters
 	//  - A <Point> or two arguments: x and y
@@ -141,12 +141,12 @@ this.Rect.prototype = {
 			this.top += b;
 		}
 	},
-	
+
 	// Returns true if this rectangle is identical to the given <Rect>.
 	equals: function(rect) {
 		return (rect.left == this.left && rect.top == this.top && rect.width == this.width && rect.height == this.height);
 	},
-	
+
 	// Returns a new <Rect> with the union of this rectangle and the given <Rect>.
 	union: function(a) {
 		let newLeft = Math.min(a.left, this.left);
@@ -154,10 +154,10 @@ this.Rect.prototype = {
 		let newWidth = Math.max(a.right, this.right) - newLeft;
 		let newHeight = Math.max(a.bottom, this.bottom) - newTop;
 		let newRect = new Rect(newLeft, newTop, newWidth, newHeight);
-		
+
 		return newRect;
 	},
-	
+
 	// Copies the values of the given <Rect> into this rectangle.
 	copy: function(a) {
 		this.left = a.left;
@@ -185,11 +185,11 @@ this.Range.prototype = {
 	get extent() {
 		return (this.max - this.min);
 	},
-	
+
 	set extent(extent) {
 		this.max = extent - this.min;
 	},
-	
+
 	// Whether the <Range> contains the given <Range> or value or not.
 	// Parameters
 	//  - a number or <Range>
@@ -202,7 +202,7 @@ this.Range.prototype = {
 		}
 		return false;
 	},
-	
+
 	// Whether the <Range> overlaps with the given <Range> value or not.
 	// Parameters
 	//  - a number or <Range>
@@ -215,7 +215,7 @@ this.Range.prototype = {
 		}
 		return false;
 	},
-	
+
 	// Maps the given value to the range [0,1], so that it returns 0 if the value is <= the min,
 	// returns 1 if the value >= the max, and returns an interpolated "proportion" in (min, max).
 	// Parameters
@@ -228,23 +228,23 @@ this.Range.prototype = {
 		if(this.max <= value) {
 			return 1;
 		}
-		
+
 		let proportion = (value - this.min) / this.extent;
-		
+
 		if(smooth) {
 			return .5 -( .5 * this.tanh(2 -(4 *proportion) ) );
 		}
-		
+
 		return proportion;
 	},
-	
+
 	// The ease function ".5+.5*Math.tanh(4*x-2)" is a pretty little graph. It goes from near 0 at x=0 to near 1 at x=1 smoothly and beautifully.
 	// http://www.wolframalpha.com/input/?i=.5+%2B+.5+*+tanh%28%284+*+x%29+-+2%29
 	tanh: function(x) {
 		let e = Math.exp(x);
 		return (e - 1/e) / (e + 1/e);
 	},
-	
+
 	// Takes the given value in [0,1] and maps it to the associated value on the Range.
 	// Parameters
 	//  - a number in [0,1]
@@ -274,23 +274,23 @@ this.Subscribable.prototype = {
 		if(!this.subscribers.has(eventName)) {
 			this.subscribers.set(eventName, new Set());
 		}
-		
+
 		let subscribers = this.subscribers.get(eventName);
 		subscribers.add(callback);
 	},
-	
+
 	// Removes the subscriber associated with the event for the given callback.
 	removeSubscriber: function(eventName, callback) {
 		if(!this.subscribers || !this.subscribers.has(eventName)) { return; }
-		
+
 		let subscribers = this.subscribers.get(eventName);
 		subscribers.delete(callback);
 	},
-	
+
 	// Internal routine. Used by the Subscribable to fire events.
 	_sendToSubscribers: function(eventName, eventInfo) {
 		if(!this.subscribers || !this.subscribers.has(eventName)) { return; }
-		
+
 		let subscribers = this.subscribers.get(eventName);
 		for(let callback of subscribers) {
 			try { callback(eventInfo); }
@@ -306,27 +306,27 @@ this.Utils = {
 	isValidXULTab: function(xulTab) {
 		return !xulTab.closing && xulTab.parentNode;
 	},
-	
+
 	// Returns true if the argument is a valid number.
 	isNumber: function(n) {
 		return typeof n == 'number' && !window.isNaN(n);
 	},
-	
+
 	// Returns true if the given object (r) looks like a <Rect>.
 	isRect: function(r) {
 		return (r && this.isNumber(r.left) && this.isNumber(r.top) && this.isNumber(r.width) && this.isNumber(r.height));
 	},
-	
+
 	// Returns true if the given object (r) looks like a <Range>.
 	isRange: function(r) {
 		return (r && this.isNumber(r.min) && this.isNumber(r.max));
 	},
-	
+
 	// Returns true if the given object (p) looks like a <Point>.
 	isPoint: function(p) {
 		return (p && this.isNumber(p.x) && this.isNumber(p.y));
 	},
-	
+
 	// Returns true if the given object has no members.
 	isEmptyObject: function(obj) {
 		for(let name in obj) {
@@ -334,7 +334,7 @@ this.Utils = {
 		}
 		return true;
 	},
-	
+
 	// Returns a copy of the argument. Note that this is a shallow copy; if the argument
 	// has properties that are themselves objects, those properties will be copied by reference.
 	copy: function(value) {
@@ -346,23 +346,23 @@ this.Utils = {
 		}
 		return value;
 	},
-	
+
 	// Merge two array-like objects into the first and return it.
 	merge: function(first, second) {
 		Array.forEach(second, el => Array.push(first, el));
 		return first;
 	},
-	
+
 	// Pass several objects in and it will combine them all into the first object and return it.
 	extend: function() {
 		// copy reference to target object
 		let target = arguments[0] || {};
-		
+
 		// Handle case when target is a string or something
 		if(typeof(target) != "object" && typeof(target) != "function") {
 			target = {};
 		}
-		
+
 		let length = arguments.length;
 		for(let i = 1; i < length; i++) {
 			// Only deal with non-null/undefined values
@@ -371,17 +371,17 @@ this.Utils = {
 				// Extend the base object
 				for(let name in options) {
 					let copy = options[name];
-					
+
 					// Prevent never-ending loop
 					if(target === copy) { continue; }
-					
+
 					if(copy !== undefined) {
 						target[name] = copy;
 					}
 				}
 			}
 		}
-		
+
 		// Return the modified object
 		return target;
 	}
@@ -403,7 +403,7 @@ this.MRUList.prototype = {
 		this.remove(entry);
 		this._list.unshift(entry);
 	},
-	
+
 	// Removes the given entry from the list.
 	remove: function(entry) {
 		let index = this._list.indexOf(entry);
@@ -411,7 +411,7 @@ this.MRUList.prototype = {
 			this._list.splice(index, 1);
 		}
 	},
-	
+
 	// Returns the most recently used entry. If a filter exists, gets the most recently used entry which matches the filter.
 	peek: function(filter) {
 		let match = null;
@@ -426,7 +426,7 @@ this.MRUList.prototype = {
 		} else {
 			match = this._list.length > 0 ? this._list[0] : null;
 		}
-		
+
 		return match;
 	},
 };

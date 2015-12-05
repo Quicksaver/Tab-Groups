@@ -22,56 +22,56 @@ Modules.UTILS = true;
 this.PrefPanes = {
 	chromeUri: 'chrome://'+objPathString+'/content/utils/preferences.xul',
 	aboutUri: null,
-	
+
 	get notifyUri () {
 		return (this.aboutUri ? this.aboutUri.spec : this.chromeUri) + '#paneAbout';
 	},
-	
+
 	panes: new Map(),
 	previousVersion: null,
-	
+
 	observe: function(aSubject, aTopic, aData) {
 		this.initWindow(aSubject);
 	},
-	
+
 	register: function(aPane, aModules) {
 		if(!this.panes.has(aPane)) {
 			if(aModules === true) {
 				aModules = { [aPane]: aPane };
 			}
-			
+
 			this.panes.set(aPane, aModules);
 		}
 	},
-	
+
 	unregister: function(aPane) {
 		if(this.panes.has(aPane)) {
 			this.panes.delete(aPane);
 		}
 	},
-	
+
 	setList: function(list) {
 		for(let args of list) {
 			this.register.apply(this, args);
 		}
 	},
-	
+
 	init: function() {
 		// we set the add-on status in the API webpage from within the add-on itself
 		Messenger.loadInAll('utils/api');
-		
+
 		// always add the about pane to the preferences dialog, it should be the last category in the list
 		this.register('utils/about', { paneAbout: 'utils/about' });
-		
+
 		Browsers.callOnAll(aWindow => { this.initWindow(aWindow); }, this.chromeUri);
 		Browsers.register(this, 'pageshow', this.chromeUri);
-		
+
 		// if defaults.js supplies an addonUUID, use it to register the about: uri linking to the add-on's preferences
 		if(addonUUID) {
 			this.aboutUri = {
 				spec: 'about:'+objPathString,
 				manager: Cm.QueryInterface(Ci.nsIComponentRegistrar),
-				
+
 				handler: {
 					uri: Services.io.newURI(this.chromeUri, null, null),
 					classDescription: 'about: handler for add-on '+objName,
@@ -85,15 +85,15 @@ this.PrefPanes = {
 					},
 					getURIFlags: function(aURI) { return 0; }
 				},
-				
+
 				load: function() {
 					this.manager.registerFactory(this.handler.classID, this.handler.classDescription, this.handler.contractID, this);
 				},
-				
+
 				unload: function() {
 					this.manager.unregisterFactory(this.handler.classID, this);
 				},
-				
+
 				createInstance: function(outer, iid) {
 					if(outer) {
 						throw Cr.NS_ERROR_NO_AGGREGATION;
@@ -102,59 +102,59 @@ this.PrefPanes = {
 				}
 			};
 			this.aboutUri.load();
-			
+
 			Browsers.callOnAll(aWindow => { this.initWindow(aWindow); }, this.aboutUri.spec);
 			Browsers.register(this, 'pageshow', this.aboutUri.spec);
 		}
-		
+
 		// if we're in a dev version, ignore all this
 		if(AddonData.version.includes('a') || AddonData.version.includes('b')) { return; }
-		
+
 		// if we're updating from a version without this module, try to figure out the last version
 		if(Prefs.lastVersionNotify == '0' && STARTED == ADDON_UPGRADE && AddonData.oldVersion) {
 			Prefs.lastVersionNotify = AddonData.oldVersion;
 		}
-		
+
 		// now make sure we notify the user when updating only; when installing for the first time do nothing
 		if(Prefs.showTabOnUpdates && Prefs.lastVersionNotify != '0' && Services.vc.compare(Prefs.lastVersionNotify, AddonData.version) < 0) {
 			this.previousVersion = Prefs.lastVersionNotify;
 			this.openWhenReady();
 		}
-		
+
 		// always set the pref to the current version, this also ensures only one notification tab will open per firefox session (and not one per window)
 		if(Prefs.lastVersionNotify != AddonData.version) {
 			Prefs.lastVersionNotify = AddonData.version;
 		}
 	},
-	
+
 	uninit: function() {
 		Messenger.unloadFromAll('utils/api');
-		
+
 		this.closeAll();
-		
+
 		Styles.unload('PrefPanesHtmlFix');
 		Styles.unload('PrefPanesXulFix');
-		
+
 		Browsers.unregister(this, 'pageshow', this.chromeUri);
-		
+
 		if(this.aboutUri) {
 			Browsers.unregister(this, 'pageshow', this.aboutUri.spec);
 			this.aboutUri.unload();
 		}
 	},
-	
+
 	// we have to wait for Session Store to finish, otherwise our tab will be overriden by a session-restored tab
 	openWhenReady: function() {
 		// in theory, the add-on could be disabled inbetween aSync calls
 		if(typeof(PrefPanes) == 'undefined') { return; }
-		
+
 		// most recent window, if it doesn't exist yet it means we're still starting up, so give it a moment
 		var aWindow = window;
 		if(!aWindow || !aWindow.SessionStore) {
 			aSync(() => { this.openWhenReady(); }, 500);
 			return;
 		}
-		
+
 		// SessionStore should have registered the window and initialized it, to ensure it doesn't overwrite our tab with any saved ones
 		// (ours will open in addition to session-saved tabs)
 		var state = JSON.parse(aWindow.SessionStore.getBrowserState());
@@ -162,16 +162,16 @@ this.PrefPanes = {
 			aSync(() => { this.openWhenReady(); }, 500);
 			return;
 		}
-		
+
 		// also ensure the window is fully initialized before trying to open a new tab
 		if(!aWindow.gBrowserInit || !aWindow.gBrowserInit.delayedStartupFinished) {
 			aSync(() => { this.openWhenReady(); }, 500);
 			return;
 		}
-		
+
 		this.open(aWindow, null, true);
 	},
-	
+
 	open: function(aWindow, aOptions, loadOnStartup) {
 		// first try to switch to an already opened options tab
 		for(let tab of aWindow.gBrowser.mTabs) {
@@ -182,7 +182,7 @@ this.PrefPanes = {
 				return;
 			}
 		}
-		
+
 		// no tab was found, so open a new one
 		if(loadOnStartup) {
 			aWindow.gBrowser.selectedTab = aWindow.gBrowser.addTab(this.notifyUri);
@@ -194,10 +194,10 @@ this.PrefPanes = {
 		aWindow.focus();
 		this.goTos(aWindow.gBrowser.selectedTab, aOptions);
 	},
-	
+
 	goTos: function(aTab, aOptions) {
 		if(!aOptions || (!aOptions.jumpto && !aOptions.pane)) { return; }
-		
+
 		if(aTab.linkedBrowser.contentDocument.readyState != 'complete') {
 			let loader = () => {
 				aTab.linkedBrowser.removeEventListener('load', loader, true);
@@ -206,7 +206,7 @@ this.PrefPanes = {
 			aTab.linkedBrowser.addEventListener('load', loader, true);
 			return;
 		}
-		
+
 		if(aOptions.jumpto) {
 			try {
 				aTab.linkedBrowser.contentWindow[objName].controllers.jumpto(aOptions.jumpto);
@@ -217,7 +217,7 @@ this.PrefPanes = {
 				aTab.linkedBrowser.contentWindow.__jumpTo = aOptions.jumpto;
 			}
 		}
-		
+
 		if(aOptions.pane) {
 			try {
 				aTab.linkedBrowser.contentWindow[objName].categories.gotoPref(aOptions.pane);
@@ -229,7 +229,7 @@ this.PrefPanes = {
 			}
 		}
 	},
-	
+
 	closeAll: function() {
 		Windows.callOnAll(aWindow => {
 			for(let tab of aWindow.gBrowser.mTabs) {
@@ -237,12 +237,12 @@ this.PrefPanes = {
 					aWindow.gBrowser.removeTab(tab);
 				}
 			}
-			
+
 			// since we're disabling the add-on there's really no point in keeping closed tabs references to our preferences tab, as they won't be valid anymore
 			if(aWindow.__SSi && aWindow.SessionStore) {
 				let closedTabs = JSON.parse(aWindow.SessionStore.getClosedTabData(aWindow));
 				let count = closedTabs.length;
-				
+
 				// we go backwards because forgetClosedTab() changes the array and we can only do one tab at once
 				for(let i = count-1; i >= 0; i--) {
 					let state = closedTabs[i].state;
@@ -258,16 +258,16 @@ this.PrefPanes = {
 			}
 		}, 'navigator:browser');
 	},
-	
+
 	ours: function(spec) {
 		return spec.startsWith(this.chromeUri) || (this.aboutUri && spec.startsWith(this.aboutUri.spec));
 	},
-	
+
 	initWindow: function(aWindow) {
 		// prepare the window as usual
 		replaceObjStrings(aWindow.document);
 		prepareObject(aWindow, objName);
-		
+
 		// load the utils only when the preferences tab is finished with its overlays from this object
 		let promises = [];
 		for(let pane of this.panes.keys()) {
@@ -280,10 +280,10 @@ this.PrefPanes = {
 				});
 			}));
 		}
-		
+
 		Promise.all(promises).then(() => {
 			aWindow[objName].Modules.load("utils/preferencesUtils");
-			
+
 			// if any of the panes require their own module, make sure they are registered with the tab's categories object,
 			// so that they are loaded when the corresponding categories are shown
 			for(let modules of this.panes.values()) {
@@ -304,7 +304,7 @@ Modules.LOADMODULE = function() {
 		showTabOnUpdates: true,
 		userNoticedTabOnUpdates: false
 	});
-	
+
 	PrefPanes.init();
 };
 

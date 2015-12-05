@@ -18,30 +18,30 @@ Modules.BASEUTILS = true;
 this.Observers = {
 	observers: new Set(),
 	hasQuit: false,
-	
+
 	observe: function() {
 		this.hasQuit = true;
 	},
-	
+
 	createObject: function(anObserver) {
 		return (typeof(anObserver) == 'function') ? { observe: anObserver } : anObserver;
 	},
-	
+
 	add: function(anObserver, aTopic, ownsWeak) {
 		var observer = this.createObject(anObserver);
-		
+
 		if(this.observing(observer, aTopic)) {
 			return false;
 		}
-		
+
 		this.observers.add({ topic: aTopic, observer: observer });
 		Services.obs.addObserver(observer, aTopic, ownsWeak);
 		return true;
 	},
-	
+
 	remove: function(anObserver, aTopic) {
 		var observer = this.createObject(anObserver);
-		
+
 		var handler = this.observing(observer, aTopic);
 		if(handler) {
 			Services.obs.removeObserver(handler.observer, handler.topic);
@@ -50,7 +50,7 @@ this.Observers = {
 		}
 		return null;
 	},
-	
+
 	observing: function(anObserver, aTopic) {
 		for(let handler of this.observers) {
 			if((handler.observer == anObserver || handler.observer.observe == anObserver.observe) && handler.topic == aTopic) {
@@ -59,7 +59,7 @@ this.Observers = {
 		}
 		return null;
 	},
-	
+
 	// this forces the observers for quit-application to trigger before I remove them
 	callQuits: function() {
 		if(this.hasQuit) { return false; }
@@ -70,14 +70,14 @@ this.Observers = {
 		}
 		return true;
 	},
-	
+
 	clean: function() {
 		for(let handler of this.observers) {
 			Services.obs.removeObserver(handler.observer, handler.topic);
 		}
 		this.observers = new Set();
 	},
-	
+
 	notify: function(aTopic, aSubject, aData) {
 		if(aSubject == undefined) {
 			aSubject = self;
@@ -89,7 +89,7 @@ this.Observers = {
 Modules.LOADMODULE = function() {
 	// This is so the observers aren't called twice on quitting sometimes
 	Observers.add(Observers, 'quit-application');
-	
+
 	alwaysRunOnShutdown.push(() => { Observers.callQuits(); });
 };
 

@@ -15,16 +15,16 @@ this.__defineGetter__('keydownPanel', function() { delete this.keydownPanel; Mod
 this.__defineGetter__('customizing', function() {
 	// duh
 	if(!window.gCustomizeMode) { return false; }
-	
+
 	if(window.gCustomizeMode._handler.isCustomizing() || window.gCustomizeMode._handler.isEnteringCustomizeMode) { return true; }
-	
+
 	// this means that the window is still opening and the first tab will open customize mode
 	if(window.gBrowser.mCurrentBrowser
 	&& window.gBrowser.mCurrentBrowser.__SS_restore_data
 	&& window.gBrowser.mCurrentBrowser.__SS_restore_data.url == 'about:customizing') {
 		return true;
 	}
-	
+
 	return false;
 });
 
@@ -37,11 +37,11 @@ Modules.LOADMODULE = function() {
 	// This will be run after removeObject(), so this is just to prevent any leftovers
 	alwaysRunOnClose.push(function(aWindow) {
 		delete aWindow['_OVERLAYS_'+objName];
-		
+
 		try {
 			var attr = aWindow.document.documentElement.getAttribute('Bootstrapped_Overlays').split(' ');
 			if(!attr.includes(objName)) { return; }
-			
+
 			attr.splice(attr.indexOf(objName), 1);
 			if(attr.length > 0) {
 				aWindow.document.documentElement.setAttribute('Bootstrapped_Overlays', attr.join(' '));
@@ -52,21 +52,21 @@ Modules.LOADMODULE = function() {
 		catch(ex) {} // Prevent some unforeseen error here
 	});
 	alwaysRunOnClose.push(removeObject);
-	
+
 	// This will not happen when quitting the application (on a restart for example), it's not needed in this case
 	Listeners.add(window, 'unload', function(e) {
 		window.willClose = true; // window.closed is not reliable in some cases
-		
+
 		// We don't use alwaysRunOnClose directly because removeObject() destroys it
 		var tempArr = [];
 		for(let aRun of alwaysRunOnClose) {
 			tempArr.push(aRun);
 		}
-		
+
 		while(tempArr.length > 0) {
 			tempArr.pop()(window);
 		}
-		
+
 		delete window.willClose;
 	}, false, true);
 };

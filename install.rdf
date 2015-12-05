@@ -2,20 +2,20 @@
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>tabgroups@quicksaver</em:id>
-		
+
 		<em:name>Tab Groups</em:name>
 		<em:version>1</em:version>
-		
+
 		<em:creator>Quicksaver</em:creator>
 		<em:optionsURL>about:tabgroups</em:optionsURL>
 		<em:iconURL>chrome://tabgroups/skin/icon.png</em:iconURL>
 		<em:homepageURL>https://addons.mozilla.org/firefox/addon/tab-groups-panorama/</em:homepageURL>
-		
+
 		<em:type>2</em:type>
 		<em:optionsType>3</em:optionsType>
 		<em:bootstrap>true</em:bootstrap>
 		<em:multiprocessCompatible>true</em:multiprocessCompatible>
-		
+
 		<em:targetApplication>
 			<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
@@ -23,7 +23,7 @@
 				<em:maxVersion>45.0a1</em:maxVersion>
 			</Description>
 		</em:targetApplication>
-		
+
 		<em:localized>
 			<Description>
 				<em:locale>en-US</em:locale>

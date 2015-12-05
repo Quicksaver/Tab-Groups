@@ -21,18 +21,18 @@ Modules.BASEUTILS = true;
 // Don't forget that in bootstraped add-ons, these modified functions take the context of the modifier (sandboxed).
 this.toCode = {
 	_records: new Map(),
-	
+
 	modify: function(aObj, aName, params) {
 		var fnName = aName.split(".").pop();
 		if(!aObj || typeof(aObj[fnName]) != 'function') { return; }
-		
+
 		var methodCode = aObj[fnName].toString();
 		var newRecord = {
 			name: aName,
 			original: aObj[fnName],
 			oldCode: methodCode
 		};
-		
+
 		for(let param of params) {
 			if(!methodCode.includes(param[0])) {
 				Cu.reportError('Could not find occurence of string '+param[0]+' in '+aName+'! Interrupting modification.');
@@ -40,7 +40,7 @@ this.toCode = {
 			}
 			methodCode = methodCode.replace(param[0], param[1].replace("{([objName])}", objName));
 		}
-		
+
 		try {
 			aObj[fnName] = eval("("+methodCode+")");
 			newRecord.newCode = aObj[fnName].toString();
@@ -51,21 +51,21 @@ this.toCode = {
 			Cu.reportError(ex);
 		}
 	},
-	
+
 	revert: function(aObj, aName) {
 		var fnName = aName.split(".").pop();
 		if(!aObj || typeof(aObj[fnName]) != 'function') { return; }
-		
+
 		if(!this._records.has(aName)) { return; }
 		var record = this._records.get(aName);
-		
+
 		// Let's ensure no other add-on further changed this function in the meantime.
 		// If it doesn't match we'll report to the error console, but for lack of a better alternative we'll still replace with our original.
 		var newCode = aObj[fnName].toString();
 		if(newCode != record.newCode) {
 			Cu.reportError('Warning! Method '+aName+' has been further changed! Reverting to saved original.');
 		}
-		
+
 		aObj[fnName] = record.original;
 		this._records.delete(aName);
 	}

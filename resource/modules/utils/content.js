@@ -36,7 +36,7 @@ this.__contentEnvironment = {
 	objName: '',
 	objPathString: '',
 	prefList: null,
-	
+
 	addonUris: {
 		homepage: '',
 		support: '',
@@ -46,33 +46,33 @@ this.__contentEnvironment = {
 		api: '',
 		development: ''
 	},
-	
+
 	initialized: false,
 	disabled: false,
 	listeners: new Set(),
 	_queued: new Set(),
-	
+
 	isContent: true,
 	Scope: this, // to delete our variable on shutdown later
 	get document () { return content.document; },
 	$: function(id) { return content.document.getElementById(id); },
 	$$: function(sel, parent = content.document) { return parent.querySelectorAll(sel); },
 	$ª: function(parent, anonid, anonattr = 'anonid') { return content.document.getAnonymousElementByAttribute(parent, anonattr, anonid); },
-	
+
 	// easy and useful helpers for when I'm debugging
 	LOG: function(str) {
 		if(!str) { str = typeof(str)+': '+str; }
 		this.console.log(this.objName+' :: CONTENT :: '+str);
 	},
-	
+
 	// some local things
 	AddonData: {},
 	Globals: {},
-	
+
 	WINNT: false,
 	DARWIN: false,
 	LINUX: false,
-	
+
 	// implement message listeners
 	MESSAGES: [
 		'shutdown',
@@ -83,15 +83,15 @@ this.__contentEnvironment = {
 		'reinit',
 		'disable'
 	],
-	
+
 	messageName: function(m) {
 		// +1 is for the ':' after objName
 		return m.name.substr(this.objName.length +1);
 	},
-	
+
 	receiveMessage: function(m) {
 		let name = this.messageName(m);
-		
+
 		switch(name) {
 			case 'shutdown':
 				// when updating the add-on, the new content script is loaded before the shutdown message is received by the previous script (go figure...),
@@ -100,78 +100,78 @@ this.__contentEnvironment = {
 					this.unload();
 				}
 				break;
-				
+
 			case 'load':
 				this.loadModule(m.data);
 				break;
-				
+
 			case 'unload':
 				this.unloadModule(m.data);
 				break;
-				
+
 			case 'loadQueued':
 				this.loadQueued();
 				break;
-			
+
 			case 'init':
 				this.finishInit(m.data);
 				break;
-			
+
 			case 'reinit':
 				this.reinit();
 				break;
-			
+
 			case 'disable':
 				this.disabled = true;
 				break;
 		}
 	},
-	
+
 	init: function() {
 		this.WINNT = Services.appinfo.OS == 'WINNT';
 		this.DARWIN = Services.appinfo.OS == 'Darwin';
 		this.LINUX = Services.appinfo.OS != 'WINNT' && Services.appinfo.OS != 'Darwin';
-		
+
 		// AddonManager can't be used in child processes!
 		XPCOMUtils.defineLazyModuleGetter(this, "console", "resource://gre/modules/devtools/Console.jsm");
 		XPCOMUtils.defineLazyModuleGetter(this.Scope, "PluralForm", "resource://gre/modules/PluralForm.jsm");
 		XPCOMUtils.defineLazyModuleGetter(this.Scope, "Promise", "resource://gre/modules/Promise.jsm");
 		XPCOMUtils.defineLazyModuleGetter(this.Scope, "Task", "resource://gre/modules/Task.jsm");
 		XPCOMUtils.defineLazyServiceGetter(Services, "navigator", "@mozilla.org/network/protocol;1?name=http", "nsIHttpProtocolHandler");
-		
+
 		// and finally our add-on stuff begins
 		Services.scriptloader.loadSubScript("resource://"+this.objPathString+"/modules/utils/Modules.jsm", this);
 		Services.scriptloader.loadSubScript("resource://"+this.objPathString+"/modules/utils/sandboxUtilsPreload.jsm", this);
 		Services.scriptloader.loadSubScript("resource://"+this.objPathString+"/modules/utils/windowUtilsPreload.jsm", this);
-		
+
 		for(let msg of this.MESSAGES) {
 			this.listen(msg, this);
 		}
 		this.message('init');
 	},
-	
+
 	finishInit: function(data) {
 		this.AddonData = data.AddonData;
 		this.addonUris = data.addonUris;
 		this.prefList = data.prefList;
 		this.initialized = true;
 	},
-	
+
 	reinit: function() {
 		if(!this.initialized) {
 			this.message('init');
 		}
 	},
-	
+
 	listen: function(aMessage, aListener) {
 		for(let l of this.listeners) {
 			if(l.message == aMessage && l.listener == aListener) { return; }
 		}
-		
+
 		this.listeners.add({ message: aMessage, listener: aListener });
 		addMessageListener(this.objName+':'+aMessage, aListener);
 	},
-	
+
 	unlisten: function(aMessage, aListener) {
 		for(let l of this.listeners) {
 			if(l.message == aMessage && l.listener == aListener) {
@@ -181,41 +181,41 @@ this.__contentEnvironment = {
 			}
 		}
 	},
-	
+
 	// send a message to chrome
 	message: function(aMessage, aData, aCPOW, bSync) {
 		// prevents console messages on e10s closing windows (i.e. view-source), there's no point in sending messages from here if "here" doesn't exist anymore
 		if(!content) { return; }
-		
+
 		if(bSync) {
 			sendSyncMessage(this.objName+':'+aMessage, aData, aCPOW);
 			return;
 		}
-		
+
 		sendAsyncMessage(this.objName+':'+aMessage, aData, aCPOW);
 	},
-	
+
 	loadModule: function(name) {
 		// prevents console messages on e10s startup if this is loaded onto the initial temporary browser, which is almost immediately removed afterwards
 		if(!content) { return; }
-		
+
 		if(this.initialized) {
 			this.Modules.load('content/'+name);
 		} else if(!this._queued.has(name)) {
 			this._queued.add(name);
 		}
 	},
-	
+
 	unloadModule: function(name) {
 		// prevents console messages on e10s closing windows (i.e. view-source), there's no point in unloading anything in-content if the content doesn't exist after all
 		if(!content) { return; }
-		
+
 		if(this._queued.has(name)) {
 			this._queued.delete(name);
 		}
 		this.Modules.unload('content/'+name);
 	},
-	
+
 	loadQueued: function() {
 		// finish loading the modules that were waiting for content to be fully initialized
 		for(let module of this._queued) {
@@ -223,7 +223,7 @@ this.__contentEnvironment = {
 		}
 		this._queued = new Set();
 	},
-	
+
 	// Apparently if removing a listener that hasn't been added (or maybe it's something else?) this will throw,
 	// the error should be reported but it's probably ok to continue with the process, this shouldn't block modules from being (un)loaded.
 	WebProgress: {
@@ -234,39 +234,39 @@ this.__contentEnvironment = {
 			}
 			return this._nsI;
 		},
-		
+
 		add: function(aListener, aNotifyMask) {
 			try { this.nsI.addProgressListener(aListener, aNotifyMask); }
 			catch(ex) { Cu.reportError(ex); }
 		},
-		
+
 		remove: function(aListener, aNotifyMask) {
 			if(!this._nsI) { return; }
-			
+
 			try { this.nsI.removeProgressListener(aListener, aNotifyMask); }
 			catch(ex) { Cu.reportError(ex); }
 		}
 	},
-	
+
 	// ZC is we add multiple listeners to Scope for DOMContentLoad, no clue why though...
 	DOMContentLoaded: {
 		Scope: this,
 		listening: false,
 		handlers: [],
-		
+
 		add: function(aMethod) {
 			if(!this.listening) {
 				this.Scope.addEventListener('DOMContentLoaded', this);
 				this.listening = true;
 			}
-			
+
 			for(var h of this.handlers) {
 				if(h == aMethod) { return; }
 			}
-			
+
 			this.handlers.push(aMethod);
 		},
-		
+
 		remove: function(aMethod) {
 			for(var h in this.handlers) {
 				if(this.handlers[h] == aMethod) {
@@ -275,7 +275,7 @@ this.__contentEnvironment = {
 				}
 			}
 		},
-		
+
 		handleEvent: function(e) {
 			for(let h of this.handlers) {
 				try {
@@ -289,7 +289,7 @@ this.__contentEnvironment = {
 			}
 		}
 	},
-	
+
 	handleDeadObject: function(ex) {
 		if(ex.message == "can't access dead object") {
 			var scriptError = Cc["@mozilla.org/scripterror;1"].createInstance(Ci.nsIScriptError);
@@ -301,23 +301,23 @@ this.__contentEnvironment = {
 			return false;
 		}
 	},
-	
+
 	// clean up this object
 	unload: function() {
 		try {
 			this.Modules.clean();
 		}
 		catch(ex) { Cu.reportError(ex); }
-		
+
 		if(this.DOMContentLoaded.listening) {
 			this.Scope.removeEventListener('DOMContentLoaded', this.DOMContentLoaded);
 		}
-		
+
 		// remove all listeners, to make sure nothing is left over
 		for(let l of this.listeners) {
 			removeMessageListener(this.objName+':'+l.message, l.listener);
 		}
-		
+
 		delete this.Scope[this.objName];
 	}
 };

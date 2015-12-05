@@ -21,16 +21,16 @@
 			modifiers="accel"
 			oncommand="objName.controllers.focusJumpto();" />
 	</keyset>
-	
+
 	<stack flex="1">
 		<hbox flex="1">
 			<richlistbox id="categories"/>
-			
+
 			<vbox class="main-wrapper" flex="1">
 				<vbox class="main-content" flex="1">
 					<prefpane id="mainPrefPane"/>
 				</vbox>
-				
+
 				<vbox id="main-footer" align="start">
 					<hbox helpbox="main-footer-helptext">
 						<button label="&preferences.button;" type="menu">

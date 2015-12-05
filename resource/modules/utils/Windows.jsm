@@ -26,11 +26,11 @@ Modules.BASEUTILS = true;
 //	see register()
 this.Windows = {
 	watchers: [],
-	
+
 	getEnumerator: function(aType) {
 		return Services.wm.getEnumerator(aType || null);
 	},
-	
+
 	callOnMostRecent: function(aCallback, aType, aURI) {
 		var type = aType || null;
 		if(aURI) {
@@ -43,14 +43,14 @@ this.Windows = {
 			}
 			return null;
 		}
-		
+
 		var window = Services.wm.getMostRecentWindow(type);
 		if(window) {
 			return aCallback(window);
 		}
 		return null;
 	},
-	
+
 	// expects aCallback() and sets its this as the window
 	callOnAll: function(aCallback, aType, aURI, beforeComplete) {
 		var browserEnumerator = this.getEnumerator(aType);
@@ -61,7 +61,7 @@ this.Windows = {
 			}
 		}
 	},
-	
+
 	register: function(aHandler, aTopic, aType, aURI, beforeComplete) {
 		if(this.watching(aHandler, aTopic, aType, aURI, beforeComplete) === false) {
 			this.watchers.push({
@@ -73,19 +73,19 @@ this.Windows = {
 			});
 		}
 	},
-	
+
 	unregister: function(aHandler, aTopic, aType, aURI, beforeComplete) {
 		var i = this.watching(aHandler, aTopic, aType, aURI, beforeComplete);
 		if(i !== false) {
 			this.watchers.splice(i, 1);
 		}
 	},
-	
+
 	watching: function(aHandler, aTopic, aType, aURI, beforeComplete) {
 		var type = aType || null;
 		var uri = aURI || null;
 		var before = beforeComplete || false;
-		
+
 		for(var i = 0; i < this.watchers.length; i++) {
 			if(this.watchers[i].handler == aHandler
 			&& this.watchers[i].topic == aTopic
@@ -97,16 +97,16 @@ this.Windows = {
 		}
 		return false;
 	},
-	
+
 	observe: function(aSubject, aTopic, noBefore) {
 		var scheduleOnLoad = false;
-		
+
 		for(let watcher of this.watchers) {
 			// 'windowtype' attr is undefined until the window loads
 			if(!noBefore && aSubject.document.readyState != 'complete' && watcher.type) {
 				scheduleOnLoad = true;
 			}
-			
+
 			if(watcher.topic == aTopic
 			&& (!watcher.type || aSubject.document.documentElement.getAttribute('windowtype') == watcher.type)
 			&& (!watcher.uri || aSubject.document.documentURI.startsWith(watcher.uri))) {
@@ -121,7 +121,7 @@ this.Windows = {
 					}
 					continue;
 				}
-				
+
 				if(aSubject.document.readyState == 'complete' || watcher.beforeComplete) {
 					if(watcher.handler.observe) {
 						watcher.handler.observe(aSubject, aTopic);
@@ -131,7 +131,7 @@ this.Windows = {
 				}
 			}
 		}
-		
+
 		if(scheduleOnLoad) {
 			callOnLoad(aSubject, (aWindow) => {
 				this.observe(aWindow, aTopic, true);

@@ -14,7 +14,7 @@ this.xmlHttpRequest = function(url, callback, method = "GET") {
 		json = true;
 		method = "GET";
 	}
-	
+
 	var xmlhttp = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
 	xmlhttp.open(method, url);
 	if(json) {
@@ -53,19 +53,19 @@ this.dispatch = function(aNode, props) {
 	if(!aNode || !aNode.dispatchEvent
 	|| (!aNode.ownerDocument && !aNode.document && (!aNode.content || !aNode.content.document))
 	|| !props || !props.type) { return false; }
-	
+
 	var bubbles = props.bubbles || true;
 	var cancelable = props.cancelable || !props.asking;
 	var detail = props.detail || undefined;
-	
+
 	var doc = (aNode.ownerDocument) ? aNode.ownerDocument : (aNode.document) ? aNode.document : aNode.content.document; // last one's for content processes
 	var event = doc.createEvent('CustomEvent');
-	
+
 	if(props.asking) {
 		event.__defineGetter__('detail', function() { return detail; });
 		event.__defineSetter__('detail', function(v) { return detail = v; });
 	}
-	
+
 	event.initCustomEvent(props.type, bubbles, cancelable, detail);
 	var ret = aNode.dispatchEvent(event);
 	return (props.asking) ? detail : ret;
@@ -77,13 +77,13 @@ this.dispatch = function(aNode, props) {
 //	(dont set) aWindow - to be used internally by isAncestor()
 this.isAncestor = function(aNode, aParent, aWindow) {
 	if(!aNode || !aParent) { return false; };
-	
+
 	if(aNode == aParent) { return true; }
-	
+
 	let ownDocument = aNode.ownerDocument || aNode.document;
 	if(ownDocument && ownDocument == aParent) { return true; }
 	if(aNode.compareDocumentPosition && (aNode.compareDocumentPosition(aParent) & aNode.DOCUMENT_POSITION_CONTAINS)) { return true; }
-	
+
 	if(aParent.nodeType == aParent.ELEMENT_NODE) {
 		let browserNodes = (aParent.tagName == 'browser') ? [aParent] : aParent.getElementsByTagName('browser');
 		for(let browser of browserNodes) {
@@ -91,7 +91,7 @@ this.isAncestor = function(aNode, aParent, aWindow) {
 			catch(ex) { /* this will fail in e10s if comparing a node from a non-remote document to a remote parent, which means we don't care either way */ }
 		}
 	}
-	
+
 	if(!aWindow) { return false; }
 	for(var frame of aWindow.frames) {
 		if(isAncestor(aNode, frame.document, frame)) { return true; }
@@ -105,7 +105,7 @@ this.trim = function(str) {
 	if(typeof(str) != 'string') {
 		return '';
 	}
-	
+
 	return str.substring(Math.max(str.search(/\S/), 0), str.search(/\S\s*$/) + 1);
 };
 
@@ -115,20 +115,20 @@ this.trim = function(str) {
 //				When specified, this method is not recursive, it will not check child nodes!
 this.replaceObjStrings = function(node, prop) {
 	if(!node) { return; }
-	
+
 	if(prop) {
 		if(!node[prop]) { return; }
-		
+
 		while(node[prop].includes('objName')) {
 			node[prop] = node[prop].replace('objName', objName);
 		}
 		while(node[prop].includes('objPathString')) {
 			node[prop] = node[prop].replace('objPathString', objPathString);
 		}
-		
+
 		return;
 	}
-	
+
 	if(node.attributes) {
 		for(let attr of node.attributes) {
 			while(attr.value.includes('objName')) {
@@ -139,7 +139,7 @@ this.replaceObjStrings = function(node, prop) {
 			}
 		}
 	}
-	
+
 	var curChild = node.firstChild;
 	while(curChild) {
 		replaceObjStrings(curChild);

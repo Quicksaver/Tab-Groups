@@ -14,7 +14,7 @@
 
 <overlay	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 			xmlns:html="http://www.w3.org/1999/xhtml">
-	
+
 	<richlistbox id="categories">
 		<richlistitem id="category-about"
 			class="category"
@@ -22,7 +22,7 @@
 			tooltiptext="&about.paneTitle;"
 			position="99"
 			align="center">
-			
+
 			<image class="category-icon"/>
 			<label class="category-name" flex="1" value="&about.paneTitle;"/>
 		</richlistitem>
@@ -32,7 +32,7 @@
 		<preferences>
 			<preference id="pref-showTabOnUpdates" name="extensions.tabgroups.showTabOnUpdates" type="bool"/>
 		</preferences>
-		
+
 		<hbox id="header-about" class="header" collapsed="true" data-category="paneAbout">
 			<image id="logo"/>
 			<vbox>
@@ -44,7 +44,7 @@
 				</hbox>
 			</vbox>
 		</hbox>
-		
+
 		<vbox id="paneAbout-wrapper" flex="1" collapsed="true" data-category="paneAbout">
 			<html:div class="row">
 				<html:div id="general" class="main-column">
@@ -130,5 +130,5 @@
 			</html:div>
 		</vbox>
 	</prefpane>
-	
+
 </overlay>

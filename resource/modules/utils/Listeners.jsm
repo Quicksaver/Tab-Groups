@@ -17,16 +17,16 @@ Modules.BASEUTILS = true;
 this.Listeners = {
 	handlers: new Set(),
 	inContent: typeof(Scope) != 'undefined',
-	
+
 	// Used to be if maxTriggers is set to the boolean false, it acted as a switch to not bind the function to our object,
 	// However this is no longer true, not only did I not use it, due to recent modifications to the method, it would be a very complex system to achieve.
 	add: function(obj, type, listener, capture, maxTriggers) {
 		if(!obj || !obj.addEventListener) { return false; }
-		
+
 		if(this.listening(obj, type, capture, listener)) { return true; }
-		
+
 		if(maxTriggers === true) { maxTriggers = 1; }
-		
+
 		var handler = {
 			_obj: obj,
 			_objID: obj.id,
@@ -42,7 +42,7 @@ this.Listeners = {
 			capture: capture,
 			maxTriggers: (maxTriggers) ? maxTriggers : null,
 			triggerCount: 0,
-			
+
 			handleEvent: function(e) {
 				if(this.maxTriggers) {
 					this.triggerCount++;
@@ -50,7 +50,7 @@ this.Listeners = {
 						Listeners.remove(this.obj, this.type, this.listener, this.capture);
 					}
 				}
-				
+
 				if(this.listener.handleEvent) {
 					this.listener.handleEvent(e);
 				} else {
@@ -58,13 +58,13 @@ this.Listeners = {
 				}
 			}
 		};
-		
+
 		this.handlers.add(handler);
-		
+
 		handler.obj.addEventListener(handler.type, handler, handler.capture);
 		return true;
 	},
-	
+
 	remove: function(obj, type, listener, capture, maxTriggers) {
 		try {
 			if(!obj || !obj.removeEventListener) { return false; }
@@ -73,7 +73,7 @@ this.Listeners = {
 			handleDeadObject(ex); /* prevents some can't access dead objects */
 			return false;
 		}
-		
+
 		let handler = this.listening(obj, type, capture, listener);
 		if(handler) {
 			handler.obj.removeEventListener(handler.type, handler, handler.capture);
@@ -82,7 +82,7 @@ this.Listeners = {
 		}
 		return false;
 	},
-	
+
 	listening: function(obj, type, capture, listener) {
 		for(let handler of this.handlers) {
 			if(handler.obj == obj
@@ -94,7 +94,7 @@ this.Listeners = {
 		}
 		return null;
 	},
-	
+
 	/* I'm not sure if clean is currently working...
 	OmniSidebar - Started browser and opened new window then closed it, it would not remove the switchers listeners, I don't know in which window,
 	or it would but it would still leave a ZC somehow. Removing them manually in UNLOADMODULE fixed the ZC but they should have been taken care of here */

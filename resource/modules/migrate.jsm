@@ -2,22 +2,22 @@
 
 this.migrate = {
 	migratorBackstage: null,
-	
+
 	init: function() {
 		this.migratePrefs();
-		
+
 		if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 			this.skipTabGroupsMigrator();
 		}
 	},
-	
+
 	uninit: function() {
 		if(this.migratorBackstage) {
 			this.migratorBackstage.TabGroupsMigrator = this.migratorBackstage._TabGroupsMigrator;
 			delete this.migratorBackstage._TabGroupsMigrator;
 		}
 	},
-	
+
 	migratePrefs: function() {
 		if(!Prefs.migratedPrefs) {
 			if(Services.prefs.prefHasUserValue('browser.panorama.animate_zoom')) {
@@ -29,7 +29,7 @@ this.migrate = {
 			Prefs.migratedPrefs = true;
 		}
 	},
-	
+
 	// we need to wait until at least one window is finished loading, so that CustomizableUI knows what it's doing
 	migrateWidget: function() {
 		// try to place our widget in the same place where the native widget used to be
@@ -48,7 +48,7 @@ this.migrate = {
 			Prefs.migratedWidget = true;
 		}
 	},
-	
+
 	skipTabGroupsMigrator: function() {
 		try {
 			this.migratorBackstage = Cu.import("resource:///modules/TabGroupsMigrator.jsm", {});
@@ -57,48 +57,48 @@ this.migrate = {
 			// this will fail until bug 1221050 lands
 			return;
 		}
-		
+
 		this.migratorBackstage._TabGroupsMigrator = this.migratorBackstage.TabGroupsMigrator;
 		this.migratorBackstage.TabGroupsMigrator = {
 			// no-op the migration, we'll just keep using the same data in the add-on anyway
 			migrate: function() {}
 		};
 	},
-	
+
 	onLoad: function(aWindow) {
 		// we can use our add-on even in builds with Tab View still present, we just have to properly deinitialize it
 		if(aWindow.TabView) {
 			aWindow.TabView.uninit();
 			aWindow.TabView._deck = null;
-			
+
 			if(aWindow.gTaskbarTabGroup) {
 				aWindow.gTaskbarTabGroup.win.removeEventListener("tabviewshown", aWindow.gTaskbarTabGroup);
 				aWindow.gTaskbarTabGroup.win.removeEventListener("tabviewhidden", aWindow.gTaskbarTabGroup);
 			}
-			
+
 			aWindow._TabView = aWindow.TabView;
 		}
-		
+
 		// compatibility shim, for other add-ons to interact with this object more closely to the original if needed
 		aWindow.TabView = aWindow[objName].TabView;
-		
+
 		// we can move this directly in the startup method once we no longer load the overlay
 		//if(Services.vc.compare(Services.appinfo.version, "45.0a1") < 0) {
 			Modules.load('keysets');
 		//}
 	},
-	
+
 	onUnload: function(aWindow) {
 		if(UNLOADED/* && Services.vc.compare(Services.appinfo.version, "45.0a1") < 0*/) {
 			Modules.unload('keysets');
 		}
-		
+
 		if(aWindow._TabView) {
 			aWindow.TabView = aWindow._TabView;
 			delete aWindow._TabView;
-			
+
 			aWindow.TabView.init();
-			
+
 			if(aWindow.gTaskbarTabGroup) {
 				aWindow.gTaskbarTabGroup.win.addEventListener("tabviewshown", aWindow.gTaskbarTabGroup);
 				aWindow.gTaskbarTabGroup.win.addEventListener("tabviewhidden", aWindow.gTaskbarTabGroup);
@@ -116,12 +116,12 @@ Modules.LOADMODULE = function() {
 	//if(Services.vc.compare(Services.appinfo.version, "45.0a1") < 0) {
 		Overlays.overlayURI('chrome://browser/content/browser.xul', 'migrate', migrate);
 	//}
-	
+
 	migrate.init();
 };
 
 Modules.UNLOADMODULE = function() {
 	migrate.uninit();
-	
+
 	Overlays.removeOverlayURI('chrome://browser/content/browser.xul', 'migrate');
 };
