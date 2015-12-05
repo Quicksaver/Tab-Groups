@@ -1,5 +1,7 @@
 // VERSION 1.0.6
 
+'use strict';
+
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
 // Class: TabItem - An <Item> that represents a tab. Also implements the <Subscribable> interface.
@@ -654,6 +656,13 @@ this.TabItems = {
 		this.tabAspect = this.tabHeight / this.tabWidth;
 		this.invTabAspect = 1 / this.tabAspect;
 
+		this._thumbFileExpirationFilter = () => {
+			return AllTabs.tabs.map(t => t.linkedBrowser.currentURI.spec);
+		}
+
+
+		gPageThumbnails.addExpirationFilter(this._thumbFileExpirationFilter);
+
 		let $canvas = iQ("<canvas>").attr('moz-opaque', '');
 		$canvas.appendTo(iQ("body"));
 		$canvas.hide();
@@ -709,6 +718,8 @@ this.TabItems = {
 
 	uninit: function() {
 		Messenger.unlistenWindow(gWindow, "MozAfterPaint", this);
+
+		gPageThumbnails.removeExpirationFilter(this._thumbFileExpirationFilter);
 
 		for(let name in this._eventListeners) {
 			AllTabs.unregister(name, this._eventListeners[name]);
@@ -1184,6 +1195,8 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 		gPageThumbnails.captureToCanvas(this.tab.linkedBrowser, this.canvas, () => {
 			this._sendToSubscribers("painted");
 		});
+		// also capture to file, thumbnail service does not persist automatically when rendering to canvas
+		gPageThumbnails.captureAndStoreIfStale(this.tab.linkedBrowser, () => {})
 	},
 
 	// Changing the dims of a canvas will clear it, so we don't want to do do this to a canvas we're currently displaying.
@@ -1205,6 +1218,8 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 			}
 			this._sendToSubscribers("painted");
 		});
+		// also capture to file, thumbnail service does not persist automatically when rendering to canvas
+		gPageThumbnails.captureAndStoreIfStale(this.tab.linkedBrowser, () => {})
 	},
 
 	toImageData: function() {
