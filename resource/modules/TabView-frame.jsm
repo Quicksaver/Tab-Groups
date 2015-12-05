@@ -1,4 +1,4 @@
-// VERSION 1.0.5
+// VERSION 1.0.6
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });

@@ -1,4 +1,4 @@
-'use strict';
+// VERSION 1.0.0
 
 this.AllTabs = {
 	_events: {

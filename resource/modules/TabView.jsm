@@ -1,6 +1,4 @@
-// VERSION 1.0.15
-
-'use strict';
+// VERSION 1.0.16
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
