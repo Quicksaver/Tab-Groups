@@ -1192,11 +1192,20 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 		let h = this.canvas.height;
 		if(!w || !h) { return; }
 
-		gPageThumbnails.captureToCanvas(this.tab.linkedBrowser, this.canvas, () => {
+		let browser = this.tab.linkedBrowser;
+
+		gPageThumbnails.captureToCanvas(browser, this.canvas, () => {
 			this._sendToSubscribers("painted");
 		});
-		// also capture to file, thumbnail service does not persist automatically when rendering to canvas
-		gPageThumbnails.captureAndStoreIfStale(this.tab.linkedBrowser, () => {})
+
+		this.persist(browser)
+	},
+
+	persist(browser) {
+		// capture to file, thumbnail service does not persist automatically when rendering to canvas
+		gPageThumbnails.shouldStoreThumbnail(browser, () => {
+				gPageThumbnails.captureAndStoreIfStale(browser, () => {})
+		})
 	},
 
 	// Changing the dims of a canvas will clear it, so we don't want to do do this to a canvas we're currently displaying.
@@ -1205,7 +1214,10 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 		let temp = gPageThumbnails.createCanvas(window);
 		temp.width = aWidth;
 		temp.height = aHeight;
-		gPageThumbnails.captureToCanvas(this.tab.linkedBrowser, temp, () => {
+
+		let browser = this.tab.linkedBrowser;
+
+		gPageThumbnails.captureToCanvas(browser, temp, () => {
 			let ctx = this.canvas.getContext('2d');
 			this.canvas.width = aWidth;
 			this.canvas.height = aHeight;
@@ -1218,8 +1230,8 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 			}
 			this._sendToSubscribers("painted");
 		});
-		// also capture to file, thumbnail service does not persist automatically when rendering to canvas
-		gPageThumbnails.captureAndStoreIfStale(this.tab.linkedBrowser, () => {})
+
+		this.persist(browser);
 	},
 
 	toImageData: function() {
