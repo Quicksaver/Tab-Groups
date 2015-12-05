@@ -656,13 +656,6 @@ this.TabItems = {
 		this.tabAspect = this.tabHeight / this.tabWidth;
 		this.invTabAspect = 1 / this.tabAspect;
 
-		this._thumbFileExpirationFilter = () => {
-			return AllTabs.tabs.map(t => t.linkedBrowser.currentURI.spec);
-		}
-
-
-		gPageThumbnails.addExpirationFilter(this._thumbFileExpirationFilter);
-
 		let $canvas = iQ("<canvas>").attr('moz-opaque', '');
 		$canvas.appendTo(iQ("body"));
 		$canvas.hide();
@@ -718,8 +711,6 @@ this.TabItems = {
 
 	uninit: function() {
 		Messenger.unlistenWindow(gWindow, "MozAfterPaint", this);
-
-		gPageThumbnails.removeExpirationFilter(this._thumbFileExpirationFilter);
 
 		for(let name in this._eventListeners) {
 			AllTabs.unregister(name, this._eventListeners[name]);
