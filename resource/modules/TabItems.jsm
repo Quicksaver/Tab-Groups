@@ -1189,13 +1189,13 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 			this._sendToSubscribers("painted");
 		});
 
-		this.persist(browser)
+		this.persist(browser);
 	},
 
 	persist(browser) {
 		// capture to file, thumbnail service does not persist automatically when rendering to canvas
 		gPageThumbnails.shouldStoreThumbnail(browser, () => {
-				gPageThumbnails.captureAndStoreIfStale(browser, () => {})
+			gPageThumbnails.captureAndStoreIfStale(browser, () => {})
 		})
 	},
 
