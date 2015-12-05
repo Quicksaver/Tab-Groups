@@ -9,7 +9,7 @@ Modules.BASEUTILS = true;
 //		(string) absolute chrome:// path to the stylesheet to be loaded
 //		(string) name of the .css file to be loaded from chrome://objPathString/skin/aPath.css
 //		(string) css declarations
-//	(optional) isData - 
+//	(optional) isData -
 //		true treats aPath as css declarations and appends "data:text/css," if necessary
 //		defaults to false
 //	(optional) aType -
@@ -26,11 +26,11 @@ Modules.BASEUTILS = true;
 //	see unload()
 this.Styles = {
 	sheets: new Set(),
-	
+
 	load: function(aName, aPath, isData, aType) {
 		var path = this.convert(aPath, isData);
 		var type = this._switchType(aType);
-		
+
 		var sheet = this.loaded(aName, path);
 		if(sheet) {
 			if(sheet.name == aName) {
@@ -40,7 +40,7 @@ this.Styles = {
 				this.unload(aName);
 			}
 		}
-		
+
 		sheet = {
 			name: aName,
 			path: path,
@@ -48,14 +48,14 @@ this.Styles = {
 			uri: Services.io.newURI(path, null, null)
 		};
 		this.sheets.add(sheet);
-		
+
 		if(!Services.stylesheet.sheetRegistered(sheet.uri, type)) {
 			try { Services.stylesheet.loadAndRegisterSheet(sheet.uri, type); }
 			catch(ex) { Cu.reportError(ex); }
 		}
 		return true;
 	},
-	
+
 	unload: function(aName, aPath, isData) {
 		if(typeof(aName) != 'string') {
 			for(let x of aName) {
@@ -63,7 +63,7 @@ this.Styles = {
 			}
 			return true;
 		};
-		
+
 		var path = this.convert(aPath, isData);
 		var sheet = this.loaded(aName, path);
 		if(sheet) {
@@ -81,7 +81,7 @@ this.Styles = {
 		}
 		return false;
 	},
-	
+
 	loadIf: function(aName, aPath, isData, anIf, aType) {
 		if(anIf) {
 			this.load(aName, aPath, isData, aType);
@@ -89,7 +89,7 @@ this.Styles = {
 			this.unload(aName, aPath, isData);
 		}
 	},
-	
+
 	loaded: function(aName, aPath) {
 		for(let sheet of this.sheets) {
 			if(sheet.name == aName || (aPath && sheet.path == aPath)) {
@@ -98,24 +98,24 @@ this.Styles = {
 		}
 		return null;
 	},
-	
+
 	convert: function(aPath, isData) {
 		if(!aPath) {
 			return aPath;
 		}
-		
+
 		if(!isData && !aPath.startsWith("chrome://")) {
 			return "chrome://"+objPathString+"/skin/"+aPath+".css";
 		}
-		
+
 		if(isData && !aPath.startsWith("data:text/css,")) {
 			let code = '/* CSS code appended by '+objPathString+':Styles.jsm */\n' + aPath;
 			return 'data:text/css,' + encodeURIComponent(code);
 		}
-		
+
 		return aPath;
 	},
-			
+
 	_switchType: function(type) {
 		switch(type) {
 			case 'agent':
@@ -132,7 +132,7 @@ this.Styles = {
 				return Services.stylesheet.AUTHOR_SHEET;
 				break;
 		}
-		
+
 		return false;
 	}
 };

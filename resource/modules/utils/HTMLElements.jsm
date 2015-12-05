@@ -15,7 +15,7 @@ this.innerText = function(node) {
 		if(!node || !node.ownerDocument || !(node instanceof node.ownerDocument.defaultView.HTMLElement)) {
 			return '';
 		}
-		
+
 		// Cloning directly on the same document often triggers new onStateChange events in the browser, which could create endless loops of processing.
 		var clone = node.ownerDocument.implementation.createHTMLDocument('').importNode(node, true);
 		if(clone.getElementsByTagName) {
@@ -32,7 +32,7 @@ this.innerText = function(node) {
 				styles[0].remove();
 			}
 		}
-		
+
 		return clone.textContent;
 	}
 	catch(ex) {

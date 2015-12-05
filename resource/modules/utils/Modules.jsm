@@ -1,6 +1,6 @@
 // VERSION 2.7.1
 
-// Many times I can't use 'this' to refer to the owning var's context, so I'm setting 'this' as 'self', 
+// Many times I can't use 'this' to refer to the owning var's context, so I'm setting 'this' as 'self',
 // I can use 'self' from within functions, timers and listeners easily and to bind those functions to it as well
 this.self = this;
 
@@ -27,32 +27,32 @@ this.self = this;
 this.Modules = {
 	modules: new Set(),
 	moduleVars: {},
-	
+
 	loadIf: function(aModule, anIf, delayed) {
 		if(anIf) {
 			return this.load(aModule, delayed);
 		}
 		return !this.unload(aModule);
 	},
-	
+
 	load: function(aModule, delayed) {
 		// Because of process separation in e10s, the resource:// path can be removed before modules are fully unloaded from the child process,
 		// if their unload methods call for modules that had't been loaded, they won't be able to be loaded now.
 		// Just enclosing problematic routines in a try-catch block isn't enough, as apparently the IO thread somehow throws aSync,
 		// causing the messages to appear in the console anyway. They may be harmless but they're also confusing when debugging, so let's avoid them.
 		if(self.isContent && self.disabled) { return false; }
-		
+
 		let path = this.preparePath(aModule);
 		if(!path) { return false; }
-		
+
 		if(this.loaded(path)) { return true; }
-		
+
 		try { Services.scriptloader.loadSubScript(path, self); }
 		catch(ex) {
 			Cu.reportError(ex);
 			return false;
 		}
-		
+
 		let module = {
 			name: aModule,
 			path: path,
@@ -65,14 +65,14 @@ this.Modules = {
 			failed: false
 		};
 		this.modules.add(module);
-		
+
 		delete this.VARSLIST;
 		delete this.LOADMODULE;
 		delete this.UNLOADMODULE;
 		delete this.UTILS;
 		delete this.BASEUTILS;
 		delete this.CLEAN;
-		
+
 		if(!Globals.moduleCache[aModule]) {
 			let tempScope = {
 				Modules: {},
@@ -89,21 +89,21 @@ this.Modules = {
 			delete tempScope.$;
 			delete tempScope.$$;
 			delete tempScope.$ª;
-			
+
 			Globals.moduleCache[aModule] = [];
 			for(let v in tempScope) {
 				Globals.moduleCache[aModule].push(v);
 			}
 		}
 		module.vars = Globals.moduleCache[aModule];
-		
+
 		try { this.createVars(module.vars); }
 		catch(ex) {
 			Cu.reportError(ex);
 			this.unload(aModule, true, true);
 			return false;
 		}
-		
+
 		if(module.load) {
 			if(!delayed || delayed.delayedStartupFinished) {
 				try { module.load(); }
@@ -118,16 +118,16 @@ this.Modules = {
 				module.aSync = () => {
 					// when disabling the add-on before it's had time to perform the load call
 					if(typeof(Modules) == 'undefined') { return; }
-					
+
 					try { module.load(); }
 					catch(ex) {
 						Cu.reportError(ex);
 						this.unload(aModule, true);
 						return;
 					}
-					module.loaded = true; 
+					module.loaded = true;
 				};
-				
+
 				// if we're delaying a load in a browser window, we should wait for it to finish the initial painting
 				if(typeof(delayed) == 'object' && "delayedStartupFinished" in delayed) {
 					module.observe = function(aSubject, aTopic) {
@@ -136,7 +136,7 @@ this.Modules = {
 							this.aSync();
 						}
 					};
-					
+
 					Observers.add(module, 'browser-delayed-startup-finished');
 				} else {
 					module._aSync = aSync(module.aSync, 250);
@@ -146,17 +146,17 @@ this.Modules = {
 		else {
 			module.loaded = true;
 		}
-		
+
 		return true;
 	},
-	
+
 	unload: function(aModule, force, justVars) {
 		let path = this.preparePath(aModule);
 		if(!path) { return true; }
-		
+
 		let module = this.loaded(aModule);
 		if(!module) { return true; }
-		
+
 		if(!justVars && module.unload && (module.loaded || force)) {
 			try { module.unload(); }
 			catch(ex) {
@@ -169,7 +169,7 @@ this.Modules = {
 				return false;
 			}
 		}
-		
+
 		try { this.deleteVars(module.vars); }
 		catch(ex) {
 			if(!force) {
@@ -180,11 +180,11 @@ this.Modules = {
 			module.failed = true;
 			return false;
 		}
-		
+
 		this.modules.delete(module);
 		return true;
 	},
-	
+
 	clean: function() {
 		// We can't unload modules in i++ mode for two reasons:
 		// One: dependencies, some modules require others to run, so by unloading in the inverse order they were loaded we are assuring dependencies are maintained
@@ -193,7 +193,7 @@ this.Modules = {
 		var utils = false;
 		var baseutils = false;
 		var done = false;
-		
+
 		while(!done) {
 			var toUnload = [];
 			for(let module of this.modules) {
@@ -203,17 +203,17 @@ this.Modules = {
 					toUnload.push(module);
 				}
 			}
-			
+
 			for(var i = toUnload.length -1; i >= 0; i--) {
 				this.unload(toUnload[i].name);
 			}
-			
+
 			if(!utils) { utils = true; }
 			else if(!baseutils) { baseutils = true; }
 			else { done = true; }
 		}
 	},
-	
+
 	loaded: function(aModule) {
 		for(let module of this.modules) {
 			if(module.path == aModule || module.name == aModule) {
@@ -222,10 +222,10 @@ this.Modules = {
 		}
 		return null;
 	},
-	
+
 	createVars: function(aList) {
 		if(!Array.isArray(aList)) { return; }
-		
+
 		for(let x of aList) {
 			if(this.moduleVars[x]) {
 				this.moduleVars[x]++;
@@ -234,10 +234,10 @@ this.Modules = {
 			}
 		}
 	},
-	
+
 	deleteVars: function(aList) {
 		if(!Array.isArray(aList)) { return; }
-		
+
 		for(let x of aList) {
 			if(this.moduleVars[x]) {
 				this.moduleVars[x]--;
@@ -248,7 +248,7 @@ this.Modules = {
 			}
 		}
 	},
-	
+
 	preparePath: function(aModule) {
 		if(typeof(aModule) != 'string') { return null; }
 		if(aModule.startsWith("resource://")) { return aModule; }

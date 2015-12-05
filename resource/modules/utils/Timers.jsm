@@ -17,15 +17,15 @@ Modules.BASEUTILS = true;
 //	see init()
 this.Timers = {
 	timers: {},
-	
+
 	init: function(aName, aFunc, aDelay, aType) {
 		this.cancel(aName);
-		
+
 		this.timers[aName] = {
 			timer: Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer),
 			handler: aFunc
 		};
-		
+
 		this.timers[aName].timer.init((aSubject, aTopic, aData) => {
 			var handler = this.timers[aName].handler;
 			if(aSubject.type == Ci.nsITimer.TYPE_ONE_SHOT) {
@@ -33,11 +33,11 @@ this.Timers = {
 			}
 			handler(aSubject, aTopic, aData);
 		}, aDelay, this._switchType(aType));
-		
+
 		this.__defineGetter__(aName, function() { return this.timers[aName]; });
 		return this.timers[aName];
 	},
-	
+
 	cancel: function(name) {
 		if(this.timers[name]) {
 			this.timers[name].timer.cancel();
@@ -47,7 +47,7 @@ this.Timers = {
 		}
 		return false;
 	},
-	
+
 	fire: function(name) {
 		if(this.timers[name]) {
 			aSync(this.timers[name].handler);
@@ -56,13 +56,13 @@ this.Timers = {
 			}
 		}
 	},
-	
+
 	clean: function() {
 		for(let timerObj in this.timers) {
 			this.cancel(timerObj);
 		}
 	},
-	
+
 	create: function(aFunc, aDelay, aType) {
 		var type = this._switchType(aType);
 		var newTimer = {
@@ -75,7 +75,7 @@ this.Timers = {
 		newTimer.timer.init(newTimer.handler, aDelay, type);
 		return newTimer;
 	},
-			
+
 	_switchType: function(type) {
 		switch(type) {
 			case 'slack':
@@ -96,7 +96,7 @@ this.Timers = {
 				return Ci.nsITimer.TYPE_ONE_SHOT;
 				break;
 		}
-		
+
 		return false;
 	}
 };

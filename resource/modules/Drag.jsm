@@ -26,12 +26,12 @@ this.Drag = function(item, event) {
 	this.parent = this.item.parent;
 	this.startPosition = new Point(event.clientX, event.clientY);
 	this.startTime = Date.now();
-	
+
 	this.item.isDragging = true;
 	this.item.setZ(999999);
-	
+
 	this.safeWindowBounds = Items.getSafeWindowBounds();
-	
+
 	Trenches.activateOthersTrenches(this.el);
 };
 
@@ -53,9 +53,9 @@ this.Drag.prototype = {
 		let updateY = false;
 		let newRect;
 		let snappedTrenches = {};
-		
+
 		// OH SNAP!
-		
+
 		// if we aren't holding down the meta key or have trenches disabled...
 		if(!Keys.meta && !Trenches.disabled) {
 			// snappable = true if we aren't a tab on top of something else, and there's no active drop site...
@@ -70,7 +70,7 @@ this.Drag.prototype = {
 				}
 			}
 		}
-		
+
 		// make sure the bounds are in the window.
 		newRect = this.snapToEdge(bounds, stationaryCorner, assumeConstantSize, keepProportional);
 		if(newRect) {
@@ -78,7 +78,7 @@ this.Drag.prototype = {
 			bounds = newRect;
 			Utils.extend(snappedTrenches, newRect.snappedTrenches);
 		}
-		
+
 		Trenches.hideGuides();
 		for(let edge in snappedTrenches) {
 			let trench = snappedTrenches[edge];
@@ -87,10 +87,10 @@ this.Drag.prototype = {
 				trench.show();
 			}
 		}
-		
+
 		return update ? bounds : false;
 	},
-	
+
 	// Called when a drag or mousemove occurs. Set the bounds based on the mouse move first, then call snap and it will adjust the item's bounds if appropriate.
 	// Also triggers the display of trenches that it snapped to.
 	// Parameters:
@@ -107,7 +107,7 @@ this.Drag.prototype = {
 		}
 		return false;
 	},
-	
+
 	// Returns a version of the bounds snapped to the edge if it is close enough. If not, returns false.
 	// If <Keys.meta> is true, this function will simply enforce the window edges.
 	// Parameters:
@@ -122,7 +122,7 @@ this.Drag.prototype = {
 		let updateX = false;
 		let updateY = false;
 		let snappedTrenches = {};
-		
+
 		let snapRadius = (Keys.meta ? 0 : Trenches.defaultRadius);
 		if(rect.left < swb.left + snapRadius ) {
 			if(stationaryCorner.indexOf('right') > -1 && !assumeConstantSize) {
@@ -133,7 +133,7 @@ this.Drag.prototype = {
 			updateX = true;
 			snappedTrenches.left = 'edge';
 		}
-		
+
 		if(rect.right > swb.right - snapRadius) {
 			if(updateX || !assumeConstantSize) {
 				let newWidth = swb.right - rect.left;
@@ -175,18 +175,18 @@ this.Drag.prototype = {
 			snappedTrenches.top = 'edge';
 			delete snappedTrenches.bottom;
 		}
-		
+
 		if(update) {
 			rect.snappedTrenches = snappedTrenches;
 			return rect;
 		}
 		return false;
 	},
-	
+
 	// Called in response to an <Item> draggable "drag" event.
 	drag: function(event) {
 		this.snap(UI.rtl ? 'topright' : 'topleft', true);
-		
+
 		if(this.parent && this.parent.expanded) {
 			let distance = this.startPosition.distance(new Point(event.clientX, event.clientY));
 			if(distance > 100) {
@@ -195,33 +195,33 @@ this.Drag.prototype = {
 			}
 		}
 	},
-	
+
 	// Called in response to an <Item> draggable "stop" event.
 	// Parameters:
 	//  immediately - bool for doing the pushAway immediately, without animation
 	stop: function(immediately) {
 		Trenches.hideGuides();
 		this.item.isDragging = false;
-		
+
 		if(this.parent && this.parent != this.item.parent) {
 			this.parent.closeIfEmpty();
 		}
-		
+
 		if(this.parent && this.parent.expanded) {
 			this.parent.arrange();
 		}
-		
+
 		if(this.item.parent) {
 			this.item.parent.arrange();
 		}
-		
+
 		if(this.item.isAGroupItem) {
 			this.item.setZ(drag.zIndex);
 			drag.zIndex++;
-			
+
 			this.item.pushAway(immediately);
 		}
-		
+
 		Trenches.disactivate();
 	}
 };

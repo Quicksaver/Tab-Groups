@@ -24,7 +24,7 @@ Modules.UTILS = true;
 //	see register()
 this.Browsers = {
 	watchers: [],
-	
+
 	// expects aCallback() and sets its this as the window
 	callOnAll: function(aCallback, aURI, beforeComplete, onlyTabs) {
 		var browserEnumerator = Services.wm.getEnumerator('navigator:browser');
@@ -36,29 +36,29 @@ this.Browsers = {
 					this.callOnBrowser(aBrowser, aCallback, aURI, beforeComplete);
 				}
 			}
-			
+
 			if(onlyTabs) { continue; }
-			
+
 			// Sidebars are browser elements too
 			for(let sidebar of this.getSidebars(aWindow)) {
 				this.callOnBrowser(sidebar, aCallback, aURI, beforeComplete);
 			}
 		}
 	},
-	
+
 	callOnBrowser: function(aBrowser, aCallback, aURI, beforeComplete) {
 		// safeguard
 		if(!aBrowser) { return; }
-		
+
 		// e10s fix, we don't check remote tabs
 		if(aBrowser.isRemoteBrowser) { return; }
-		
+
 		if(aBrowser && aBrowser.docShell && aBrowser.contentWindow
 		&& (!aURI || aBrowser.contentDocument.documentURI.startsWith(aURI))) {
 			callOnLoad(aBrowser.contentWindow, aCallback, beforeComplete);
 		}
 	},
-	
+
 	register: function(aHandler, aTopic, aURI, beforeComplete) {
 		if(this.watching(aHandler, aTopic) === false) {
 			this.watchers.push({
@@ -69,18 +69,18 @@ this.Browsers = {
 			});
 		}
 	},
-	
+
 	unregister: function(aHandler, aTopic, aURI, beforeComplete) {
 		var i = this.watching(aHandler, aTopic, aURI, beforeComplete);
 		if(i !== false) {
 			this.watchers.splice(i, 1);
 		}
 	},
-	
+
 	watching: function(aHandler, aTopic, aURI, beforeComplete) {
 		var uri = aURI || null;
 		var before = beforeComplete || false;
-		
+
 		for(var i = 0; i < this.watchers.length; i++) {
 			if(this.watchers[i].handler == aHandler
 			&& this.watchers[i].topic == aTopic
@@ -91,7 +91,7 @@ this.Browsers = {
 		}
 		return false;
 	},
-	
+
 	observe: function(aWindow, aTopic) {
 		switch(aTopic) {
 			case 'domwindowopened':
@@ -104,11 +104,11 @@ this.Browsers = {
 						aWindow.gBrowser.tabContainer.addEventListener('TabOpen', this, true);
 						aWindow.gBrowser.tabContainer.addEventListener('TabClose', this, true);
 					}
-					
+
 					if(aWindow.SidebarUI) {
 						// Also listen for the sidebars being loaded
 						aWindow.addEventListener('SidebarFocused', this, true);
-						
+
 						// any already loaded sidebars must have the unload listener setup as well
 						for(let sidebar of this.getSidebars(aWindow)) {
 							if(sidebar && sidebar.docShell && sidebar.contentWindow && sidebar.contentDocument.documentURI != 'about:blank') {
@@ -118,7 +118,7 @@ this.Browsers = {
 					}
 				});
 				break;
-				
+
 			case 'domwindowclosed':
 				if(aWindow.document.readyState == 'complete') {
 					if(aWindow.gBrowser) {
@@ -131,7 +131,7 @@ this.Browsers = {
 						aWindow.gBrowser.tabContainer.removeEventListener('TabOpen', this, true);
 						aWindow.gBrowser.tabContainer.removeEventListener('TabClose', this, true);
 					}
-					
+
 					if(aWindow.SidebarUI) {
 						aWindow.removeEventListener('SidebarFocused', this, true);
 						for(let sidebar of this.getSidebars(aWindow)) {
@@ -144,13 +144,13 @@ this.Browsers = {
 				break;
 		}
 	},
-	
+
 	handleEvent: function(e) {
 		switch(e.type) {
 			case 'TabOpen':
 				e.target.addEventListener('TabRemotenessChange', this);
 				// no break; let it run TabRemotenessChange
-				
+
 			case 'TabRemotenessChange':
 				if(e.target.linkedBrowser.isRemoteBrowser) {
 					this.tabRemote(e.target);
@@ -158,34 +158,34 @@ this.Browsers = {
 					this.tabNonRemote(e.target);
 				}
 				break;
-			
+
 			case 'TabClose':
 				e.target.removeEventListener('TabRemotenessChange', this);
-				
+
 				// e10s fix, we don't check remote tabs, we only check about: and chrome:// tabs
 				if(e.target.linkedBrowser.isRemoteBrowser) { break; }
-				
+
 				this.tabRemote(e.target); // this removes the listeners, which is what we want to do
 				this.callWatchers(e.target.linkedBrowser.contentDocument, 'pagehide');
 				break;
-			
+
 			case 'SidebarFocused':
 				// we need to know when this sidebar will be unloaded as well
 				this.watchSidebarUnload(e.target);
 				this.callWatchers(e.target.document, e.type);
 				break;
-				
+
 			case 'unload': // sidebar unloaded/closed
 				// pass a different event type to watchers, as "unload" is too generalized and could conflict with other listeners that want actual unload events
 				this.callWatchers(e.target, 'SidebarUnloaded');
 				break;
-				
+
 			default:
 				this.callWatchers(e.originalTarget, e.type);
 				break;
 		}
 	},
-	
+
 	getSidebars: function*(aWindow) {
 		if(aWindow.SidebarUI) {
 			// compatibility with OmniSidebar
@@ -200,10 +200,10 @@ this.Browsers = {
 			}
 		}
 	},
-	
+
 	callWatchers: function(aDoc, aTopic) {
 		if(aDoc.nodeName != '#document') { return; }
-		
+
 		var aSubject = aDoc.defaultView;
 		for(let watcher of this.watchers) {
 			if(watcher.topic == aTopic
@@ -223,19 +223,19 @@ this.Browsers = {
 			}
 		}
 	},
-	
+
 	tabNonRemote: function(tab) {
 		// The event can be DOMContentLoaded, pageshow, pagehide, load or unload. Don't use these in remote browsers as they use CPOWs to work there.
 		// These seem to be enough
 		tab.linkedBrowser.addEventListener('pageshow', this, true);
 		tab.linkedBrowser.addEventListener('pagehide', this, true);
 	},
-	
+
 	tabRemote: function(tab) {
 		tab.linkedBrowser.removeEventListener('pageshow', this, true);
 		tab.linkedBrowser.removeEventListener('pagehide', this, true);
 	},
-	
+
 	watchSidebarUnload: function(aWindow) {
 		callOnLoad(aWindow, () => {
 			aWindow.addEventListener('unload', this);
@@ -247,7 +247,7 @@ Modules.LOADMODULE = function() {
 	Windows.callOnAll((aWindow) => {
 		Browsers.observe(aWindow, 'domwindowopened');
 	}, 'navigator:browser');
-	
+
 	Windows.register(Browsers, 'domwindowopened', 'navigator:browser');
 	Windows.register(Browsers, 'domwindowclosed', 'navigator:browser');
 };
@@ -255,7 +255,7 @@ Modules.LOADMODULE = function() {
 Modules.UNLOADMODULE = function() {
 	Windows.unregister(Browsers, 'domwindowopened', 'navigator:browser');
 	Windows.unregister(Browsers, 'domwindowclosed', 'navigator:browser');
-	
+
 	Windows.callOnAll((aWindow) => {
 		Browsers.observe(aWindow, 'domwindowclosed');
 	}, 'navigator:browser', null, true);

@@ -2,23 +2,23 @@
 
 this.paneSession = {
 	manualAction: false,
-	
+
 	get alldataCheckbox() { return $('paneSession-backup-alldata'); },
 	get alldata() { return this.alldataCheckbox.checked; },
-	
+
 	get backupBtn() { return $('paneSession-backup-button'); },
 	get loadBtn() { return $('paneSession-load-button'); },
 	get importBtn() { return $('paneSession-import-button'); },
 	get clearBtn1() { return $('paneSession-clear-button-1'); },
 	get clearBtn2() { return $('paneSession-clear-button-2'); },
 	get clearBtn3() { return $('paneSession-clear-button-3'); },
-	
+
 	get tabList() { return $('paneSession-restore-tabList'); },
 	get invalidNotice() { return $('paneSession-restore-invalid'); },
 	get importfinishedNotice() { return $('paneSession-restore-finished'); },
 	get autoloadedNotice() { return $('paneSession-backup-autoloaded'); },
 	get clearChecklist() { return $('paneSession-clear-checklist'); },
-	
+
 	handleEvent: function(e) {
 		switch(e.type) {
 			case 'command':
@@ -26,19 +26,19 @@ this.paneSession = {
 					case this.alldataCheckbox:
 						$('paneSession-backup-warning').hidden = !this.alldata;
 						break;
-					
+
 					case this.backupBtn:
 						this.backup();
 						break;
-					
+
 					case this.loadBtn:
 						this.loadBackup();
 						break;
-					
+
 					case this.importBtn:
 						this.importSelected();
 						break;
-						
+
 					case this.clearBtn1:
 					case this.clearBtn2:
 					case this.clearBtn3:
@@ -46,7 +46,7 @@ this.paneSession = {
 						break;
 				}
 				break;
-			
+
 			// tree handlers
 			case 'keydown':
 				switch(e.keyCode) {
@@ -56,11 +56,11 @@ this.paneSession = {
 						break;
 				}
 				break;
-			
+
 			case 'click':
 			case 'dblclick':
 				if(e.button != 0) { break; }
-				
+
 				let id = (e.type == 'click') ? "paneSession-restore-restore" : "paneSession-restore-title";
 				let cell = treeView.treeBox.getCellAt(e.clientX, e.clientY);
 				if(cell.col && cell.col.id == id) {
@@ -69,7 +69,7 @@ this.paneSession = {
 				break;
 		}
 	},
-	
+
 	init: function() {
 		Listeners.add(this.alldataCheckbox, 'command', this);
 		Listeners.add(this.backupBtn, 'command', this);
@@ -82,10 +82,10 @@ this.paneSession = {
 		Listeners.add(this.tabList, 'click', this);
 		Listeners.add(this.tabList, 'dblclick', this);
 	},
-	
+
 	uninit: function() {
 		Timers.cancel('resetClear');
-		
+
 		Listeners.remove(this.alldataCheckbox, 'command', this);
 		Listeners.remove(this.backupBtn, 'command', this);
 		Listeners.remove(this.loadBtn, 'command', this);
@@ -97,14 +97,14 @@ this.paneSession = {
 		Listeners.remove(this.tabList, 'click', this);
 		Listeners.remove(this.tabList, 'dblclick', this);
 	},
-	
+
 	backup: function() {
 		controllers.showFilePicker(Ci.nsIFilePicker.modeSave, objName, (aFile) => {
 			let { TextEncoder, OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
-			
+
 			let state = SessionStore.getCurrentState();
 			let save;
-			
+
 			// if backing up all session data it's simple, just save everything
 			if(this.alldata) {
 				save = (new TextEncoder()).encode(JSON.stringify(state));
@@ -116,7 +116,7 @@ this.paneSession = {
 					version: [ objName, 1 ],
 					windows: []
 				};
-				
+
 				let anonGroupId = 0;
 				if(state.windows) {
 					for(let win of state.windows) {
@@ -124,13 +124,13 @@ this.paneSession = {
 							tabs: [],
 							extData: {}
 						};
-						
+
 						try {
 							for(let tab of win.tabs) {
 								// don't save tab history, only the latest (current) visible entry
 								let i = tab.index -1;
 								let current = tab.entries[i];
-								
+
 								let saveTab = {
 									entries: [ {
 										url: current.url,
@@ -145,7 +145,7 @@ this.paneSession = {
 									extData: {},
 									index: 1
 								};
-								
+
 								if(tab.lastAccessed) {
 									saveTab.lastAccessed = tab.lastAccessed;
 								}
@@ -165,12 +165,12 @@ this.paneSession = {
 								if(tab.image) {
 									saveTab.image = tab.image;
 								}
-								
+
 								winData.tabs.push(saveTab);
 							}
 						}
-						catch(ex) { Cu.reportError(ex); }		
-						
+						catch(ex) { Cu.reportError(ex); }
+
 						if(win.extData) {
 							if(win.extData[Storage.kGroupIdentifier]) {
 								winData.extData[Storage.kGroupIdentifier] = win.extData[Storage.kGroupIdentifier];
@@ -179,24 +179,24 @@ this.paneSession = {
 								winData.extData[Storage.kGroupsIdentifier] = win.extData[Storage.kGroupsIdentifier];
 							}
 						}
-						
+
 						saveData.windows.push(winData);
 					}
 				}
-				
+
 				save = (new TextEncoder()).encode(JSON.stringify(saveData));
 			}
-			
+
 			OS.File.open(aFile.path, { truncate: true }).then((ref) => {
 				ref.write(save).then(() => {
 					ref.close();
-					
+
 					// Load the newly created file in the Restore Tab Groups block, so that the user can confirm all the tabs and groups were backed up properly.
 					// We read from the newly created file so that we're sure to show the info that was actually saved, and not the info that's still in memory.
 					OS.File.open(aFile.path, { read: true }).then((ref) => {
 						ref.read().then((savedState) => {
 							ref.close();
-							
+
 							this.manualAction = false;
 							this.readState(savedState);
 						});
@@ -205,44 +205,44 @@ this.paneSession = {
 			});
 		});
 	},
-	
+
 	loadBackup: function() {
 		controllers.showFilePicker(Ci.nsIFilePicker.modeOpen, null, (aFile) => {
 			let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
-			
+
 			OS.File.open(aFile.path, { read: true }).then((ref) => {
 				ref.read().then((savedState) => {
 					ref.close();
-					
+
 					this.manualAction = true;
 					this.readState(savedState, true);
 				});
 			});
 		});
 	},
-	
+
 	readState: function(savedState) {
 		let { TextDecoder } = Cu.import("resource://gre/modules/osfile.jsm", {});
-		
+
 		let state;
 		let pinnedGroupIdx = 0;
 		let tabGroupIdx = 0;
-		
+
 		try {
 			state = JSON.parse((new TextDecoder()).decode(savedState));
 		}
 		catch(ex) {
 			Cu.reportError(ex);
-			
+
 			this.invalidNotice.hidden = false;
 			this.tabList.hidden = true;
 			return;
 		}
-		
+
 		treeView.data = [];
 		for(let win of state.windows) {
 			if(!win.tabs) { continue; }
-			
+
 			let winGroups;
 			let groups;
 			let activeGroupId;
@@ -264,14 +264,14 @@ this.paneSession = {
 			}
 			catch(ex) {
 				Cu.reportError(ex);
-				
+
 				// groups data is corrupted, consider the whole window its own group
 				activeGroupId = 1;
 				groups = {
 					1: { id: 1 }
 				};
 			}
-			
+
 			let pinned = [];
 			let tabs = [];
 			for(let tab of win.tabs) {
@@ -287,7 +287,7 @@ this.paneSession = {
 					}
 					catch(ex) {
 						Cu.reportError(ex);
-						
+
 						// I think it's possible that tabs created while TabView is closed could somehow skip the group registration.
 						// Even if not, we squeeze in any ungrouped tabs into the "current" group of that window,
 						// as that's the most likely case, or at least the most logical step to take in their case.
@@ -296,7 +296,7 @@ this.paneSession = {
 					tabs.push(tab);
 				}
 			}
-			
+
 			// show pinned tabs as if they had their own group
 			if(pinned.length) {
 				let label = Strings.get('TabView', 'restorePinned', [
@@ -312,7 +312,7 @@ this.paneSession = {
 					treeView.data.push(tab);
 				}
 			}
-			
+
 			// now divide the existing tab data into their own groups
 			if(tabs.length) {
 				for(let groupId in groups) {
@@ -347,7 +347,7 @@ this.paneSession = {
 				}
 			}
 		}
-		
+
 		if(treeView.data.length) {
 			this.invalidNotice.hidden = true;
 			this.tabList.hidden = false;
@@ -366,7 +366,7 @@ this.paneSession = {
 		this.autoloadedNotice.hidden = this.manualAction;
 		this.importfinishedNotice.hidden = true;
 	},
-	
+
 	createGroupItem: function(aIdx, aLabel, aGroup) {
 		let group = {
 			label: aLabel,
@@ -382,11 +382,11 @@ this.paneSession = {
 		}
 		return group;
 	},
-	
+
 	createTabItem: function(groupData, tab) {
 		let entry = tab.entries && tab.entries[tab.index -1];
 		if(!entry) { return; }
-		
+
 		let iconURL = tab.image || (tab.attributes && tab.attributes.image) || null;
 		// don't initiate a connection just to fetch a favicon (see bug 462863)
 		if(/^https?:/.test(iconURL)) {
@@ -400,20 +400,20 @@ this.paneSession = {
 			parent: groupData
 		});
 	},
-	
+
 	importSelected: function() {
 		let importGroups = treeView.data.filter(function(item, idx) { return treeView.isContainer(idx) && item.checked !== false; });
-		
+
 		// no items are selected, no-op
 		if(!importGroups.length) { return; }
-		
+
 		// first make sure the TabView frame isn't initialized, we don't want it interfering
 		let root = this._getRootWindow();
 		root[objName].TabView._deinitFrame();
-		
+
 		// initialize window if necessary, just in case
 		Storage._scope.SessionStoreInternal.onLoad(root);
-		
+
 		// get the next id to be used for the imported groups
 		let groups = Storage.readGroupItemData(root);
 		let groupItems = Storage.readGroupItemsData(root);
@@ -426,51 +426,51 @@ this.paneSession = {
 		if(!groupItems.totalNumber) {
 			groupItems.totalNumber = 0;
 		}
-		
+
 		for(let group of importGroups) {
 			// pinned tabs are direct, just append and restore
 			if(group.pinned) {
 				for(let tab of group.tabs) {
 					if(!tab.checked) { continue; }
-					
+
 					// these tabs are pinned, so they can't be hidden, make sure this is respected
 					tab._tab.pinned = true;
 					tab._tab.hidden = false;
-					
+
 					this.restoreTab(root, tab._tab);
 				}
 				continue;
 			}
-			
+
 			let groupID = groupItems.nextID++;
 			let groupData = group._group;
 			groupData.id = groupID;
-			
+
 			// first append the imported group into the session data
 			Storage.saveGroupItem(root, groupData);
 			groupItems.totalNumber++;
-			
+
 			for(let tab of group.tabs) {
 				if(!tab.checked) { continue; }
-				
+
 				// we are creating a new id for this group, make sure its tabs know this
 				tab._tab._tabData.groupID = groupID;
-				
+
 				// force these tabs hidden, since they belong to newly creative (inactive) groups
 				delete tab._tab.pinned;
 				tab._tab.hidden = true;
-				
+
 				this.restoreTab(root, tab._tab);
 			}
 		}
-		
+
 		// don't forget to insert back the updated data
 		Storage.saveGroupItemsData(root, {
 			nextID: groupItems.nextID,
 			activeGroupId: groupItems.activeGroupId || null,
 			totalNumber: groupItems.totalNumber
 		});
-		
+
 		this.autoloadedNotice.hidden = true;
 		this.invalidNotice.hidden = true;
 		this.tabList.hidden = true;
@@ -478,25 +478,25 @@ this.paneSession = {
 		this.importfinishedNotice.hidden = false;
 		this.importfinishedNotice.scrollIntoView()
 	},
-	
+
 	restoreTab: function(win, tabData) {
 		if(!tabData.extData) {
 			tabData.extData = {};
 		}
 		tabData.extData[Storage.kTabIdentifier] = JSON.stringify(tabData._tabData);
 		delete tabData._tabData;
-		
+
 		let tab = win.gBrowser.addTab("about:blank", { skipAnimation: true, forceNotRemote: true, });
 		Storage._scope.SessionStoreInternal.restoreTab(tab, tabData);
 	},
-	
+
 	toggleRowChecked: function(aIx) {
 		let isChecked = function(aItem) { return aItem.checked; }
-		
+
 		let item = treeView.data[aIx];
 		item.checked = !item.checked;
 		treeView.treeBox.invalidateRow(aIx);
-		
+
 		if(treeView.isContainer(aIx)) {
 			// (un)check all tabs of this window as well
 			for(let tab of item.tabs) {
@@ -510,7 +510,7 @@ this.paneSession = {
 			treeView.treeBox.invalidateRow(treeView.data.indexOf(item.parent));
 		}
 	},
-	
+
 	clearData: function() {
 		let phase = this.clearChecklist.getAttribute('phase');
 		switch(phase) {
@@ -518,15 +518,15 @@ this.paneSession = {
 				setAttribute(this.clearChecklist, 'phase', '2');
 				this.resetClear();
 				break;
-			
+
 			case '2':
 				setAttribute(this.clearChecklist, 'phase', '3');
 				this.resetClear();
 				break;
-			
+
 			case '3':
 				Timers.cancel('resetClear');
-				
+
 				let state = SessionStore.getBrowserState();
 				try {
 					state = JSON.parse(state);
@@ -546,7 +546,7 @@ this.paneSession = {
 					}
 				}
 				state = JSON.stringify(state);
-				
+
 				// The current window can't be closed, otherwise the new session data for other opened windows wouldn't be properly saved.
 				// (http://mxr.mozilla.org/mozilla-central/source/browser/components/sessionstore/SessionStore.jsm -> SessionStoreInternal.setBrowserState())
 				// Instead, we'll force an unloaded state of all tabs, since they will be forced to reload when reselected (we don't do this, SessionRestore does).
@@ -556,7 +556,7 @@ this.paneSession = {
 						tab.linkedBrowser.loadURI("about:blank");
 					}
 				}
-				
+
 				let wins = [];
 				Windows.callOnAll(function(win) {
 					// don't close the current window
@@ -564,24 +564,24 @@ this.paneSession = {
 						wins.unshift(win);
 					}
 				}, 'navigator:browser');
-				
+
 				// close all windows including the current one, otherwise its tabs would technically be "pending" even though their contents were already loaded
 				for(let win of wins) {
 					win.close();
 				}
-				
+
 				SessionStore.setBrowserState(state);
 				break;
 		}
 	},
-	
+
 	// reset the clear block after a few seconds, to ensure the user actually wants to clear the data
 	resetClear: function() {
 		Timers.init('resetClear', () => {
 			setAttribute(this.clearChecklist, 'phase', '1');
 		}, 10000);
 	},
-	
+
 	eraseDataFromWindow: function(win) {
 		let activeGroupId;
 		if(win.extData) {
@@ -590,12 +590,12 @@ this.paneSession = {
 				activeGroupId = groupData.activeGroupId;
 			}
 			catch(ex) { /* don't care, just consider all hidden tabs as belonging to non-active groups and remove them */ }
-			
+
 			delete win.extData[Storage.kGroupsIdentifier];
 			delete win.extData[Storage.kGroupIdentifier];
 			delete win.extData[Storage.kUIIdentifier];
 		}
-		
+
 		if(win.tabs) {
 			for(let tab of win.tabs.concat()) {
 				if(!this.eraseDataFromTab(activeGroupId, tab, win.tabs)) {
@@ -603,7 +603,7 @@ this.paneSession = {
 				}
 			}
 		}
-		
+
 		if(win._closedTabs) {
 			for(let tab of win._closedTabs.concat()) {
 				if(!this.eraseDataFromTab(activeGroupId, tab, win._closedTabs)) {
@@ -612,13 +612,13 @@ this.paneSession = {
 			}
 		}
 	},
-	
+
 	eraseDataFromTab: function(activeGroupId, tab, tabs) {
 		if(!tab.pinned && tab.hidden) {
 			if(!activeGroupId) {
 				return false;
 			}
-			
+
 			if(tab.extData) {
 				let tabGroupId;
 				try {
@@ -626,25 +626,25 @@ this.paneSession = {
 					tabGroupId = tabData.groupID;
 				}
 				catch(ex) { /* don't care, just consider all hidden tabs as belonging to non-active groups and remove them */ }
-				
+
 				if(!tabGroupId || tabGroupId != activeGroupId) {
 					return false;
 				}
 			}
-			
+
 			// we're keeping this tab around, so make sure it's visible
 			tab.hidden = false;
 		}
-		
+
 		if(tab.extData) {
 			delete tab.extData[Storage.kTabIdentifier];
 		}
 		return true;
 	},
-	
+
 	removeTabFromWindow: function(tab, tabs, win) {
 		let i = tabs.indexOf(tab);
-		
+
 		// if we're removing a tab before the currently selected tab, we need to make sure the window's selected index is updated,
 		// so that when it's reopened, it selectes the correct tab.
 		// We should never remove the selected tab (likely the tab groups preferences tab), because if it's selected then it's in the current group, which is never removed.
@@ -652,10 +652,10 @@ this.paneSession = {
 		if(win && i < win.selected) {
 			win.selected--;
 		}
-		
+
 		tabs.splice(i, 1);
 	},
-	
+
 	_getRootWindow: function() {
 		// investigate when exactly I can use windowRoot
 		return window.windowRoot
@@ -674,7 +674,7 @@ this.treeView = {
 	data: [],
 	treeBox: null,
 	selection: null,
-	
+
 	get rowCount() { return this.data.length; },
 	setTree: function(treeBox) { this.treeBox = treeBox; },
 	getCellText: function(idx, column) { return this.data[idx].label; },
@@ -687,7 +687,7 @@ this.treeView = {
 	isEditable: function(idx, column) { return false; },
 	canDrop: function(idx, orientation, dt) { return false; },
 	getLevel: function(idx) { return this.isContainer(idx) ? 0 : 1; },
-	
+
 	getParentIndex: function(idx) {
 		if(!this.isContainer(idx)) {
 			for(let t = idx -1; t >= 0; t--) {
@@ -698,7 +698,7 @@ this.treeView = {
 		}
 		return -1;
 	},
-	
+
 	hasNextSibling: function(idx, after) {
 		let thisLevel = this.getLevel(idx);
 		for(let t = after +1; t < this.data.length; t++) {
@@ -708,10 +708,10 @@ this.treeView = {
 		}
 		return false;
 	},
-	
+
 	toggleOpenState: function(idx) {
 		if(!this.isContainer(idx)) { return; }
-		
+
 		let item = this.data[idx];
 		if(item.open) {
 			// remove this group's tab rows from the view
@@ -733,7 +733,7 @@ this.treeView = {
 		item.open = !item.open;
 		this.treeBox.invalidateRow(idx);
 	},
-	
+
 	getCellProperties: function(idx, column) {
 		if(column.id == "paneSession-restore-restore" && this.isContainer(idx) && this.data[idx].checked === 0) {
 			return "partial";
@@ -743,23 +743,23 @@ this.treeView = {
 		}
 		return "";
 	},
-	
+
 	getRowProperties: function(idx) {
 		let groupState = this.data[idx].parent || this.data[idx];
 		if(groupState.ix % 2 != 0) {
 			return "alternate";
 		}
-		
+
 		return "";
 	},
-	
+
 	getImageSrc: function(idx, column) {
 		if(column.id == "paneSession-restore-title") {
 			return this.data[idx].src || null;
 		}
 		return null;
 	},
-	
+
 	getProgressMode: function(idx, column) {},
 	cycleHeader: function(column) {},
 	cycleCell: function(idx, column) {},

@@ -9,14 +9,14 @@ this.__defineGetter__('gTabViewFrame', function() { return gTabView._iframe; });
 
 this.TabView = {
 	_browserBundle: null,
-	
+
 	get browserBundle() {
 		if(!this._browserBundle) {
 			this._browserBundle = Services.strings.createBundle("chrome://browser/locale/tabbrowser.properties");
 		}
 		return this._browserBundle;
 	},
-	
+
 	// compatibility shims, for other add-ons to interact with this window more closely to the original if needed
 	shims: [
 		'iQ',
@@ -41,15 +41,15 @@ this.AllTabs = {
 		pinned: "TabPinned",
 		unpinned: "TabUnpinned"
 	},
-	
+
 	get tabs() {
 		return Array.filter(gBrowser.tabs, tab => Utils.isValidXULTab(tab));
 	},
-	
+
 	register: function(eventName, callback) {
 		Listeners.add(gBrowser.tabContainer, this._events[eventName], callback);
 	},
-	
+
 	unregister: function(eventName, callback) {
 		Listeners.remove(gBrowser.tabContainer, this._events[eventName], callback);
 	}
@@ -61,7 +61,7 @@ Modules.LOADMODULE = function() {
 		let prop = shim;
 		window.__defineGetter__(prop, function() { return self[prop]; });
 	}
-	
+
 	Modules.load('iQ');
 	Modules.load('Items');
 	Modules.load('GroupItems');
@@ -83,7 +83,7 @@ Modules.UNLOADMODULE = function() {
 	Modules.unload('GroupItems');
 	Modules.unload('Items');
 	Modules.unload('iQ');
-	
+
 	for(let shim of TabView.shims) {
 		delete window[shim];
 	}

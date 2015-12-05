@@ -24,7 +24,7 @@ this.keydownPanel = {
 	setupPanel: function(panel) {
 		// already set
 		if(!panel || panel.handleEvent) { return; }
-		
+
 		panel.handleEvent = function(e) {
 			switch(e.type) {
 				case 'keydown':
@@ -33,18 +33,18 @@ this.keydownPanel = {
 						Listeners.remove(window, 'keydown', this, true);
 						return;
 					}
-					
+
 					// if this var exists, it means this keyset should be used to toggle the panel as well
 					if(this._toggleKeyset) {
 						var keycode = Keysets.translateToConstantCode(this._toggleKeyset.keycode);
-						
+
 						if(e[keycode] && e[keycode] == e.which
 						&& this._toggleKeyset.shift == e.shiftKey
 						&& this._toggleKeyset.alt == e.altKey
 						&& this._toggleKeyset.accel == (DARWIN ? e.metaKey : e.ctrlKey)) {
 							e.preventDefault();
 							e.stopPropagation();
-							
+
 							if(this.hidePopup) {
 								this.hidePopup();
 							} else {
@@ -53,7 +53,7 @@ this.keydownPanel = {
 							return;
 						}
 					}
-					
+
 					switch(e.which) {
 						case e.DOM_VK_A: case e.DOM_VK_B: case e.DOM_VK_C: case e.DOM_VK_D: case e.DOM_VK_E: case e.DOM_VK_F: case e.DOM_VK_G: case e.DOM_VK_H: case e.DOM_VK_I: case e.DOM_VK_J: case e.DOM_VK_K: case e.DOM_VK_L: case e.DOM_VK_M: case e.DOM_VK_N: case e.DOM_VK_O: case e.DOM_VK_P: case e.DOM_VK_Q: case e.DOM_VK_R: case e.DOM_VK_S: case e.DOM_VK_T: case e.DOM_VK_U: case e.DOM_VK_V: case e.DOM_VK_W: case e.DOM_VK_X: case e.DOM_VK_Y: case e.DOM_VK_Z:
 							var items = this.querySelectorAll('menuitem,toolbarbutton.subviewbutton');
@@ -67,7 +67,7 @@ this.keydownPanel = {
 								}
 							}
 							break;
-						
+
 						case e.DOM_VK_UP:
 						case e.DOM_VK_DOWN:
 						case e.DOM_VK_HOME:
@@ -76,7 +76,7 @@ this.keydownPanel = {
 							e.stopPropagation();
 							Listeners.add(this, 'mouseover', this);
 							Listeners.add(this, 'mousemove', this);
-							
+
 							var items = this.querySelectorAll('menuitem,toolbarbutton.subviewbutton');
 							let active = -1;
 							for(var i=0; i<items.length; i++) {
@@ -86,7 +86,7 @@ this.keydownPanel = {
 									break;
 								}
 							}
-							
+
 							if(items[active]) {
 								var attr = (items[active].localName == 'menuitem') ? '_moz-menuactive' : 'focused';
 								if(attr == 'focused') {
@@ -95,7 +95,7 @@ this.keydownPanel = {
 								}
 								removeAttribute(items[active], attr);
 							}
-							
+
 							switch(e.which) {
 								case e.DOM_VK_UP:
 									active--;
@@ -112,16 +112,16 @@ this.keydownPanel = {
 									active = items.length -1;
 									break;
 							}
-							
+
 							var attr = (items[active].localName == 'menuitem') ? '_moz-menuactive' : 'focused';
 							setAttribute(items[active], attr, 'true');
 							if(attr == 'focused') {
 								items[active].style.MozUserFocus = 'normal';
 								items[active].focus();
 							}
-							
+
 							break;
-						
+
 						case e.DOM_VK_RETURN:
 							var items = this.querySelectorAll('menuitem,toolbarbutton.subviewbutton');
 							for(let item of items) {
@@ -133,18 +133,18 @@ this.keydownPanel = {
 										item.blur();
 										item.style.MozUserFocus = '';
 									}
-									
+
 									item.doCommand();
 									keydownPanel.closeSubView();
 									break;
 								}
 							}
 							break;
-						
+
 						default: break;
 					}
 					break;
-				
+
 				case 'mouseover':
 				case 'mousemove':
 					Listeners.remove(this, 'mouseover', this);
@@ -159,14 +159,14 @@ this.keydownPanel = {
 						removeAttribute(item, attr);
 					}
 					break;
-				
+
 				case 'ViewShowing':
 				case 'popupshown':
 					if(e.target == this) {
 						Listeners.add(window, 'keydown', this, true);
 					}
 					break;
-				
+
 				case 'ViewHiding':
 				case 'popuphidden':
 					if(e.target == this) {
@@ -177,7 +177,7 @@ this.keydownPanel = {
 					break;
 			}
 		};
-		
+
 		if(panel.nodeName == 'panelview' && isAncestor(panel, window.PanelUI.multiView)) {
 			Listeners.add(panel, 'ViewShowing', panel);
 			Listeners.add(panel, 'ViewHiding', panel);
@@ -186,15 +186,15 @@ this.keydownPanel = {
 			Listeners.add(panel, 'popuphidden', panel);
 		}
 	},
-	
+
 	unsetPanel: function(panel) {
 		// not set
 		if(!panel || !panel.handleEvent) { return; }
-		
+
 		Listeners.remove(panel, 'mouseover', panel);
 		Listeners.remove(panel, 'mousemove', panel);
 		Listeners.remove(window, 'keydown', panel, true);
-		
+
 		if(panel.nodeName == 'panelview' && isAncestor(panel, window.PanelUI.multiView)) {
 			Listeners.remove(panel, 'ViewShowing', panel);
 			Listeners.remove(panel, 'ViewHiding', panel);
@@ -202,14 +202,14 @@ this.keydownPanel = {
 			Listeners.remove(panel, 'popupshown', panel);
 			Listeners.remove(panel, 'popuphidden', panel);
 		}
-		
+
 		delete panel.handleEvent;
 	},
-	
+
 	closeSubView: function() {
 		window.PanelUI.multiView.showMainView();
 	},
-	
+
 	menuItemAccesskeyCode: function(str, e) {
 		if(!str) return null;
 		str = str.toLowerCase();

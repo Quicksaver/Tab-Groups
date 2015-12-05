@@ -110,16 +110,16 @@ function prepareObject(window, aName) {
 	// I can override the object name if I want
 	let objectName = aName || objName;
 	if(window[objectName]) { return; }
-	
+
 	var rtl = getComputedStyle(window.document.documentElement).direction == 'rtl';
-	
+
 	window[objectName] = {
 		objName: objectName,
 		objPathString: objPathString,
 		_UUID: new Date().getTime(),
 		RTL: rtl,
 		LTR: !rtl,
-		
+
 		// every supposedly global variable is inaccessible because bootstraped means sandboxed, so I have to reference all these;
 		// it's easier to reference more specific objects from within the modules for better control, only setting these two here because they're more generalized
 		window: window,
@@ -128,18 +128,18 @@ function prepareObject(window, aName) {
 		$$: function(sel, parent = window.document) { return parent.querySelectorAll(sel); },
 		$ª: function(parent, anonid, anonattr = 'anonid') { return window.document.getAnonymousElementByAttribute(parent, anonattr, anonid); }
 	};
-	
+
 	Services.scriptloader.loadSubScript("resource://"+objPathString+"/modules/utils/Modules.jsm", window[objectName]);
 	Services.scriptloader.loadSubScript("resource://"+objPathString+"/modules/utils/windowUtilsPreload.jsm", window[objectName]);
 	window[objectName].Modules.load("utils/windowUtils");
-	
+
 	setAttribute(window.document.documentElement, objectName+'_UUID', window[objectName]._UUID);
 	setAttribute(window.document.documentElement, objectName+'_Version', AddonData.version);
 }
 
 function removeObject(window, aName) {
 	let objectName = aName || objName;
-	
+
 	if(window[objectName]) {
 		removeAttribute(window.document.documentElement, objectName+'_UUID');
 		removeAttribute(window.document.documentElement, objectName+'_Version');
@@ -150,7 +150,7 @@ function removeObject(window, aName) {
 
 function preparePreferences(window, aName) {
 	let objectName = aName || objName;
-	
+
 	if(!window[objectName]) {
 		prepareObject(window, objectName);
 	}
@@ -163,13 +163,13 @@ function removeOnceListener(oncer) {
 			onceListeners[i]();
 			continue;
 		}
-		
+
 		if(onceListeners[i] == oncer) {
 			onceListeners.splice(i, 1);
 			return;
 		}
 	}
-	
+
 	if(!oncer) {
 		onceListeners = [];
 	}
@@ -177,7 +177,7 @@ function removeOnceListener(oncer) {
 
 function listenOnce(aSubject, type, handler, capture) {
 	if(UNLOADED || !aSubject || !aSubject.addEventListener) { return; }
-	
+
 	var runOnce = function(event) {
 		try { aSubject.removeEventListener(type, runOnce, capture); }
 		catch(ex) { handleDeadObject(ex); } // Prevents some can't access dead object errors
@@ -187,7 +187,7 @@ function listenOnce(aSubject, type, handler, capture) {
 			catch(ex) { Cu.reportError(ex); }
 		}
 	};
-	
+
 	aSubject.addEventListener(type, runOnce, capture);
 	onceListeners.push(runOnce);
 }
@@ -198,13 +198,13 @@ function callOnLoad(aSubject, aCallback, beforeComplete) {
 		catch(ex) { Cu.reportError(ex); }
 		return;
 	}
-	
+
 	// don't wait for the load event if we're terminating
 	if(UNLOADED) { return; }
-	
+
 	listenOnce(aSubject, "load", function() {
 		if(UNLOADED) { return; }
-		
+
 		try { aCallback(aSubject); }
 		catch(ex) { Cu.reportError(ex); }
 	}, false);
@@ -218,12 +218,12 @@ function disable() {
 
 function continueStartup(aReason) {
 	STARTED = aReason;
-	
+
 	// append actual preferences panes into the preferences tab
 	if(paneList) {
 		PrefPanes.setList(paneList);
 	}
-	
+
 	if(typeof(onStartup) == 'function') {
 		onStartup(AddonData, aReason);
 	}
@@ -232,28 +232,28 @@ function continueStartup(aReason) {
 function startup(aData, aReason) {
 	UNLOADED = false;
 	AddonData = aData;
-	
+
 	// to make sure we get always the most recent files when updating the add-on, see:
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=918033
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=1051238
 	AddonData.initTime = new Date().getTime();
-	
+
 	// This includes the optionsURL property
 	AddonManager.getAddonByID(AddonData.id, function(addon) {
 		if(typeof(UNLOADED) == 'undefined' || UNLOADED) { return; }
 		Addon = addon;
 	});
-	
+
 	// Set the default strings for the add-on
 	let alias = Services.io.newFileURI(AddonData.installPath);
 	let defaultsURI = ((AddonData.installPath.isDirectory()) ? alias.spec : 'jar:' + alias.spec + '!/')+'resource/defaults.js';
 	Services.scriptloader.loadSubScript(defaultsURI, this);
-	
+
 	// Get the utils.jsm module into our sandbox
 	Services.scriptloader.loadSubScript("resource://"+objPathString+"/modules/utils/Modules.jsm", this);
 	Services.scriptloader.loadSubScript("resource://"+objPathString+"/modules/utils/sandboxUtilsPreload.jsm", this);
 	Modules.load("utils/sandboxUtils");
-	
+
 	if(typeof(startConditions) != 'function' || startConditions(aReason)) {
 		continueStartup(aReason);
 	}
@@ -261,29 +261,29 @@ function startup(aData, aReason) {
 
 function shutdown(aData, aReason) {
 	UNLOADED = aReason;
-	
+
 	if(aReason == APP_SHUTDOWN) {
 		// List of methods that must always be run on shutdown, such as restoring some native prefs
 		while(alwaysRunOnShutdown.length > 0) {
 			alwaysRunOnShutdown.pop()();
 		}
-		
+
 		removeOnceListener();
 		return;
 	}
-	
+
 	if(STARTED) {
 		// content scripts should know as soon as possible that we're disabling the add-on, before any of them starts unloading,
 		// otherwise they could try to load modules after the resource:// uri was gone
 		if(MessengerLoaded) {
 			Messenger.messageAll('disable');
 		}
-		
+
 		if(typeof(onShutdown) == 'function') {
 			onShutdown(aData, aReason);
 		}
 	}
-	
+
 	Modules.unload("utils/sandboxUtils");
 	removeOnceListener();
 }

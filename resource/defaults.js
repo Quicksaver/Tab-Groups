@@ -16,12 +16,12 @@ addonUris = {
 
 prefList = {
 	animateZoom: true,
-	
+
 	tabViewKeycode: 'E',
 	tabViewAccel: true,
 	tabViewShift: true,
 	tabViewAlt: false,
-	
+
 	// for internal use
 	pageBackup: -1,
 	pageAutoChanged: false,
@@ -52,7 +52,7 @@ function onStartup(aReason) {
 	//if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 	//	Modules.load('keysets');
 	//}
-	
+
 	// Apply the add-on to every window opened and to be opened
 	Windows.callOnAll(startAddon, 'navigator:browser');
 	Windows.register(startAddon, 'domwindowopened', 'navigator:browser');
@@ -61,7 +61,7 @@ function onStartup(aReason) {
 function onShutdown(aReason) {
 	// remove the add-on from all windows
 	Windows.callOnAll(stopAddon, null, null, true);
-	
+
 	//if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 	//	Modules.unload('keysets');
 	//}

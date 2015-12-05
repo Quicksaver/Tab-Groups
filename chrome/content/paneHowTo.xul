@@ -9,7 +9,7 @@
 ]>
 <overlay	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 			xmlns:html="http://www.w3.org/1999/xhtml">
-			
+
 	<richlistbox id="categories">
 		<richlistitem id="category-howTo"
 			class="category"
@@ -17,21 +17,21 @@
 			tooltiptext="&howto.pane.label;"
 			position="3"
 			align="center">
-			
+
 			<image class="category-icon"/>
 			<label class="category-name" flex="1" value="&howto.pane.label;"/>
 		</richlistitem>
 	</richlistbox>
-	
+
 	<prefpane id="mainPrefPane">
 		<hbox id="header-howTo" class="header" collapsed="true" data-category="paneHowTo">
 			<label class="header-name">&howto.pane.label;</label>
 		</hbox>
-		
+
 		<groupbox align="start" id="paneHowTo-overview" collapsed="true" data-category="paneHowTo">
 			<html:p>&howto.overview.a;</html:p>
 		</groupbox>
-		
+
 		<groupbox align="start" id="paneHowTo-create" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.create.caption;"/>
 			<html:ol>
@@ -44,13 +44,13 @@
 			</html:ol>
 			<html:img src="chrome://objPathString/skin/howto/create.png"/>
 		</groupbox>
-		
+
 		<groupbox align="start" id="paneHowTo-switch" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.switch.caption;"/>
 			<html:p>&nbsp;</html:p>
 			<html:p>&howto.switch.description;</html:p>
 		</groupbox>
-		
+
 		<groupbox align="start" id="paneHowTo-search" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.search.caption;"/>
 			<html:ol>
@@ -64,7 +64,7 @@
 			<html:img src="chrome://objPathString/skin/howto/search.png"/>
 			<html:p>&howto.search.final;</html:p>
 		</groupbox>
-		
+
 		<groupbox align="start" id="paneHowTo-organize" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.organize.caption;"/>
 			<html:p>&nbsp;</html:p>
@@ -95,14 +95,14 @@
 				</groupbox>
 			</html:ul>
 		</groupbox>
-		
+
 		<groupbox align="start" id="paneHowTo-pinned" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.pinned.caption;"/>
 			<html:p>&nbsp;</html:p>
 			<html:p>&howto.pinned.description;</html:p>
 			<html:img src="chrome://objPathString/skin/howto/pinned.png"/>
 		</groupbox>
-		
+
 		<groupbox align="start" id="paneHowTo-credits" collapsed="true" data-category="paneHowTo">
 			<html:p><html:span id="paneHowTo-credits-body">&howto.credits;</html:span>&nbsp;<html:a target="_blank" href="https://support.mozilla.org/user/marsf">marsf</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/djst">djst</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/JasnaPaka">JasnaPaka</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/KadirTopal">KadirTopal</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/Verdi">Verdi</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/scoobidiver">scoobidiver</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/Swarnava">Swarnava</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/linesarefuzzy">linesarefuzzy</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/greasemonkey">greasemonkey</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/ideato">ideato</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/deb.bhattacharya6">deb.bhattacharya6</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/KamranMackey">KamranMackey</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/grubert">grubert</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/jsavage">jsavage</html:a>.
 			</html:p>

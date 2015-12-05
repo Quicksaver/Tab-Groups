@@ -7,11 +7,11 @@ this.tabViewKey = {
 	get accel () { return Prefs.tabViewAccel; },
 	get shift () { return Prefs.tabViewShift; },
 	get alt () { return Prefs.tabViewAlt; },
-	
+
 	observe: function(aSubject, aTopic, aData) {
 		this.set();
 	},
-	
+
 	set: function() {
 		if(this.keycode != 'none') { Keysets.register(this); }
 		else { Keysets.unregister(this); }
@@ -20,7 +20,7 @@ this.tabViewKey = {
 
 Modules.LOADMODULE = function() {
 	tabViewKey.set();
-	
+
 	Prefs.listen('tabViewKeycode', tabViewKey);
 	Prefs.listen('tabViewAccel', tabViewKey);
 	Prefs.listen('tabViewShift', tabViewKey);
@@ -32,6 +32,6 @@ Modules.UNLOADMODULE = function() {
 	Prefs.unlisten('tabViewAccel', tabViewKey);
 	Prefs.unlisten('tabViewShift', tabViewKey);
 	Prefs.unlisten('tabViewAlt', tabViewKey);
-	
+
 	Keysets.unregister(tabViewKey);
 };
