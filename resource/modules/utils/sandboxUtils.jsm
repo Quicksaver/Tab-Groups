@@ -32,7 +32,7 @@ this.__defineGetter__('Keysets', function() { Windows; delete this.Keysets; Modu
 // Keysets - handles editable keysets for the add-on
 this.__defineGetter__('PrefPanes', function() { Browsers; delete this.PrefPanes; Modules.load('utils/PrefPanes'); return PrefPanes; });
 
-// DnDprefs -
+// DnDprefs - handles customizable areas with draggable elements in the preferences
 this.__defineGetter__('DnDprefs', function() { delete this.DnDprefs; Modules.load('utils/DnDprefs'); return DnDprefs; });
 
 // closeCustomize() - useful for when you want to close the customize tabs for whatever reason
