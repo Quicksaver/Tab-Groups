@@ -1,4 +1,4 @@
-// VERSION 1.0.6
+// VERSION 1.0.7
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -1181,9 +1181,24 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 		let h = this.canvas.height;
 		if(!w || !h) { return; }
 
-		gPageThumbnails.captureToCanvas(this.tab.linkedBrowser, this.canvas, () => {
+		let browser = this.tab.linkedBrowser;
+
+		gPageThumbnails.captureToCanvas(browser, this.canvas, () => {
 			this._sendToSubscribers("painted");
 		});
+
+		this.persist(browser);
+	},
+
+	persist(browser) {
+		// capture to file, thumbnail service does not persist automatically when rendering to canvas
+		gPageThumbnails.shouldStoreThumbnail(browser, (storeAllowed) => {
+			if(storeAllowed) {
+				// ifStale bails out early if there already is an existing thumbnail less than 2 days old
+				// so this shouldn't cause excessive IO when a thumbnail is updated frequently
+				gPageThumbnails.captureAndStoreIfStale(browser, () => {})
+			}
+		})
 	},
 
 	// Changing the dims of a canvas will clear it, so we don't want to do do this to a canvas we're currently displaying.
@@ -1192,7 +1207,10 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 		let temp = gPageThumbnails.createCanvas(window);
 		temp.width = aWidth;
 		temp.height = aHeight;
-		gPageThumbnails.captureToCanvas(this.tab.linkedBrowser, temp, () => {
+
+		let browser = this.tab.linkedBrowser;
+
+		gPageThumbnails.captureToCanvas(browser, temp, () => {
 			let ctx = this.canvas.getContext('2d');
 			this.canvas.width = aWidth;
 			this.canvas.height = aHeight;
@@ -1205,6 +1223,8 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 			}
 			this._sendToSubscribers("painted");
 		});
+
+		this.persist(browser);
 	},
 
 	toImageData: function() {

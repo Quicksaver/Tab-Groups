@@ -1,4 +1,4 @@
-// VERSION 1.0.15
+// VERSION 1.0.16
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -6,6 +6,7 @@ this.__defineGetter__('gTaskbarTabGroup', function() { return window.gTaskbarTab
 this.__defineGetter__('TabContextMenu', function() { return window.TabContextMenu; });
 
 XPCOMUtils.defineLazyGetter(this, "AeroPeek", () => { return Cu.import("resource:///modules/WindowsPreviewPerTab.jsm", {}).AeroPeek; });
+XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
 this.TabView = {
 	_deck: null,
@@ -179,6 +180,10 @@ this.TabView = {
 		Listeners.add(gBrowser.tabContainer, "TabShow", this);
 		Listeners.add(gBrowser.tabContainer, "TabClose", this);
 
+		// prevent thumbnail service from expiring thumbnails
+		// we can't wait for the panel view here since expiration may run before it is initialized
+		gPageThumbnails.addExpirationFilter(this);
+
 		if(this._tabBrowserHasHiddenTabs()) {
 			Listeners.add(window, "keypress", this);
 		} else {
@@ -237,6 +242,8 @@ this.TabView = {
 			Listeners.remove(window, 'tabviewhidden', this);
 		}
 
+		gPageThumbnails.removeExpirationFilter(this);
+
 		Piggyback.revert('TabView', window, 'WindowIsClosing');
 		Piggyback.revert('TabView', window, 'undoCloseTab');
 		Piggyback.revert('TabView', gBrowser, 'updateTitlebar');
@@ -247,6 +254,10 @@ this.TabView = {
 
 		this._initialized = false;
 		this._deinitFrame();
+	},
+
+	filterForThumbnailExpiration() {
+		return AllTabs.tabs.map(t => t.linkedBrowser.currentURI.spec);
 	},
 
 	// Creates the frame and calls the callback once it's loaded. If the frame already exists, calls the callback immediately.
@@ -496,9 +507,11 @@ this.TabView = {
 };
 
 Modules.LOADMODULE = function() {
+	Modules.load('AllTabs');
 	Overlays.overlayWindow(window, 'TabView', TabView);
 };
 
 Modules.UNLOADMODULE = function() {
 	Overlays.removeOverlayWindow(window, 'TabView');
+	Modules.unload('AllTabs');
 };

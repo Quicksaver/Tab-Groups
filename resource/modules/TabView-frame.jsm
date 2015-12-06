@@ -1,4 +1,4 @@
-// VERSION 1.0.5
+// VERSION 1.0.6
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -31,30 +31,6 @@ this.TabView = {
 	]
 };
 
-this.AllTabs = {
-	_events: {
-		attrModified: "TabAttrModified",
-		close: "TabClose",
-		move: "TabMove",
-		open: "TabOpen",
-		select: "TabSelect",
-		pinned: "TabPinned",
-		unpinned: "TabUnpinned"
-	},
-
-	get tabs() {
-		return Array.filter(gBrowser.tabs, tab => Utils.isValidXULTab(tab));
-	},
-
-	register: function(eventName, callback) {
-		Listeners.add(gBrowser.tabContainer, this._events[eventName], callback);
-	},
-
-	unregister: function(eventName, callback) {
-		Listeners.remove(gBrowser.tabContainer, this._events[eventName], callback);
-	}
-};
-
 Modules.LOADMODULE = function() {
 	// compatibility shims, for other add-ons to interact with this window more closely to the original if needed
 	for(let shim of TabView.shims) {
@@ -62,6 +38,7 @@ Modules.LOADMODULE = function() {
 		window.__defineGetter__(prop, function() { return self[prop]; });
 	}
 
+	Modules.load('AllTabs');
 	Modules.load('iQ');
 	Modules.load('Items');
 	Modules.load('GroupItems');
@@ -74,6 +51,7 @@ Modules.LOADMODULE = function() {
 };
 
 Modules.UNLOADMODULE = function() {
+	Modules.unload('AllTabs');
 	Modules.unload('UI');
 	Modules.unload('Search');
 	Modules.unload('Trench');
