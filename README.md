@@ -21,7 +21,7 @@ Whether you'd like to fix bugs or add new features yourself, you're welcome to f
 
 - Please try to keep the coding style as similar to the current style as you possibly can. I believe consistency is far more important than anything else, even optimization sometimes.
 
-- Also, please avoid commiting ```'use script';``` to any files. I know it's not the best coding habits, but I do rely on non-strict behavior in a handful of places, and if while coding I eventually run into any conflict with this, I'll never remember to check this factor. Eventually I may fix those parts though, but don't count on it happening any time soon.
+- Also, please avoid commiting ```'use strict';``` to any files. I know it's not the best coding habits, but I do rely on non-strict behavior in a handful of places, and if while coding I eventually run into any conflict with this, I'll never remember to check this factor. Eventually I may fix those parts though, but don't count on it happening any time soon.
 
 - You'll notice every Javascript file has  ```VERSION a.b.c``` version somewhere near the top, usually on the very first line. This is a personal method of organization, and I'd appreciate it if you could bump these versions accordingly when changing files:
   - a - major changes, represents a complete overhaul of the code in the file, hardly distinguishable from before; you probably will never need to bump this; when creating new files just give it a version of 1.0.0.
