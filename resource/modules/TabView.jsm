@@ -1,4 +1,4 @@
-// VERSION 1.0.17
+// VERSION 1.0.18
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -474,6 +474,11 @@ this.TabView = {
 };
 
 Modules.LOADMODULE = function() {
+	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
+		// compatibility shim, for other add-ons to interact with this object more closely to the original if needed
+		window.TabView = TabView;
+	}
+
 	Modules.load('AllTabs');
 	Overlays.overlayWindow(window, 'TabView', TabView);
 };
@@ -481,4 +486,8 @@ Modules.LOADMODULE = function() {
 Modules.UNLOADMODULE = function() {
 	Overlays.removeOverlayWindow(window, 'TabView');
 	Modules.unload('AllTabs');
+
+	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
+		delete window.TabView;
+	}
 };
