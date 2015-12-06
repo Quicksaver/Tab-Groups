@@ -1192,8 +1192,12 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 
 	persist(browser) {
 		// capture to file, thumbnail service does not persist automatically when rendering to canvas
-		gPageThumbnails.shouldStoreThumbnail(browser, () => {
-			gPageThumbnails.captureAndStoreIfStale(browser, () => {})
+		gPageThumbnails.shouldStoreThumbnail(browser, (storeAllowed) => {
+			if(storeAllowed) {
+				// ifStale bails out early if there already is an existing thumbnail less than 2 days old
+				// so this shouldn't cause excessive IO when a thumbnail is updated frequently
+				gPageThumbnails.captureAndStoreIfStale(browser, () => {})
+			}
 		})
 	},
 
