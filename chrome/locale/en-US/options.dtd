@@ -2,13 +2,17 @@
 <!ENTITY pane.session.label "Backup / Restore">
 
 <!ENTITY cat.general.label "General">
-<!ENTITY cat.tabViewKeyset.label "Keyboard Shortcut">
+<!ENTITY cat.keyboardshortcuts.label "Keyboard Shortcuts">
 <!ENTITY cat.backup.label "Backup your Tab Groups">
 <!ENTITY cat.restore.label "Restore Tab Groups">
 <!ENTITY cat.clear.label "Clear Tab Groups">
 
 <!ENTITY opt.animateZoom.label "Animate Zoom">
 <!ENTITY opt.animateZoom.tooltip "Smooth transitions when entering and leaving Tab Groups mode, by zooming out of the current tab into groups mode, and zooming back into the tab when leaving groups mode.">
+
+<!ENTITY opt.tabViewKeyset.label "Enter and exit groups mode">
+<!ENTITY opt.nextGroupKeyset.label "Switch to the next group">
+<!ENTITY opt.previousGroupKeyset.label "Switch to the previous group">
 
 <!ENTITY sessionRestore.caption "Keep tab groups across restarts">
 <!ENTITY sessionRestore.description "In order for Firefox to remember your tab groups, it needs to restore your windows and tabs between sessions. Otherwise, you'll have to redo your groups each time you close and reopen the browser.">

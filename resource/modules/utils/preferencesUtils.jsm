@@ -1,4 +1,4 @@
-// VERSION 2.4.9
+// VERSION 2.4.10
 Modules.UTILS = true;
 
 // dependsOn - object that adds a dependson attribute functionality to xul preference elements.
@@ -295,6 +295,7 @@ this.keys = {
 				altBox: $$('[keysetAlt="'+id+'"]')[0],
 				get disabled () { return trueAttribute(this.node, 'disabled'); },
 				get keycode () { return this.node.value; },
+				set keycode (v) { return this.node.value = v; },
 				get accel () { return this.accelBox.checked; },
 				get shift () { return this.shiftBox.checked; },
 				get alt () { return this.altBox.checked; },

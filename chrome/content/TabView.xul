@@ -50,6 +50,8 @@
 
 	<commandset id="mainCommandSet">
 		<command id="objName:ToggleTabView" oncommand="objName.TabView.toggle();"/>
+		<command id="objName:NextGroup" oncommand="objName.TabView.switchGroup(false);"/>
+		<command id="objName:PreviousGroup" oncommand="objName.TabView.switchGroup(true);"/>
 	</commandset>
 
 </overlay>

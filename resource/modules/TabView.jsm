@@ -1,4 +1,4 @@
-// VERSION 1.0.16
+// VERSION 1.0.17
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -33,7 +33,7 @@ this.TabView = {
 	set firstUseExperienced(v) { return true; },
 	get sessionRestoreEnabledOnce() { return Prefs.pageAutoChanged; },
 	set sessionRestoreEnabledOnce(v) { return Prefs.pageAutoChanged = v; },
-	get _browserKeyHandlerInitialized() { return !!Listeners.listening(window, "keypress", this); },
+	get _browserKeyHandlerInitialized() { return true; },
 	getContentWindow: function() { return this._window; },
 
 	get windowTitle() {
@@ -60,38 +60,11 @@ this.TabView = {
 				this._isFrameLoading = false;
 				this._window = this._iframe.contentWindow;
 
-				// Adds new key commands to the browser, for invoking the Tab Candy UI and for switching between groups of tabs when outside of the Tab Candy UI.
-				Listeners.add(window, "keypress", this);
-
 				Listeners.remove(gBrowser.tabContainer, "TabShow", this);
 				Listeners.remove(gBrowser.tabContainer, "TabClose", this);
-				Listeners.remove(window, "SSWindowStateReady", this);
 
 				this._initFrameCallbacks.forEach(cb => cb());
 				this._initFrameCallbacks = [];
-
-				break;
-
-			case 'keypress':
-				if(this.isVisible() || !this._tabBrowserHasHiddenTabs()) { return; }
-
-				// Control (+ Shift) + `
-				if(e.ctrlKey && !e.metaKey && !e.altKey && (e.charCode == 96 || e.charCode == 126)) {
-					e.stopPropagation();
-					e.preventDefault();
-
-					this._initFrame(() => {
-						let groupItems = this._window[objName].GroupItems;
-						let tabItem = groupItems.getNextGroupItemTab(e.shiftKey);
-						if(!tabItem) { return; }
-
-						if(gBrowser.selectedTab.pinned) {
-							groupItems.updateActiveGroupItemAndTabBar(tabItem, { dontSetActiveTabInGroup: true });
-						} else {
-							gBrowser.selectedTab = tabItem.tab;
-						}
-					});
-				}
 
 				break;
 
@@ -112,13 +85,6 @@ this.TabView = {
 			case 'TabClose':
 				if(!this._window && !gBrowser.visibleTabs.length) {
 					this._closedLastVisibleTabBeforeFrameInitialized = true;
-				}
-				break;
-
-			// for restoring last session and undoing recently closed window
-			case 'SSWindowStateReady':
-				if(this._tabBrowserHasHiddenTabs()) {
-					Listeners.add(window, "keypress", this);
 				}
 				break;
 
@@ -183,12 +149,6 @@ this.TabView = {
 		// prevent thumbnail service from expiring thumbnails
 		// we can't wait for the panel view here since expiration may run before it is initialized
 		gPageThumbnails.addExpirationFilter(this);
-
-		if(this._tabBrowserHasHiddenTabs()) {
-			Listeners.add(window, "keypress", this);
-		} else {
-			Listeners.add(window, "SSWindowStateReady", this);
-		}
 
 		Piggyback.add('TabView', window, 'WindowIsClosing', () => {
 			if(this.hide()) {
@@ -305,17 +265,7 @@ this.TabView = {
 		if(this._initialized) {
 			Listeners.add(gBrowser.tabContainer, "TabShow", this);
 			Listeners.add(gBrowser.tabContainer, "TabClose", this);
-
-			if(this._tabBrowserHasHiddenTabs()) {
-				Listeners.remove(window, "SSWindowStateReady", this);
-				Listeners.add(window, "keypress", this);
-			} else {
-				Listeners.remove(window, "keypress", this);
-				Listeners.add(window, "SSWindowStateReady", this);
-			}
 		} else {
-			Listeners.remove(window, "SSWindowStateReady", this);
-			Listeners.remove(window, "keypress", this);
 			Listeners.remove(gBrowser.tabContainer, "TabShow", this);
 			Listeners.remove(gBrowser.tabContainer, "TabClose", this);
 		}
@@ -361,6 +311,23 @@ this.TabView = {
 		} else {
 			this.show();
 		}
+	},
+
+	switchGroup: function(aPrevious) {
+		if(!this._tabBrowserHasHiddenTabs()) { return; }
+
+		this._initFrame(() => {
+			let groupItems = this._window[objName].GroupItems;
+			let tabItem = groupItems.getNextGroupItemTab(aPrevious);
+			if(!tabItem) { return; }
+
+			let isVisible = this.isVisible();
+			if(gBrowser.selectedTab.pinned || isVisible) {
+				groupItems.updateActiveGroupItemAndTabBar(tabItem, { dontSetActiveTabInGroup: !isVisible });
+			} else {
+				gBrowser.selectedTab = tabItem.tab;
+			}
+		});
 	},
 
 	_tabBrowserHasHiddenTabs: function() {

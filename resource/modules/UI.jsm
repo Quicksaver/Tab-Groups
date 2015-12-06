@@ -1,4 +1,4 @@
-// VERSION 1.0.13
+// VERSION 1.0.14
 
 this.Keys = { meta: false };
 
@@ -872,15 +872,9 @@ this.UI = {
 				// let any keys with alt to pass through
 				if(e.altKey) { return; }
 
-				// make sure our keyboard shortcut also works to toggle out of tab view
-				if(Keysets.isRegistered(tabViewKey)) {
-					let keycode = Keysets.translateToConstantCode(tabViewKey.keycode);
-					if(e[keycode] && e[keycode] == e.which
-					&& tabViewKey.shift == e.shiftKey
-					&& tabViewKey.alt == e.altKey
-					&& tabViewKey.accel == (DARWIN ? e.metaKey : e.ctrlKey)) {
-						return;
-					}
+				// make sure our keyboard shortcuts also work, such as to toggle out of tab view
+				for(let key of keysets) {
+					if(Keysets.isRegistered(key) && Keysets.compareWithEvent(key, e)) { return; }
 				}
 
 				if((DARWIN && e.metaKey) || (!DARWIN && e.ctrlKey)) {

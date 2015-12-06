@@ -23,6 +23,14 @@
 			<preference id="pref-tabViewAccel" name="extensions.tabgroups.tabViewAccel" type="bool"/>
 			<preference id="pref-tabViewShift" name="extensions.tabgroups.tabViewShift" type="bool"/>
 			<preference id="pref-tabViewAlt" name="extensions.tabgroups.tabViewAlt" type="bool"/>
+			<preference id="pref-nextGroupKeycode" name="extensions.tabgroups.nextGroupKeycode" type="string"/>
+			<preference id="pref-nextGroupAccel" name="extensions.tabgroups.nextGroupAccel" type="bool"/>
+			<preference id="pref-nextGroupShift" name="extensions.tabgroups.nextGroupShift" type="bool"/>
+			<preference id="pref-nextGroupAlt" name="extensions.tabgroups.nextGroupAlt" type="bool"/>
+			<preference id="pref-previousGroupKeycode" name="extensions.tabgroups.previousGroupKeycode" type="string"/>
+			<preference id="pref-previousGroupAccel" name="extensions.tabgroups.previousGroupAccel" type="bool"/>
+			<preference id="pref-previousGroupShift" name="extensions.tabgroups.previousGroupShift" type="bool"/>
+			<preference id="pref-previousGroupAlt" name="extensions.tabgroups.previousGroupAlt" type="bool"/>
 		</preferences>
 
 		<hbox id="header-tabGroups" class="header" collapsed="true" data-category="paneTabGroups">
@@ -38,13 +46,30 @@
 		</groupbox>
 
 		<groupbox align="start" id="paneTabGroups-shortcut" collapsed="true" data-category="paneTabGroups">
-			<caption label="&cat.tabViewKeyset.label;"/>
-			<hbox jump="tabViewKeycode,&cat.tabViewKeyset.label;">
-				<checkbox class="smallindent" keysetAccel="tabView" delayPreference="pref-tabViewAccel"/>
-				<checkbox class="smallindent" keysetAlt="tabView" delayPreference="pref-tabViewAlt"/>
-				<checkbox class="smallindent" keysetShift="tabView" delayPreference="pref-tabViewShift"/>
-				<menulist class="smallindent" keyset="tabView" delayPreference="pref-tabViewKeycode"/>
-			</hbox>
+			<caption label="&cat.keyboardshortcuts.label;"/>
+			<vbox>
+				<hbox jump="tabViewKeycode,&opt.tabViewKeyset.label;">
+					<label class="stretch" value="&opt.tabViewKeyset.label;" flex="1"/>
+					<checkbox class="smallindent" keysetAccel="tabView" delayPreference="pref-tabViewAccel"/>
+					<checkbox class="smallindent" keysetAlt="tabView" delayPreference="pref-tabViewAlt"/>
+					<checkbox class="smallindent" keysetShift="tabView" delayPreference="pref-tabViewShift"/>
+					<menulist class="smallindent" keyset="tabView" delayPreference="pref-tabViewKeycode"/>
+				</hbox>
+				<hbox jump="nextGroupKeycode,&opt.nextGroupKeyset.label;">
+					<label class="stretch" value="&opt.nextGroupKeyset.label;" flex="1"/>
+					<checkbox class="smallindent" keysetAccel="nextGroup" delayPreference="pref-nextGroupAccel"/>
+					<checkbox class="smallindent" keysetAlt="nextGroup" delayPreference="pref-nextGroupAlt"/>
+					<checkbox class="smallindent" keysetShift="nextGroup" delayPreference="pref-nextGroupShift"/>
+					<menulist class="smallindent" keyset="nextGroup" delayPreference="pref-nextGroupKeycode"/>
+				</hbox>
+				<hbox jump="previousGroupKeycode,&opt.previousGroupKeyset.label;">
+					<label class="stretch" value="&opt.previousGroupKeyset.label;" flex="1"/>
+					<checkbox class="smallindent" keysetAccel="previousGroup" delayPreference="pref-previousGroupAccel"/>
+					<checkbox class="smallindent" keysetAlt="previousGroup" delayPreference="pref-previousGroupAlt"/>
+					<checkbox class="smallindent" keysetShift="previousGroup" delayPreference="pref-previousGroupShift"/>
+					<menulist class="smallindent" keyset="previousGroup" delayPreference="pref-previousGroupKeycode"/>
+				</hbox>
+			</vbox>
 		</groupbox>
 
 		<groupbox align="start" id="paneTabGroups-sessionRestore" collapsed="true" data-category="paneTabGroups">

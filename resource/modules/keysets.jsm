@@ -1,37 +1,101 @@
-Modules.VERSION = '1.0.0';
+// VERSION 2.0.0
 
-this.tabViewKey = {
-	id: objName+'-key-tabView',
-	command: objName+':ToggleTabView',
-	get keycode () { return Prefs.tabViewKeycode; },
-	get accel () { return Prefs.tabViewAccel; },
-	get shift () { return Prefs.tabViewShift; },
-	get alt () { return Prefs.tabViewAlt; },
+this.keysets = new Set([
+	{
+		id: objName+'-key-tabView',
+		command: objName+':ToggleTabView',
 
-	observe: function(aSubject, aTopic, aData) {
-		this.set();
+		keycodePref: 'tabViewKeycode',
+		accelPref: 'tabViewAccel',
+		shiftPref: 'tabViewShift',
+		altPref: 'tabViewAlt',
+
+		get keycode () { return Prefs[this.keycodePref]; },
+		get accel () { return Prefs[this.accelPref]; },
+		get shift () { return Prefs[this.shiftPref]; },
+		get alt () { return Prefs[this.altPref]; },
+
+		observe: function(aSubject, aTopic, aData) {
+			this.set();
+		},
+
+		set: function() {
+			if(this.keycode != 'none') { Keysets.register(this); }
+			else { Keysets.unregister(this); }
+		}
 	},
+	{
+		id: objName+'-key-nextGroup',
+		command: objName+':NextGroup',
 
-	set: function() {
-		if(this.keycode != 'none') { Keysets.register(this); }
-		else { Keysets.unregister(this); }
+		keycodePref: 'nextGroupKeycode',
+		accelPref: 'nextGroupAccel',
+		shiftPref: 'nextGroupShift',
+		altPref: 'nextGroupAlt',
+
+		get keycode () { return Prefs[this.keycodePref]; },
+		get accel () { return Prefs[this.accelPref]; },
+		get shift () { return Prefs[this.shiftPref]; },
+		get alt () { return Prefs[this.altPref]; },
+
+		observe: function(aSubject, aTopic, aData) {
+			this.set();
+		},
+
+		set: function() {
+			if(this.keycode != 'none') { Keysets.register(this); }
+			else { Keysets.unregister(this); }
+		}
+	},
+	{
+		id: objName+'-key-previousGroup',
+		command: objName+':PreviousGroup',
+
+		keycodePref: 'previousGroupKeycode',
+		accelPref: 'previousGroupAccel',
+		shiftPref: 'previousGroupShift',
+		altPref: 'previousGroupAlt',
+
+		get keycode () { return Prefs[this.keycodePref]; },
+		get accel () { return Prefs[this.accelPref]; },
+		get shift () { return Prefs[this.shiftPref]; },
+		get alt () { return Prefs[this.altPref]; },
+
+		observe: function(aSubject, aTopic, aData) {
+			this.set();
+		},
+
+		set: function() {
+			if(this.keycode != 'none') { Keysets.register(this); }
+			else { Keysets.unregister(this); }
+		}
+	}
+]);
+
+Modules.LOADMODULE = function() {
+	// this is to migrate to the new Keysets object, it can probably be removed once most users have updated to the latest version
+	if(!Prefs.migratedKeysets) {
+		Prefs.migratedKeysets = true;
+		Prefs.tabViewKeycode = Keysets.translateFromConstantCode(Prefs.tabViewKeycode);
+	}
+
+	for(let key of keysets) {
+		key.set();
+
+		Prefs.listen(key.keycodePref, key);
+		Prefs.listen(key.accelPref, key);
+		Prefs.listen(key.shiftPref, key);
+		Prefs.listen(key.altPref, key);
 	}
 };
 
-Modules.LOADMODULE = function() {
-	tabViewKey.set();
-
-	Prefs.listen('tabViewKeycode', tabViewKey);
-	Prefs.listen('tabViewAccel', tabViewKey);
-	Prefs.listen('tabViewShift', tabViewKey);
-	Prefs.listen('tabViewAlt', tabViewKey);
-};
-
 Modules.UNLOADMODULE = function() {
-	Prefs.unlisten('tabViewKeycode', tabViewKey);
-	Prefs.unlisten('tabViewAccel', tabViewKey);
-	Prefs.unlisten('tabViewShift', tabViewKey);
-	Prefs.unlisten('tabViewAlt', tabViewKey);
+	for(let key of keysets) {
+		Prefs.unlisten(key.keycodePref, key);
+		Prefs.unlisten(key.accelPref, key);
+		Prefs.unlisten(key.shiftPref, key);
+		Prefs.unlisten(key.altPref, key);
 
-	Keysets.unregister(tabViewKey);
+		Keysets.unregister(key);
+	}
 };

@@ -4,6 +4,12 @@
 #categories .category[value="paneHowTo"] image { -moz-image-region: rect(0px 72px 24px 48px); }
 #categories .category[value="paneSession"] image { -moz-image-region: rect(0px 96px 24px 72px); }
 
+#paneTabGroups-shortcut label.stretch {
+	-moz-margin-end: 1.5em !important;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
 #paneHowTo-credits {
 	padding-top: 4em;
 	font-size: 0.8em;

@@ -1,4 +1,4 @@
-// VERSION 1.6.1
+// VERSION 1.7.0
 Modules.UTILS = true;
 
 // Keysets - handles editable keysets for the add-on
@@ -7,7 +7,7 @@ Modules.UTILS = true;
 //			id - (string) id for the key element
 //			(either this or oncommand) command - (string) id of command element to trigger
 //			(either this or command) oncommand - (string) action to perform
-//			keycode - (string) either a key to press (e.g. 'A') or a keycode to watch for (e.g. 'VK_F8'); some keys/keycodes don't work, see below notes.
+//			keycode - (string) a key to press (e.g. 'A', 'F8', etc.); some keys don't work, see below notes.
 //			accel: (bool) true if control key (command key on mac) should be pressed
 //			shift: (bool) true if shift key should be pressed
 //			alt: (bool) true if alt key (option key on mac) should be pressed
@@ -17,11 +17,12 @@ Modules.UTILS = true;
 //		a - (obj) keyset to compare, see register()
 //		b - (obj) keyset to compare, see register()
 //		(optional) justModifiers - if true only the modifiers will be compared and the keycode will be ignored, defaults to false
-//	exists(key, ignore) -	returns (obj) of existing key if provided keycode and modifiers already exists,
+//	exists(key) -	returns (obj) of existing key if provided keycode and modifiers already exists,
 //				returns (bool) false otherwise. Returns null if no browser window is opened.
-//		(optional) ignore - if true, keysets registered by this object are ignored, defaults to false
 //		see register()
-//	translateToConstantCode(input) - returns equivalent DOM_VK_INPUT string name
+//	translateToConstantCode(key) - returns the VK_INPUT string to be used in a key element for a given non-input key value
+//	translateFromConstantCode(keycode) - returns equivalent key value from a possible DOM_VK_INPUT string name
+//	compareWithEvent(k, e) - returns whether a given key event corresponds to a registered keyset
 this.Keysets = {
 	registered: [],
 	queued: [],
@@ -34,14 +35,14 @@ this.Keysets = {
 			accel: true,
 			shift: false,
 			alt: false,
-			keycode: 'VK_PAGE_UP'
+			keycode: 'PageUp'
 		},
 		{
 			id: 'native_togglesTabs',
 			accel: true,
 			shift: false,
 			alt: false,
-			keycode: 'VK_PAGE_DOWN'
+			keycode: 'PageDown'
 		},
 		// Ctrl+F4 closes current tab
 		// Alt+F4 closes current window
@@ -50,14 +51,14 @@ this.Keysets = {
 			accel: true,
 			shift: false,
 			alt: false,
-			keycode: 'VK_F4'
+			keycode: 'F4'
 		},
 		{
 			id: 'close_current_window',
 			accel: false,
 			shift: false,
 			alt: true,
-			keycode: 'VK_F4'
+			keycode: 'F4'
 		},
 		// F10 Toggles menu bar
 		{
@@ -65,7 +66,29 @@ this.Keysets = {
 			accel: false,
 			shift: false,
 			alt: false,
-			keycode: 'VK_F10'
+			keycode: 'F10'
+		},
+		{
+			id: 'toggle_menubar',
+			accel: true,
+			shift: false,
+			alt: false,
+			keycode: 'F10'
+		},
+		// Shift+F10 Toggles context menu
+		{
+			id: 'toggle_contextmenu',
+			accel: false,
+			shift: true,
+			alt: false,
+			keycode: 'F10'
+		},
+		{
+			id: 'toggle_contextmenu',
+			accel: true,
+			shift: true,
+			alt: false,
+			keycode: 'F10'
 		},
 		// F7 toggle caret browsing
 		{
@@ -73,55 +96,34 @@ this.Keysets = {
 			accel: false,
 			shift: false,
 			alt: false,
-			keycode: 'VK_F7'
+			keycode: 'F7'
 		}
 
 	],
 
 	// Restricts available key combos, I'm setting all displaying keys and other common ones to at least need the Ctrl key
-	allCodesAccel: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'VK_PAGE_UP', 'VK_PAGE_DOWN', 'VK_HOME', 'VK_END', 'VK_UP', 'VK_DOWN', 'VK_LEFT', 'VK_RIGHT', '.', ',', ';', '/', '\\', '=', '+', '-', '*', '<', '>' ],
+	allCodesAccel: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', '.', ',', ';', '/', '\\', '=', '+', '-', '*', '<', '>', String.fromCharCode(180)/*'´'*/, '`', '~', '^' ],
 
 	// Function keys should work by themselves without any modifiers
-	allCodes: ['VK_F1', 'VK_F2', 'VK_F3', 'VK_F4', 'VK_F5', 'VK_F6', 'VK_F7', 'VK_F8', 'VK_F9', 'VK_F10', 'VK_F11', 'VK_F12', 'VK_F13', 'VK_F14', 'VK_F15', 'VK_F16', 'VK_F17', 'VK_F18', 'VK_F19', 'VK_F20', 'VK_F21', 'VK_F22', 'VK_F23', 'VK_F24'],
+	allCodes: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'F24'],
 
 	// all the codes to be filled into selection menus, in the order they should be shown
 	fillCodes: [
 		['none', Strings.get('utils/keys', 'none')],
 		['A'],['B'],['C'],['D'],['E'],['F'],['G'],['H'],['I'],['J'],['K'],['L'],['M'],['N'],['O'],['P'],['Q'],['R'],['S'],['T'],['U'],['V'],['W'],['X'],['Y'],['Z'],
 		[' ', Strings.get('utils/keys', 'spacebar')],
-		['VK_PAGE_UP', Strings.get('utils/keys', 'pageup')],
-		['VK_PAGE_DOWN', Strings.get('utils/keys', 'pagedown')],
-		['VK_HOME', Strings.get('utils/keys', 'home')],
-		['VK_END', Strings.get('utils/keys', 'end')],
-		['VK_UP', Strings.get('utils/keys', 'up')],
-		['VK_DOWN', Strings.get('utils/keys', 'down')],
-		['VK_LEFT', Strings.get('utils/keys', 'left')],
-		['VK_RIGHT', Strings.get('utils/keys', 'right')],
+		['PageUp', Strings.get('utils/keys', 'pageup')],
+		['PageDown', Strings.get('utils/keys', 'pagedown')],
+		['Home', Strings.get('utils/keys', 'home')],
+		['End', Strings.get('utils/keys', 'end')],
+		['ArrowUp', Strings.get('utils/keys', 'up')],
+		['ArrowDown', Strings.get('utils/keys', 'down')],
+		['ArrowLeft', Strings.get('utils/keys', 'left')],
+		['ArrowRight', Strings.get('utils/keys', 'right')],
 		['.'],[','],[';'],['/'],['\\'],['='],['+'],['-'],['*'],['<'],['>'],
-		['VK_F1', 'F1'],
-		['VK_F2', 'F2'],
-		['VK_F3', 'F3'],
-		['VK_F4', 'F4'],
-		['VK_F5', 'F5'],
-		['VK_F6', 'F6'],
-		['VK_F7', 'F7'],
-		['VK_F8', 'F8'],
-		['VK_F9', 'F9'],
-		['VK_F10', 'F10'],
-		['VK_F11', 'F11'],
-		['VK_F12', 'F12'],
-		['VK_F13', 'F13'],
-		['VK_F14', 'F14'],
-		['VK_F15', 'F15'],
-		['VK_F16', 'F16'],
-		['VK_F17', 'F17'],
-		['VK_F18', 'F18'],
-		['VK_F19', 'F19'],
-		['VK_F20', 'F20'],
-		['VK_F21', 'F21'],
-		['VK_F22', 'F22'],
-		['VK_F23', 'F23'],
-		['VK_F24', 'F24']
+		[String.fromCharCode(180)/*'´'*/],['`'],['~'],['^'],
+		['F1'],['F2'],['F3'],['F4'],['F5'],['F6'],['F7'],['F8'],['F9'],['F10'],['F11'],['F12'],
+		['F13'],['F14'],['F15'],['F16'],['F17'],['F18'],['F19'],['F20'],['F21'],['F22'],['F23'],['F24']
 	],
 
 	// for the preferences tab, to auto-fill all the key options and labels
@@ -141,27 +143,60 @@ this.Keysets = {
 		key.node.value = key.node.value;
 	},
 
-	translateToConstantCode: function(keycode) {
-		if(!keycode.startsWith('DOM_')) {
-			if(!keycode.startsWith('VK_')) {
-				switch(keycode) {
-					case ' ': keycode = 'SPACE'; break;
-					case '.': keycode = 'PERIOD'; break;
-					case ',': keycode = 'COMMA'; break;
-					case ';': keycode = 'SEMICOLON'; break;
-					case '/': keycode = 'SLASH'; break;
-					case '\\': keycode = 'BACK_SLASH'; break;
-					case '=': keycode = 'EQUALS'; break;
-					case '+': keycode = 'PLUS'; break;
-					case '-': keycode = 'HYPHEN_MINUS'; break;
-					case '*': keycode = 'ASTERISK'; break;
-					default: break;
-				}
-				keycode = 'VK_'+keycode;
-			}
-			keycode = 'DOM_'+keycode;
+	// we only translate the ones we actually use in here
+	translateToConstantCode: function(key) {
+		switch(key) {
+			case 'PageUp': return 'VK_PAGE_UP';
+			case 'PageDown': return 'VK_PAGE_DOWN';
+			case 'Home': return 'VK_HOME';
+			case 'End': return 'VK_END';
+			case 'ArrowUp': return 'VK_UP';
+			case 'ArrowDown': return 'VK_DOWN';
+			case 'ArrowLeft': return 'VK_LEFT';
+			case 'ArrowRight': return 'VK_RIGHT';
+
+			case 'F1': case 'F2': case 'F3': case 'F4': case 'F5': case 'F6': case 'F7': case 'F8': case 'F9': case 'F10': case 'F11': case 'F12':
+			case 'F13': case 'F14': case 'F15': case 'F16': case 'F17': case 'F18': case 'F19': case 'F20': case 'F21': case 'F22': case 'F23': case 'F24':
+				return 'VK_'+key;
+
 		}
-		return keycode;
+		return key;
+	},
+
+	// we only translate the ones we actually use in here
+	translateFromConstantCode: function(keycode) {
+		let key = keycode;
+		if(key.startsWith('DOM_')) { key = key.substr(4); }
+		if(key.startsWith('VK_')) { key = key.substr(3); }
+		switch(key) {
+			case 'SPACE': key = ' '; break;
+			case 'PERIOD': key = '.'; break;
+			case 'COMMA': key = ','; break;
+			case 'SEMICOLON': key = ';'; break;
+			case 'SLASH': key = '/'; break;
+			case 'BACK_SLASH': key = '\\'; break;
+			case 'EQUALS': key = '='; break;
+			case 'PLUS': key = '+'; break;
+			case 'HYPHEN_MINUS': key = '-'; break;
+			case 'ASTERISK': key = '*'; break;
+			case 'BACK_QUOTE': key = '`'; break;
+			case 'TILDE': key = '~'; break;
+			case 'CIRCUMFLEX': key = '^'; break;
+			case 'PAGE_UP': key = 'PageUp'; break;
+			case 'PAGE_DOWN': key = 'PageDown'; break;
+			case 'HOME': key = 'Home'; break;
+			case 'END': key = 'End'; break;
+			case 'UP': key = 'ArrowUp'; break;
+			case 'DOWN': key = 'ArrowDown'; break;
+			case 'LEFT': key = 'ArrowLeft'; break;
+			case 'RIGHT': key = 'ArrowRight'; break;
+			default: break;
+		}
+		// we like single chars to always be uppercased (no distinction between 'a' and 'A')
+		if(key.length == 1) {
+			key = key.toUpperCase();
+		}
+		return key;
 	},
 
 	register: function(key, noSchedule) {
@@ -184,7 +219,7 @@ this.Keysets = {
 		}
 
 		if(this.isValid(key)) {
-			var exists = this.exists(key, true);
+			let exists = this.exists(key);
 			if(!exists) {
 				this.registered.push(key);
 			} else {
@@ -231,6 +266,10 @@ this.Keysets = {
 		return false;
 	},
 
+	compareWithEvent: function(k, e) {
+		return (k.keycode == this.translateFromConstantCode(e.key) && k.shift == e.shiftKey && k.alt == e.altKey && k.accel == (DARWIN ? e.metaKey : e.ctrlKey));
+	},
+
 	// array of methods/occasions where a key could be reported as in/valid by mistake because it belongs to an add-on that hasn't been initialized yet
 	delayedOtherKeys: [
 		// Tile Tabs Function keys
@@ -238,7 +277,7 @@ this.Keysets = {
 	],
 
 	prepareKey: function(key) {
-		var newKey = {
+		let newKey = {
 			id: key.id || null,
 			command: key.command || null,
 			oncommand: key.oncommand || null,
@@ -252,38 +291,39 @@ this.Keysets = {
 
 	getAllSets: function(aWindow) {
 		if(!aWindow) {
-			return Windows.callOnMostRecent(this.getAllSets, 'navigator:browser');
+			Windows.callOnMostRecent((bWindow) => { aWindow = bWindow; }, 'navigator:browser');
 		}
 
-		var allSets = [];
+		let allSets = [];
 
 		// Grab all key elements in the document
-		var keys = aWindow.document.querySelectorAll('key');
-		for(var k of keys) {
-			if(!k.id || !k.parentNode || k.parentNode.nodeName != 'keyset' || trueAttribute(k, 'disabled')) { continue; }
+		let keys = aWindow.document.querySelectorAll('key');
+		for(let k of keys) {
+			if(!k.id || k.parentNode.nodeName != 'keyset' || trueAttribute(k, 'disabled')) { continue; }
 
-			var key = {
+			// we don't want our own keyset here
+			if(k.parentNode.id == objName+'-keyset') { continue; }
+
+			let key = {
 				id: k.id,
 				hasModifiers: k.hasAttribute('modifiers'),
 				self: k.getAttribute('Keysets') == objName
 			};
 
-			var modifiers = k.getAttribute('modifiers').toLowerCase();
+			let modifiers = k.getAttribute('modifiers').toLowerCase();
 			key.accel = modifiers.includes('accel') || modifiers.includes('control'); // control or command key on mac
 			key.alt = modifiers.includes('alt'); // option key on mac
 			key.shift = modifiers.includes('shift');
 
-			key.keycode = k.getAttribute('keycode') || k.getAttribute('key');
-			key.keycode = key.keycode.toUpperCase();
-
+			key.keycode = this.translateFromConstantCode(k.getAttribute('keycode') || k.getAttribute('key'));
 			allSets.push(key);
 		}
 
 		// Alt + % will open certain menus, we need to account for these as well, twice with shift as it also works
-		var mainmenu = aWindow.document.getElementById('main-menubar');
+		let mainmenu = aWindow.document.getElementById('main-menubar');
 		if(mainmenu) {
-			for(var menu of mainmenu.childNodes) {
-				var key = {
+			for(let menu of mainmenu.childNodes) {
+				let key = {
 					id: menu.id,
 					accel: false,
 					alt: true,
@@ -292,7 +332,7 @@ this.Keysets = {
 				};
 				allSets.push(key);
 
-				var key = {
+				key = {
 					id: menu.id,
 					accel: false,
 					alt: true,
@@ -303,7 +343,7 @@ this.Keysets = {
 			}
 		}
 
-		for(var x of Keysets.unusable) {
+		for(let x of Keysets.unusable) {
 			allSets.push(x);
 		}
 
@@ -315,21 +355,21 @@ this.Keysets = {
 		key.shift = key.shift || false;
 		key.alt = key.alt || false;
 
-		var allSets = this.getAllSets();
-		var available = {};
+		let allSets = this.getAllSets();
+		let available = {};
 
 		if(key.accel) {
 			codesLoop:
-			for(var code of this.allCodesAccel) {
-				var check = this.isCodeAvailable(code, key, allSets, moreKeys);
+			for(let code of this.allCodesAccel) {
+				let check = this.isCodeAvailable(code, key, allSets, moreKeys);
 				if(check) {
 					available[code] = check;
 				}
 			}
 		}
 
-		for(var code of this.allCodes) {
-			var check = this.isCodeAvailable(code, key, allSets, moreKeys);
+		for(let code of this.allCodes) {
+			let check = this.isCodeAvailable(code, key, allSets, moreKeys);
 			if(check) {
 				available[code] = check;
 			}
@@ -339,7 +379,7 @@ this.Keysets = {
 	},
 
 	isCodeAvailable: function(code, key, allSets, moreKeys) {
-		var check = {
+		let check = {
 			id: null,
 			keycode: code,
 			accel: key.accel,
@@ -347,8 +387,12 @@ this.Keysets = {
 			alt: key.alt
 		};
 
+		if(this.exists(check, allSets)) {
+			return null;
+		}
+
 		if(moreKeys) {
-			for(var more of moreKeys) {
+			for(let more of moreKeys) {
 				if(more.disabled) { continue; }
 
 				if(this.compareKeys(more, check)) {
@@ -360,51 +404,35 @@ this.Keysets = {
 			}
 		}
 
-		var exists = this.exists(check, false, allSets);
-		if(exists) {
-			if(moreKeys) {
-				for(var more of moreKeys) {
-					if(more.disabled) { continue; }
-
-					if(more.id == exists.id) {
-						if(!this.compareKeys(more, exists)) {
-							return check;
-						}
-						break;
-					}
-				}
-			}
-			return null;
-		}
-
 		return check;
 	},
 
-	exists: function(key, ignore, allSets) {
-		if(!allSets) { allSets = this.getAllSets(); }
-		if(!allSets) { return null; }
-
-		for(var k of allSets) {
-			if(ignore && k.self) {
-				continue;
+	exists: function(key, allSets) {
+		if(!allSets) {
+			allSets = this.getAllSets();
+			if(!allSets) {
+				return null;
 			}
+		}
 
+		for(let k of allSets) {
 			if(this.compareKeys(k, key)) {
 				return k;
 			}
 		}
+
 		return false;
 	},
 
 	isValid: function(key) {
-		for(var code of this.allCodes) {
+		for(let code of this.allCodes) {
 			if(code == key.keycode) {
 				return true;
 			}
 		}
 
 		if(key.accel) {
-			for(var code of this.allCodesAccel) {
+			for(let code of this.allCodesAccel) {
 				if(code == key.keycode) {
 					return true;
 				}
@@ -415,7 +443,7 @@ this.Keysets = {
 	},
 
 	isRegistered: function(key) {
-		for(var k of this.registered) {
+		for(let k of this.registered) {
 			if(key.id == k.id
 			&& key.command == k.command
 			&& key.oncommand == k.oncommand
@@ -430,6 +458,17 @@ this.Keysets = {
 		Windows.callOnAll((aWindow) => { this.setWindow(aWindow); }, 'navigator:browser');
 	},
 
+	unsetAllWindows: function() {
+		Windows.callOnAll((aWindow) => { this.unsetWindow(aWindow); }, 'navigator:browser');
+	},
+
+	unsetWindow: function(aWindow) {
+		let keyset = aWindow.document.getElementById(objName+'-keyset');
+		if(keyset) {
+			keyset.remove();
+		}
+	},
+
 	setWindow: function(aWindow) {
 		if(this.queued.length > 0) {
 			while(this.queued.length > 0) {
@@ -440,27 +479,24 @@ this.Keysets = {
 			return;
 		}
 
-		var keyset = aWindow.document.getElementById(objName+'-keyset');
-		if(keyset) {
-			keyset.remove();
-		}
-
-		if(UNLOADED) { return; }
+		this.unsetWindow(aWindow);
 
 		if(this.registered.length > 0) {
-			var keyset = aWindow.document.createElement('keyset');
+			let keyset = aWindow.document.createElement('keyset');
 			keyset.id = objName+'-keyset';
 
-			for(var r of this.registered) {
-				var key = aWindow.document.createElement('key');
+			for(let r of this.registered) {
+				let key = aWindow.document.createElement('key');
 				key.id = r.id;
 				key.setAttribute('Keysets', objName);
-				key.setAttribute((r.keycode.startsWith('VK_') ? 'keycode' : 'key'), r.keycode);
 				toggleAttribute(key, 'command', r.command, r.command);
 				toggleAttribute(key, 'oncommand', r.oncommand, r.oncommand);
 
+				let code = this.translateToConstantCode(r.keycode);
+				key.setAttribute(code.startsWith('VK_') ? 'keycode' : 'key', code);
+
 				if(r.accel || r.shift || r.alt) {
-					var modifiers = [];
+					let modifiers = [];
 					if(r.accel) { modifiers.push('accel'); }
 					if(r.shift) { modifiers.push('shift'); }
 					if(r.alt) { modifiers.push('alt'); }
@@ -485,5 +521,5 @@ Modules.LOADMODULE = function() {
 
 Modules.UNLOADMODULE = function() {
 	Windows.unregister(Keysets, 'domwindowopened', 'navigator:browser');
-	Keysets.setAllWindows(); // removes the keyset object if the add-on has been unloaded
+	Keysets.unsetAllWindows(); // removes the keyset object if the add-on has been unloaded
 };

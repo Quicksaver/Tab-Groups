@@ -1,4 +1,4 @@
-// VERSION 1.4.1
+// VERSION 1.4.2
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -35,23 +35,16 @@ this.keydownPanel = {
 					}
 
 					// if this var exists, it means this keyset should be used to toggle the panel as well
-					if(this._toggleKeyset) {
-						var keycode = Keysets.translateToConstantCode(this._toggleKeyset.keycode);
+					if(this._toggleKeyset && Keysets.compareWithEvent(this._toggleKeyset, e)) {
+						e.preventDefault();
+						e.stopPropagation();
 
-						if(e[keycode] && e[keycode] == e.which
-						&& this._toggleKeyset.shift == e.shiftKey
-						&& this._toggleKeyset.alt == e.altKey
-						&& this._toggleKeyset.accel == (DARWIN ? e.metaKey : e.ctrlKey)) {
-							e.preventDefault();
-							e.stopPropagation();
-
-							if(this.hidePopup) {
-								this.hidePopup();
-							} else {
-								keydownPanel.closeSubView();
-							}
-							return;
+						if(this.hidePopup) {
+							this.hidePopup();
+						} else {
+							keydownPanel.closeSubView();
 						}
+						return;
 					}
 
 					switch(e.which) {

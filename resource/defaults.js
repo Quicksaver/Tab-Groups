@@ -1,4 +1,4 @@
-// VERSION 1.3.13
+// VERSION 1.3.14
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -22,11 +22,22 @@ prefList = {
 	tabViewShift: true,
 	tabViewAlt: false,
 
+	nextGroupKeycode: '`',
+	nextGroupAccel: true,
+	nextGroupShift: false,
+	nextGroupAlt: false,
+
+	previousGroupKeycode: '`',
+	previousGroupAccel: true,
+	previousGroupShift: true,
+	previousGroupAlt: false,
+
 	// for internal use
 	pageBackup: -1,
 	pageAutoChanged: false,
 	migratedWidget: false,
-	migratedPrefs: false
+	migratedPrefs: false,
+	migratedKeysets: false
 };
 
 paneList = [
