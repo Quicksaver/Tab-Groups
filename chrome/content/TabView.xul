@@ -16,7 +16,7 @@
 
 			<menupopup id="objName-context_tabViewMenuPopup">
 				<menuseparator id="objName-context_tabViewNamedGroups" hidden="true"/>
-				<menuitem id="context_tabViewNewGroup"
+				<menuitem id="objName-context_tabViewNewGroup"
 					label="&moveToNewGroup.label;"
 					oncommand="objName.TabView.moveTabTo(TabContextMenu.contextTab, null);"/>
 			</menupopup>

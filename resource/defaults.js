@@ -1,4 +1,4 @@
-// VERSION 1.3.15
+// VERSION 1.3.16
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -60,6 +60,7 @@ function onStartup(aReason) {
 	Modules.load('Storage');
 	Modules.load('nativePrefs');
 	Modules.load('migrate');
+	Modules.load('compatibilityFix/sandboxFixes');
 	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 		Modules.load('keysets');
 	}
@@ -76,6 +77,7 @@ function onShutdown(aReason) {
 	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 		Modules.unload('keysets');
 	}
+	Modules.unload('compatibilityFix/sandboxFixes');
 	Modules.unload('migrate');
 	Modules.unload('nativePrefs');
 	Modules.unload('Storage');

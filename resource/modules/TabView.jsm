@@ -1,4 +1,4 @@
-// VERSION 1.0.18
+// VERSION 1.0.19
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -392,13 +392,14 @@ this.TabView = {
 		let menuItem = document.createElement("menuitem");
 		let title = this.getGroupTitle(groupItem);
 
+		menuItem.groupId = groupItem.id;
 		menuItem.setAttribute("label", title);
 		menuItem.setAttribute("tooltiptext", title);
 		menuItem.setAttribute("crop", "center");
 		menuItem.setAttribute("class", "tabview-menuitem");
 
 		menuItem.handleEvent = (e) => {
-			this.moveTabTo(TabContextMenu.contextTab, groupItem.id);
+			this.moveTabTo(TabContextMenu.contextTab, menuItem.groupId);
 		};
 		menuItem.addEventListener("command", menuItem);
 
