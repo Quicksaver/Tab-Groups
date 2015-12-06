@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 // The Drag that's currently in process.
 this.drag = {
@@ -29,6 +29,9 @@ this.Drag = function(item, event) {
 
 	this.item.isDragging = true;
 	this.item.setZ(999999);
+
+	// show a dragging cursor while the item is being dragged
+	this.$el.addClass('dragging');
 
 	this.safeWindowBounds = Items.getSafeWindowBounds();
 
@@ -202,6 +205,7 @@ this.Drag.prototype = {
 	stop: function(immediately) {
 		Trenches.hideGuides();
 		this.item.isDragging = false;
+		this.$el.removeClass('dragging');
 
 		if(this.parent && this.parent != this.item.parent) {
 			this.parent.closeIfEmpty();
