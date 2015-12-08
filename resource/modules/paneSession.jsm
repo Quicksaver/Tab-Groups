@@ -1,13 +1,15 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 this.paneSession = {
 	manualAction: false,
+	migratedBackupFile: null,
 
 	get alldataCheckbox() { return $('paneSession-backup-alldata'); },
 	get alldata() { return this.alldataCheckbox.checked; },
 
 	get backupBtn() { return $('paneSession-backup-button'); },
 	get loadBtn() { return $('paneSession-load-button'); },
+	get migratedBtn() { return $('paneSession-migrated-button'); },
 	get importBtn() { return $('paneSession-import-button'); },
 	get clearBtn1() { return $('paneSession-clear-button-1'); },
 	get clearBtn2() { return $('paneSession-clear-button-2'); },
@@ -43,6 +45,10 @@ this.paneSession = {
 					case this.clearBtn2:
 					case this.clearBtn3:
 						this.clearData();
+						break;
+
+					case this.migratedBtn:
+						this.loadSessionFile(this.migratedBackupFile);
 						break;
 				}
 				break;
@@ -81,6 +87,8 @@ this.paneSession = {
 		Listeners.add(this.tabList, 'keydown', this);
 		Listeners.add(this.tabList, 'click', this);
 		Listeners.add(this.tabList, 'dblclick', this);
+
+		this.checkMigrationBackup();
 	},
 
 	uninit: function() {
@@ -89,6 +97,7 @@ this.paneSession = {
 		Listeners.remove(this.alldataCheckbox, 'command', this);
 		Listeners.remove(this.backupBtn, 'command', this);
 		Listeners.remove(this.loadBtn, 'command', this);
+		Listeners.remove(this.migratedBtn, 'command', this);
 		Listeners.remove(this.importBtn, 'command', this);
 		Listeners.remove(this.clearBtn1, 'command', this);
 		Listeners.remove(this.clearBtn2, 'command', this);
@@ -206,17 +215,52 @@ this.paneSession = {
 		});
 	},
 
+	// if Firefox created its migration backup when it updated to 45, we can add a helper button to load it directly,
+	// so users can import back their groups easily
+	checkMigrationBackup: function() {
+		// the backup is placed in the profile folder by default
+		let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
+		let dest = Services.dirsvc.get("ProfD", Ci.nsIFile);
+		dest.append("tabgroups-session-backup.json");
+		OS.File.exists(dest.path).then((exists) => {
+			if(exists) {
+				this.showMigratedButton(dest);
+				return;
+			}
+
+			// for a time in Nightly, this backup was placed in the desktop.
+			// This whole method will probably be removed some time after FF45, when it is no longer needed; this part will probably be removed even sooner.
+			let alt = Services.dirsvc.get("Desk", Ci.nsIFile);
+			alt.append("Firefox-tabgroups-backup.json");
+			OS.File.exists(alt.path).then((altExists) => {
+				if(altExists) {
+					this.showMigratedButton(alt);
+				}
+			});
+		});
+	},
+
+	showMigratedButton: function(aPath) {
+		this.migratedBackupFile = aPath;
+		this.migratedBtn.hidden = false;
+		Listeners.add(this.migratedBtn, 'command', this);
+	},
+
 	loadBackup: function() {
 		controllers.showFilePicker(Ci.nsIFilePicker.modeOpen, null, (aFile) => {
-			let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
+			this.loadSessionFile(aFile);
+		});
+	},
 
-			OS.File.open(aFile.path, { read: true }).then((ref) => {
-				ref.read().then((savedState) => {
-					ref.close();
+	loadSessionFile: function(aFile) {
+		let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
 
-					this.manualAction = true;
-					this.readState(savedState, true);
-				});
+		OS.File.open(aFile.path, { read: true }).then((ref) => {
+			ref.read().then((savedState) => {
+				ref.close();
+
+				this.manualAction = true;
+				this.readState(savedState, true);
 			});
 		});
 	},

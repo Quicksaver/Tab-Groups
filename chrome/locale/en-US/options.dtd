@@ -30,6 +30,8 @@
 <!ENTITY session.backup.alldata.caution.b "Be cautious of who has access to this file, it will contain information from all your tabs, including page history, form data, and other private and potentially sensitive information.">
 
 <!ENTITY session.restore.load.button "Load Backup File">
+<!ENTITY session.restore.migrated.button "Load Migration Backup">
+<!ENTITY session.restore.migrated.tooltip "This is the backup created by Firefox when it updated, following the removal of its native Tab Groups. It should contain all your groups and tabs from before the update.">
 <!ENTITY session.restore.import.button "Import selected items into this window">
 <!ENTITY session.restore.import.tooltip.a "After pressing this button, you can enter Tab Groups mode and arrange the newly imported groups as usual.">
 <!ENTITY session.restore.import.tooltip.b "Note that you can only import new groups, you can't import tabs into already existing groups. Which means that you can very easily end up with duplicate groups if you import the same group twice. In this case, just go into Tab Groups mode and close the ones you don't want.">

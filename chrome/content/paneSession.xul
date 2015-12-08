@@ -55,9 +55,18 @@
 			<vbox jump="restore">
 				<description>&session.restore.description;</description>
 				<description id="paneSession-restore-invalid" hidden="true">&session.restore.invalid;</description>
-				<button id="paneSession-load-button"
-					class="content-cell-item"
-					label="&session.restore.load.button;"/>
+				<hbox>
+					<button id="paneSession-load-button"
+						class="content-cell-item"
+						flex="1"
+						label="&session.restore.load.button;"/>
+					<button id="paneSession-migrated-button"
+						class="content-cell-item"
+						helptext="&session.restore.migrated.tooltip;"
+						flex="1"
+						hidden="true"
+						label="&session.restore.migrated.button;"/>
+				</hbox>
 				<description id="paneSession-restore-finished" hidden="true">&session.restore.finished;</description>
 				<tree id="paneSession-restore-tabList"
 					seltype="single"
