@@ -1,4 +1,4 @@
-// VERSION 1.0.14
+// VERSION 1.0.15
 
 this.Keys = { meta: false };
 
@@ -868,7 +868,7 @@ this.UI = {
 				Keys.meta = true;
 			}
 
-			let processBrowserKeys = (e) => {
+			let processBrowserKeys = (e, input) => {
 				// let any keys with alt to pass through
 				if(e.altKey) { return; }
 
@@ -891,12 +891,24 @@ this.UI = {
 								preventDefault = false;
 							}
 						}
-					} else if(e.charCode in this._browserKeys) {
+					}
+					else if(e.charCode in this._browserKeys) {
 						let key = this._browserKeys[e.charCode];
 						if(key == "find") {
 							this.enableSearch();
 						} else {
 							preventDefault = false;
+						}
+					}
+					// let ctrl+edit keys work while typing in a text field (group name or search box)
+					else if(input) {
+						switch(e.key) {
+							case 'ArrowLeft':
+							case 'ArrowRight':
+							case 'Backspace':
+							case 'Delete':
+								preventDefault = false;
+								break;
 						}
 					}
 					if(preventDefault) {
@@ -909,7 +921,7 @@ this.UI = {
 			let focused = iQ(":focus");
 			if((focused.length && focused[0].nodeName == "input") || Search.isEnabled() || this.ignoreKeypressForSearch) {
 				this.ignoreKeypressForSearch = false;
-				processBrowserKeys(e);
+				processBrowserKeys(e, true);
 				return;
 			}
 
