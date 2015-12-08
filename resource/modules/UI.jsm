@@ -1,4 +1,4 @@
-// VERSION 1.0.15
+// VERSION 1.0.16
 
 this.Keys = { meta: false };
 
@@ -58,6 +58,9 @@ this.UI = {
 	// Used to keep track of the tab strip smooth scroll value.
 	_originalSmoothScroll: null,
 
+	// has the user clicked the close button in the notice in this window already
+	_noticeDismissed: false,
+
 	get sessionRestoreNotice() { return $('sessionRestoreNotice'); },
 	get sessionRestoreAutoChanged() { return $('sessionRestoreAutoChanged'); },
 	get sessionRestorePrivate() { return $('sessionRestorePrivate'); },
@@ -105,6 +108,15 @@ this.UI = {
 
 			// clicking the #sessionRestoreNotice banner
 			case 'mousedown':
+				// see if we just want to dismiss the warning
+				if(e.originalTarget.classList.contains('close')) {
+					e.preventDefault();
+					e.stopPropagation();
+					this.sessionRestoreNotice.hidden = true;
+					this._noticeDismissed = true;
+					break;
+				}
+
 				this.goToPreferences({ jumpto: 'sessionRestore' });
 				break;
 		}
@@ -113,6 +125,7 @@ this.UI = {
 	observe: function(aSubject, aTopic, aData) {
 		switch(aTopic) {
 			case 'nsPref:changed':
+				this._noticeDismissed = false;
 				this.checkSessionRestore();
 				break;
 		}
@@ -220,7 +233,7 @@ this.UI = {
 			Messenger.loadInWindow(gWindow, 'TabView');
 
 			Prefs.listen('page', this);
-			Listeners.add(this.sessionRestoreNotice, 'mousedown', this);
+			Listeners.add(this.sessionRestoreNotice, 'mousedown', this, true);
 
 			// ___ Done
 			this._frameInitialized = true;
@@ -242,7 +255,7 @@ this.UI = {
 		Listeners.remove(gWindow, "SSWindowClosing", this);
 		Listeners.remove(gWindow, "SSWindowStateBusy", this);
 		Listeners.remove(gWindow, "SSWindowStateReady", this);
-		Listeners.remove(this.sessionRestoreNotice, 'mousedown', this);
+		Listeners.remove(this.sessionRestoreNotice, 'mousedown', this, true);
 
 		Prefs.unlisten('page', this);
 
@@ -1395,7 +1408,7 @@ this.UI = {
 
 		if(!PrivateBrowsing.isPrivate(gWindow)) {
 			// Notify the user if necessary that session restore needs to be enabled by showing a banner at the bottom.
-			this.sessionRestoreNotice.hidden = (Prefs.page == 3);
+			this.sessionRestoreNotice.hidden = this._noticeDismissed || (Prefs.page == 3);
 			this.sessionRestorePrivate.hidden = true;
 		}
 		else {

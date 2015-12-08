@@ -503,11 +503,16 @@ html[dir=rtl] .title-shield {
 	opacity: 1;
 	background-image: linear-gradient(#ffe13e, #ffc703);
 	color: rgba(0,0,0,0.95);
+	padding: 10px 20px;
 }
 
 #sessionRestoreNotice:hover {
 	background-image: linear-gradient(#fff14e, #ffd713);
 	cursor: pointer;
+}
+
+#sessionRestoreNotice .close {
+	top: calc(50% - 8px);
 }
 
 /* Resizable */
