@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 this.paneSession = {
 	manualAction: false,
@@ -431,7 +431,7 @@ this.paneSession = {
 		let entry = tab.entries && tab.entries[tab.index -1];
 		if(!entry) { return; }
 
-		let iconURL = tab.image || (tab.attributes && tab.attributes.image) || null;
+		let iconURL = tab.image || null;
 		// don't initiate a connection just to fetch a favicon (see bug 462863)
 		if(/^https?:/.test(iconURL)) {
 			iconURL = "moz-anno:favicon:" + iconURL;
