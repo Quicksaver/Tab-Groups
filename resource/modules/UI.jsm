@@ -1,4 +1,4 @@
-// VERSION 1.0.17
+// VERSION 1.0.18
 
 this.Keys = { meta: false };
 
@@ -738,6 +738,11 @@ this.UI = {
 				this._closedSelectedTabInTabView = false;
 				this.closedLastTabInTabView = false;
 				this.restoredClosedTab = false;
+
+				// when closing the active tab, the new active tab should correspond to the actual newly selected tab
+				if(tab._tabViewTabItem) {
+					this._setActiveTab(tab._tabViewTabItem);
+				}
 				return;
 			}
 		}

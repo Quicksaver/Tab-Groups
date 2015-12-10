@@ -1,4 +1,4 @@
-// VERSION 1.0.6
+// VERSION 1.0.7
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -955,13 +955,15 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			}
 
 			let index = this._children.indexOf(item);
+			let prevIndex = 0;
 			if(index != -1) {
 				this._children.splice(index, 1);
+				prevIndex = Math.max(0, index -1);
 			}
 
 			if(item == this._activeTab || !this._activeTab) {
 				if(this._children.length) {
-					this._activeTab = this._children[0];
+					this._activeTab = this._children[prevIndex];
 				} else {
 					this._activeTab = null;
 				}
@@ -1000,8 +1002,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				this.arrange({ animate: !options.immediately });
 				this._unfreezeItemSize({ dontArrange: true });
 			}
-
-			this._sendToSubscribers("childRemoved", { item: item });
 		}
 		catch(ex) {
 			Cu.reportError(ex);
