@@ -1,4 +1,4 @@
-// VERSION 1.0.16
+// VERSION 1.0.17
 
 this.Keys = { meta: false };
 
@@ -364,13 +364,21 @@ this.UI = {
 		if(this._activeTab) {
 			this._activeTab.addSubscriber("close", this._onActiveTabClosed);
 			this._activeTab.makeActive();
+
+			// When setting a new active tab (i.e. when closing the previous active tab) TabView loses focus, probably because the physical tab gets it when it's "selected".
+			// This prevents the keyboard from working correctly unless we refocus our TabView.
+			Timers.init('focusTabView', () => {
+				if(this.isTabViewVisible() && !this._isChangingVisibility) {
+					window.focus();
+				}
+			}, 0);
 		}
 	},
 
 	// Handles when the currently active tab gets closed.
 	// Parameters:
 	//  - the <TabItem> that is closed
-	_onActiveTabClosed: function(tabItem){
+	_onActiveTabClosed: function(tabItem) {
 		if(UI._activeTab == tabItem) {
 			UI._setActiveTab(null);
 		}
@@ -490,6 +498,8 @@ this.UI = {
 	// Hides TabView and shows the main browser UI.
 	hideTabView: function() {
 		if(!this.isTabViewVisible() || this._isChangingVisibility) { return; }
+
+		Timers.cancel('focusTabView');
 
 		// another tab might be select if user decides to stay on a page when a onclose confirmation prompts.
 		GroupItems.removeHiddenGroups();
