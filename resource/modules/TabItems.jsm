@@ -1,4 +1,4 @@
-// VERSION 1.0.7
+// VERSION 1.0.8
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -397,7 +397,7 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 		this.$container.css({ zIndex: value });
 	},
 
-	// Closes this item (actually closes the tab associated with it, which automatically closes the item.
+	// Closes this item (actually closes the tab associated with it, which automatically closes the item).
 	// Parameters:
 	//   groupClose - true if this method is called by group close action.
 	// Returns true if this tab is removed.
@@ -409,14 +409,8 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 			group.newTab(null, { closedLastTab: true });
 		}
 
-		// when "TabClose" event is fired, the browser tab is about to close and our item "close" is fired before the browser tab actually get closed.
-		// Therefore, we need "tabRemoved" event below.
 		gBrowser.removeTab(this.tab);
 		let tabClosed = !this.tab;
-
-		if(tabClosed) {
-			this._sendToSubscribers("tabRemoved");
-		}
 
 		// No need to explicitly delete the tab data, becasue sessionstore data associated with the tab will automatically go away
 		return tabClosed;
