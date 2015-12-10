@@ -1,4 +1,4 @@
-// VERSION 1.0.18
+// VERSION 1.0.19
 
 this.Keys = { meta: false };
 
@@ -45,9 +45,6 @@ this.UI = {
 
 	// Used to keep track of allowed browser keys.
 	_browserKeys: null,
-
-	// Used to keep track of allowed browser keys with Shift key combination.
-	_browserKeysWithShift: null,
 
 	// Used to prevent keypress being handled after quitting search mode.
 	ignoreKeypressForSearch: false,
@@ -845,40 +842,26 @@ this.UI = {
 
 	// Sets up the allowed browser keys using key elements.
 	_setupBrowserKeys: function() {
-		let keys = {};
-
-		let keyArray = [ "newNavigator", "newNavigatorTab", "undo", "cut", "copy", "paste", "selectAll", "find" ];
-		if(DARWIN) {
-			keyArray.push("preferencesCmdMac", "minimizeWindow", "hideThisAppCmdMac");
-		}
+		this._browserKeys = [];
+		let keyArray = [ "newNavigator", "newNavigatorTab", "undo", "redo", "cut", "copy", "paste", "selectAll", "find", "closeWindow", "undoCloseTab", "undoCloseWindow" ];
 		if(!WINNT) {
 			keyArray.push("quitApplication");
-		} else {
-			keyArray.push("redo");
-		}
-		keyArray.forEach(function(key) {
-			let element = gWindow.document.getElementById("key_" + key);
-			let code = element.getAttribute("key").toLocaleLowerCase().charCodeAt(0);
-			keys[code] = key;
-		});
-		this._browserKeys = keys;
-
-		keys = {};
-		// The lower case letters are passed to processBrowserKeys() even with shift key when stimulating a key press using EventUtils.synthesizeKey()
-		// so need to handle both upper and lower cases here.
-		keyArray = [ "closeWindow", "undoCloseTab", "undoCloseWindow" ];
-		if(!WINNT) {
-			keyArray.push("redo");
 			if(DARWIN) {
-				keyArray.push("fullScreen");
+				keyArray.push("preferencesCmdMac", "minimizeWindow", "hideThisAppCmdMac", "fullScreen");
 			}
 		}
-		keyArray.forEach(function(key) {
-			let element = gWindow.document.getElementById("key_" + key);
-			let code = element.getAttribute("key").toLocaleLowerCase().charCodeAt(0);
-			keys[code] = key;
-		});
-		this._browserKeysWithShift = keys;
+		for(let name of keyArray) {
+			let element = gWindow.document.getElementById("key_" + name);
+			let key = element.getAttribute('keycode') || element.getAttribute("key");
+			let modifiers = element.getAttribute('modifiers') || "";
+			this._browserKeys.push({
+				name: name,
+				key: Keysets.translateFromConstantCode(key),
+				accel: modifiers.includes('accel'),
+				alt: modifiers.includes('alt'),
+				shift: modifiers.includes('shift')
+			});
+		}
 	},
 
 	// Sets up the key handlers for navigating between tabs within the TabView UI.
@@ -905,44 +888,39 @@ this.UI = {
 					if(Keysets.isRegistered(key) && Keysets.compareWithEvent(key, e)) { return; }
 				}
 
-				if((DARWIN && e.metaKey) || (!DARWIN && e.ctrlKey)) {
-					let preventDefault = true;
-					if(e.shiftKey) {
-						// when a user presses ctrl+shift+key, upper case letter charCode is passed to processBrowserKeys() so converting back to lower
-						// case charCode before doing the check
-						let lowercaseCharCode = String.fromCharCode(e.charCode).toLocaleLowerCase().charCodeAt(0);
-						if(this._browserKeysWithShift.lowercaseCharCode !== undefined) {
-							let key = this._browserKeysWithShift[lowercaseCharCode];
-							if(key == "tabview") {
-								this.exit();
-							} else {
-								preventDefault = false;
+				let accel = (DARWIN && e.metaKey) || (!DARWIN && e.ctrlKey);
+				if(accel) {
+					let alt = e.altKey;
+					let shift = e.shiftKey;
+					let key = Keysets.translateFromConstantCode(e.key); // mostly to capitalize single char keys
+
+					for(let k of this._browserKeys) {
+						if(k.key == key && k.accel == accel && k.alt == alt && k.shift == shift) {
+							switch(k.name) {
+								case "find":
+									this.enableSearch();
+									break;
+
+								default: return;
 							}
+							break;
 						}
 					}
-					else if(e.charCode in this._browserKeys) {
-						let key = this._browserKeys[e.charCode];
-						if(key == "find") {
-							this.enableSearch();
-						} else {
-							preventDefault = false;
-						}
-					}
+
 					// let ctrl+edit keys work while typing in a text field (group name or search box)
-					else if(input) {
-						switch(e.key) {
+					if(input) {
+						switch(key) {
 							case 'ArrowLeft':
 							case 'ArrowRight':
 							case 'Backspace':
 							case 'Delete':
-								preventDefault = false;
-								break;
+								return;
 						}
 					}
-					if(preventDefault) {
-						e.stopPropagation();
-						e.preventDefault();
-					}
+
+					// We cancel most shortcuts that shouldn't take place while TabView is shown.
+					e.preventDefault();
+					e.stopPropagation();
 				}
 			};
 
@@ -983,20 +961,20 @@ this.UI = {
 			let activeTab;
 			let activeGroupItem;
 			let norm = null;
-			switch(e.keyCode) {
-				case e.DOM_VK_RIGHT:
+			switch(e.key) {
+				case "ArrowRight":
 					norm = function(a, me) { return a.x > me.x };
 					break;
 
-				case e.DOM_VK_LEFT:
+				case "ArrowLeft":
 					norm = function(a, me) { return a.x < me.x };
 					break;
 
-				case e.DOM_VK_DOWN:
+				case "ArrowDown":
 					norm = function(a, me) { return a.y > me.y };
 					break;
 
-				case e.DOM_VK_UP:
+				case "ArrowUp":
 					norm = function(a, me) { return a.y < me.y }
 					break;
 			}
@@ -1010,8 +988,8 @@ this.UI = {
 					this.setActive(nextTab);
 				}
 			} else {
-				switch(e.keyCode) {
-					case e.DOM_VK_ESCAPE:
+				switch(e.key) {
+					case "Escape":
 						activeGroupItem = GroupItems.getActiveGroupItem();
 						if(activeGroupItem && activeGroupItem.expanded) {
 							activeGroupItem.collapse();
@@ -1020,7 +998,7 @@ this.UI = {
 						}
 						break;
 
-					case e.DOM_VK_RETURN:
+					case "Enter":
 						activeGroupItem = GroupItems.getActiveGroupItem();
 						if(activeGroupItem) {
 							activeTab = this.getActiveTab();
@@ -1037,7 +1015,7 @@ this.UI = {
 						}
 						break;
 
-					case e.DOM_VK_TAB:
+					case "Tab":
 						// tab/shift + tab to go to the next tab.
 						activeTab = this.getActiveTab();
 						if(activeTab) {
