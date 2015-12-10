@@ -1,4 +1,4 @@
-// VERSION 1.0.20
+// VERSION 1.0.21
 
 this.Keys = { meta: false };
 
@@ -61,6 +61,8 @@ this.UI = {
 	get sessionRestoreNotice() { return $('sessionRestoreNotice'); },
 	get sessionRestoreAutoChanged() { return $('sessionRestoreAutoChanged'); },
 	get sessionRestorePrivate() { return $('sessionRestorePrivate'); },
+
+	_els: Cc["@mozilla.org/eventlistenerservice;1"].getService(Ci.nsIEventListenerService),
 
 	// Called when a web page is about to show a modal dialog.
 	receiveMessage: function(m) {
@@ -414,6 +416,53 @@ this.UI = {
 		return gTabViewDeck.selectedPanel == gTabViewFrame;
 	},
 
+	// To close the current tab, as commanded by the keyboard shortcut.
+	closeActiveTab: function() {
+		if(this._activeTab) {
+			this._activeTab.closedManually = true;
+			this._activeTab.close();
+		}
+	},
+
+	// The following is adapted from the equivalent gBrowser.moveActiveTab* methods.
+	moveActiveTab: function(aWhere) {
+		if(!this._activeTab) { return; }
+
+		switch(aWhere) {
+			case "forward":
+			case "backward": {
+				let sibling = this._activeTab.tab;
+				let x = (aWhere == "forward") ? "next" : "previous";
+				while(sibling && sibling[x+"Sibling"]) {
+					sibling = sibling[x+"Sibling"];
+					if(!sibling.hidden) {
+						this._moveActiveTab(sibling._tPos);
+						break;
+					}
+				}
+				break;
+			}
+			case "tostart":
+				if(this._activeTab.tab._tPos > 0) {
+					this._moveActiveTab(0);
+				}
+				break;
+
+			case "toend": {
+				let last = gBrowser.tabs.length -1;
+				if(this._activeTab.tab._tPos < last) {
+					this._moveActiveTab(last);
+				}
+				break;
+			}
+		}
+	},
+
+	_moveActiveTab: function(pos) {
+		gBrowser.moveTabTo(this._activeTab.tab, pos);
+		this._activeTab.parent.reorderTabItemsBasedOnTabOrder();
+	},
+
 	// Initializes the page base direction
 	_initPageDirection: function() {
 		let chromeReg = Cc["@mozilla.org/chrome/chrome-registry;1"].getService(Ci.nsIXULChromeRegistry);
@@ -452,6 +501,10 @@ this.UI = {
 		if(DARWIN) {
 			this.setTitlebarColors(true);
 		}
+
+		// Trick to make Ctrl+F4 and Ctrl+Shift+PageUp/PageDown shortcuts behave as expected in TabView,
+		// we need to remove the gBrowser as a listener for these, otherwise it would consume these events and they would never reach our handler.
+		this._els.removeSystemEventListener(gWindow.document, "keydown", gBrowser, false);
 
 		if(zoomOut && currentTab && currentTab._tabViewTabItem) {
 			let item = currentTab._tabViewTabItem;
@@ -521,6 +574,8 @@ this.UI = {
 		if(DARWIN) {
 			this.setTitlebarColors(false);
 		}
+
+		this._els.addSystemEventListener(gWindow.document, "keydown", gBrowser, false);
 
 		this._isChangingVisibility = false;
 
@@ -845,7 +900,7 @@ this.UI = {
 		this._browserKeys = [];
 		let keyArray = [
 			"newNavigator", "closeWindow", "undoCloseWindow",
-			"newNavigatorTab", "undoCloseTab",
+			"newNavigatorTab", "close", "undoCloseTab",
 			"undo", "redo", "cut", "copy", "paste",
 			"selectAll", "find", "browserConsole"
 		];
@@ -867,6 +922,79 @@ this.UI = {
 				shift: modifiers.includes('shift')
 			});
 		}
+
+		// The following are handled by gBrowser._handleKeyDownEvent(): http://mxr.mozilla.org/mozilla-central/source/browser/base/content/tabbrowser.xml
+		this._browserKeys.push(
+			{
+				name: "moveTabBackward",
+				key: Keysets.translateFromConstantCode("PageUp"),
+				accel: true,
+				alt: false,
+				shift: true
+			},
+			{
+				name: "moveTabForward",
+				key: Keysets.translateFromConstantCode("PageDown"),
+				accel: true,
+				alt: false,
+				shift: true
+			}
+		);
+		if(!DARWIN) {
+			this._browserKeys.push({
+				name: "closeNotMac",
+				key: Keysets.translateFromConstantCode("F4"),
+				accel: true,
+				alt: false,
+				shift: false
+			});
+		}
+
+		// The following are handled by each tab's keydown event handler
+		this._browserKeys.push(
+			{
+				name: "moveTabBackward",
+				key: Keysets.translateFromConstantCode("ArrowUp"),
+				accel: true,
+				alt: false,
+				shift: false
+			},
+			{
+				name: "moveTabForward",
+				key: Keysets.translateFromConstantCode("ArrowDown"),
+				accel: true,
+				alt: false,
+				shift: false
+			},
+			{
+				name: "moveTabBackward",
+				key: Keysets.translateFromConstantCode(LTR ? "ArrowLeft" : "ArrowRight"),
+				accel: true,
+				alt: false,
+				shift: false
+			},
+			{
+				name: "moveTabForward",
+				key: Keysets.translateFromConstantCode(RTL ? "ArrowLeft" : "ArrowRight"),
+				accel: true,
+				alt: false,
+				shift: false
+			},
+			{
+				name: "moveTabToStart",
+				key: Keysets.translateFromConstantCode("Home"),
+				accel: true,
+				alt: false,
+				shift: false
+			},
+			{
+				name: "moveTabToEnd",
+				key: Keysets.translateFromConstantCode("End"),
+				accel: true,
+				alt: false,
+				shift: false
+			}
+		);
 	},
 
 	// Sets up the key handlers for navigating between tabs within the TabView UI.
@@ -899,19 +1027,6 @@ this.UI = {
 					let shift = e.shiftKey;
 					let key = Keysets.translateFromConstantCode(e.key); // mostly to capitalize single char keys
 
-					for(let k of this._browserKeys) {
-						if(k.key == key && k.accel == accel && k.alt == alt && k.shift == shift) {
-							switch(k.name) {
-								case "find":
-									this.enableSearch();
-									break;
-
-								default: return;
-							}
-							break;
-						}
-					}
-
 					// let ctrl+edit keys work while typing in a text field (group name or search box)
 					if(input) {
 						switch(key) {
@@ -920,6 +1035,41 @@ this.UI = {
 							case 'Backspace':
 							case 'Delete':
 								return;
+						}
+					}
+					else {
+						for(let k of this._browserKeys) {
+							if(k.key == key && k.accel == accel && k.alt == alt && k.shift == shift) {
+								switch(k.name) {
+									case "find":
+										this.enableSearch();
+										break;
+
+									case "close":
+									case "closeNotMac":
+										this.closeActiveTab();
+										break;
+
+									case "moveTabForward":
+										this.moveActiveTab("forward");
+										break;
+
+									case "moveTabBackward":
+										this.moveActiveTab("backward");
+										break;
+
+									case "moveTabToStart":
+										this.moveActiveTab("tostart");
+										break;
+
+									case "moveTabToEnd":
+										this.moveActiveTab("toend");
+										break;
+
+									default: return;
+								}
+								break;
+							}
 						}
 					}
 
@@ -966,22 +1116,25 @@ this.UI = {
 			let activeTab;
 			let activeGroupItem;
 			let norm = null;
-			switch(e.key) {
-				case "ArrowRight":
-					norm = function(a, me) { return a.x > me.x };
-					break;
+			let accel = (DARWIN && e.metaKey) || (!DARWIN && e.ctrlKey);
+			if(!accel) {
+				switch(e.key) {
+					case "ArrowRight":
+						norm = function(a, me) { return a.x > me.x };
+						break;
 
-				case "ArrowLeft":
-					norm = function(a, me) { return a.x < me.x };
-					break;
+					case "ArrowLeft":
+						norm = function(a, me) { return a.x < me.x };
+						break;
 
-				case "ArrowDown":
-					norm = function(a, me) { return a.y > me.y };
-					break;
+					case "ArrowDown":
+						norm = function(a, me) { return a.y > me.y };
+						break;
 
-				case "ArrowUp":
-					norm = function(a, me) { return a.y < me.y }
-					break;
+					case "ArrowUp":
+						norm = function(a, me) { return a.y < me.y }
+						break;
+				}
 			}
 
 			if(norm != null) {
