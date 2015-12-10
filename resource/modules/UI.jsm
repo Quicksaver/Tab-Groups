@@ -1,4 +1,4 @@
-// VERSION 1.0.19
+// VERSION 1.0.20
 
 this.Keys = { meta: false };
 
@@ -843,7 +843,12 @@ this.UI = {
 	// Sets up the allowed browser keys using key elements.
 	_setupBrowserKeys: function() {
 		this._browserKeys = [];
-		let keyArray = [ "newNavigator", "newNavigatorTab", "undo", "redo", "cut", "copy", "paste", "selectAll", "find", "closeWindow", "undoCloseTab", "undoCloseWindow" ];
+		let keyArray = [
+			"newNavigator", "closeWindow", "undoCloseWindow",
+			"newNavigatorTab", "undoCloseTab",
+			"undo", "redo", "cut", "copy", "paste",
+			"selectAll", "find", "browserConsole"
+		];
 		if(!WINNT) {
 			keyArray.push("quitApplication");
 			if(DARWIN) {
