@@ -1,4 +1,4 @@
-// VERSION 1.0.21
+// VERSION 1.0.22
 
 this.Keys = { meta: false };
 
@@ -708,7 +708,11 @@ this.UI = {
 				} else {
 					let activeGroupItem = GroupItems.getActiveGroupItem();
 					if(activeGroupItem) {
-						this.setReorderTabItemsOnShow(activeGroupItem);
+						if(!this.isTabViewVisible() || this._isChangingVisibility) {
+							this.setReorderTabItemsOnShow(activeGroupItem);
+						} else {
+							activeGroupItem.reorderTabItemsBasedOnTabOrder();
+						}
 					}
 				}
 			}
