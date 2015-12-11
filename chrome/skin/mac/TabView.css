@@ -39,6 +39,7 @@
 
 @media (min-resolution: 1.1dppx) {
 	#tabGroups-tabview-button {
+		list-style-image: url(chrome://tabgroups-os/skin/Toolbar@2x.png);
 		-moz-image-region: rect(0, 36px, 36px, 0);
 	}
 	#tabGroups-tabview-button:hover:active:not([disabled="true"]):not([cui-areatype="menu-panel"]) {
@@ -46,7 +47,11 @@
 	}
 	#tabGroups-tabview-button[cui-areatype="menu-panel"],
 	toolbarpaletteitem[place="palette"] > #tabGroups-tabview-button {
-		-moz-image-region: rect(0, 64px, 64	px, 0);
+		-moz-image-region: rect(0, 64px, 64px, 0);
+	}
+
+	toolbar[brighttext] #tabGroups-tabview-button {
+		list-style-image: url(chrome://tabgroups-os/skin/Toolbar-inverted@2x.png);
 	}
 }
 

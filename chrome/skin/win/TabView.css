@@ -35,6 +35,16 @@
 	max-width: 18px;
 }
 
+@media (min-resolution: 1.1dppx) {
+	#tabGroups-tabview-button {
+		list-style-image: url(chrome://tabgroups-os/skin/Toolbar@2x.png);
+	}
+
+	toolbar[brighttext] #tabGroups-tabview-button {
+		list-style-image: url(chrome://tabgroups-os/skin/Toolbar-inverted@2x.png);
+	}
+}
+
 #nav-bar #tabGroups-tabview-button > .toolbarbutton-icon {
 	padding: 2px 6px;
 	max-width: 32px;
