@@ -9,4 +9,6 @@
 <!ENTITY buttonOptionsTabGroups.label "Alterar as opções dos grupos de separadores">
 <!ENTITY buttonHelpTabGroups.label "Como usar os grupos de separadores">
 <!ENTITY sessionRestoreNotice.label "Os teus separadores e grupos não serão restaurados da próxima vez que iniciares o navegador! Carrega aqui para alterar isso.">
+<!ENTITY sessionRestoreNotice.dismiss.tooltip "Fechar este aviso até reiniciar o navegador.">
 <!ENTITY sessionRestoreAutoChanged.label "Os teus separadores e grupos serão restaurados automaticamente da próxima vez que iniciares o navegador.">
+<!ENTITY sessionRestorePrivate.label "Esta é uma janela privada, os teus separadores e grupos não podem ser restaurados depois de ser fechada.">

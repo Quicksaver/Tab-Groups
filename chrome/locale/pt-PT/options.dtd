@@ -1,12 +1,15 @@
 <!ENTITY pane.tabGroups.label "Grupos de Separadores">
 <!ENTITY pane.session.label "Cópia e Restauro">
 <!ENTITY cat.general.label "Geral">
-<!ENTITY cat.tabViewKeyset.label "Atalho de Teclado">
+<!ENTITY cat.keyboardshortcuts.label "Atalhos do Teclado">
 <!ENTITY cat.backup.label "Cópia de segurança dos Grupos de Separadores">
 <!ENTITY cat.restore.label "Restaurar Grupos de Separadores">
 <!ENTITY cat.clear.label "Limpar Grupos de Separadores">
 <!ENTITY opt.animateZoom.label "Animar Zoom">
 <!ENTITY opt.animateZoom.tooltip "Transições suaves ao entrar e sair do modo Grupos de Separadores, ao fazer zoom para do separador atual para o modo de grupos, e fazer novamente zoom ao sair do modo de grupos e voltar ao separador.">
+<!ENTITY opt.tabViewKeyset.label "Entrar e sair do modo de grupos">
+<!ENTITY opt.nextGroupKeyset.label "Ir para o próximo gropo">
+<!ENTITY opt.previousGroupKeyset.label "Ir para o grupo anterior">
 <!ENTITY sessionRestore.caption "Manter os grupos de separadores entre reinícios">
 <!ENTITY sessionRestore.description "Para o Firefox se lembrar dos teus grupos de separadores, as tuas janelas e separadores têm de ser restaurados entre sessões. Caso contrário, terás de refazer os teus grupos de cada vez que feches e reinicies o navegador.">
 <!ENTITY sessionRestore.button.label "Mostrar as minhas janelas e separadores anteriores quando o Firefox inicia">
@@ -21,6 +24,8 @@
 <!ENTITY session.backup.alldata.caution.a "Atenção! Isto também vai exportar todos os dados da sessão atual.">
 <!ENTITY session.backup.alldata.caution.b "Tem cuidado com quem tem acesso a este ficheiro, ele irá conter informação de todos os teus separadores, incluindo o histórico de navegação, dados de formulário, e outras informações privadas e potencialmente sensíveis.">
 <!ENTITY session.restore.load.button "Carregar Ficheiro de Cópia de Segurança">
+<!ENTITY session.restore.migrated.button "Carregar Cópia de Segurança de Migração">
+<!ENTITY session.restore.migrated.tooltip "Esta cópia de segurança foi criada pelo Firefox ao ser atualizado, a seguir à remoção dos Grupos de Separadores nativos. Deve conter todos os teus grupos e separadores antes da atualização.">
 <!ENTITY session.restore.import.button "Importar or itens selecionados para esta janela">
 <!ENTITY session.restore.import.tooltip.a "Após premir este botão, podes entrar no modo de Grupos de Separadores para arranjares os grupos importados como de costume.">
 <!ENTITY session.restore.import.tooltip.b "Repara que só podes importar grupos novos, não podes importar separadores para grupos já existentes. Isto significa que podes facilmente ficar com grupos em duplicado se importares o mesmo grupo duas vezes. Neste caso, basta ires ao modo de Grupos de Separadores e removeres os grupos que não queres.">
