@@ -1,4 +1,4 @@
-// VERSION 2.7.4
+// VERSION 2.7.5
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -151,5 +151,5 @@ this.replaceObjStrings = function(node, prop) {
 //	aNode - (element) of which to return the computed style object
 //	(optional) pseudo -(string) specifying the pseudo-element to match, see https://developer.mozilla.org/en-US/docs/Web/API/Window.getComputedStyle
 this.getComputedStyle = function(aNode, pseudo) {
-	return aNode.ownerGlobal.getComputedStyle(aNode, pseudo);
+	return aNode.ownerDocument.defaultView.getComputedStyle(aNode, pseudo);
 };
