@@ -1,4 +1,4 @@
-// VERSION 1.0.22
+// VERSION 1.0.23
 
 this.Keys = { meta: false };
 
@@ -1568,7 +1568,13 @@ this.UI = {
 		}
 		else {
 			// In private windows it's expected of the groups to be gone after closing it, so the warning is really more of a notice.
-			this.tempShowBanner(this.sessionRestorePrivate);
+			// We "dismiss" it immediately, in the sense that it really should only be shown once per window.
+			if(!this._noticeDismissed) {
+				this.tempShowBanner(this.sessionRestorePrivate);
+				this._noticeDismissed = true;
+			} else {
+				this.sessionRestorePrivate.hidden = true;
+			}
 			this.sessionRestoreNotice.hidden = true;
 		}
 	},
@@ -1592,18 +1598,19 @@ this.UI = {
 			duration = 5000;
 		}
 
-		let ontransitionend = function() {
-			if(trueAttribute(banner, 'show')) {
-				Timers.init("tempShowBanner", function() {
-					removeAttribute(banner, 'show');
+		banner.handleEvent = function(e) {
+			if(trueAttribute(this, 'show')) {
+				this._tempShowBanner = aSync(() => {
+					removeAttribute(this, 'show');
 				}, duration);
 			} else {
-				banner.hidden = true;
-				Listeners.remove(banner, 'transitionend', ontransitionend);
+				this.hidden = true;
+				Listeners.remove(this, 'transitionend', this);
+				delete this._tempShowBanner;
 			}
 		};
 
-		Listeners.add(banner, 'transitionend', ontransitionend);
+		Listeners.add(banner, 'transitionend', banner);
 		banner.hidden = false;
 
 		// force reflow before setting the show attribute, so it animates
