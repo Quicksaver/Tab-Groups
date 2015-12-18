@@ -4,6 +4,7 @@
 
 html {
 	overflow: hidden;
+	-moz-user-select: none;
 }
 
 body {
