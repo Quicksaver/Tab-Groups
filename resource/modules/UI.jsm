@@ -1,4 +1,4 @@
-// VERSION 1.0.23
+// VERSION 1.0.24
 
 this.Keys = { meta: false };
 
@@ -231,7 +231,7 @@ this.UI = {
 			// ___ load frame script
 			Messenger.loadInWindow(gWindow, 'TabView');
 
-			Prefs.listen('page', this);
+			pageWatch.register(this);
 			Listeners.add(this.sessionRestoreNotice, 'mousedown', this, true);
 
 			// ___ Done
@@ -256,7 +256,7 @@ this.UI = {
 		Listeners.remove(gWindow, "SSWindowStateReady", this);
 		Listeners.remove(this.sessionRestoreNotice, 'mousedown', this, true);
 
-		Prefs.unlisten('page', this);
+		pageWatch.unregister(this);
 
 		Messenger.unlistenWindow(gWindow, "DOMWillOpenModalDialog", this);
 		Messenger.unloadFromWindow(gWindow, 'TabView');
@@ -1563,7 +1563,7 @@ this.UI = {
 
 		if(!PrivateBrowsing.isPrivate(gWindow)) {
 			// Notify the user if necessary that session restore needs to be enabled by showing a banner at the bottom.
-			this.sessionRestoreNotice.hidden = this._noticeDismissed || (Prefs.page == 3);
+			this.sessionRestoreNotice.hidden = this._noticeDismissed || pageWatch.sessionRestoreEnabled;
 			this.sessionRestorePrivate.hidden = true;
 		}
 		else {
@@ -1585,7 +1585,7 @@ this.UI = {
 		Prefs.pageAutoChanged = true;
 
 		// enable session restore if necessary
-		if(Prefs.page != 3) {
+		if(!pageWatch.sessionRestoreEnabled) {
 			pageWatch.enableSessionRestore();
 
 			// Notify the user that session restore has been automatically enabled by showing a banner that expects no user interaction. It fades out after some seconds.

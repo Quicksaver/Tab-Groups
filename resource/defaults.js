@@ -1,4 +1,4 @@
-// VERSION 1.3.16
+// VERSION 1.3.17
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -33,7 +33,6 @@ prefList = {
 	previousGroupAlt: false,
 
 	// for internal use
-	pageBackup: -1,
 	pageAutoChanged: false,
 	migratedWidget: false,
 	migratedPrefs: false,

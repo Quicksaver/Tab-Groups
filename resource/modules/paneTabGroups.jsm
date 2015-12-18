@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.sessionRestore = {
 	get button() { return $('paneTabGroups-sessionRestore-button'); },
@@ -12,7 +12,7 @@ this.sessionRestore = {
 	},
 
 	init: function() {
-		Prefs.listen('page', this);
+		pageWatch.register(this);
 
 		Listeners.add(this.button, 'command', this);
 
@@ -22,11 +22,11 @@ this.sessionRestore = {
 	uninit: function() {
 		Listeners.remove(this.button, 'command', this);
 
-		Prefs.unlisten('page', sessionRestore);
+		pageWatch.unregister(this);
 	},
 
 	updateButton: function() {
-		toggleAttribute(this.button, 'disabled', Prefs.page == 3);
+		toggleAttribute(this.button, 'disabled', pageWatch.sessionRestoreEnabled);
 	},
 
 	enable: function() {
