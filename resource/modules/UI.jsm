@@ -1,4 +1,4 @@
-// VERSION 1.0.25
+// VERSION 1.0.26
 
 this.Keys = { meta: false };
 
@@ -316,13 +316,10 @@ this.UI = {
 			immediately: true
 		};
 		let groupItem = new GroupItem([], options);
-		let items = TabItems.getItems();
-		items.forEach(function(item) {
-			if(item.parent) {
-				item.parent.remove(item);
-			}
+		for(let tab of gBrowser.tabs) {
+			let item = tab._tabViewTabItem;
 			groupItem.add(item, { immediately: true });
-		});
+		}
 		this.setActive(groupItem);
 	},
 
