@@ -1,4 +1,4 @@
-// VERSION 1.0.24
+// VERSION 1.0.25
 
 this.Keys = { meta: false };
 
@@ -478,6 +478,8 @@ this.UI = {
 		if(this.isTabViewVisible() || this._isChangingVisibility) { return; }
 		this._isChangingVisibility = true;
 
+		dispatch(window, { type: "willshowtabview", cancelable: false });
+
 		// store tab strip smooth scroll value and disable it.
 		let tabStrip = gBrowser.tabContainer.mTabstrip;
 		this._originalSmoothScroll = tabStrip.smoothScroll;
@@ -550,6 +552,8 @@ this.UI = {
 		if(!this.isTabViewVisible() || this._isChangingVisibility) { return; }
 
 		Timers.cancel('focusTabView');
+
+		dispatch(window, { type: "willhidetabview", cancelable: false });
 
 		// another tab might be select if user decides to stay on a page when a onclose confirmation prompts.
 		GroupItems.removeHiddenGroups();
