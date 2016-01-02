@@ -1,4 +1,4 @@
-// VERSION 1.0.7
+// VERSION 1.0.8
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -1936,6 +1936,16 @@ this.GroupItems = {
 					if(this.storageSanityGroupItem(data)) {
 						let groupItem = this.groupItem(data.id);
 						if(groupItem && !groupItem.hidden) {
+							// (TMP) In case this group is re-used by session restore, make sure all of its children still belong to this group.
+							// Do it before setBounds trigger data save that will overwrite session restore data.
+							// TabView will use TabItems.resumeReconnecting or UI.reset to reconnect the tabItem.
+							groupItem.getChildren().forEach(tabItem => {
+								let tabData = Storage.getTabData(tabItem.tab);
+								if(!tabData || tabData.groupID != data.id) {
+									tabItem._reconnected = false;
+								}
+							});
+
 							groupItem.userSize = data.userSize;
 							groupItem.setTitle(data.title);
 							groupItem.setBounds(data.bounds, true);

@@ -1,4 +1,4 @@
-// VERSION 1.0.27
+// VERSION 1.0.28
 
 this.Keys = { meta: false };
 
@@ -285,6 +285,9 @@ this.UI = {
 
 	// Resets the Panorama view to have just one group with all tabs
 	reset: function() {
+		// (TMP) Reconnect tabs could have been disconnected in GroupItems.reconstitute.
+		TabItems.resumeReconnecting();
+
 		let padding = Trenches.defaultRadius;
 		let welcomeWidth = 300;
 		let pageBounds = Items.getPageBounds();
