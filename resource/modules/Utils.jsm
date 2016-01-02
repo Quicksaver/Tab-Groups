@@ -1,4 +1,4 @@
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -309,7 +309,7 @@ this.Utils = {
 
 	// Returns true if the argument is a valid number.
 	isNumber: function(n) {
-		return typeof n == 'number' && !window.isNaN(n);
+		return typeof n == 'number' && !Number.isNaN(n);
 	},
 
 	// Returns true if the given object (r) looks like a <Rect>.
