@@ -1,4 +1,4 @@
-// VERSION 1.0.26
+// VERSION 1.0.27
 
 this.Keys = { meta: false };
 
@@ -317,7 +317,13 @@ this.UI = {
 		};
 		let groupItem = new GroupItem([], options);
 		for(let tab of gBrowser.tabs) {
+			if(tab.pinned || !tab._tabViewTabItem) { continue; }
+
 			let item = tab._tabViewTabItem;
+			// To keep in sync with TMP's session manager requirements.
+			if(gWindow.Tabmix) {
+				item._reconnected = true;
+			}
 			groupItem.add(item, { immediately: true });
 		}
 		this.setActive(groupItem);
