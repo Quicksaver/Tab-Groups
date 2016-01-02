@@ -10,9 +10,10 @@ Modules.BASEUTILS = true;
 //			To also enable a keyset that toggles (closes) the panel, supply it to the panel object as its ._toggleKeyset property, in the form of:
 //				key - (obj):
 //					keycode - (string) either a key to press (e.g. 'A') or a keycode to watch for (e.g. 'VK_F8')
-//					accel: (bool) true if control key (command key on mac) should be pressed
+//					accel: (bool) true if control key (command key on OSX) should be pressed
+//					ctrl: (bool) (OSX only) true if ctrl key should be pressed
 //					shift: (bool) true if shift key should be pressed
-//					alt: (bool) true if alt key (option key on mac) should be pressed
+//					alt: (bool) true if alt key (option key on OSX) should be pressed
 //	setupPanel(panel) - sets up a panel element to be able to use keyboard navigation
 //		panel - (xul element): panel element to be set
 //	unsetPanel(panel) - removes keyboard navigation from a panel

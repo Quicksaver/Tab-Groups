@@ -1,4 +1,4 @@
-// VERSION 1.7.0
+// VERSION 1.7.1
 Modules.UTILS = true;
 
 // Keysets - handles editable keysets for the add-on
@@ -8,9 +8,10 @@ Modules.UTILS = true;
 //			(either this or oncommand) command - (string) id of command element to trigger
 //			(either this or command) oncommand - (string) action to perform
 //			keycode - (string) a key to press (e.g. 'A', 'F8', etc.); some keys don't work, see below notes.
-//			accel: (bool) true if control key (command key on mac) should be pressed
+//			accel: (bool) true if control key (command key on OSX) should be pressed
+//			ctrl: (bool) (OSX only) true if control key should be pressed
 //			shift: (bool) true if shift key should be pressed
-//			alt: (bool) true if alt key (option key on mac) should be pressed
+//			alt: (bool) true if alt key (option key on OSX) should be pressed
 //	unregister(key) - unregisters a keyset
 //		see register()
 //	compareKeys(a, b, justModifiers) - compares two keysets, returns true if they have the same specs (keycode and modifiers), returns false otherwise
@@ -35,6 +36,7 @@ this.Keysets = {
 			accel: true,
 			shift: false,
 			alt: false,
+			ctrl: false,
 			keycode: 'PageUp'
 		},
 		{
@@ -42,6 +44,7 @@ this.Keysets = {
 			accel: true,
 			shift: false,
 			alt: false,
+			ctrl: false,
 			keycode: 'PageDown'
 		},
 		// Ctrl+F4 closes current tab
@@ -51,6 +54,7 @@ this.Keysets = {
 			accel: true,
 			shift: false,
 			alt: false,
+			ctrl: false,
 			keycode: 'F4'
 		},
 		{
@@ -58,6 +62,7 @@ this.Keysets = {
 			accel: false,
 			shift: false,
 			alt: true,
+			ctrl: false,
 			keycode: 'F4'
 		},
 		// F10 Toggles menu bar
@@ -66,6 +71,7 @@ this.Keysets = {
 			accel: false,
 			shift: false,
 			alt: false,
+			ctrl: false,
 			keycode: 'F10'
 		},
 		{
@@ -73,6 +79,7 @@ this.Keysets = {
 			accel: true,
 			shift: false,
 			alt: false,
+			ctrl: false,
 			keycode: 'F10'
 		},
 		// Shift+F10 Toggles context menu
@@ -81,6 +88,7 @@ this.Keysets = {
 			accel: false,
 			shift: true,
 			alt: false,
+			ctrl: false,
 			keycode: 'F10'
 		},
 		{
@@ -88,6 +96,7 @@ this.Keysets = {
 			accel: true,
 			shift: true,
 			alt: false,
+			ctrl: false,
 			keycode: 'F10'
 		},
 		// F7 toggle caret browsing
@@ -96,6 +105,7 @@ this.Keysets = {
 			accel: false,
 			shift: false,
 			alt: false,
+			ctrl: false,
 			keycode: 'F7'
 		}
 
@@ -131,6 +141,10 @@ this.Keysets = {
 		setAttribute(key.accelBox, 'label', Strings.get('utils/keys', DARWIN ? 'command' : 'control'));
 		setAttribute(key.shiftBox, 'label', Strings.get('utils/keys', 'shift'));
 		setAttribute(key.altBox, 'label', Strings.get('utils/keys', DARWIN ? 'option' : 'alt'));
+		setAttribute(key.ctrlBox, 'label', Strings.get('utils/keys', 'control'));
+
+		// A separate checkbox for Control is shown in OSX, because "accel" == "ctrl" only on Windows and Linux, and it's == "command" in OSX.
+		key.ctrlBox.hidden = !DARWIN;
 
 		for(let entry of this.fillCodes) {
 			let item = key.menu.ownerDocument.createElement('menuitem');
@@ -260,14 +274,19 @@ this.Keysets = {
 		if((a.keycode == b.keycode || justModifiers)
 		&& a.accel == b.accel
 		&& a.shift == b.shift
-		&& a.alt == b.alt) {
+		&& a.alt == b.alt
+		&& (!DARWIN || a.ctrl == b.ctrl)) {
 			return true;
 		}
 		return false;
 	},
 
 	compareWithEvent: function(k, e) {
-		return (k.keycode == this.translateFromConstantCode(e.key) && k.shift == e.shiftKey && k.alt == e.altKey && k.accel == (DARWIN ? e.metaKey : e.ctrlKey));
+		return	k.keycode == this.translateFromConstantCode(e.key)
+			&& k.shift == e.shiftKey
+			&& k.alt == e.altKey
+			&& k.accel == (DARWIN ? e.metaKey : e.ctrlKey)
+			&& (!DARWIN || k.ctrl == e.ctrlKey);
 	},
 
 	// array of methods/occasions where a key could be reported as in/valid by mistake because it belongs to an add-on that hasn't been initialized yet
@@ -284,7 +303,8 @@ this.Keysets = {
 			keycode: key.keycode || null,
 			accel: key.accel || false,
 			shift: key.shift || false,
-			alt: key.alt || false
+			alt: key.alt || false,
+			ctrl: (DARWIN && key.ctrl) || false
 		};
 		return newKey;
 	},
@@ -311,9 +331,10 @@ this.Keysets = {
 			};
 
 			let modifiers = k.getAttribute('modifiers').toLowerCase();
-			key.accel = modifiers.includes('accel') || modifiers.includes('control'); // control or command key on mac
+			key.accel = modifiers.includes('accel') || modifiers.includes(!DARWIN ? 'control' : 'meta'); // control key in windows and linux, command key on osx
 			key.alt = modifiers.includes('alt'); // option key on mac
 			key.shift = modifiers.includes('shift');
+			key.ctrl = DARWIN && modifiers.includes('control');
 
 			key.keycode = this.translateFromConstantCode(k.getAttribute('keycode') || k.getAttribute('key'));
 			allSets.push(key);
@@ -328,6 +349,7 @@ this.Keysets = {
 					accel: false,
 					alt: true,
 					shift: false,
+					ctrl: false,
 					keycode: menu.getAttribute('accesskey').toUpperCase()
 				};
 				allSets.push(key);
@@ -337,6 +359,7 @@ this.Keysets = {
 					accel: false,
 					alt: true,
 					shift: true,
+					ctrl: false,
 					keycode: menu.getAttribute('accesskey').toUpperCase()
 				};
 				allSets.push(key);
@@ -351,14 +374,10 @@ this.Keysets = {
 	},
 
 	getAvailable: function(key, moreKeys) {
-		key.accel = key.accel || false;
-		key.shift = key.shift || false;
-		key.alt = key.alt || false;
-
 		let allSets = this.getAllSets();
 		let available = {};
 
-		if(key.accel) {
+		if(key.accel || (DARWIN && key.ctrl)) {
 			codesLoop:
 			for(let code of this.allCodesAccel) {
 				let check = this.isCodeAvailable(code, key, allSets, moreKeys);
@@ -384,7 +403,8 @@ this.Keysets = {
 			keycode: code,
 			accel: key.accel,
 			shift: key.shift,
-			alt: key.alt
+			alt: key.alt,
+			ctrl: key.ctrl
 		};
 
 		if(this.exists(check, allSets)) {
@@ -431,7 +451,7 @@ this.Keysets = {
 			}
 		}
 
-		if(key.accel) {
+		if(key.accel || (DARWIN && key.ctrl)) {
 			for(let code of this.allCodesAccel) {
 				if(code == key.keycode) {
 					return true;
@@ -495,11 +515,12 @@ this.Keysets = {
 				let code = this.translateToConstantCode(r.keycode);
 				key.setAttribute(code.startsWith('VK_') ? 'keycode' : 'key', code);
 
-				if(r.accel || r.shift || r.alt) {
+				if(r.accel || r.shift || r.alt || r.ctrl) {
 					let modifiers = [];
 					if(r.accel) { modifiers.push('accel'); }
 					if(r.shift) { modifiers.push('shift'); }
 					if(r.alt) { modifiers.push('alt'); }
+					if(r.ctrl) { modifiers.push('control'); }
 					key.setAttribute('modifiers', modifiers.join(','));
 				}
 

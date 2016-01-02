@@ -23,14 +23,17 @@
 			<preference id="pref-tabViewAccel" name="extensions.tabgroups.tabViewAccel" type="bool"/>
 			<preference id="pref-tabViewShift" name="extensions.tabgroups.tabViewShift" type="bool"/>
 			<preference id="pref-tabViewAlt" name="extensions.tabgroups.tabViewAlt" type="bool"/>
+			<preference id="pref-tabViewCtrl" name="extensions.tabgroups.tabViewCtrl" type="bool"/>
 			<preference id="pref-nextGroupKeycode" name="extensions.tabgroups.nextGroupKeycode" type="string"/>
 			<preference id="pref-nextGroupAccel" name="extensions.tabgroups.nextGroupAccel" type="bool"/>
 			<preference id="pref-nextGroupShift" name="extensions.tabgroups.nextGroupShift" type="bool"/>
 			<preference id="pref-nextGroupAlt" name="extensions.tabgroups.nextGroupAlt" type="bool"/>
+			<preference id="pref-nextGroupCtrl" name="extensions.tabgroups.nextGroupCtrl" type="bool"/>
 			<preference id="pref-previousGroupKeycode" name="extensions.tabgroups.previousGroupKeycode" type="string"/>
 			<preference id="pref-previousGroupAccel" name="extensions.tabgroups.previousGroupAccel" type="bool"/>
 			<preference id="pref-previousGroupShift" name="extensions.tabgroups.previousGroupShift" type="bool"/>
 			<preference id="pref-previousGroupAlt" name="extensions.tabgroups.previousGroupAlt" type="bool"/>
+			<preference id="pref-previousGroupCtrl" name="extensions.tabgroups.previousGroupCtrl" type="bool"/>
 		</preferences>
 
 		<hbox id="header-tabGroups" class="header" collapsed="true" data-category="paneTabGroups">
@@ -53,6 +56,7 @@
 					<checkbox class="smallindent" keysetAccel="tabView" delayPreference="pref-tabViewAccel"/>
 					<checkbox class="smallindent" keysetAlt="tabView" delayPreference="pref-tabViewAlt"/>
 					<checkbox class="smallindent" keysetShift="tabView" delayPreference="pref-tabViewShift"/>
+					<checkbox class="smallindent" keysetCtrl="tabView" delayPreference="pref-tabViewCtrl"/>
 					<menulist class="smallindent" keyset="tabView" delayPreference="pref-tabViewKeycode"/>
 				</hbox>
 				<hbox jump="nextGroupKeycode,&opt.nextGroupKeyset.label;">
@@ -60,6 +64,7 @@
 					<checkbox class="smallindent" keysetAccel="nextGroup" delayPreference="pref-nextGroupAccel"/>
 					<checkbox class="smallindent" keysetAlt="nextGroup" delayPreference="pref-nextGroupAlt"/>
 					<checkbox class="smallindent" keysetShift="nextGroup" delayPreference="pref-nextGroupShift"/>
+					<checkbox class="smallindent" keysetCtrl="nextGroup" delayPreference="pref-nextGroupCtrl"/>
 					<menulist class="smallindent" keyset="nextGroup" delayPreference="pref-nextGroupKeycode"/>
 				</hbox>
 				<hbox jump="previousGroupKeycode,&opt.previousGroupKeyset.label;">
@@ -67,6 +72,7 @@
 					<checkbox class="smallindent" keysetAccel="previousGroup" delayPreference="pref-previousGroupAccel"/>
 					<checkbox class="smallindent" keysetAlt="previousGroup" delayPreference="pref-previousGroupAlt"/>
 					<checkbox class="smallindent" keysetShift="previousGroup" delayPreference="pref-previousGroupShift"/>
+					<checkbox class="smallindent" keysetCtrl="previousGroup" delayPreference="pref-previousGroupCtrl"/>
 					<menulist class="smallindent" keyset="previousGroup" delayPreference="pref-previousGroupKeycode"/>
 				</hbox>
 			</vbox>

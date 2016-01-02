@@ -1,4 +1,4 @@
-// VERSION 1.3.17
+// VERSION 1.3.18
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -21,16 +21,19 @@ prefList = {
 	tabViewAccel: true,
 	tabViewShift: true,
 	tabViewAlt: false,
+	tabViewCtrl: false,
 
 	nextGroupKeycode: '`',
 	nextGroupAccel: true,
 	nextGroupShift: false,
 	nextGroupAlt: false,
+	nextGroupCtrl: false,
 
 	previousGroupKeycode: '`',
 	previousGroupAccel: true,
 	previousGroupShift: true,
 	previousGroupAlt: false,
+	previousGroupCtrl: false,
 
 	// for internal use
 	pageAutoChanged: false,

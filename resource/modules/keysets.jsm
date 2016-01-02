@@ -1,4 +1,4 @@
-// VERSION 2.0.0
+// VERSION 2.0.1
 
 this.keysets = new Set([
 	{
@@ -9,11 +9,13 @@ this.keysets = new Set([
 		accelPref: 'tabViewAccel',
 		shiftPref: 'tabViewShift',
 		altPref: 'tabViewAlt',
+		ctrlPref: 'tabViewCtrl',
 
 		get keycode () { return Prefs[this.keycodePref]; },
 		get accel () { return Prefs[this.accelPref]; },
 		get shift () { return Prefs[this.shiftPref]; },
 		get alt () { return Prefs[this.altPref]; },
+		get ctrl () { return Prefs[this.ctrlPref]; },
 
 		observe: function(aSubject, aTopic, aData) {
 			this.set();
@@ -32,11 +34,13 @@ this.keysets = new Set([
 		accelPref: 'nextGroupAccel',
 		shiftPref: 'nextGroupShift',
 		altPref: 'nextGroupAlt',
+		ctrlPref: 'nextGroupCtrl',
 
 		get keycode () { return Prefs[this.keycodePref]; },
 		get accel () { return Prefs[this.accelPref]; },
 		get shift () { return Prefs[this.shiftPref]; },
 		get alt () { return Prefs[this.altPref]; },
+		get ctrl () { return Prefs[this.ctrlPref]; },
 
 		observe: function(aSubject, aTopic, aData) {
 			this.set();
@@ -55,11 +59,13 @@ this.keysets = new Set([
 		accelPref: 'previousGroupAccel',
 		shiftPref: 'previousGroupShift',
 		altPref: 'previousGroupAlt',
+		ctrlPref: 'previousGroupCtrl',
 
 		get keycode () { return Prefs[this.keycodePref]; },
 		get accel () { return Prefs[this.accelPref]; },
 		get shift () { return Prefs[this.shiftPref]; },
 		get alt () { return Prefs[this.altPref]; },
+		get ctrl () { return Prefs[this.ctrlPref]; },
 
 		observe: function(aSubject, aTopic, aData) {
 			this.set();
@@ -86,6 +92,7 @@ Modules.LOADMODULE = function() {
 		Prefs.listen(key.accelPref, key);
 		Prefs.listen(key.shiftPref, key);
 		Prefs.listen(key.altPref, key);
+		Prefs.listen(key.ctrlPref, key);
 	}
 };
 
@@ -95,6 +102,7 @@ Modules.UNLOADMODULE = function() {
 		Prefs.unlisten(key.accelPref, key);
 		Prefs.unlisten(key.shiftPref, key);
 		Prefs.unlisten(key.altPref, key);
+		Prefs.unlisten(key.ctrlPref, key);
 
 		Keysets.unregister(key);
 	}
