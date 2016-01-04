@@ -1,4 +1,4 @@
-// VERSION 1.3.18
+// VERSION 1.3.19
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -34,6 +34,9 @@ prefList = {
 	previousGroupShift: true,
 	previousGroupAlt: false,
 	previousGroupCtrl: false,
+
+	// hidden preferences
+	noWarningsAboutSession: false,
 
 	// for internal use
 	pageAutoChanged: false,

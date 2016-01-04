@@ -1,4 +1,4 @@
-// VERSION 1.0.28
+// VERSION 1.0.29
 
 this.Keys = { meta: false };
 
@@ -1573,13 +1573,13 @@ this.UI = {
 
 		if(!PrivateBrowsing.isPrivate(gWindow)) {
 			// Notify the user if necessary that session restore needs to be enabled by showing a banner at the bottom.
-			this.sessionRestoreNotice.hidden = this._noticeDismissed || pageWatch.sessionRestoreEnabled;
+			this.sessionRestoreNotice.hidden = Prefs.noWarningsAboutSession || this._noticeDismissed || pageWatch.sessionRestoreEnabled;
 			this.sessionRestorePrivate.hidden = true;
 		}
 		else {
 			// In private windows it's expected of the groups to be gone after closing it, so the warning is really more of a notice.
 			// We "dismiss" it immediately, in the sense that it really should only be shown once per window.
-			if(!this._noticeDismissed) {
+			if(!Prefs.noWarningsAboutSession && !this._noticeDismissed) {
 				this.tempShowBanner(this.sessionRestorePrivate);
 				this._noticeDismissed = true;
 			} else {
