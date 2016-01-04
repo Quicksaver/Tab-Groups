@@ -1,4 +1,4 @@
-// VERSION 1.0.19
+// VERSION 1.0.20
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -336,7 +336,7 @@ this.TabView = {
 
 	updateContextMenu: function(tab, popup) {
 		let separator = $(objName+"-context_tabViewNamedGroups");
-		let isEmpty = true;
+		separator.hidden = true;
 
 		// empty the menu immediately so old and invalid entries aren't shown
 		this.emptyContextMenu(popup, separator);
@@ -347,19 +347,29 @@ this.TabView = {
 
 			let activeGroup = tab._tabViewTabItem.parent;
 			let groupItems = this._window[objName].GroupItems.groupItems;
+			let menuItems = [];
 
-			groupItems.forEach((groupItem) => {
+			for(let groupItem of groupItems) {
 				// if group has title, it's not hidden and there is no active group or the active group id doesn't match the group id,
 				// a group menu item will be added.
 				if(!groupItem.hidden
 				&& (groupItem.getTitle().trim() || groupItem.getChildren().length)
 				&& (!activeGroup || activeGroup.id != groupItem.id)) {
-					let menuItem = this._createGroupMenuItem(groupItem);
-					popup.insertBefore(menuItem, separator);
-					isEmpty = false;
+					menuItems.push(this._createGroupMenuItem(groupItem));
 				}
-			});
-			separator.hidden = isEmpty;
+			}
+
+			if(menuItems.length) {
+				menuItems.sort(function(a, b) {
+					if(a.groupTitle < b.groupTitle) { return -1; }
+					if(a.groupTitle > b.groupTitle) { return 1; }
+					return 0;
+				});
+				for(let menuItem of menuItems) {
+					popup.insertBefore(menuItem, separator);
+				}
+				separator.hidden = false;
+			}
 		});
 	},
 
@@ -393,6 +403,7 @@ this.TabView = {
 		let title = this.getGroupTitle(groupItem);
 
 		menuItem.groupId = groupItem.id;
+		menuItem.groupTitle = title;
 		menuItem.setAttribute("label", title);
 		menuItem.setAttribute("tooltiptext", title);
 		menuItem.setAttribute("crop", "center");

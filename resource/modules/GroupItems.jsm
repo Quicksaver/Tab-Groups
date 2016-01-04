@@ -1,4 +1,4 @@
-// VERSION 1.0.8
+// VERSION 1.0.9
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -2198,8 +2198,18 @@ this.GroupItems = {
 		let activeGroupItem = GroupItems.getActiveGroupItem();
 		let tabItem = null;
 
+		// When cycling through groups, order them by their titles, otherwise it's far too arbitrary.
+		for(let groupItem of groupItems) {
+			groupItem.groupTitle = gWindow[objName].TabView.getGroupTitle(groupItem);
+		}
+		groupItems.sort(function(a, b) {
+			if(a.groupTitle < b.groupTitle) { return -1; }
+			if(a.groupTitle > b.groupTitle) { return 1; }
+			return 0;
+		});
+
 		if(reverse) {
-			groupItems = groupItems.reverse();
+			groupItems.reverse();
 		}
 
 		let some = function(groupItem) {
