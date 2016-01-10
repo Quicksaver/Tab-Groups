@@ -17,6 +17,8 @@ this.FavIcons = {
 			} else {
 				this._getFavIconForNonImageDocument(tab, callback);
 			}
+		}).catch(() => {
+		  callback(null)
 		});
 	},
 
@@ -58,7 +60,7 @@ this.FavIcons = {
 	},
 
 	// Checks whether an image is loaded into the given tab.
-	_isImageDocument: function(tab, callback) {
+	_isImageDocument: function(tab) {
 		return new Promise(function(resolve, reject) {
 			let repeat;
 
@@ -74,7 +76,11 @@ this.FavIcons = {
 			// sometimes on first open, we don't get a response right away because the message isn't actually sent, although I have no clue why...
 			let ask = function() {
 				Messenger.messageBrowser(tab.linkedBrowser, "isImageDocument");
-				repeat = aSync(ask, 1000);
+				if(!repeat) { // only repeat once
+				  repeat = aSync(ask, 1000);				  
+				} else {
+				  reject("isImageDocument response timeout");
+				}
 			};
 			ask();
 		});
