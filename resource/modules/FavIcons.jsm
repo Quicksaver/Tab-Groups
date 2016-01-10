@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.FavIcons = {
 	get defaultFavicon() {
@@ -63,19 +63,21 @@ this.FavIcons = {
 	_isImageDocument: function(tab) {
 		return new Promise(function(resolve, reject) {
 			let repeat;
+			let mm = tab.linkedBrowser.frameLoader.messageManager;
 
 			let receiver = function(m) {
 				if(repeat) {
 					repeat.cancel();
 				}
-				Messenger.unlistenBrowser(tab.linkedBrowser, "isImageDocument", receiver);
-				resolve(m.data);
+				
+				mm.removeMessageListener("tabgroups:isImageDocument", receiver);
+				resolve(m.data.result);
 			};
-			Messenger.listenBrowser(tab.linkedBrowser, "isImageDocument", receiver);
+			mm.addMessageListener("tabgroups:isImageDocument", receiver)
 
 			// sometimes on first open, we don't get a response right away because the message isn't actually sent, although I have no clue why...
 			let ask = function() {
-				Messenger.messageBrowser(tab.linkedBrowser, "isImageDocument");
+				mm.sendAsyncMessage("tabgroups:isImageDocument", {});
 				if(!repeat) { // only repeat once
 				  repeat = aSync(ask, 1000);				  
 				} else {

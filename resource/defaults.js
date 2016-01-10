@@ -66,6 +66,7 @@ function onStartup(aReason) {
 	Modules.load('nativePrefs');
 	Modules.load('migrate');
 	Modules.load('compatibilityFix/sandboxFixes');
+	Modules.load('MessageManager');
 	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 		Modules.load('keysets');
 	}
@@ -82,6 +83,7 @@ function onShutdown(aReason) {
 	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 		Modules.unload('keysets');
 	}
+	Modules.unload('MessageManager');
 	Modules.unload('compatibilityFix/sandboxFixes');
 	Modules.unload('migrate');
 	Modules.unload('nativePrefs');

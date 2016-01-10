@@ -1,4 +1,4 @@
-// VERSION 1.0.13
+// VERSION 1.0.14
 Modules.UTILS = true;
 
 // PrefPanes - handles the preferences tab and all its contents for the add-on
@@ -57,9 +57,6 @@ this.PrefPanes = {
 	},
 
 	init: function() {
-		// we set the add-on status in the API webpage from within the add-on itself
-		Messenger.loadInAll('utils/api');
-
 		// always add the about pane to the preferences dialog, it should be the last category in the list
 		this.register('utils/about', { paneAbout: 'utils/about' });
 
@@ -128,8 +125,6 @@ this.PrefPanes = {
 	},
 
 	uninit: function() {
-		Messenger.unloadFromAll('utils/api');
-
 		this.closeAll();
 
 		Styles.unload('PrefPanesHtmlFix');

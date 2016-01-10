@@ -1,4 +1,4 @@
-// VERSION 1.0.8
+// VERSION 1.0.9
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -651,8 +651,8 @@ this.TabItems = {
 		let $canvas = iQ("<canvas>").attr('moz-opaque', '');
 		$canvas.appendTo(iQ("body"));
 		$canvas.hide();
-
-		Messenger.listenWindow(gWindow, "MozAfterPaint", this);
+		
+		gWindow.messageManager.addMessageListener("tabgroups:MozAfterPaint", this)
 
 		// When a tab is opened, create the TabItem
 		this._eventListeners.open = (event) => {
@@ -702,7 +702,7 @@ this.TabItems = {
 	},
 
 	uninit: function() {
-		Messenger.unlistenWindow(gWindow, "MozAfterPaint", this);
+	  gWindow.messageManager.removeMessageListener("tabgroups:MozAfterPaint", this)
 
 		for(let name in this._eventListeners) {
 			AllTabs.unregister(name, this._eventListeners[name]);
@@ -774,14 +774,16 @@ this.TabItems = {
 				aSync(() => resolve(false));
 				return;
 			}
+			
+			let mm = tab.linkedBrowser.frameLoader.messageManager;
 
 			let receiver = function(m) {
-				Messenger.unlistenBrowser(tab.linkedBrowser, "isDocumentLoaded", receiver);
-				resolve(m.data);
+			  mm.removeMessageListener("tabgroups:isDocumentLoaded", receiver);
+				resolve(m.data.result);
 			};
 
-			Messenger.listenBrowser(tab.linkedBrowser, "isDocumentLoaded", receiver);
-			Messenger.messageBrowser(tab.linkedBrowser, "isDocumentLoaded");
+      mm.addMessageListener("tabgroups:isDocumentLoaded", receiver);
+      mm.sendAsyncMessage("tabgroups:isDocumentLoaded", {});
 		});
 	},
 

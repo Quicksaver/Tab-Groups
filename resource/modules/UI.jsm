@@ -1,4 +1,4 @@
-// VERSION 1.0.29
+// VERSION 1.0.30
 
 this.Keys = { meta: false };
 
@@ -191,7 +191,7 @@ this.UI = {
 				groupItem.newTab();
 			});
 
-			Messenger.listenWindow(gWindow, "DOMWillOpenModalDialog", this);
+			gWindow.messageManager.addMessageListener("tabgroups:DOMWillOpenModalDialog", this)
 
 			// ___ setup key handlers
 			this._setTabViewFrameKeyHandlers();
@@ -228,8 +228,6 @@ this.UI = {
 
 			Listeners.add(gWindow, "SSWindowClosing", this);
 
-			// ___ load frame script
-			Messenger.loadInWindow(gWindow, 'TabView');
 
 			pageWatch.register(this);
 			Listeners.add(this.sessionRestoreNotice, 'mousedown', this, true);
@@ -258,8 +256,7 @@ this.UI = {
 
 		pageWatch.unregister(this);
 
-		Messenger.unlistenWindow(gWindow, "DOMWillOpenModalDialog", this);
-		Messenger.unloadFromWindow(gWindow, 'TabView');
+    gWindow.messageManager.removeMessageListener("tabgroups:DOMWillOpenModalDialog", this)
 
 		// additional clean up
 		TabItems.uninit();
@@ -792,13 +789,14 @@ this.UI = {
 			}
 			if(this._closedLastVisibleTab || (this._closedSelectedTabInTabView && !this.closedLastTabInTabView) || this.restoredClosedTab) {
 				if(this.restoredClosedTab) {
+				  let mm = tab.linkedBrowser.frameLoader.messageManager;
 					// when the tab view UI is being displayed, update the thumb for the restored closed tab after the page load
 					let receiver = function() {
-						Messenger.unlistenBrowser(tab.linkedBrowser, "documentLoaded", receiver);
+					  mm.removeMessageListener("tabgroups:documentLoaded", receiver);
 						TabItems._update(tab);
 					};
-					Messenger.listenBrowser(tab.linkedBrowser, "documentLoaded", receiver);
-					Messenger.messageBrowser(tab.linkedBrowser, "waitForDocumentLoad");
+					mm.addMessageListener("tabgroups:documentLoaded", receiver);
+					mm.sendAsyncMessage("tabgroups:waitForDocumentLoad", {})
 				}
 				this._closedLastVisibleTab = false;
 				this._closedSelectedTabInTabView = false;
