@@ -69,7 +69,7 @@ this.FavIcons = {
 				if(repeat) {
 					repeat.cancel();
 				}
-				
+
 				mm.removeMessageListener("tabgroups:isImageDocument", receiver);
 				resolve(m.data.result);
 			};
@@ -79,8 +79,9 @@ this.FavIcons = {
 			let ask = function() {
 				mm.sendAsyncMessage("tabgroups:isImageDocument", {});
 				if(!repeat) { // only repeat once
-				  repeat = aSync(ask, 1000);				  
+				  repeat = aSync(ask, 1000);
 				} else {
+					mm.removeMessageListener("tabgroups:isImageDocument", receiver);
 				  reject("isImageDocument response timeout");
 				}
 			};
