@@ -4,67 +4,15 @@
 
 const Cu = Components.utils;
 const Ci = Components.interfaces;
-const Services = Cu.import("resource://gre/modules/Services.jsm", {}).Services;
-const cpmm = Services.cpmm;
-const console = (Cu.import("resource://gre/modules/devtools/Console.jsm", {})).console;
+
+const console = Cu.import("resource://gre/modules/devtools/Console.jsm", {}).console;
 
 const TabView = {};
 
-let crossProcessConfig = {};
 let active = true;
-
-if(cpmm.initialProcessData && cpmm.initialProcessData["tabgroups:config"]) {
-  crossProcessConfig = cpmm.initialProcessData["tabgroups:config"];
-}
 
 const frames = new Set();
 
-const PageAPI = {
-    onDOMContentLoaded: function(e) {
-      let frameMM = e.currentTarget;
-      // this is the content document of the loaded page.
-      let doc = e.originalTarget;
-      if(doc instanceof frameMM.content.HTMLDocument) {
-        // is this an inner frame?
-        // Find the root document:
-        while(doc.defaultView.frameElement) {
-          doc = doc.defaultView.frameElement.ownerDocument;
-        }
-
-        if(doc == frameMM.content.document) {
-          PageAPI.checkPage(frameMM);
-        }
-      }
-    },
-
-    checkPage: function(frame) {
-      let content = frame.content
-      let document = content.document
-      
-      if(document.readyState != 'complete') {
-        var waiting = () => {
-          content.removeEventListener('load', waiting);
-          this.checkPage(frame);
-        };
-        content.addEventListener('load', waiting);
-        return;
-      }
-      
-      let addonUris = crossProcessConfig.addonUris
-      
-      if(addonUris && addonUris.development && document.documentURI.startsWith(addonUris.development)) {
-        var unwrap = Cu.waiveXrays(content);
-        if(unwrap.enable) {
-          unwrap.enable(crossProcessConfig.objPathString);
-        }
-      }
-    }
-};
-
-
-function updateConfig(message) {
-  crossProcessConfig = message.data  
-}
 
 //console.log("tabgroups content sandbox load");
 
@@ -73,18 +21,16 @@ function shutdown() {
   for(let frame of frames) {
     removeFrame(frame);
   }
-  cpmm.removeMessageListener("tabgroups:config-update", updateConfig);
+
   //console.log("tabgroups content sandbox shutdown", frames.size);
   frames.clear()
 }
 
-cpmm.addMessageListener("tabgroups:config-update", updateConfig);
-
 TabView.handleEvent = function(e) {
   if(!active) {return;}
-  
+
   let frameMM = e.currentTarget;
-  
+
   switch(e.type) {
   // Sends a synchronous message when the "onDOMWillOpenModalDialog" event is fired right before a modal dialog will be opened by the current page.
   case 'DOMWillOpenModalDialog':
@@ -110,19 +56,19 @@ TabView.handleEvent = function(e) {
       frameMM.sendAsyncMessage("tabgroups:MozAfterPaint", {});
     }
     break;
-    
+
   case 'load':
     frameMM.sendAsyncMessage("tabgroups:documentLoaded", {});
     break;
 
   }
-  
+
 
 };
 
 TabView.receiveMessage = function(m) {
   if(!active) {return;}
-  
+
   let name = m.name;
   let frameMM = m.target;
   let content = frameMM.content;
@@ -154,14 +100,12 @@ TabView.receiveMessage = function(m) {
 function frameUnload(e) {
   if(!(e.target instanceof Ci.nsIMessageListenerManager))
     return;
-  removeFrame(e.target)  
+  removeFrame(e.target)
 }
 
 function removeFrame(frame) {
   //console.log("removing frame");
   frames.delete(frame);
-  
-  frame.removeEventListener("DOMContentLoaded", PageAPI.onDOMContentLoaded);
 
   frame.removeEventListener("DOMWillOpenModalDialog", TabView);
   frame.removeEventListener("MozAfterPaint", TabView);
@@ -169,20 +113,18 @@ function removeFrame(frame) {
   frame.removeEventListener("load", TabView);
   frame.removeEventListener("unload", frameUnload);
 
-  
+
   frame.removeMessageListener("tabgroups:isDocumentLoaded", TabView);
   frame.removeMessageListener("tabgroups:isImageDocument", TabView);
   frame.removeMessageListener("tabgroups:waitForDocumentLoad", TabView);
-  
+
 }
 
 function registerFrame(frame) {
   //console.log("adding frame")
   frames.add(frame)
-  
+
   frame.addEventListener("unload", frameUnload);
-  
-  frame.addEventListener("DOMContentLoaded", PageAPI.onDOMContentLoaded);
 
   frame.addEventListener("DOMWillOpenModalDialog", TabView);
   frame.addEventListener("MozAfterPaint", TabView);
@@ -192,4 +134,3 @@ function registerFrame(frame) {
   frame.addMessageListener("tabgroups:isImageDocument", TabView);
   frame.addMessageListener("tabgroups:waitForDocumentLoad", TabView);
 }
-
