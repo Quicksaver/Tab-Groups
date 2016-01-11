@@ -191,7 +191,7 @@ this.UI = {
 				groupItem.newTab();
 			});
 
-			gWindow.messageManager.addMessageListener("tabgroups:DOMWillOpenModalDialog", this)
+			gWindow.messageManager.addMessageListener("tabgroups:DOMWillOpenModalDialog", this);
 
 			// ___ setup key handlers
 			this._setTabViewFrameKeyHandlers();
@@ -796,7 +796,7 @@ this.UI = {
 						TabItems._update(tab);
 					};
 					mm.addMessageListener("tabgroups:documentLoaded", receiver);
-					mm.sendAsyncMessage("tabgroups:waitForDocumentLoad", {})
+					mm.sendAsyncMessage("tabgroups:waitForDocumentLoad", {});
 				}
 				this._closedLastVisibleTab = false;
 				this._closedSelectedTabInTabView = false;

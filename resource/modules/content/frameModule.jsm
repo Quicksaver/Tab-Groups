@@ -23,23 +23,23 @@ let active = true;
 //console.log("tabgroups frame module loaded");
 
 const shutdownHook = {
-    receiveMessage: function(m) {
-      if(!active)
-        return;
-      //console.log("unloading tabgroups frame module");
-      active = false;
-      sandbox.shutdown();
-      Cu.nukeSandbox(sandbox)
-      sandbox = null;
-      cpmm.removeMessageListener("tabgroups:shutdown-content", shutdownHook);
-      Cu.unload("resource://tabgroups/modules/content/frameModule.jsm");
-    }
+	receiveMessage: function(m) {
+		if(!active)
+			return;
+		//console.log("unloading tabgroups frame module");
+		active = false;
+		sandbox.shutdown();
+		Cu.nukeSandbox(sandbox)
+		sandbox = null;
+		cpmm.removeMessageListener("tabgroups:shutdown-content", shutdownHook);
+		Cu.unload("resource://tabgroups/modules/content/frameModule.jsm");
+	}
 }
 
 cpmm.addMessageListener("tabgroups:shutdown-content", shutdownHook);
 
 
 function registerFrame(frame) {
-  if(!active) { return; }
-  sandbox.registerFrame(frame);
+	if(!active) { return; }
+	sandbox.registerFrame(frame);
 }

@@ -18,7 +18,7 @@ this.FavIcons = {
 				this._getFavIconForNonImageDocument(tab, callback);
 			}
 		}).catch(() => {
-		  callback(null)
+		  callback(null);
 		});
 	},
 
@@ -73,7 +73,7 @@ this.FavIcons = {
 				mm.removeMessageListener("tabgroups:isImageDocument", receiver);
 				resolve(m.data.result);
 			};
-			mm.addMessageListener("tabgroups:isImageDocument", receiver)
+			mm.addMessageListener("tabgroups:isImageDocument", receiver);
 
 			// sometimes on first open, we don't get a response right away because the message isn't actually sent, although I have no clue why...
 			let ask = function() {
