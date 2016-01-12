@@ -42,7 +42,7 @@
 
 		<groupbox align="start" id="paneTabGroups-general" collapsed="true" data-category="paneTabGroups">
 			<caption label="&cat.general.label;"/>
-			<checkbox label="&opt.animateZoom.label;"
+			<checkbox label="&opt.animateZoom.label2;"
 				helptext="&opt.animateZoom.tooltip;"
 				jump="animateZoom"
 				delayPreference="pref-animateZoom"/>

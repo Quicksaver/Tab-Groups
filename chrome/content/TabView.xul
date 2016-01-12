@@ -32,6 +32,7 @@
 			class="menuitem-iconic"
 			key="objName-key_tabview"
 			label="&viewTabGroups.label;"
+			accesskey="&viewTabGroups.accesskey;"
 			command="objName:ToggleTabView"
 			observes="objName-tabviewGroupsNumber"
 			insertbefore="alltabs_undoCloseTab"/>

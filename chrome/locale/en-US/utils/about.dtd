@@ -1,7 +1,7 @@
 <!ENTITY about.paneTitle "About">
 
 <!ENTITY about.version "Version {v}">
-<!ENTITY about.versionDivider " - ">
+<!ENTITY about.versionDivider "-">
 <!ENTITY about.uptodate "up-to-date, congratulations!">
 <!ENTITY about.needsupdate "update available!">
 
@@ -23,7 +23,7 @@
 <!ENTITY about.email "Or send me an e-mail about it">
 
 <!ENTITY about.author "More from the author">
-<!ENTITY about.trymore "Try one of my other add-ons for an even better firefox experience!">
+<!ENTITY about.trymore "Try one of my other add-ons for an even better Firefox experience!">
 <!ENTITY about.profile "Find them in my profile">
 
 <!ENTITY about.share "Share!">

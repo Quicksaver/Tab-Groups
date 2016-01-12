@@ -5,7 +5,7 @@
 <!ENTITY cat.backup.label "Cópia de segurança dos Grupos de Separadores">
 <!ENTITY cat.restore.label "Restaurar Grupos de Separadores">
 <!ENTITY cat.clear.label "Limpar Grupos de Separadores">
-<!ENTITY opt.animateZoom.label "Animar Zoom">
+<!ENTITY opt.animateZoom.label2 "Animar transições">
 <!ENTITY opt.animateZoom.tooltip "Transições suaves ao entrar e sair do modo Grupos de Separadores, ao fazer zoom para do separador atual para o modo de grupos, e fazer novamente zoom ao sair do modo de grupos e voltar ao separador.">
 <!ENTITY opt.tabViewKeyset.label "Entrar e sair do modo de grupos">
 <!ENTITY opt.nextGroupKeyset.label "Ir para o próximo gropo">

@@ -12,6 +12,6 @@
 <!ENTITY buttonHelpTabGroups.label "How to use tab groups">
 
 <!ENTITY sessionRestoreNotice.label "Your tabs and groups will not be restored the next time you start the browser! Click here to fix it.">
-<!ENTITY sessionRestoreNotice.dismiss.tooltip "Dismiss this warning until I restart the browser.">
+<!ENTITY sessionRestoreNotice.dismiss.tooltip "Dismiss this warning until I restart the browser">
 <!ENTITY sessionRestoreAutoChanged.label "Your tabs and groups will be restored automatically the next time you start the browser.">
 <!ENTITY sessionRestorePrivate.label "This is a private window, your tabs and groups cannot be restored once you close it.">
