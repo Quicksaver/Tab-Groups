@@ -1,6 +1,21 @@
 {
-	"current":"1.0.1",
+	"current":"1.0.2",
 	"releases": {
+		"1.0.2":{
+			"date":"January 12, 2016",
+			"notes":[
+				["new","Can use the control key in Mac OSX in the customizable keyboard shortcuts (<a=https://github.com/Quicksaver/Tab-Groups/issues/39>issue #39</a>)"],
+				["new","Hidden preference \"extensions.tabgroups.noWarningAboutSession\", to never show warnings about tabs and groups not being saved after closing the window; enable with caution as it's very easy to forget they won't be saved"],
+				["new","Added de, fy-NL, nl, zh-CN and zh-TW locales"],
+				["changed","When switching groups through the keyboard shortcuts, and in the \"Move to Group\" item in the tabs context menu, groups are now ordered by their title (<a=https://github.com/Quicksaver/Tab-Groups/issues/40>issue #40</a>)"],
+				["bugfix","In HiDPI configurations in linux, the Tab Groups button wouldn't have an icon (<a=https://github.com/Quicksaver/Tab-Groups/issues/28>issue #28</a>)"],
+				["bugfix","The notice that groups and tabs can't be saved in private windows should only be shown once per window"],
+				["bugfix","Compatibility with <a=https://addons.mozilla.org/firefox/addon/tab-mix-plus/>Tab Mix Plus</a>'s session manager (<a=https://addons.mozilla.org/firefox/addon/tab-mix-plus/versions/>version 0.4.2.1</a> or later only) (<a=https://github.com/Quicksaver/Tab-Groups/issues/37>issue #37</a>)"],
+				["bugfix","While in groups mode you shouldn't be able to make any kind of text selections outside of group name fields or the search field (<a=https://github.com/Quicksaver/Tab-Groups/issues/38>issue #38</a>)"],
+				["bugfix","Compatibility with <a=https://addons.mozilla.org/firefox/addon/vimperator/>Vimperator</a>"],
+				["","Other minor fixes"]
+			]
+		},
 		"1.0.1":{
 			"date":"December 11, 2015",
 			"notes":[
