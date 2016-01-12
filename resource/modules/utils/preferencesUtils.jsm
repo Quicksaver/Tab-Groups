@@ -1,4 +1,4 @@
-// VERSION 2.4.11
+// VERSION 2.4.12
 Modules.UTILS = true;
 
 // dependsOn - object that adds a dependson attribute functionality to xul preference elements.
@@ -1040,7 +1040,7 @@ this.controllers = {
 
 		if(mode == Ci.nsIFilePicker.modeSave) {
 			let date = new Date();
-			let dateStr = date.getFullYear()+'-'+date.getMonth()+'-'+date.getDate()+'-'+date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds();
+			let dateStr = date.getFullYear()+'-'+(date.getMonth() +1)+'-'+date.getDate()+'-'+date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds();
 			fp.defaultString = prefix+'-'+dateStr;
 		}
 
