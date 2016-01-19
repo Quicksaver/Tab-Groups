@@ -1,4 +1,4 @@
-// VERSION 1.3.19
+// VERSION 1.4.0
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -45,6 +45,9 @@ prefList = {
 	migratedKeysets: false
 };
 
+// If we're initializing in a content process, we don't care about the rest
+if(isContent) { throw 'isContent'; }
+
 paneList = [
 	[ "paneTabGroups", true ],
 	[ "paneHowTo", true ],
@@ -66,7 +69,6 @@ function onStartup(aReason) {
 	Modules.load('nativePrefs');
 	Modules.load('migrate');
 	Modules.load('compatibilityFix/sandboxFixes');
-	Modules.load('MessageManager');
 	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 		Modules.load('keysets');
 	}
@@ -83,7 +85,6 @@ function onShutdown(aReason) {
 	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
 		Modules.unload('keysets');
 	}
-	Modules.unload('MessageManager');
 	Modules.unload('compatibilityFix/sandboxFixes');
 	Modules.unload('migrate');
 	Modules.unload('nativePrefs');

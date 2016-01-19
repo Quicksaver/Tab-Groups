@@ -1,4 +1,4 @@
-// VERSION 2.7.1
+// VERSION 2.7.2
 
 // Many times I can't use 'this' to refer to the owning var's context, so I'm setting 'this' as 'self',
 // I can use 'self' from within functions, timers and listeners easily and to bind those functions to it as well
@@ -40,7 +40,7 @@ this.Modules = {
 		// if their unload methods call for modules that had't been loaded, they won't be able to be loaded now.
 		// Just enclosing problematic routines in a try-catch block isn't enough, as apparently the IO thread somehow throws aSync,
 		// causing the messages to appear in the console anyway. They may be harmless but they're also confusing when debugging, so let's avoid them.
-		if(self.isContent && self.disabled) { return false; }
+		if(isContent && gDisabled) { return false; }
 
 		let path = this.preparePath(aModule);
 		if(!path) { return false; }

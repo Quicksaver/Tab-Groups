@@ -1,4 +1,4 @@
-// VERSION 1.8.5
+// VERSION 1.8.6
 
 // This looks for file defaults.js in resource folder, expects:
 //	objName - (string) main object name for the add-on, to be added to window element
@@ -45,6 +45,7 @@ var onceListeners = [];
 var alwaysRunOnShutdown = [];
 var MessengerLoaded = false;
 var isChrome = true;
+var isContent = false;
 
 // Globals - lets me use objects that I can share through all the windows
 var Globals = {};
@@ -92,11 +93,11 @@ XPCOMUtils.defineLazyServiceGetter(Services, "stylesheet", "@mozilla.org/content
 // I check these pretty much everywhere, so might as well keep a single reference to them
 var WINNT = Services.appinfo.OS == 'WINNT';
 var DARWIN = Services.appinfo.OS == 'Darwin';
-var LINUX = Services.appinfo.OS != 'WINNT' && Services.appinfo.OS != 'Darwin';
+var LINUX = !WINNT && !DARWIN;
 
 function handleDeadObject(ex) {
 	if(ex.message == "can't access dead object") {
-		var scriptError = Cc["@mozilla.org/scripterror;1"].createInstance(Ci.nsIScriptError);
+		let scriptError = Cc["@mozilla.org/scripterror;1"].createInstance(Ci.nsIScriptError);
 		scriptError.init("Can't access dead object. This shouldn't cause any problems.", ex.sourceName || ex.fileName || null, ex.sourceLine || null, ex.lineNumber || null, ex.columnNumber || null, scriptError.warningFlag, 'XPConnect JavaScript');
 		Services.console.logMessage(scriptError);
 		return true;
@@ -276,7 +277,7 @@ function shutdown(aData, aReason) {
 		// content scripts should know as soon as possible that we're disabling the add-on, before any of them starts unloading,
 		// otherwise they could try to load modules after the resource:// uri was gone
 		if(MessengerLoaded) {
-			Messenger.messageAll('disable');
+			Services.ppmm.broadcastAsyncMessage(Messenger.messageName('disable'));
 		}
 
 		if(typeof(onShutdown) == 'function') {

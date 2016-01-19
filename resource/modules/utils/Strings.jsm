@@ -1,4 +1,4 @@
-// VERSION 2.3.2
+// VERSION 2.3.3
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -16,7 +16,8 @@ this.Strings = {
 	bundles: {},
 
 	getPath: function(aPath, alt) {
-		return "chrome://"+objPathString+((alt) ? '-en' : '')+"/locale/"+aPath+".properties?"+AddonData.initTime;
+		let cacheBuster = (AddonData) ? '?'+AddonData.initTime : '';
+		return "chrome://"+objPathString+((alt) ? '-en' : '')+"/locale/"+aPath+".properties"+cacheBuster;
 	},
 
 	get: function(bundle, string, replace, aNumber, alt) {

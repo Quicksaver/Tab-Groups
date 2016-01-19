@@ -1,4 +1,4 @@
-// VERSION 1.5.4
+// VERSION 1.6.0
 Modules.UTILS = true;
 
 // Messenger - 	Aid object to communicate with browser content scripts (e10s).
@@ -6,16 +6,19 @@ Modules.UTILS = true;
 //		or that at least it won't fail when loaded like this.
 // messageName(aMessage) - to ensure that all receivers respond to messages that come only from this add-on
 //	aMessage - (message object) will return the message name stripped off the add-on's identifier; or (string) returns with the add-on identifier appended
-// messageBrowser(aBrowser, aMessage, aData, aCPOW) - sends a message to content scripts of a browser
-//	aBrowser - (xul element) the browser element to send the message to
+// messageChild(aSender, aMessage, aData, aCPOW) - sends a message to the given process script's message sender.
+//	aSender - (object) the nsIMessageSender of the child process to receive the message
 //	aMessage - (string) message to send, will be sent as objName-aMessage
 //	aData - (string) data to be passed along with the message; can be a JSON-serializable object
 //	aCPOW - (object) an object, typically a xul element, that will be proxied to the content script
-// messageWindow(aWindow, aMessage, aData, aCPOW) - sends a message to content scripts of all browsers in the provided window
+// messageBrowser(aBrowser, aMessage, aData, aCPOW) - sends a message to frame scripts of a browser
+//	aBrowser - (xul element) the browser element to send the message to
+//	see messageChild()
+// messageWindow(aWindow, aMessage, aData, aCPOW) - sends a message to frame scripts of all browsers in the provided window
 //	aWindow - (obj) window of which all browsers should receive this message
-//	see messageBrowser()
-// messageAll(aMessage, aData, aCPOW) - sends a message to content scripts of all browsers in all windows
-//	see messageBrowser()
+//	see messageChild()
+// messageAll(aMessage, aData, aCPOW) - sends a message to frame scripts of all browsers in all windows
+//	see messageChild()
 // listenBrowser(aBrowser, aMessage, aListener) - registers a listener for messages sent from content scripts through this backbone's methods
 //	aBrowser - (xul element) the browser element from which to listen to messages
 //	aMessage - (string) message to listen for
@@ -31,24 +34,25 @@ Modules.UTILS = true;
 //	see listenBrowser()
 // unlistenAll(aMessage, aListener) - unregisters a listener for messages sent from all browsers open in all windows
 //	see listenBrowser()
-// loadInBrowser(aBrowser, aModule) - loads a module into the content script of the specified browser
+// loadInBrowser(aBrowser, aModule) - loads a module into the frame script of the specified browser
 //	aBrowser - (xul element) the browser element corresponding to the content script into which to load the module
 //	aModule - (string) name of the module to load
-// unloadFromBrowser(aBrowser, aModule) - unloads a module from a content script [undoes loadInBrowser()]
+// unloadFromBrowser(aBrowser, aModule) - unloads a module from a frame script [undoes loadInBrowser()]
 //	see loadInBrowser()
-// loadInWindow(aWindow, aModule) - loads a module into all the content scripts of a specified window
+// loadInWindow(aWindow, aModule, inProcess) - loads a module into all the content scripts of a specified window
 //	aWindow - (xul element) navigator window of which all content scripts will have the module loaded into
+//	inProcess -	(bool) if false, the content script will be loaded into each individual frame script of the given window.
+//			If true (default), it will be loaded into the global child process script. Use the Frames object to register the content module properly in this case,
+//			by setting its .moduleName property to its own name.
 //	see loadInBrowser()
 // unloadFromWindow(aWindow, aModule) - unloads a module from all the content scripts of a window [undoes loadInWindow()]
 //	see loadInWindow()
-// loadInAll(aModule) - loads a module into all content scripts
+// loadInAll(aModule) - loads a module into all child process scripts
 //	see loadInBrowser()
-// unloadFromAll(aModule) - unloads a module from all content scripts [undoes loadInAll()]
+// unloadFromAll(aModule) - unloads a module from all child process scripts [undoes loadInAll()]
 //	see loadInBrowser()
 this.Messenger = {
 	loadedInAll: new Set(),
-
-	globalMM: Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager),
 
 	messageName: function(aMessage) {
 		// when supplying a message object, we want to strip it of this add-on's unique identifier to get only the actual message
@@ -70,10 +74,19 @@ this.Messenger = {
 		return aMessage;
 	},
 
-	messageBrowser: function(aBrowser, aMessage, aData, aCPOW) {
-		if(!aBrowser || !aBrowser.messageManager) { return; }
+	messageChild: function(aSender, aMessage, aData, aCPOW) {
+		if(!aSender || !(aSender instanceof Ci.nsIMessageSender)) { return; }
 
-		aBrowser.messageManager.sendAsyncMessage(this.messageName(aMessage), aData, aCPOW);
+		aSender.sendAsyncMessage(this.messageName(aMessage), aData, aCPOW);
+	},
+
+	messageBrowser: function(aBrowser, aMessage, aData, aCPOW) {
+		if(aBrowser && aBrowser.messageManager) {
+			this.messageChild(aBrowser.messageManager, aMessage, aData, aCPOW);
+			return;
+		}
+
+		this.messageChild(aBrowser, aMessage, aData, aCPOW);
 	},
 
 	messageWindow: function(aWindow, aMessage, aData, aCPOW) {
@@ -83,7 +96,7 @@ this.Messenger = {
 	},
 
 	messageAll: function(aMessage, aData, aCPOW) {
-		this.globalMM.broadcastAsyncMessage(this.messageName(aMessage), aData, aCPOW);
+		Services.mm.broadcastAsyncMessage(this.messageName(aMessage), aData, aCPOW);
 	},
 
 	listenBrowser: function(aBrowser, aMessage, aListener) {
@@ -111,11 +124,11 @@ this.Messenger = {
 	},
 
 	listenAll: function(aMessage, aListener) {
-		this.globalMM.addMessageListener(this.messageName(aMessage), aListener);
+		Services.mm.addMessageListener(this.messageName(aMessage), aListener);
 	},
 
 	unlistenAll: function(aMessage, aListener) {
-		this.globalMM.removeMessageListener(this.messageName(aMessage), aListener);
+		Services.mm.removeMessageListener(this.messageName(aMessage), aListener);
 	},
 
 	loadInBrowser: function(aBrowser, aModule) {
@@ -126,91 +139,92 @@ this.Messenger = {
 		this.messageBrowser(aBrowser, 'unload', aModule);
 	},
 
-	loadInWindow: function(aWindow, aModule) {
-		if(aWindow.gBrowser && aWindow.gBrowser.tabContainer) {
-			if(!aWindow.gBrowser.tabContainer[objName+'Content']) {
-				aWindow.gBrowser.tabContainer[objName+'Content'] = {
-					modules: new Set([aModule]),
-					handleEvent: function(e) {
-						Messenger.messageBrowser(e.target.linkedBrowser, 'reinit');
-					}
-				};
-				aWindow.gBrowser.tabContainer.addEventListener('TabOpen', aWindow.gBrowser.tabContainer[objName+'Content'], true);
-			}
-			else if(!aWindow.gBrowser.tabContainer[objName+'Content'].modules.has(aModule)) {
-				aWindow.gBrowser.tabContainer[objName+'Content'].modules.add(aModule);
+	loadInWindow: function(aWindow, aModule, inProcess = true) {
+		if(!aWindow[objName+'Content']) {
+			aWindow[objName+'Content'] = new Set();
+		}
+		else {
+			// If it's already loaded we probably don't need the overhead of all the back and forth messaging.
+			for(let module of aWindow[objName+'Content']) {
+				if(module.name == aModule && module.inProcess == inProcess) { return; }
 			}
 		}
 
-		this.messageWindow(aWindow, 'load', aModule);
+		let module = {
+			name: aModule,
+			inProcess: inProcess
+		};
+		aWindow[objName+'Content'].add(module);
+		this.messageWindow(aWindow, 'loadInWindow', module);
 	},
 
 	unloadFromWindow: function(aWindow, aModule) {
-		if(aWindow.gBrowser && aWindow.gBrowser.tabContainer) {
-			if(aWindow.gBrowser.tabContainer[objName+'Content'] && aWindow.gBrowser.tabContainer[objName+'Content'].modules.has(aModule)) {
-				aWindow.gBrowser.tabContainer[objName+'Content'].modules.delete(aModule);
-				if(aWindow.gBrowser.tabContainer[objName+'Content'].modules.size == 0) {
-					aWindow.gBrowser.tabContainer.removeEventListener('TabOpen', aWindow.gBrowser.tabContainer[objName+'Content'], true);
-					delete aWindow.gBrowser.tabContainer[objName+'Content'];
+		// If it's already not loaded we definitely don't need the overhead of all the back and forth messaging.
+		if(!aWindow[objName+'Content']) { return; }
+
+		for(let module of aWindow[objName+'Content']) {
+			if(module.name == aModule) {
+				this.messageWindow(aWindow, 'unloadFromWindow', module);
+
+				aWindow[objName+'Content'].delete(module);
+				if(!aWindow[objName+'Content'].size) {
+					delete aWindow[objName+'Content'];
 				}
+				break;
 			}
 		}
-
-		this.messageWindow(aWindow, 'unload', aModule);
 	},
 
 	loadInAll: function(aModule) {
 		if(this.loadedInAll.has(aModule)) { return; }
 
 		this.loadedInAll.add(aModule);
-		this.messageAll('load', aModule);
+		Services.ppmm.broadcastAsyncMessage(this.messageName('load'), aModule);
 	},
 
 	unloadFromAll: function(aModule) {
 		if(!this.loadedInAll.has(aModule)) { return; }
 
 		this.loadedInAll.delete(aModule);
-		this.messageAll('unload', aModule);
+		Services.ppmm.broadcastAsyncMessage(this.messageName('unload'), aModule);
 	},
 
 	receiveMessage: function(m) {
-		// if this is a preloaded browser, we don't need to load in it, the content script will still be loaded in the actual tab's browser
-		if(m.target.parentNode.localName == 'window' && m.target.parentNode.id == 'win') { return; }
+		// Initialize any frame script with the modules that should be loaded in all tabs of that window.
+		if(m.target.ownerGlobal) {
+			let modules = m.target.ownerGlobal[objName+'Content'];
+			if(modules) {
+				for(let module of modules) {
+					this.messageBrowser(m.target, 'loadInWindow', module);
+				}
+			}
+			return;
+		}
 
 		// can't stringify AddonData directly, because it contains an nsIFile instance (installPath) and an nsIURI instance (resourceURI)
-		var carryData = {
+		let carryData = {
 			AddonData: {
 				id: AddonData.id,
 				initTime: AddonData.initTime,
 				version: AddonData.version,
 				oldVersion: AddonData.oldVersion,
 				newVersion: AddonData.newVersion
-			},
-			addonUris: addonUris,
-			prefList: prefList
+			}
 		};
-		this.messageBrowser(m.target, 'init', carryData);
+		this.messageChild(m.target, 'init', carryData);
 
 		// load into this browser all the content modules that should be loaded in all content scripts
 		for(let module of this.loadedInAll) {
-			this.messageBrowser(m.target, 'load', module);
+			this.messageChild(m.target, 'load', module);
 		}
-
-		// load into this browser all the content modules that should be loaded into content scripts of this window
-		if(m.target.ownerGlobal.gBrowser && m.target.ownerGlobal.gBrowser.tabContainer && m.target.ownerGlobal.gBrowser.tabContainer[objName+'Content']) {
-			for(let module of m.target.ownerGlobal.gBrowser.tabContainer[objName+'Content'].modules) {
-				this.messageBrowser(m.target, 'load', module);
-			}
-		}
-
-		// now we can load other individual modules that have been queued in the meantime (between window opening and content process finishing to initialize)
-		this.messageBrowser(m.target, 'loadQueued');
 	},
 
 	cleanWindow: function(aWindow) {
-		if(aWindow.gBrowser && aWindow.gBrowser.tabContainer && aWindow.gBrowser.tabContainer[objName+'Content']) {
-			aWindow.gBrowser.tabContainer.removeEventListener('TabOpen', aWindow.gBrowser.tabContainer[objName+'Content'], true);
-			delete aWindow.gBrowser.tabContainer[objName+'Content'];
+		if(aWindow[objName+'Content']) {
+			for(let module of aWindow[objName+'Content']) {
+				this.messageWindow(aWindow, 'unloadFromWindow', module);
+			}
+			delete aWindow[objName+'Content'];
 		}
 	}
 };
@@ -219,14 +233,16 @@ Modules.LOADMODULE = function() {
 	MessengerLoaded = true;
 
 	Messenger.listenAll('init', Messenger);
-	Messenger.globalMM.loadFrameScript('resource://'+objPathString+'/defaultsContent.js?'+AddonData.initTime, true);
+	Services.ppmm.addMessageListener(Messenger.messageName('init'), Messenger);
+	Services.mm.loadFrameScript('resource://'+objPathString+'/defaultsContent.js?'+AddonData.initTime, true);
 };
 
 Modules.UNLOADMODULE = function() {
+	Services.ppmm.removeMessageListener(Messenger.messageName('init'), Messenger);
 	Messenger.unlistenAll('init', Messenger);
 
 	Windows.callOnAll(Messenger.cleanWindow, 'navigator:browser');
 
-	Messenger.globalMM.removeDelayedFrameScript('resource://'+objPathString+'/defaultsContent.js?'+AddonData.initTime);
-	Messenger.messageAll('shutdown');
+	Services.mm.removeDelayedFrameScript('resource://'+objPathString+'/defaultsContent.js?'+AddonData.initTime);
+	Services.ppmm.broadcastAsyncMessage(Messenger.messageName('shutdown'));
 };
