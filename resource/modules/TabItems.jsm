@@ -1,4 +1,4 @@
-// VERSION 1.0.10
+// VERSION 1.0.8
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
