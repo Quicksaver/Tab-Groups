@@ -1,4 +1,4 @@
-// VERSION 1.0.20
+// VERSION 1.0.21
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -118,9 +118,8 @@ this.TabView = {
 				break;
 
 			case 'tabviewhidden':
-				if(AeroPeek._prefenabled) {
-					gTaskbarTabGroup.enabled = true;
-				}
+				gTaskbarTabGroup.enabled = AeroPeek.enabled;
+				this.updateAeroPeek();
 				break;
 		}
 	},
@@ -189,6 +188,19 @@ this.TabView = {
 		if(gTaskbarTabGroup) {
 			Listeners.add(window, 'tabviewshown', this);
 			Listeners.add(window, 'tabviewhidden', this);
+
+			Piggyback.add('TabView', gTaskbarTabGroup, 'newTab', function(tab) {
+				// Only add tabs to the taskbar preview area if they belong to the current group.
+				return !tab.hidden;
+			}, Piggyback.MODE_BEFORE);
+
+			Piggyback.add('TabView', gTaskbarTabGroup, 'removeTab', function(tab) {
+				// Not all tabs are being handled, make sure it won't freak out because of this.
+				return this.previews.has(tab);
+			}, Piggyback.MODE_BEFORE);
+
+			// Make sure only tabs from the current group are displayed in the aero peek on startup.
+			this.updateAeroPeek();
 		}
 
 		this._initialized = true;
@@ -198,6 +210,9 @@ this.TabView = {
 		if(!this._initialized) { return; }
 
 		if(gTaskbarTabGroup) {
+			Piggyback.revert('TabView', gTaskbarTabGroup, 'newTab');
+			Piggyback.revert('TabView', gTaskbarTabGroup, 'removeTab');
+
 			Listeners.remove(window, 'tabviewshown', this);
 			Listeners.remove(window, 'tabviewhidden', this);
 		}
@@ -468,6 +483,36 @@ this.TabView = {
 		}
 
 		return retVal;
+	},
+
+	// With Aero Peek enabled, it should only peek tabs of the current group.
+	updateAeroPeek: function() {
+		if(!gTaskbarTabGroup) { return; }
+		let changed = false;
+
+		// First we eliminate all preview thumbs from tabs not in the current group.
+		for(let tab of gTaskbarTabGroup.previews.keys()) {
+			if(tab.hidden) {
+				gTaskbarTabGroup.removeTab(tab);
+				changed = true;
+			}
+		}
+
+		// Next we add thumbs from tabs in the current group that aren't already tracked.
+		for(let tab of gBrowser.tabs) {
+			if(!tab.hidden && !gTaskbarTabGroup.previews.has(tab)) {
+				gTaskbarTabGroup.newTab(tab);
+				changed = true;
+			}
+		}
+
+		if(changed) {
+			// We make sure the thumbs are shown in the correct order.
+			gTaskbarTabGroup.updateTabOrdering();
+
+			// And if previews should even be shown at all.
+			AeroPeek.checkPreviewCount();
+		}
 	},
 
 	onLoad: function() {

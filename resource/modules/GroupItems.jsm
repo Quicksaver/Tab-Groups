@@ -1,4 +1,4 @@
-// VERSION 1.0.9
+// VERSION 1.0.10
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -2179,6 +2179,7 @@ this.GroupItems = {
 
 		let tabItems = this._activeGroupItem._children;
 		gBrowser.showOnlyTheseTabs(tabItems.map(item => item.tab));
+		gTabView.updateAeroPeek();
 	},
 
 	// Sets active TabItem and GroupItem, and updates tab bar appropriately.
