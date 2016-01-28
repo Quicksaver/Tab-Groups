@@ -9,7 +9,7 @@ To localize the add-on:
 
 1. Create an account on http://www.babelzilla.org
 
-2. Register as translator for the add-on: https://www.babelzilla.org/index.php?option=com_wts&Itemid=0&type=show&extension=5749
+2. Register as translator for the add-on: https://www.babelzilla.org/index.php?option=com_wts&extension=5749&type=show
 
 3. Translate away!
 
