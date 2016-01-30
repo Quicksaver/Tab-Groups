@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.4
 Modules.UTILS = true;
 
 // DnDprefs -	this is an adaptation of the browser's gCustomizeMode - http://mxr.mozilla.org/mozilla-central/source/browser/components/customizableui/CustomizeMode.jsm
@@ -361,13 +361,15 @@ this.DnDprefs = {
 		};
 
 		try {
-			let obj = JSON.parse(pref.value) || {};
-			for(let id in obj) {
-				pref.placements.order.push(id);
+			if(pref.value) {
+				let obj = JSON.parse(pref.value) || {};
+				for(let id in obj) {
+					pref.placements.order.push(id);
 
-				let setting = this._newSetting(pref, id);
-				setting._enable = !!obj[id]; // don't trigger _savePlacements()
-				pref.placements.settings.set(id, setting);
+					let setting = this._newSetting(pref, id);
+					setting._enable = !!obj[id]; // don't trigger _savePlacements()
+					pref.placements.settings.set(id, setting);
+				}
 			}
 		}
 		catch(ex) {
@@ -579,7 +581,7 @@ this.DnDprefs = {
 		let draggedItem = doc.getElementById(draggedItemId);
 		let originArea = this._getCustomizableParent(draggedItem);
 		if(this._dragSizeMap) {
-			this._dragSizeMap.clear();
+			this._dragSizeMap = new WeakMap();
 		}
 
 		// Do nothing if the target area or origin area are not customizable or if we're not dragging inside the same area.
@@ -1099,7 +1101,7 @@ this.DragPositionManager = {
 	},
 
 	stop: function() {
-		this.managers.clear();
+		this.managers = new WeakMap();
 	},
 
 	getManagerForArea: function(aArea) {

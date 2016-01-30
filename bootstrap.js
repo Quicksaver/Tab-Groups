@@ -1,4 +1,4 @@
-// VERSION 1.8.6
+// VERSION 1.8.7
 
 // This looks for file defaults.js in resource folder, expects:
 //	objName - (string) main object name for the add-on, to be added to window element
@@ -80,7 +80,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "Promise", "resource://gre/modules/Promi
 XPCOMUtils.defineLazyModuleGetter(this, "Task", "resource://gre/modules/Task.jsm");
 
 // easy and useful helpers for when I'm debugging
-XPCOMUtils.defineLazyModuleGetter(this, "console", "resource://gre/modules/devtools/Console.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "console", "resource://gre/modules/Console.jsm");
 function LOG(str) {
 	if(!str) { str = typeof(str)+': '+str; }
 	console.log(objName+' :: CHROME :: '+str);

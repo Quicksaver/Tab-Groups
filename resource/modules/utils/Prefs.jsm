@@ -1,4 +1,4 @@
-// VERSION 2.5.4
+// VERSION 2.6.1
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -22,9 +22,21 @@ Modules.BASEUTILS = true;
 //	see listen()
 // reset(pref) - resets pref to default value
 //	see listen()
+// proxyNative(cPref, nPrefName, nPrefDefaultValue, branch, trunk) -	use an add-on preference to proxy a native Firefox preference, possibly changing its default value even.
+//									The native preference will be accesible by our Prefs object like if it was our own as well.
+//									The native preference will be returned to its original value when disabling the add-on. If, on alternative,
+//									you want to fully reset the preference instead (by user option for instance), just define a 'resetNative'
+//									bool preference in the initial prefList and toggle it accordingly.
+//	cPref - (string) name of our proxy preference as defined in prefList
+//	nPrefName - (string) name of the native preference we want to proxy
+//	nPrefDefaultValue - (string/bool/int) default value this preference has in Firefox.
+//	see setDefaults()
+// unProxyNative(cPref, nPrefName) - undoes proxying a native preference by the above proxyNative() method
+//	see proxyNative()
 this.Prefs = {
-	_prefObjects: {},
-	length: 0,
+	instances: new Map(),
+	natives: new Set(),
+	cleaningOnShutdown: false,
 
 	setDefaults: function(prefList, branch, trunk) {
 		if(!branch) {
@@ -91,91 +103,96 @@ this.Prefs = {
 		for(let pref in prefList) {
 			if(pref.startsWith('NoSync_')) { continue; }
 
-			if(!this._prefObjects[pref]) {
+			if(!this.instances.has(pref)) {
 				this._setPref(pref, branch, trunk);
 			}
 		}
 	},
 
 	_setPref: function(pref, branch, trunk) {
-		this._prefObjects[pref] = {};
-		this.length++;
+		let instance = {};
 
-		this._prefObjects[pref].listeners = new Set();
-		this._prefObjects[pref].branch = Services.prefs.getBranch(((trunk) ? trunk+'.' : '') +branch+'.');
-		this._prefObjects[pref].type = this._prefObjects[pref].branch.getPrefType(pref);
+		instance.listeners = new Set();
+		instance.branch = Services.prefs.getBranch(((trunk) ? trunk+'.' : '') +branch+'.');
+		instance.type = instance.branch.getPrefType(pref);
 
-		switch(this._prefObjects[pref].type) {
+		switch(instance.type) {
 			case Services.prefs.PREF_STRING:
-				this._prefObjects[pref].__defineGetter__('value', function() { return this.branch.getCharPref(pref); });
-				this._prefObjects[pref].__defineSetter__('value', function(v) { this.branch.setCharPref(pref, v); return this.value; });
+				instance.__defineGetter__('value', function() { return this.branch.getCharPref(pref); });
+				instance.__defineSetter__('value', function(v) { this.branch.setCharPref(pref, v); return this.value; });
 				break;
 			case Services.prefs.PREF_INT:
-				this._prefObjects[pref].__defineGetter__('value', function() { return this.branch.getIntPref(pref); });
-				this._prefObjects[pref].__defineSetter__('value', function(v) { this.branch.setIntPref(pref, v); return this.value; });
+				instance.__defineGetter__('value', function() { return this.branch.getIntPref(pref); });
+				instance.__defineSetter__('value', function(v) { this.branch.setIntPref(pref, v); return this.value; });
 				break;
 			case Services.prefs.PREF_BOOL:
-				this._prefObjects[pref].__defineGetter__('value', function() { return this.branch.getBoolPref(pref); });
-				this._prefObjects[pref].__defineSetter__('value', function(v) { this.branch.setBoolPref(pref, v); return this.value; });
+				instance.__defineGetter__('value', function() { return this.branch.getBoolPref(pref); });
+				instance.__defineSetter__('value', function(v) { this.branch.setBoolPref(pref, v); return this.value; });
 				break;
 		}
 
-		this.__defineGetter__(pref, function() { return this._prefObjects[pref].value; });
-		this.__defineSetter__(pref, function(v) { return this._prefObjects[pref].value = v; });
+		this.__defineGetter__(pref, function() { return instance.value; });
+		this.__defineSetter__(pref, function(v) { return instance.value = v; });
 
-		this._prefObjects[pref].branch.addObserver(pref, this, false);
+		this.instances.set(pref, instance);
+		instance.branch.addObserver(pref, this, false);
 	},
 
 	listen: function(pref, handler) {
+		let instance = this.instances.get(pref);
+
 		// failsafe
-		if(typeof(this._prefObjects[pref]) == 'undefined') {
+		if(!instance) {
 			Cu.reportError('Setting listener on unset preference: '+pref);
 			return false;
 		}
 
 		if(!this.listening(pref, handler)) {
-			this._prefObjects[pref].listeners.add(handler);
+			instance.listeners.add(handler);
 			return true;
 		}
 		return false;
 	},
 
 	unlisten: function(pref, handler) {
+		let instance = this.instances.get(pref);
+
 		// failsafe
-		if(typeof(this._prefObjects[pref]) == 'undefined') {
+		if(!instance) {
 			Cu.reportError('Setting listener on unset preference: '+pref);
 			return false;
 		}
 
 		if(this.listening(pref, handler)) {
-			this._prefObjects[pref].listeners.delete(handler);
+			instance.listeners.delete(handler);
 			return true;
 		}
 		return false;
 	},
 
 	listening: function(pref, handler) {
-		return this._prefObjects[pref].listeners.has(handler);
+		return this.instances.get(pref).listeners.has(handler);
 	},
 
 	reset: function(pref) {
-		this._prefObjects[pref].branch.clearUserPref(pref);
+		this.instances.get(pref).branch.clearUserPref(pref);
 	},
 
 	observe: function(aSubject, aTopic, aData) {
 		let pref = aData;
-		while(!this._prefObjects[pref]) {
+		while(!this.instances.has(pref)) {
 			if(!pref.includes('.')) {
 				Cu.reportError("Couldn't find listener handlers for preference "+aData);
 				return;
 			}
 			pref = pref.substr(pref.indexOf('.')+1);
 		}
+		let instance = this.instances.get(pref);
 
 		// in case we remove a listener and re-add it inside that same listener, it would be part of the iterable object as a new listener, creating an endless loop,
 		// so we call only the listeners that were set at the time the change occurred
-		var handlers = new Set();
-		for(let handler of this._prefObjects[pref].listeners) {
+		let handlers = new Set();
+		for(let handler of instance.listeners) {
 			handlers.add(handler);
 		}
 
@@ -192,9 +209,78 @@ this.Prefs = {
 		}
 	},
 
+	proxyNative: function(cPref, nPrefName, nPrefDefaultValue, branch, trunk) {
+		// When we're proxying a preference, we need to make sure it's always reverted on shutdown, so that its value is always reset to before it was changed by us.
+		if(!this.cleaningOnShutdown) {
+			this.cleaningOnShutdown = true;
+			alwaysRunOnShutdown.push(() => { this.cleanNatives(); });
+		}
+
+		// We need to keep this preference accessible also from this object like any of our own preferences.
+		this.setDefaults({ [nPrefName]: nPrefDefaultValue }, branch, trunk);
+
+		let handler = {
+			nPref: nPrefName,
+			cPref: cPref,
+			revertValue: Prefs[nPrefName],
+
+			observe: function(aSubject, aTopic, aData) {
+				switch(aSubject) {
+					case this.nPref:
+						this.revertValue = Prefs[this.nPref];
+						Prefs.unlisten(this.cPref, this);
+						Prefs[this.cPref] = Prefs[this.nPref];
+						Prefs.listen(this.cPref, this);
+						break;
+
+					case this.cPref:
+						Prefs.unlisten(this.nPref, this);
+						Prefs[this.nPref] = Prefs[this.cPref];
+						Prefs.listen(this.nPref, this);
+						break;
+				}
+			}
+		};
+
+		this.natives.add(handler);
+		this[nPrefName] = this[cPref];
+		this.listen(cPref, handler);
+		this.listen(nPrefName, handler);
+	},
+
+	unProxyNative: function(cPref, nPrefName) {
+		for(let x of this.natives) {
+			if(x.nPref == nPrefName && x.cPref == cPref) {
+				this.shutdownProxy(x);
+				this.natives.delete(x);
+				break;
+			}
+		}
+	},
+
+	shutdownProxy: function(proxy) {
+		this.unlisten(proxy.cPref, proxy);
+		this.unlisten(proxy.nPref, proxy);
+		if(!this.resetNative) {
+			this[proxy.nPref] = proxy.revertValue;
+		} else {
+			this.reset(proxy.nPref);
+		}
+	},
+
 	clean: function() {
-		for(let pref in this._prefObjects) {
-			this._prefObjects[pref].branch.removeObserver(pref, this);
+		// Removing our change observer is enough, all actual listeners are just added to a sub-object that's about to be nuked with the add-on anyway.
+		for(let [ pref, instance ] of this.instances) {
+			instance.branch.removeObserver(pref, this);
+		}
+
+		this.cleanNatives();
+	},
+
+	cleanNatives: function() {
+		// Restore native preferences to their value before our proxy preferences changed them (if applicable).
+		for(let x of this.natives) {
+			this.shutdownProxy(x);
 		}
 	}
 };
