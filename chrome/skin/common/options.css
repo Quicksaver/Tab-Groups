@@ -49,7 +49,9 @@
 }
 
 #paneSession-restore-tabList {
-	height: 450px;
+	min-height: 100px;
+	max-height: 450px;
+	height: 60vh;
 }
 
 #paneSession-restore-invalid {
