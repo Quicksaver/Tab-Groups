@@ -1,4 +1,4 @@
-// VERSION 1.0.10
+// VERSION 1.0.11
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -629,8 +629,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	_unhide: function(options) {
 		this._cancelFadeAwayUndoButtonTimer();
 		this.hidden = false;
-		this.$undoContainer.remove();
-		this.$undoContainer = null;
+		this.removeUndoButton();
 		this.droppable(true);
 		this.setTrenches(this.bounds);
 
@@ -719,7 +718,9 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 		if(this._children.length) {
 			if(this.hidden) {
-				this.$undoContainer.fadeOut(() => { this._unhide() });
+				if(!this.clickUndoButton()) {
+					this._unhide();
+				}
 			}
 
 			return false;
@@ -763,7 +764,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		iQ("<span/>")
 			.text(Strings.get("TabView", "groupItemUndoCloseGroup"))
 			.appendTo(this.$undoContainer);
-		let undoClose = iQ("<span/>")
+		let undoClose = iQ("<div/>")
 			.addClass("close")
 			.attr("title", Strings.get("TabView", "groupItemDiscardClosedGroup"))
 			.appendTo(this.$undoContainer);
@@ -783,24 +784,24 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				"opacity": 1
 			}, {
 				easing: "tabviewBounce",
-				duration: 170,
-				complete: () => {
-					this._sendToSubscribers("groupHidden");
-				}
+				duration: 170
 			});
 		}, 50);
 
 		// add click handlers
 		this.$undoContainer.click((e) => {
 			// don't do anything if the close button is clicked.
-			if(e.target == undoClose[0]) {
+			if(e.originalTarget == undoClose[0]) {
 				return;
 			}
 
-			this.$undoContainer.fadeOut(() => { this._unhide(); });
+			this.clickUndoButton();
 		});
 
-		undoClose.click(() => {
+		undoClose.click((e) => {
+			e.preventDefault();
+			e.stopPropagation();
+			this._cancelFadeAwayUndoButtonTimer();
 			this.$undoContainer.fadeOut(() => { this.closeHidden(); });
 		});
 
@@ -819,8 +820,8 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 	// Sets up fade away undo button timeout.
 	setupFadeAwayUndoButtonTimer: function() {
-		if(!Timers.undoButton) {
-			Timers.init("undoButton", () => {
+		if(!this.undoButtonFadeTimer) {
+			this.undoButtonFadeTimer = aSync(() => {
 				this._fadeAwayUndoButton();
 			}, this.fadeAwayUndoButtonDelay);
 		}
@@ -828,7 +829,47 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 	// Cancels the fade away undo button timeout.
 	_cancelFadeAwayUndoButtonTimer: function() {
-		Timers.cancel("undoButton");
+		if(this.undoButtonFadeTimer) {
+			this.undoButtonFadeTimer.cancel();
+			this.undoButtonFadeTimer = null;
+		}
+	},
+
+	removeUndoButton: function() {
+		this._cancelFadeAwayUndoButtonTimer();
+		// Only remove the container if it's not animating out, it will remove itself when it finishes.
+		if(this.$undoContainer) {
+			this.$undoContainer.remove();
+			this.$undoContainer = null;
+		}
+	},
+
+	clickUndoButton: function() {
+		if(!this.$undoContainer) { return false; }
+
+		this._cancelFadeAwayUndoButtonTimer();
+
+		// This makes it so we can begin restoring the group without having to remove the undo button first == better animation.
+		// After this animation finished, the undo button will self remove.
+		let undoContainer = this.$undoContainer;
+		this.$undoContainer = null;
+
+		undoContainer.animate({
+			opacity: 0,
+			"transform": "scale(.1)",
+		}, {
+			duration: 170,
+			complete: () => {
+				undoContainer.remove();
+			}
+		});
+
+		// Begin showing the group even before the undo button is fully removed.
+		aSync(() => {
+			this._unhide();
+		}, 50);
+
+		return true;
 	},
 
 	// Adds an item to the groupItem.

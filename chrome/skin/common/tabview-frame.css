@@ -281,27 +281,31 @@ html[dir=rtl] .appTabTrayContainer {
 
 .undo {
 	position: absolute;
-	padding-top: 3px;
-	padding-bottom: 3px;
-	-moz-padding-start: 5px;
-	-moz-padding-end: 20px;
-	width: 135px;
-	line-height: 25px;
+	display: flex;
+	align-items: stretch;
+	align-content: stretch;
 	border-radius: 0.4em;
-	text-align: center;
 	border: none;
 	cursor: pointer;
 }
 
-.undo .close {
-	top: 7px;
-	right: 7px;
-	opacity: 0.5;
+.undo > span {
+	flex: 1 1 auto;
+	margin: 0.5em 1em;
+	-moz-margin-end: 0.75em;
 }
 
-html[dir=rtl] .undo .close {
+.undo .close {
+	position: static;
+	width: 16px;
+	-moz-padding-end: 0.75em;
+	opacity: 0.5;
+	background-position: 0 50%;
+	/* can remove these later when rewriting .close above */
+	top: auto;
 	right: auto;
-	left: 7px;
+	left: auto;
+	height: auto;
 }
 
 .undo .close:hover {
