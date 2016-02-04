@@ -1,4 +1,4 @@
-// VERSION 1.0.7
+// VERSION 1.0.8
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -60,16 +60,16 @@ Modules.LOADMODULE = function() {
 };
 
 Modules.UNLOADMODULE = function() {
-	Modules.unload('AllTabs');
 	Modules.unload('UI');
 	Modules.unload('Search');
 	Modules.unload('Trench');
 	Modules.unload('Drag');
-	Modules.unload('FacIcons');
+	Modules.unload('FavIcons');
 	Modules.unload('TabItems');
 	Modules.unload('GroupItems');
 	Modules.unload('Items');
 	Modules.unload('iQ');
+	Modules.unload('AllTabs');
 
 	for(let shim of TabView.shims) {
 		delete window[shim];

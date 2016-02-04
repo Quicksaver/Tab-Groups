@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 // Class: Trench - Class for drag-snapping regions; called "trenches" as they are long and narrow.
 // Parameters:
@@ -67,7 +67,7 @@ this.Trench.prototype = {
 	setPosition: function(position, range, minRange) {
 		this.position = position;
 
-		let page = Items.getPageBounds(true);
+		let page = Items.getPageBounds();
 
 		// optionally, set the range.
 		if(Utils.isRange(range)) {

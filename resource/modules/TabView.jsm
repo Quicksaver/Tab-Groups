@@ -1,4 +1,4 @@
-// VERSION 1.0.21
+// VERSION 1.0.22
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -60,8 +60,8 @@ this.TabView = {
 				this._isFrameLoading = false;
 				this._window = this._iframe.contentWindow;
 
-				Listeners.remove(gBrowser.tabContainer, "TabShow", this);
-				Listeners.remove(gBrowser.tabContainer, "TabClose", this);
+				Tabs.unlisten("TabShow", this);
+				Tabs.unlisten("TabClose", this);
 
 				this._initFrameCallbacks.forEach(cb => cb());
 				this._initFrameCallbacks = [];
@@ -72,7 +72,7 @@ this.TabView = {
 				// if a tab is changed from hidden to unhidden and the iframe is not initialized, load the iframe and setup the tab.
 				if(!this._window) {
 					this._initFrame(() => {
-						this._window[objName].UI.onTabSelect(gBrowser.selectedTab);
+						this._window[objName].UI.onTabSelect(Tabs.selected);
 						if(this._closedLastVisibleTabBeforeFrameInitialized) {
 							this._closedLastVisibleTabBeforeFrameInitialized = false;
 							this._window[objName].UI.showTabView(false);
@@ -83,7 +83,7 @@ this.TabView = {
 				break;
 
 			case 'TabClose':
-				if(!this._window && !gBrowser.visibleTabs.length) {
+				if(!this._window && !Tabs.visible.length) {
 					this._closedLastVisibleTabBeforeFrameInitialized = true;
 				}
 				break;
@@ -101,8 +101,7 @@ this.TabView = {
 					// On "move to group" popup showing.
 					case this.kTabMenuPopupId:
 						// Update the context menu only if Panorama was already initialized or if there are hidden tabs.
-						let numHiddenTabs = gBrowser.tabs.length - gBrowser.visibleTabs.length;
-						if(this._window || numHiddenTabs) {
+						if(this._window || Tabs.hasHidden()) {
 							this.updateContextMenu(TabContextMenu.contextTab, e.target);
 						}
 
@@ -142,8 +141,8 @@ this.TabView = {
 		Listeners.add(this.tooltip, "popupshowing", this, true);
 		Listeners.add(this.tabMenuPopup, "popupshowing", this);
 		Listeners.add($('tabContextMenu'), "popupshowing", this);
-		Listeners.add(gBrowser.tabContainer, "TabShow", this);
-		Listeners.add(gBrowser.tabContainer, "TabClose", this);
+		Tabs.listen("TabShow", this);
+		Tabs.listen("TabClose", this);
 
 		// prevent thumbnail service from expiring thumbnails
 		// we can't wait for the panel view here since expiration may run before it is initialized
@@ -161,8 +160,8 @@ this.TabView = {
 			if(SessionStore.getClosedTabCount(window) > (aIndex || 0)) {
 				// wallpaper patch to prevent an unnecessary blank tab (bug 343895)
 				let blankTabToRemove = null;
-				if(gBrowser.tabs.length == 1 && window.isTabEmpty(gBrowser.selectedTab)) {
-					blankTabToRemove = gBrowser.selectedTab;
+				if(Tabs.length == 1 && window.isTabEmpty(Tabs.selected)) {
+					blankTabToRemove = Tabs.selected;
 				}
 
 				this.prepareUndoCloseTab(blankTabToRemove);
@@ -232,7 +231,7 @@ this.TabView = {
 	},
 
 	filterForThumbnailExpiration() {
-		return AllTabs.tabs.map(t => t.linkedBrowser.currentURI.spec);
+		return Tabs.all.map(t => t.linkedBrowser.currentURI.spec);
 	},
 
 	// Creates the frame and calls the callback once it's loaded. If the frame already exists, calls the callback immediately.
@@ -278,11 +277,11 @@ this.TabView = {
 		Listeners.remove(this._iframe, "DOMContentLoaded", this);
 
 		if(this._initialized) {
-			Listeners.add(gBrowser.tabContainer, "TabShow", this);
-			Listeners.add(gBrowser.tabContainer, "TabClose", this);
+			Tabs.listen("TabShow", this);
+			Tabs.listen("TabClose", this);
 		} else {
-			Listeners.remove(gBrowser.tabContainer, "TabShow", this);
-			Listeners.remove(gBrowser.tabContainer, "TabClose", this);
+			Tabs.unlisten("TabShow", this);
+			Tabs.unlisten("TabClose", this);
 		}
 
 		this._deck = null;
@@ -329,7 +328,7 @@ this.TabView = {
 	},
 
 	switchGroup: function(aPrevious) {
-		if(!this._tabBrowserHasHiddenTabs()) { return; }
+		if(!Tabs.hasHidden()) { return; }
 
 		this._initFrame(() => {
 			let groupItems = this._window[objName].GroupItems;
@@ -337,16 +336,12 @@ this.TabView = {
 			if(!tabItem) { return; }
 
 			let isVisible = this.isVisible();
-			if(gBrowser.selectedTab.pinned || isVisible) {
+			if(Tabs.selected.pinned || isVisible) {
 				groupItems.updateActiveGroupItemAndTabBar(tabItem, { dontSetActiveTabInGroup: !isVisible });
 			} else {
-				gBrowser.selectedTab = tabItem.tab;
+				Tabs.selected = tabItem.tab;
 			}
 		});
-	},
-
-	_tabBrowserHasHiddenTabs: function() {
-		return (gBrowser.tabs.length - gBrowser.visibleTabs.length);
 	},
 
 	updateContextMenu: function(tab, popup) {
@@ -499,8 +494,8 @@ this.TabView = {
 		}
 
 		// Next we add thumbs from tabs in the current group that aren't already tracked.
-		for(let tab of gBrowser.tabs) {
-			if(!tab.hidden && !gTaskbarTabGroup.previews.has(tab)) {
+		for(let tab of Tabs.visible) {
+			if(!gTaskbarTabGroup.previews.has(tab)) {
 				gTaskbarTabGroup.newTab(tab);
 				changed = true;
 			}

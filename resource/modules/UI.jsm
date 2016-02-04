@@ -1,4 +1,4 @@
-// VERSION 1.0.29
+// VERSION 1.0.30
 
 this.Keys = { meta: false };
 
@@ -30,9 +30,6 @@ this.UI = {
 
 	// Keeps track of which xul:tab we are currently on. Used to facilitate zooming down from a previous tab.
 	_currentTab: null,
-
-	// Keeps track of event listeners added to the AllTabs object.
-	_eventListeners: {},
 
 	// If the UI is in the middle of an operation, this is the max amount of milliseconds to wait between input events before we no longer consider the operation interactive.
 	_maxInteractiveWait: 250,
@@ -68,10 +65,8 @@ this.UI = {
 	receiveMessage: function(m) {
 		if(!this.isTabViewVisible()) { return; }
 
-		let index = gBrowser.browsers.indexOf(m.target);
-		if(index == -1) { return; }
-
-		let tab = gBrowser.tabs[index];
+		let tab = gBrowser.getTabForBrowser(m.target);
+		if(!tab) { return; }
 
 		// When TabView is visible, we need to call onTabSelect to make sure that TabView is hidden and that the correct group is activated.
 		// When a modal dialog is shown for currently selected tab the onTabSelect event handler is not called, so we need to do it.
@@ -81,6 +76,8 @@ this.UI = {
 	},
 
 	handleEvent: function(e) {
+		let tab = e.target;
+
 		switch(e.type) {
 			// ___ setup event listener to save canvas images
 			case 'SSWindowClosing':
@@ -118,6 +115,94 @@ this.UI = {
 
 				this.goToPreferences({ jumpto: 'sessionRestore' });
 				break;
+
+			case 'TabOpen':
+				// if it's an app tab, add it to all the group items
+				if(tab.pinned) {
+					GroupItems.addAppTab(tab);
+				} else if(this.isTabViewVisible() && !this._storageBusyCount) {
+					this._lastOpenedTab = tab;
+				}
+				break;
+
+			case 'TabClose': {
+				// if it's an app tab, remove it from all the group items
+				if(tab.pinned) {
+					GroupItems.removeAppTab(tab);
+				}
+
+				if(this.isTabViewVisible()) {
+					// just closed the selected tab in the TabView interface.
+					if(this._currentTab == tab) {
+						this._closedSelectedTabInTabView = true;
+					}
+					break;
+				}
+
+				// If we're currently in the process of session store update, we don't want to go to the Tab View UI.
+				if(this._storageBusy) { return; }
+
+				// do this only if not closing the last tab
+				if(Tabs.length <= 1) { return; }
+
+				// Don't return to TabView if there are any app tabs
+				if(Tabs.numPinned) { return; }
+
+				let groupItem = GroupItems.getActiveGroupItem();
+
+				// 1) Only go back to the TabView tab when there you close the last tab of a groupItem.
+				let closingLastOfGroup = (groupItem && groupItem._children.length == 1 && groupItem._children[0].tab == tab);
+
+				// 2) When a blank tab is active while restoring a closed tab the blank tab gets removed.
+				// The active group is not closed as this is where the restored tab goes. So do not show the TabView.
+				let tabItem = tab && tab._tabViewTabItem;
+				let closingBlankTabAfterRestore = (tabItem && tabItem.isRemovedAfterRestore);
+
+				if(closingLastOfGroup && !closingBlankTabAfterRestore) {
+					// for the tab focus event to pick up.
+					this._closedLastVisibleTab = true;
+					this.showTabView();
+				}
+				break;
+			}
+			case 'TabMove':
+				if(GroupItems.groupItems.length) {
+					if(tab.pinned) {
+						if(Tabs.numPinned > 1) {
+							GroupItems.arrangeAppTab(tab);
+						}
+					} else {
+						let activeGroupItem = GroupItems.getActiveGroupItem();
+						if(activeGroupItem) {
+							if(!this.isTabViewVisible() || this._isChangingVisibility) {
+								this.setReorderTabItemsOnShow(activeGroupItem);
+							} else {
+								activeGroupItem.reorderTabItemsBasedOnTabOrder();
+							}
+						}
+					}
+				}
+				break;
+
+			case 'TabSelect':
+				this.onTabSelect(tab);
+				break;
+
+			case 'TabPinned':
+				TabItems.handleTabPin(tab);
+				GroupItems.addAppTab(tab);
+				break;
+
+			case 'TabUnpinned': {
+				TabItems.handleTabUnpin(tab);
+				GroupItems.removeAppTab(tab);
+
+				let groupItem = tab._tabViewTabItem.parent;
+				if(groupItem) {
+					this.setReorderTabItemsOnShow(groupItem);
+				}
+				break;
+			}
 		}
 	},
 
@@ -148,7 +233,7 @@ this.UI = {
 			Search.init();
 
 			// ___ currentTab
-			this._currentTab = gBrowser.selectedTab;
+			this._currentTab = Tabs.selected;
 
 			// ___ exit button
 			iQ("#exit-button").click(() => {
@@ -303,8 +388,7 @@ this.UI = {
 
 		// ___ make a fresh groupItem
 		let box = new Rect(pageBounds);
-		box.width = Math.min(box.width * 0.667,
-		pageBounds.width - (welcomeWidth + padding));
+		box.width = Math.min(box.width * 0.667, pageBounds.width - (welcomeWidth + padding));
 		box.height = box.height * 0.667;
 		if(UI.rtl) {
 			box.left = pageBounds.left + welcomeWidth + 2 * padding;
@@ -319,8 +403,8 @@ this.UI = {
 			immediately: true
 		};
 		let groupItem = new GroupItem([], options);
-		for(let tab of gBrowser.tabs) {
-			if(tab.pinned || !tab._tabViewTabItem) { continue; }
+		for(let tab of Tabs.notPinned) {
+			if(!tab._tabViewTabItem) { continue; }
 
 			let item = tab._tabViewTabItem;
 			// To keep in sync with TMP's session manager requirements.
@@ -455,7 +539,7 @@ this.UI = {
 				break;
 
 			case "toend": {
-				let last = gBrowser.tabs.length -1;
+				let last = Tabs.length -1;
 				if(this._activeTab.tab._tPos < last) {
 					this._moveActiveTab(last);
 				}
@@ -650,121 +734,22 @@ this.UI = {
 		Listeners.add(gWindow, "SSWindowStateBusy", this);
 		Listeners.add(gWindow, "SSWindowStateReady", this);
 
-		// TabOpen
-		this._eventListeners.open = (e) => {
-			let tab = e.target;
-
-			// if it's an app tab, add it to all the group items
-			if(tab.pinned) {
-				GroupItems.addAppTab(tab);
-			} else if(this.isTabViewVisible() && !this._storageBusyCount) {
-				this._lastOpenedTab = tab;
-			}
-		};
-
-		// TabClose
-		this._eventListeners.close = (e) => {
-			let tab = e.target;
-
-			// if it's an app tab, remove it from all the group items
-			if(tab.pinned) {
-				GroupItems.removeAppTab(tab);
-			}
-
-			if(this.isTabViewVisible()) {
-				// just closed the selected tab in the TabView interface.
-				if(this._currentTab == tab) {
-					this._closedSelectedTabInTabView = true;
-				}
-			} else {
-				// If we're currently in the process of session store update, we don't want to go to the Tab View UI.
-				if(this._storageBusy) { return; }
-
-				// if not closing the last tab
-				if(gBrowser.tabs.length > 1) {
-					// Don't return to TabView if there are any app tabs
-					for(let a = 0; a < gBrowser._numPinnedTabs; a++) {
-						if(Utils.isValidXULTab(gBrowser.tabs[a])) { return; }
-					}
-
-					let groupItem = GroupItems.getActiveGroupItem();
-
-					// 1) Only go back to the TabView tab when there you close the last tab of a groupItem.
-					let closingLastOfGroup = (groupItem && groupItem._children.length == 1 && groupItem._children[0].tab == tab);
-
-					// 2) When a blank tab is active while restoring a closed tab the blank tab gets removed.
-					// The active group is not closed as this is where the restored tab goes. So do not show the TabView.
-					let tabItem = tab && tab._tabViewTabItem;
-					let closingBlankTabAfterRestore = (tabItem && tabItem.isRemovedAfterRestore);
-
-					if(closingLastOfGroup && !closingBlankTabAfterRestore) {
-						// for the tab focus event to pick up.
-						this._closedLastVisibleTab = true;
-						this.showTabView();
-					}
-				}
-			}
-		};
-
-		// TabMove
-		this._eventListeners.move = (e) => {
-			let tab = e.target;
-
-			if(GroupItems.groupItems.length > 0) {
-				if(tab.pinned) {
-					if(gBrowser._numPinnedTabs > 1) {
-						GroupItems.arrangeAppTab(tab);
-					}
-				} else {
-					let activeGroupItem = GroupItems.getActiveGroupItem();
-					if(activeGroupItem) {
-						if(!this.isTabViewVisible() || this._isChangingVisibility) {
-							this.setReorderTabItemsOnShow(activeGroupItem);
-						} else {
-							activeGroupItem.reorderTabItemsBasedOnTabOrder();
-						}
-					}
-				}
-			}
-		};
-
-		// TabSelect
-		this._eventListeners.select = (e) => {
-			this.onTabSelect(e.target);
-		};
-
-		// TabPinned
-		this._eventListeners.pinned = function(e) {
-			let tab = e.target;
-
-			TabItems.handleTabPin(tab);
-			GroupItems.addAppTab(tab);
-		};
-
-		// TabUnpinned
-		this._eventListeners.unpinned = (e) => {
-			let tab = e.target;
-
-			TabItems.handleTabUnpin(tab);
-			GroupItems.removeAppTab(tab);
-
-			let groupItem = tab._tabViewTabItem.parent;
-			if(groupItem) {
-				this.setReorderTabItemsOnShow(groupItem);
-			}
-		};
-
-		// Actually register the above handlers
-		for(let name in this._eventListeners) {
-			AllTabs.register(name, this._eventListeners[name]);
-		}
+		Tabs.listen("TabOpen", this);
+		Tabs.listen("TabClose", this);
+		Tabs.listen("TabMove", this);
+		Tabs.listen("TabSelect", this);
+		Tabs.listen("TabPinned", this);
+		Tabs.listen("TabUnpinned", this);
 	},
 
 	// Removes handlers to handle tab actions.
 	_removeTabActionHandlers: function() {
-		for(let name in this._eventListeners) {
-			AllTabs.unregister(name, this._eventListeners[name]);
-		}
+		Tabs.unlisten("TabOpen", this);
+		Tabs.unlisten("TabClose", this);
+		Tabs.unlisten("TabMove", this);
+		Tabs.unlisten("TabSelect", this);
+		Tabs.unlisten("TabPinned", this);
+		Tabs.unlisten("TabUnpinned", this);
 	},
 
 	// Selects the given xul:tab in the browser.
@@ -773,7 +758,7 @@ this.UI = {
 		if(xulTab.selected) {
 			this.onTabSelect(xulTab);
 		} else {
-			gBrowser.selectedTab = xulTab;
+			Tabs.selected = xulTab;
 		}
 	},
 
@@ -845,13 +830,10 @@ this.UI = {
 			// No tabItem; must be an app tab. Base the tab bar on the current group.
 			// If no current group, figure it out based on what's already in the tab bar.
 			if(!GroupItems.getActiveGroupItem()) {
-				for(let a = 0; a < gBrowser.tabs.length; a++) {
-					let theTab = gBrowser.tabs[a];
-					if(!theTab.pinned) {
-						let tabItem = theTab._tabViewTabItem;
-						this.setActive(tabItem.parent);
-						break;
-					}
+				let theTab = Tabs.notPinned[0];
+				if(theTab) {
+					let tabItem = theTab._tabViewTabItem;
+					this.setActive(tabItem.parent);
 				}
 			}
 
@@ -1491,7 +1473,7 @@ this.UI = {
 				return (!groupItem.hidden && !groupItem.getChildren().length);
 			});
 			let group = (emptyGroups.length ? emptyGroups[0] : GroupItems.newGroup());
-			if(!gBrowser._numPinnedTabs) {
+			if(!Tabs.numPinned) {
 				group.newTab(null, { closedLastTab: true });
 				return;
 			}
@@ -1500,7 +1482,7 @@ this.UI = {
 		// If there's an active TabItem, zoom into it. If not (for instance when the selected tab is an app tab), just go there.
 		let activeTabItem = this.getActiveTab();
 		if(!activeTabItem) {
-			let tabItem = gBrowser.selectedTab._tabViewTabItem;
+			let tabItem = Tabs.selected._tabViewTabItem;
 			if(tabItem) {
 				if(!tabItem.parent || !tabItem.parent.hidden) {
 					activeTabItem = tabItem;
@@ -1516,17 +1498,14 @@ this.UI = {
 		if(activeTabItem) {
 			activeTabItem.zoomIn();
 		} else {
-			if(gBrowser._numPinnedTabs > 0) {
-				if(gBrowser.selectedTab.pinned) {
-					this.goToTab(gBrowser.selectedTab);
+			if(Tabs.numPinned > 0) {
+				if(Tabs.selected.pinned) {
+					this.goToTab(Tabs.selected);
 				} else {
-					Array.some(gBrowser.tabs, (tab) => {
-						if(tab.pinned) {
-							this.goToTab(tab);
-							return true;
-						}
-						return false
-					});
+					let tab = Tabs.pinned[0];
+					if(tab) {
+						this.goToTab(tab);
+					}
 				}
 			}
 		}

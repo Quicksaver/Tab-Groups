@@ -1,4 +1,4 @@
-// VERSION 1.0.11
+// VERSION 1.0.12
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -176,12 +176,10 @@ this.GroupItem = function(listOfEls, options) {
 		.addClass("appTabTray")
 		.appendTo(appTabTrayContainer);
 
-	let pinnedTabCount = gBrowser._numPinnedTabs;
-	AllTabs.tabs.forEach((xulTab, index) => {
+	let pinnedTabCount = Tabs.numPinned;
+	Tabs.pinned.forEach((tab, index) => {
 		// only adjust tray when it's the last app tab.
-		if(xulTab.pinned) {
-			this.addAppTab(xulTab, { dontAdjustTray: index + 1 < pinnedTabCount });
-		}
+		this.addAppTab(tab, { dontAdjustTray: index + 1 < pinnedTabCount });
 	}, this);
 
 	// ___ Undo Close
@@ -672,7 +670,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 		let tab = null;
 
-		if(!gBrowser._numPinnedTabs && !remainingGroups.length) {
+		if(!Tabs.numPinned && !remainingGroups.length) {
 			let emptyGroups = GroupItems.groupItems.filter((groupItem) => {
 				return (groupItem != this && !groupItem.getChildren().length);
 			});
@@ -958,7 +956,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	_onChildClose: function(tabItem) {
 		let count = this._children.length;
 		let dontArrange = tabItem.closedManually && (this.expanded || !this.shouldStack(count));
-		let dontClose = !tabItem.closedManually && gBrowser._numPinnedTabs;
+		let dontClose = !tabItem.closedManually && Tabs.numPinned;
 		this.remove(tabItem, { dontArrange: dontArrange, dontClose: dontClose });
 
 		if(dontArrange) {
@@ -1037,7 +1035,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			}
 
 			let closed = options.dontClose ? false : this.closeIfEmpty();
-			if(closed || (!this._children.length && !gBrowser._numPinnedTabs && !item.isDragging)) {
+			if(closed || (!this._children.length && !Tabs.numPinned && !item.isDragging)) {
 				this._makeLastActiveGroupItemActive();
 			} else if(!options.dontArrange) {
 				this.arrange({ animate: !options.immediately });
@@ -1561,11 +1559,11 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			lastMouseDownTarget = null;
 
 			if(same && !this.isDragging) {
-				if(gBrowser.selectedTab.pinned
+				if(Tabs.selected.pinned
 				&& UI.getActiveTab() != this.getActiveTab()
 				&& this.getChildren().length) {
 					UI.setActive(this, { dontSetActiveTabInGroup: true });
-					UI.goToTab(gBrowser.selectedTab);
+					UI.goToTab(Tabs.selected);
 				} else {
 					let tabItem = this.getTopChild();
 					if(tabItem) {
@@ -1787,12 +1785,12 @@ this.GroupItems = {
 	handleEvent: function(e) {
 		switch(e.type) {
 			// setup attr modified handler, and prepare for its uninit
-			case 'attrModified':
+			case 'TabAttrModified':
 				this._handleAttrModified(e.target);
 				break;
 
 			// make sure any closed tabs are removed from the delay update list
-			case 'close':
+			case 'TabClose':
 				let idx = this._delayedModUpdates.delete(e.target);
 				break;
 		}
@@ -1802,14 +1800,14 @@ this.GroupItems = {
 	init: function() {
 		this._lastActiveList = new MRUList();
 
-		AllTabs.register("attrModified", this);
-		AllTabs.register("close", this);
+		Tabs.listen("TabAttrModified", this);
+		Tabs.listen("TabClose", this);
 	},
 
 	// Function: uninit
 	uninit: function() {
-		AllTabs.unregister("attrModified", this);
-		AllTabs.unregister("close", this);
+		Tabs.unlisten("TabAttrModified", this);
+		Tabs.unlisten("TabClose", this);
 
 		// additional clean up
 		this.groupItems = [];
@@ -2149,7 +2147,7 @@ this.GroupItems = {
 
 		let targetGroupItem;
 		// find first non-app visible tab belongs a group, and add the new tabItem to that group
-		gBrowser.visibleTabs.some(function(tab) {
+		Tabs.visible.some(function(tab) {
 			if(!tab.pinned && tab != tabItem.tab) {
 				if(tab._tabViewTabItem && tab._tabViewTabItem.parent && !tab._tabViewTabItem.parent.hidden) {
 					targetGroupItem = tab._tabViewTabItem.parent;
@@ -2313,7 +2311,7 @@ this.GroupItems = {
 
 		// switch to the appropriate tab first.
 		if(tab.selected) {
-			if(gBrowser.visibleTabs.length > 1) {
+			if(Tabs.visible.length > 1) {
 				gBrowser._blurTab(tab);
 				shouldUpdateTabBar = true;
 			} else {
@@ -2371,7 +2369,7 @@ this.GroupItems = {
 	getUnclosableGroupItemId: function() {
 		let unclosableGroupItemId = null;
 
-		if(gBrowser._numPinnedTabs) {
+		if(Tabs.numPinned) {
 			let hiddenGroupItems = this.groupItems.concat().filter(function(groupItem) {
 				return !groupItem.hidden;
 			});

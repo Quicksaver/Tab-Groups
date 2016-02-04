@@ -1,4 +1,4 @@
-// VERSION 1.0.8
+// VERSION 1.0.9
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -404,7 +404,7 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 	close: function(groupClose) {
 		// When the last tab is closed, put a new tab into closing tab's group.
 		// If closing tab doesn't belong to a group and no empty group, create a new one for the new tab.
-		if(!groupClose && gBrowser.tabs.length == 1) {
+		if(!groupClose && Tabs.length == 1) {
 			let group = this.tab._tabViewTabItem.parent;
 			group.newTab(null, { closedLastTab: true });
 		}
@@ -467,7 +467,7 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 			// tab might not be selected because hideTabView() is invoked after
 			// UI.goToTab() so we need to setup everything for the gBrowser.selectedTab
 			if (!tab.selected) {
-				UI.onTabSelect(gBrowser.selectedTab);
+				UI.onTabSelect(Tabs.selected);
 			} else {
 				if(isNewBlankTab) {
 					gWindow.gURLBar.focus();
@@ -626,7 +626,6 @@ this.TabItems = {
 	_heartbeatTiming: 200, // milliseconds between calls
 	_maxTimeForUpdating: 200, // milliseconds that consecutive updates can take
 	_lastUpdateTime: Date.now(),
-	_eventListeners: [],
 	_reconnectingPaused: false,
 	tabItemPadding: {},
 
@@ -637,6 +636,33 @@ this.TabItems = {
 
 		if(!tab.pinned) {
 			this.update(tab);
+		}
+	},
+
+	handleEvent: function(e) {
+		let tab = e.target;
+
+		// We don't care about pinned tabs here
+		if(tab.pinned) { return; }
+
+		switch(e.type) {
+			// When a tab is opened, create the TabItem
+			case "TabOpen":
+				this.link(tab);
+				break;
+
+			// When a tab's content is loaded, show the canvas and hide the cached data if necessary.
+			case "TabAttrModified":
+				this.update(tab);
+				break;
+
+			// When a tab is closed, unlink.
+			case "TabClose":
+				// XXX bug #635975 - don't unlink the tab if the dom window is closing.
+				if(!UI.isDOMWindowClosing) {
+					this.unlink(tab);
+				}
+				break;
 		}
 	},
 
@@ -654,41 +680,14 @@ this.TabItems = {
 
 		Messenger.listenWindow(gWindow, "MozAfterPaint", this);
 
-		// When a tab is opened, create the TabItem
-		this._eventListeners.open = (event) => {
-			let tab = event.target;
-
-			if(!tab.pinned) {
-				this.link(tab);
-			}
-		};
-		// When a tab's content is loaded, show the canvas and hide the cached data if necessary.
-		this._eventListeners.attrModified = (event) => {
-			let tab = event.target;
-
-			if(!tab.pinned) {
-				this.update(tab);
-			}
-		};
-		// When a tab is closed, unlink.
-		this._eventListeners.close = (event) => {
-			let tab = event.target;
-
-			// XXX bug #635975 - don't unlink the tab if the dom window is closing.
-			if(!tab.pinned && !UI.isDOMWindowClosing) {
-				this.unlink(tab);
-			}
-		};
-		for(let name in this._eventListeners) {
-			AllTabs.register(name, this._eventListeners[name]);
-		}
+		Tabs.listen("TabOpen", this);
+		Tabs.listen("TabAttrModified", this);
+		Tabs.listen("TabClose", this);
 
 		let activeGroupItem = GroupItems.getActiveGroupItem();
 		let activeGroupItemId = activeGroupItem ? activeGroupItem.id : null;
 		// For each tab, create the link.
-		AllTabs.tabs.forEach((tab) => {
-			if(tab.pinned) { return; }
-
+		Tabs.notPinned.forEach((tab) => {
 			let options = { immediately: true };
 			// if tab is visible in the tabstrip and doesn't have any data stored in the session store (see TabItem__reconnect),
 			// it implies that it is a new tab which is created before Panorama is initialized.
@@ -704,9 +703,10 @@ this.TabItems = {
 	uninit: function() {
 		Messenger.unlistenWindow(gWindow, "MozAfterPaint", this);
 
-		for(let name in this._eventListeners) {
-			AllTabs.unregister(name, this._eventListeners[name]);
-		}
+		Tabs.unlisten("TabOpen", this);
+		Tabs.unlisten("TabAttrModified", this);
+		Tabs.unlisten("TabClose", this);
+
 		for(let tabItem of this.items) {
 			delete tabItem.tab._tabViewTabItem;
 
@@ -718,7 +718,6 @@ this.TabItems = {
 		}
 
 		this.items = [];
-		this._eventListeners = [];
 		this._lastUpdateTime = Date.now();
 		this._tabsWaitingForUpdate.clear();
 	},
