@@ -1,4 +1,4 @@
-// VERSION 1.0.12
+// VERSION 1.1.0
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -168,20 +168,6 @@ this.GroupItem = function(listOfEls, options) {
 		.appendTo($container)
 		.hide();
 
-	// ___ app tabs: create app tab tray and populate it
-	let appTabTrayContainer = iQ("<div/>")
-		.addClass("appTabTrayContainer")
-		.appendTo($container);
-	this.$appTabTray = iQ("<div/>")
-		.addClass("appTabTray")
-		.appendTo(appTabTrayContainer);
-
-	let pinnedTabCount = Tabs.numPinned;
-	Tabs.pinned.forEach((tab, index) => {
-		// only adjust tray when it's the last app tab.
-		this.addAppTab(tab, { dontAdjustTray: index + 1 < pinnedTabCount });
-	}, this);
-
 	// ___ Undo Close
 	this.$undoContainer = null;
 
@@ -219,8 +205,6 @@ this.GroupItem = function(listOfEls, options) {
 
 	this._inited = true;
 	this.save();
-
-	GroupItems.updateGroupCloseButtons();
 };
 
 this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subscribable(), {
@@ -307,73 +291,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		this.$title[0].focus();
 	},
 
-	// Used to adjust the appTabTray size, to split the appTabIcons across multiple columns when needed - if the groupItem size is too small.
-	// Parameters:
-	//   arrangeGroup - rearrange the groupItem if the number of appTab columns changes. If true, then this.arrange() is called, otherwise not.
-	adjustAppTabTray: function(arrangeGroup) {
-		let icons = iQ(".appTabIcon", this.$appTabTray);
-		let container = iQ(this.$appTabTray[0].parentNode);
-		if(!icons.length) {
-			// There are no icons, so hide the appTabTray if needed.
-			if(parseInt(container.css("width")) != 0) {
-				this.$appTabTray.css("-moz-column-count", "auto");
-				this.$appTabTray.css("height", 0);
-				container.css("width", 0);
-				container.css("height", 0);
-
-				if(container.hasClass("appTabTrayContainerTruncated")) {
-					container.removeClass("appTabTrayContainerTruncated");
-				}
-
-				if(arrangeGroup) {
-					this.arrange();
-				}
-			}
-			return;
-		}
-
-		let iconBounds = iQ(icons[0]).bounds();
-		let boxBounds = this.getBounds();
-		let contentHeight = boxBounds.height -parseInt(container.css("top")) -this.$resizer.height();
-		let rows = Math.floor(contentHeight /iconBounds.height);
-		let columns = Math.ceil(icons.length /rows);
-		let columnsGap = parseInt(this.$appTabTray.css("-moz-column-gap"));
-		let iconWidth = iconBounds.width +columnsGap;
-		let maxColumns = Math.floor((boxBounds.width * 0.20) / iconWidth);
-
-		if(columns > maxColumns) {
-			container.addClass("appTabTrayContainerTruncated");
-		} else if(container.hasClass("appTabTrayContainerTruncated")) {
-			container.removeClass("appTabTrayContainerTruncated");
-		}
-
-		// Need to drop the -moz- prefix when Gecko makes it obsolete.
-		// See bug 629452.
-		if(parseInt(this.$appTabTray.css("-moz-column-count")) != columns) {
-			this.$appTabTray.css("-moz-column-count", columns);
-		}
-
-		if(parseInt(this.$appTabTray.css("height")) != contentHeight) {
-			this.$appTabTray.css("height", contentHeight + "px");
-			container.css("height", contentHeight + "px");
-		}
-
-		let fullTrayWidth = iconWidth * columns - columnsGap;
-		if(parseInt(this.$appTabTray.css("width")) != fullTrayWidth) {
-			this.$appTabTray.css("width", fullTrayWidth + "px");
-		}
-
-		let trayWidth = iconWidth * Math.min(columns, maxColumns) - columnsGap;
-		if(parseInt(container.css("width")) != trayWidth) {
-			container.css("width", trayWidth + "px");
-
-			// Rearrange the groupItem if the width changed.
-			if(arrangeGroup) {
-				this.arrange();
-			}
-		}
-	},
-
 	// Returns a <Rect> for the groupItem's content area (which doesn't include the title, etc).
 	// Parameters:
 	//   options - an object with additional parameters, see below
@@ -384,17 +301,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		let titleHeight = this.$titlebar.height();
 		box.top += titleHeight;
 		box.height -= titleHeight;
-
-		let appTabTrayContainer = iQ(this.$appTabTray[0].parentNode);
-		let appTabTrayWidth = appTabTrayContainer.width();
-		if(appTabTrayWidth) {
-			appTabTrayWidth += parseInt(appTabTrayContainer.css(UI.rtl ? "left" : "right"));
-		}
-
-		box.width -= appTabTrayWidth;
-		if(UI.rtl) {
-			box.left += appTabTrayWidth;
-		}
 
 		// Make the computed bounds' "padding" and expand button margin actually be themeable --OR-- compute this from actual bounds. Bug 586546
 		box.inset(6, 6);
@@ -453,11 +359,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 		let offset = new Point(rect.left - this.bounds.left, rect.top - this.bounds.top);
 		this.bounds = new Rect(rect);
-
-		// Make sure the AppTab icons fit the new groupItem size.
-		if(css.width || css.height) {
-			this.adjustAppTabTray();
-		}
 
 		// ___ Deal with children
 		if(css.width || css.height) {
@@ -537,7 +438,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			this.removeTrenches();
 			Items.unsquish();
 			this._sendToSubscribers("close");
-			GroupItems.updateGroupCloseButtons();
 		};
 
 		if(this.hidden || (options && options.immediately)) {
@@ -611,7 +511,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	closeIfEmpty: function() {
 		if(this.isEmpty()
 		&& !UI._closedLastVisibleTab
-		&& !GroupItems.getUnclosableGroupItemId()
 		&& !GroupItems._autoclosePaused) {
 			this.close();
 			return true;
@@ -654,8 +553,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			$container.css({ "transform": "none", opacity: 1 });
 			finalize();
 		}
-
-		GroupItems.updateGroupCloseButtons();
 	},
 
 	// Function: closeHidden
@@ -812,8 +709,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		this.$undoContainer.mouseout(() => {
 			this.setupFadeAwayUndoButtonTimer();
 		});
-
-		GroupItems.updateGroupCloseButtons();
 	},
 
 	// Sets up fade away undo button timeout.
@@ -1057,92 +952,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		for(let child of this._children.concat()) {
 			this.remove(child, newOptions);
 		}
-	},
-
-	// Adds the given xul:tab as an app tab in this group's apptab tray
-	// Parameters:
-	//   xulTab - the xul:tab.
-	//   options - change how the app tab is added.
-	// Options:
-	//   position - the position of the app tab should be added to.
-	//   dontAdjustTray - (boolean) if true, do not adjust the tray.
-	addAppTab: function(xulTab, options) {
-		GroupItems.getAppTabFavIconUrl(xulTab, (iconUrl) => {
-			// The tab might have been removed or unpinned while waiting.
-			if(!Utils.isValidXULTab(xulTab) || !xulTab.pinned) { return; }
-
-			let $appTab = iQ("<img>")
-				.addClass("appTabIcon")
-				.attr("src", iconUrl)
-				.data("xulTab", xulTab)
-				.mousedown(function(event) {
-					// stop mousedown propagation to disable group dragging on app tabs
-					event.stopPropagation();
-				})
-				.click((e) => {
-					if(e.button != 0) { return; }
-
-					UI.setActive(this, { dontSetActiveTabInGroup: true });
-					UI.goToTab($appTab.data("xulTab"));
-				});
-
-			if(options && "position" in options) {
-				let children = this.$appTabTray[0].childNodes;
-
-				if(options.position >= children.length) {
-					$appTab.appendTo(this.$appTabTray);
-				} else {
-					this.$appTabTray[0].insertBefore($appTab[0], children[options.position]);
-				}
-			} else {
-				$appTab.appendTo(this.$appTabTray);
-			}
-			if(!options || !options.dontAdjustTray) {
-				this.adjustAppTabTray(true);
-			}
-
-			this._sendToSubscribers("appTabIconAdded", { item: $appTab });
-		});
-	},
-
-	// Removes the given xul:tab as an app tab in this group's apptab tray
-	removeAppTab: function(xulTab) {
-		// remove the icon
-		iQ(".appTabIcon", this.$appTabTray).each(function(icon) {
-			let $icon = iQ(icon);
-			if($icon.data("xulTab") != xulTab) {
-				return true;
-			}
-
-			$icon.remove();
-			return false;
-		});
-
-		// adjust the tray
-		this.adjustAppTabTray(true);
-	},
-
-	// Arranges the given xul:tab as an app tab in the group's apptab tray
-	arrangeAppTab: function(xulTab) {
-		let elements = iQ(".appTabIcon", this.$appTabTray);
-		let length = elements.length;
-
-		elements.each((icon) => {
-			let $icon = iQ(icon);
-			if($icon.data("xulTab") != xulTab) {
-				return true;
-			}
-
-			let targetIndex = xulTab._tPos;
-
-			$icon.remove({ preserveEventHandlers: true });
-			if(targetIndex < (length - 1)) {
-				this.$appTabTray[0].insertBefore(icon, iQ(".appTabIcon:nth-child(" + (targetIndex + 1) + ")", this.$appTabTray)[0]);
-			} else {
-				$icon.appendTo(this.$appTabTray);
-			}
-			return false;
-		});
 	},
 
 	// Hide the control which expands a stacked groupItem into a quick-look view.
@@ -1547,8 +1356,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			&& this.$closeButton[0] != target
 			&& this.$titlebar[0] != target
 			&& this.$expander[0] != target
-			&& !this.$titlebar.contains(target)
-			&& !this.$appTabTray.contains(target)) {
+			&& !this.$titlebar.contains(target)) {
 				lastMouseDownTarget = target;
 			} else {
 				lastMouseDownTarget = null;
@@ -1776,7 +1584,6 @@ this.GroupItems = {
 	_arrangePaused: false,
 	_arrangesPending: [],
 	_removingHiddenGroups: false,
-	_delayedModUpdates: new Set(),
 	_autoclosePaused: false,
 	minGroupHeight: 110,
 	minGroupWidth: 125,
@@ -1784,15 +1591,6 @@ this.GroupItems = {
 
 	handleEvent: function(e) {
 		switch(e.type) {
-			// setup attr modified handler, and prepare for its uninit
-			case 'TabAttrModified':
-				this._handleAttrModified(e.target);
-				break;
-
-			// make sure any closed tabs are removed from the delay update list
-			case 'TabClose':
-				let idx = this._delayedModUpdates.delete(e.target);
-				break;
 		}
 	},
 
@@ -1851,67 +1649,6 @@ this.GroupItems = {
 			g.groupItem.arrange(g.options);
 		}
 		this._arrangesPending = [];
-	},
-
-	// watch for icon changes on app tabs
-	_handleAttrModified: function(xulTab) {
-		if(!UI.isTabViewVisible()) {
-			this._delayedModUpdates.add(xulTab);
-		} else {
-			this._updateAppTabIcons(xulTab);
-		}
-	},
-
-	// Update apptab icons based on xulTabs which have been updated while the TabView hasn't been visible
-	flushAppTabUpdates: function() {
-		for(let xulTab of this._delayedModUpdates) {
-			this._updateAppTabIcons(xulTab);
-		}
-		this._delayedModUpdates.clear();
-	},
-
-	// Update images of any apptab icons that point to passed in xultab
-	_updateAppTabIcons: function(xulTab) {
-		if(!xulTab.pinned) { return; }
-
-		this.getAppTabFavIconUrl(xulTab, function(iconUrl) {
-			iQ(".appTabIcon").each(function(icon) {
-				let $icon = iQ(icon);
-				if($icon.data("xulTab") == xulTab && iconUrl != $icon.attr("src")) {
-					$icon.attr("src", iconUrl);
-				}
-			});
-		});
-	},
-
-	// Gets the fav icon url for app tab.
-	getAppTabFavIconUrl: function(xulTab, callback) {
-		FavIcons.getFavIconUrlForTab(xulTab, function(iconUrl) {
-			callback(iconUrl || FavIcons.defaultFavicon);
-		});
-	},
-
-	// Adds the given xul:tab to the app tab tray in all groups
-	addAppTab: function(xulTab) {
-		this.groupItems.forEach(function(groupItem) {
-			groupItem.addAppTab(xulTab);
-		});
-		this.updateGroupCloseButtons();
-	},
-
-	// Removes the given xul:tab from the app tab tray in all groups
-	removeAppTab: function(xulTab) {
-		this.groupItems.forEach(function(groupItem) {
-			groupItem.removeAppTab(xulTab);
-		});
-		this.updateGroupCloseButtons();
-	},
-
-	// Arranges the given xul:tab as an app tab from app tab tray in all groups
-	arrangeAppTab: function(xulTab) {
-		this.groupItems.forEach(function(groupItem) {
-			groupItem.arrangeAppTab(xulTab);
-		});
 	},
 
 	// Returns the next unused groupItem ID.
@@ -2364,40 +2101,6 @@ this.GroupItems = {
 		this._removingHiddenGroups = false;
 	},
 
-	// If there's only one (non-hidden) group, and there are app tabs present, returns that group.
-	// Return the <GroupItem>'s Id
-	getUnclosableGroupItemId: function() {
-		let unclosableGroupItemId = null;
-
-		if(Tabs.numPinned) {
-			let hiddenGroupItems = this.groupItems.concat().filter(function(groupItem) {
-				return !groupItem.hidden;
-			});
-			if(hiddenGroupItems.length == 1) {
-				unclosableGroupItemId = hiddenGroupItems[0].id;
-			}
-		}
-
-		return unclosableGroupItemId;
-	},
-
-	// Updates group close buttons.
-	updateGroupCloseButtons: function() {
-		let unclosableGroupItemId = this.getUnclosableGroupItemId();
-
-		if(unclosableGroupItemId) {
-			let groupItem = this.groupItem(unclosableGroupItemId);
-
-			if(groupItem) {
-				groupItem.$closeButton.hide();
-			}
-		} else {
-			this.groupItems.forEach(function(groupItem) {
-				groupItem.$closeButton.show();
-			});
-		}
-	},
-
 	// Basic measure rules. Assures that item is a minimum size.
 	calcValidSize: function(size, options) {
 		return new Point(Math.max(size.x, GroupItems.minGroupWidth), Math.max(size.y, GroupItems.minGroupHeight));
@@ -2412,5 +2115,165 @@ this.GroupItems = {
 	// Re-enables the auto-close behavior.
 	resumeAutoclose: function() {
 		this._autoclosePaused = false;
+	}
+};
+
+this.PinnedTabs = {
+	get tray() { return $('pinnedTabs'); },
+
+	icons: new Map(),
+	_delayedUpdates: new Set(),
+
+	handleEvent: function(e) {
+		let tab = e.target;
+
+		switch(e.type) {
+			case "TabOpen":
+				if(tab.pinned) {
+					this.add(tab);
+				}
+				break;
+
+			case "TabClose":
+				// make sure any closed tabs are removed from the delay update list
+				this._delayedUpdates.delete(tab);
+
+				if(tab.pinned) {
+					this.remove(tab);
+				}
+				break;
+
+			case "TabMove":
+				if(tab.pinned) {
+					this.arrange(tab);
+				}
+				break;
+
+			case 'TabPinned':
+				this.add(tab);
+				break;
+
+			case 'TabUnpinned':
+				this.remove(tab);
+				break;
+
+			// watch for icon changes on app tabs
+			case 'TabAttrModified':
+				if(!UI.isTabViewVisible()) {
+					this._delayedUpdates.add(tab);
+				} else {
+					this._updateIcons(tab);
+				}
+				break;
+		}
+	},
+
+	init: function() {
+		Tabs.listen("TabOpen", this);
+		Tabs.listen("TabClose", this);
+		Tabs.listen("TabMove", this);
+		Tabs.listen("TabPinned", this);
+		Tabs.listen("TabUnpinned", this);
+		Tabs.listen("TabAttrModified", this);
+
+		for(let tab of Tabs.pinned) {
+			this.add(tab);
+		}
+	},
+
+	uninit: function() {
+		Tabs.unlisten("TabOpen", this);
+		Tabs.unlisten("TabClose", this);
+		Tabs.unlisten("TabMove", this);
+		Tabs.unlisten("TabPinned", this);
+		Tabs.unlisten("TabUnpinned", this);
+		Tabs.unlisten("TabAttrModified", this);
+
+		for(let icon of this.icons.values()) {
+			icon.remove();
+		}
+		this.icons.clear();
+		this.tray.hidden = true;
+	},
+
+	// Show the pinned tabs group only when there are pinned tabs.
+	updateTray: function() {
+		this.tray.hidden = !this.icons.size;
+	},
+
+	// Update apptab icons based on xulTabs which have been updated while the TabView hasn't been visible
+	flushUpdates: function() {
+		for(let tab of this._delayedUpdates) {
+			this._updateIcons(tab);
+		}
+		this._delayedUpdates.clear();
+	},
+
+	// Update images of any apptab icons that point to passed in xultab
+	_updateIcons: function(tab) {
+		if(!tab.pinned) { return; }
+
+		this.getFavIconUrl(tab, (iconUrl) => {
+			let icon = this.icons.get(tab);
+			if(icon && icon.getAttribute("src") != iconUrl) {
+				icon.setAttribute("src", iconUrl);
+			}
+		});
+	},
+
+	// Gets the fav icon url for app tab.
+	getFavIconUrl: function(tab, callback) {
+		FavIcons.getFavIconUrlForTab(tab, function(iconUrl) {
+			callback(iconUrl || FavIcons.defaultFavicon);
+		});
+	},
+
+	// Adds the given xul:tab as an app tab in the apptab tray
+	add: function(tab) {
+		// This shouldn't happen, just making sure.
+		if(this.icons.has(tab)) { return; }
+
+		this.getFavIconUrl(tab, (iconUrl) => {
+			// The tab might have been removed or unpinned while waiting.
+			if(!Utils.isValidXULTab(tab) || !tab.pinned) { return; }
+
+			let icon = document.createElement("img");
+			icon.classList.add("appTabIcon");
+			icon.setAttribute("src", iconUrl);
+			icon.handleEvent = function(e) {
+				// "click" event only
+				// left-clicks only
+				if(e.button != 0) { return; }
+
+				UI.goToTab(tab);
+			};
+			icon.addEventListener("click", icon);
+
+			this.icons.set(tab, icon);
+			this.tray.appendChild(icon);
+			this.updateTray();
+		});
+	},
+
+	// Removes the given xul:tab as an app tab in the apptab tray
+	remove: function(tab) {
+		let icon = this.icons.get(tab);
+		if(icon) {
+			icon.remove();
+			this.icons.delete(tab);
+			this.updateTray();
+		}
+	},
+
+	// Arranges the given xul:tab as an app tab in the group's apptab tray
+	arrange: function(tab) {
+		let icon = this.icons.get(tab);
+		if(icon) {
+			// so that the indexes match
+			icon.remove();
+
+			let sibling = this.tray.childNodes[tab._tPos] || null;
+			this.tray.insertBefore(icon, sibling);
+		}
 	}
 };

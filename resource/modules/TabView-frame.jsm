@@ -1,4 +1,4 @@
-// VERSION 1.0.8
+// VERSION 1.0.9
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -49,10 +49,10 @@ Modules.LOADMODULE = function() {
 
 	Modules.load('AllTabs');
 	Modules.load('iQ');
+	Modules.load('FavIcons');
 	Modules.load('Items');
 	Modules.load('GroupItems');
 	Modules.load('TabItems');
-	Modules.load('FavIcons');
 	Modules.load('Drag');
 	Modules.load('Trench');
 	Modules.load('Search');
@@ -64,10 +64,10 @@ Modules.UNLOADMODULE = function() {
 	Modules.unload('Search');
 	Modules.unload('Trench');
 	Modules.unload('Drag');
-	Modules.unload('FavIcons');
 	Modules.unload('TabItems');
 	Modules.unload('GroupItems');
 	Modules.unload('Items');
+	Modules.unload('FavIcons');
 	Modules.unload('iQ');
 	Modules.unload('AllTabs');
 

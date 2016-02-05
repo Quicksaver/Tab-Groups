@@ -156,13 +156,15 @@ input.name:focus {
 
 /* Side buttons */
 
-#actions {
+#actions,
+#pinnedTabs {
 	border: 1px solid rgba(230,230,230,1);
 	background-color: rgba(248,248,248,1);
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) 1px 1px 3px;
 }
 
-html[dir=rtl] #actions {
+html[dir=rtl] #actions,
+html[dir=rtl] #pinnedTabs {
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) -1px 1px 3px;
 }
 

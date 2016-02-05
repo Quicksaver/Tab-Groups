@@ -231,54 +231,6 @@ html[dir=rtl] .overlay {
 	box-shadow: -3px 3px 5.5px rgba(0,0,0,.5);
 }
 
-.appTabTrayContainer {
-	position: absolute;
-	top: 34px;
-	right: 1px;
-	-moz-border-start: 1px solid #E1E1E1;
-	padding: 0 5px;
-	overflow: -moz-hidden-unscrollable;
-	text-align: start;
-	line-height: 0;
-}
-
-html[dir=rtl] .appTabTrayContainer {
-	right: auto;
-	left: 1px;
-}
-
-.appTabTray {
-	display: inline-block;
-	-moz-column-width: 16px;
-	-moz-column-gap: 5px;
-}
-
-.appTabTrayContainerTruncated {
-	padding-bottom: 7px;
-}
-
-.appTabTrayContainerTruncated:after {
-	content: "…";
-	position: absolute;
-	bottom: 2px;
-	left: 0;
-	display: block;
-	width: 100%;
-	height: 15px;
-	line-height: 15px;
-	text-align: center;
-	font-size: 15px;
-}
-
-.appTabIcon {
-	width: 16px;
-	height: 16px;
-	cursor: pointer;
-	opacity: 0.8;
-	padding-bottom: 3px;
-	display: block;
-}
-
 .undo {
 	position: absolute;
 	display: flex;
@@ -568,7 +520,8 @@ html[dir=rtl] .iq-resizable-se {
 
 /* Side buttons */
 
-#actions {
+#actions,
+#pinnedTabs {
 	position: absolute;
 	top: 0px;
 	right: -3px;
@@ -580,7 +533,8 @@ html[dir=rtl] .iq-resizable-se {
 	border-radius: 0.4em;
 }
 
-html[dir=rtl] #actions {
+html[dir=rtl] #actions,
+html[dir=rtl] #pinnedTabs {
 	right: auto;
 	left: -3px;
 }
@@ -611,6 +565,21 @@ html[dir=rtl] #actions {
 
 #actions #helpbutton {
 	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 60, 20, 40);
+}
+
+/* Pinned Tabs group */
+
+#pinnedTabs {
+	top: 135px;
+}
+
+.appTabIcon {
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+	opacity: 0.8;
+	padding: 4px;
+	display: block;
 }
 
 /* Search */

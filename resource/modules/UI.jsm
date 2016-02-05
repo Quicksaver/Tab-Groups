@@ -1,4 +1,4 @@
-// VERSION 1.0.30
+// VERSION 1.0.31
 
 this.Keys = { meta: false };
 
@@ -117,20 +117,12 @@ this.UI = {
 				break;
 
 			case 'TabOpen':
-				// if it's an app tab, add it to all the group items
-				if(tab.pinned) {
-					GroupItems.addAppTab(tab);
-				} else if(this.isTabViewVisible() && !this._storageBusyCount) {
+				if(!tab.pinned && this.isTabViewVisible() && !this._storageBusyCount) {
 					this._lastOpenedTab = tab;
 				}
 				break;
 
 			case 'TabClose': {
-				// if it's an app tab, remove it from all the group items
-				if(tab.pinned) {
-					GroupItems.removeAppTab(tab);
-				}
-
 				if(this.isTabViewVisible()) {
 					// just closed the selected tab in the TabView interface.
 					if(this._currentTab == tab) {
@@ -166,19 +158,13 @@ this.UI = {
 				break;
 			}
 			case 'TabMove':
-				if(GroupItems.groupItems.length) {
-					if(tab.pinned) {
-						if(Tabs.numPinned > 1) {
-							GroupItems.arrangeAppTab(tab);
-						}
-					} else {
-						let activeGroupItem = GroupItems.getActiveGroupItem();
-						if(activeGroupItem) {
-							if(!this.isTabViewVisible() || this._isChangingVisibility) {
-								this.setReorderTabItemsOnShow(activeGroupItem);
-							} else {
-								activeGroupItem.reorderTabItemsBasedOnTabOrder();
-							}
+				if(!tab.pinned && GroupItems.groupItems.length) {
+					let activeGroupItem = GroupItems.getActiveGroupItem();
+					if(activeGroupItem) {
+						if(!this.isTabViewVisible() || this._isChangingVisibility) {
+							this.setReorderTabItemsOnShow(activeGroupItem);
+						} else {
+							activeGroupItem.reorderTabItemsBasedOnTabOrder();
 						}
 					}
 				}
@@ -190,12 +176,10 @@ this.UI = {
 
 			case 'TabPinned':
 				TabItems.handleTabPin(tab);
-				GroupItems.addAppTab(tab);
 				break;
 
 			case 'TabUnpinned': {
 				TabItems.handleTabUnpin(tab);
-				GroupItems.removeAppTab(tab);
 
 				let groupItem = tab._tabViewTabItem.parent;
 				if(groupItem) {
@@ -288,6 +272,7 @@ this.UI = {
 			GroupItems.init();
 			GroupItems.pauseArrange();
 			let hasGroupItemsData = GroupItems.load();
+			PinnedTabs.init();
 
 			// ___ tabs
 			TabItems.init();
@@ -348,6 +333,7 @@ this.UI = {
 
 		// additional clean up
 		TabItems.uninit();
+		PinnedTabs.uninit();
 		GroupItems.uninit();
 
 		this._removeTabActionHandlers();
@@ -617,7 +603,7 @@ this.UI = {
 				dispatch(window, { type: "tabviewshown", cancelable: false });
 
 				// Flush pending updates
-				GroupItems.flushAppTabUpdates();
+				PinnedTabs.flushUpdates();
 
 				TabItems.resumePainting();
 			});
@@ -629,7 +615,7 @@ this.UI = {
 			dispatch(window, { type: "tabviewshown", cancelable: false });
 
 			// Flush pending updates
-			GroupItems.flushAppTabUpdates();
+			PinnedTabs.flushUpdates();
 
 			TabItems.resumePainting();
 		}
