@@ -1,4 +1,4 @@
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -682,7 +682,8 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				"opacity": 1
 			}, {
 				easing: "tabviewBounce",
-				duration: 170
+				duration: 170,
+				complete: () => { this._sendToSubscribers("groupHidden"); }
 			});
 		}, 50);
 
@@ -939,6 +940,8 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				this.arrange({ animate: !options.immediately });
 				this._unfreezeItemSize({ dontArrange: true });
 			}
+
+			this._sendToSubscribers("childRemoved", { item: item });
 		}
 		catch(ex) {
 			Cu.reportError(ex);
@@ -2249,6 +2252,8 @@ this.PinnedTabs = {
 			this.icons.set(tab, icon);
 			this.tray.appendChild(icon);
 			this.updateTray();
+
+			this._sendToSubscribers("appTabIconAdded", { item: icon });
 		});
 	},
 

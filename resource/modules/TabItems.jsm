@@ -1,4 +1,4 @@
-// VERSION 1.0.11
+// VERSION 1.0.12
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -412,6 +412,10 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 		gBrowser.removeTab(this.tab);
 		let tabClosed = !this.tab;
 
+		if(tabClosed) {
+			this._sendToSubscribers("tabRemoved");
+		}
+
 		// No need to explicitly delete the tab data, becasue sessionstore data associated with the tab will automatically go away
 		return tabClosed;
 	},
@@ -607,6 +611,8 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 		if(this.isShowingCachedData()) {
 			this.hideCachedData();
 		}
+
+		this._sendToSubscribers("updated");
 	}
 });
 
@@ -829,6 +835,7 @@ this.TabItems = {
 					}
 					fav.hide();
 				}
+				tabItem._sendToSubscribers("iconUpdated");
 			});
 
 			// ___ label
