@@ -1,4 +1,4 @@
-// VERSION 1.0.9
+// VERSION 1.0.10
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -829,7 +829,6 @@ this.TabItems = {
 					}
 					fav.hide();
 				}
-				tabItem._sendToSubscribers("iconUpdated");
 			});
 
 			// ___ label
@@ -850,14 +849,12 @@ this.TabItems = {
 			// ___ Make sure the tab is complete and ready for updating.
 			if(options && options.force) {
 				tabItem.updateCanvas();
-				tabItem._sendToSubscribers("updated");
 			} else {
 				this._isComplete(tab).then((isComplete) => {
 					if(!Utils.isValidXULTab(tab) || tab.pinned) { return; }
 
 					if(isComplete) {
 						tabItem.updateCanvas();
-						tabItem._sendToSubscribers("updated");
 					} else {
 						this._tabsWaitingForUpdate.push(tab);
 					}
