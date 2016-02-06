@@ -1,4 +1,4 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -2001,6 +2001,12 @@ this.GroupItems = {
 				let child = groupItem.getChild(0);
 				if(child) {
 					tabItem = child;
+					return true;
+				}
+				// if the group has no tabs, open a new one in it
+				let newTab = groupItem.newTab();
+				if(newTab) {
+					tabItem = newTab._tabViewTabItem;
 					return true;
 				}
 			}

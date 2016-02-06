@@ -1,4 +1,4 @@
-// VERSION 1.0.23
+// VERSION 1.0.24
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -360,10 +360,9 @@ this.TabView = {
 			let menuItems = [];
 
 			for(let groupItem of groupItems) {
-				// if group has title, it's not hidden and there is no active group or the active group id doesn't match the group id,
+				// it's not hidden and there is no active group or the active group id doesn't match the group id,
 				// a group menu item will be added.
 				if(!groupItem.hidden
-				&& (groupItem.getTitle().trim() || groupItem.getChildren().length)
 				&& (!activeGroup || activeGroup.id != groupItem.id)) {
 					menuItems.push(this._createGroupMenuItem(groupItem));
 				}
@@ -393,6 +392,12 @@ this.TabView = {
 		let title = groupItem.getTitle();
 		if(title.trim()) {
 			return title;
+		}
+
+		if(!groupItem.getChildren().length) {
+			return Strings.get('TabView', 'groupItemUnnamed', [
+				[ "$num", groupItem.id ]
+			]);
 		}
 
 		let topChildLabel = groupItem.getTopChild().tab.label;
