@@ -1,4 +1,4 @@
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -178,9 +178,9 @@ this.GroupItem = function(listOfEls, options) {
 	// We explicitly set dontArrange=true to prevent the groupItem from re-arranging its children after a tabItem has been added.
 	// This saves us a group.arrange() call per child and therefore some tab.setBounds() calls.
 	options.dontArrange = true;
-	listOfEls.forEach((el) => {
+	for(let el of listOfEls) {
 		this.add(el, options);
-	});
+	}
 
 	// ___ Finish Up
 	this._addHandlers($container);
@@ -632,9 +632,12 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			let shouldFadeAway = false;
 
 			if(GroupItems.groupItems.length > 1) {
-				shouldFadeAway = GroupItems.groupItems.some((groupItem) => {
-					return (groupItem != this && groupItem.getChildren().length > 0);
-				});
+				for(let groupItem of GroupItems.groupItems) {
+					if(groupItem != this && groupItem.getChildren().length > 0) {
+						shouldFadeAway = true;
+						break;
+					}
+				}
 			}
 
 			if(shouldFadeAway) {
@@ -1136,7 +1139,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			childrenToArrange.unshift(topChild);
 		}
 
-		childrenToArrange.forEach(function(child) {
+		for(let child of childrenToArrange) {
 			// Children are still considered stacked even if they're hidden later.
 			child.addClass("stacked");
 			child.isStacked = true;
@@ -1145,12 +1148,12 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			} else {
 				child.setHidden(true);
 			}
-		});
+		}
 
 		this._isStacked = true;
 
 		let angleAccum = 0;
-		children.forEach(function(child, index) {
+		for(let child of children) {
 			child.setZ(zIndex);
 			zIndex--;
 
@@ -1159,7 +1162,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			child.setRotation((UI.rtl ? -1 : 1) * angleAccum);
 			child.setHidden(false);
 			angleAccum += angleDelta;
-		});
+		}
 	},
 
 	// Arranges the children into a grid.
@@ -1186,11 +1189,11 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				columns: this._columns
 			});
 
-			childrenToArrange.forEach(function(child) {
+			for(let child of childrenToArrange) {
 				child.removeClass("stacked");
 				child.isStacked = false;
 				child.setHidden(false);
-			});
+			}
 		}
 
 		if(!childrenToArrange.length) { return false; }
@@ -1204,7 +1207,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 		this._columns = columns;
 		let index = 0;
-		childrenToArrange.forEach((child, i) => {
+		for(let child of childrenToArrange) {
 			// If dropIndex spacing is active and this is a child after index, bump it up one so we actually use the correct rect (and skip one for the dropPos)
 			if(this._dropSpaceActive && index === dropIndex) {
 				index++;
@@ -1215,7 +1218,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				child.setZ(arrangeOptions.z);
 			}
 			index++;
-		});
+		}
 
 		return dropIndex;
 	},
@@ -1662,9 +1665,9 @@ this.GroupItems = {
 	// Saves GroupItems state, as well as the state of all of the groupItems.
 	saveAll: function() {
 		this._save();
-		this.groupItems.forEach(function(groupItem) {
+		for(let groupItem of this.groupItems) {
 			groupItem.save();
-		});
+		}
 	},
 
 	// Saves GroupItems state.
@@ -1715,12 +1718,12 @@ this.GroupItems = {
 							// (TMP) In case this group is re-used by session restore, make sure all of its children still belong to this group.
 							// Do it before setBounds trigger data save that will overwrite session restore data.
 							// TabView will use TabItems.resumeReconnecting or UI.reset to reconnect the tabItem.
-							groupItem.getChildren().forEach(tabItem => {
+							for(let tabItem of groupItem.getChildren()) {
 								let tabData = Storage.getTabData(tabItem.tab);
 								if(!tabData || tabData.groupID != data.id) {
 									tabItem._reconnected = false;
 								}
-							});
+							}
 
 							groupItem.userSize = data.userSize;
 							groupItem.setTitle(data.title);
@@ -1742,9 +1745,9 @@ this.GroupItems = {
 					}
 				}
 
-				toClose.forEach(function(groupItem) {
+				for(let groupItem of toClose) {
 					// all tabs still existing in closed groups will be moved to new groups. prepare them to be reconnected later.
-					groupItem.getChildren().forEach(function(tabItem) {
+					for(let tabItem of groupItem.getChildren()) {
 						if(tabItem.parent.hidden) {
 							iQ(tabItem.container).show();
 						}
@@ -1755,7 +1758,7 @@ this.GroupItems = {
 						let tabData = Storage.getTabData(tabItem.tab);
 
 						if(tabData) {
-							let parentGroup = GroupItems.groupItem(tabData.groupID);
+							let parentGroup = this.groupItem(tabData.groupID);
 
 							// the tab's group id could be invalid or point to a non-existing group.
 							// correct it by assigning the active group id or the first group of the just restored session.
@@ -1764,11 +1767,11 @@ this.GroupItems = {
 								Storage.saveTab(tabItem.tab, tabData);
 							}
 						}
-					});
+					}
 
 					// this closes the group but not its children
 					groupItem.close({ immediately: true });
-				});
+				}
 			}
 
 			// set active group item
@@ -1850,22 +1853,22 @@ this.GroupItems = {
 			// uninit has been called
 			return null;
 		}
-		let result = null;
-		this.groupItems.forEach(function(candidate) {
-			if(candidate.id == a) {
-				result = candidate;
-			}
-		});
 
-		return result;
+		for(let candidate of this.groupItems) {
+			if(candidate.id == a) {
+				return candidate;
+			}
+		}
+
+		return null;
 	},
 
 	// Removes all tabs from all groupItems (which automatically closes all unnamed groupItems).
 	removeAll: function() {
 		let toRemove = this.groupItems.concat();
-		toRemove.forEach(function(groupItem) {
+		for(let groupItem of toRemove) {
 			groupItem.removeAll();
-		});
+		}
 	},
 
 	// Given a <TabItem>, files it in the appropriate groupItem.
@@ -1882,33 +1885,26 @@ this.GroupItems = {
 			return;
 		}
 
-		let targetGroupItem;
 		// find first non-app visible tab belongs a group, and add the new tabItem to that group
-		Tabs.visible.some(function(tab) {
+		for(let tab of Tabs.visible) {
 			if(!tab.pinned && tab != tabItem.tab) {
 				if(tab._tabViewTabItem && tab._tabViewTabItem.parent && !tab._tabViewTabItem.parent.hidden) {
-					targetGroupItem = tab._tabViewTabItem.parent;
+					let targetGroupItem = tab._tabViewTabItem.parent;
+					targetGroupItem.add(tabItem);
+					UI.setActive(targetGroupItem);
+					return;
 				}
-				return true;
+				break;
 			}
-			return false;
-		});
-
-		if(targetGroupItem) {
-			// add the new tabItem to the first group item
-			targetGroupItem.add(tabItem);
-			UI.setActive(targetGroupItem);
-			return;
 		}
 
 		// find the first visible group item
-		let visibleGroupItems = this.groupItems.filter(function(groupItem) {
-			return (!groupItem.hidden);
-		});
-		if(visibleGroupItems.length) {
-			visibleGroupItems[0].add(tabItem);
-			UI.setActive(visibleGroupItems[0]);
-			return;
+		for(let groupItem of this.groupItems) {
+			if(!groupItem.hidden) {
+				groupItem.add(tabItem);
+				UI.setActive(groupItem);
+				return;
+			}
 		}
 
 		// create new group for the new tabItem
@@ -1967,13 +1963,39 @@ this.GroupItems = {
 		this._updateTabBar();
 	},
 
+	getNextItemTabFromGroups: function(groupItems) {
+		for(let groupItem of groupItems) {
+			if(groupItem.hidden) { continue; }
+
+			// restore the last active tab in the group
+			let activeTab = groupItem.getActiveTab();
+			if(activeTab) {
+				return activeTab;
+			}
+
+			// if no tab is active, use the first one
+			let child = groupItem.getChild(0);
+			if(child) {
+				return child;
+			}
+
+			// if the group has no tabs, open a new one in it
+			let newTab = groupItem.newTab();
+			if(newTab) {
+				return newTab._tabViewTabItem;
+			}
+
+			break;
+		}
+
+		return null;
+	},
+
 	// Paramaters:
 	//  reverse - the boolean indicates the direction to look for the next groupItem.
 	// Returns the <tabItem>. If nothing is found, return null.
 	getNextGroupItemTab: function(reverse) {
-		let groupItems = Utils.copy(GroupItems.groupItems);
-		let activeGroupItem = GroupItems.getActiveGroupItem();
-		let tabItem = null;
+		let groupItems = this.groupItems.concat([]);
 
 		// When cycling through groups, order them by their titles, otherwise it's far too arbitrary.
 		for(let groupItem of groupItems) {
@@ -1989,49 +2011,18 @@ this.GroupItems = {
 			groupItems.reverse();
 		}
 
-		let some = function(groupItem) {
-			if(!groupItem.hidden) {
-				// restore the last active tab in the group
-				let activeTab = groupItem.getActiveTab();
-				if(activeTab) {
-					tabItem = activeTab;
-					return true;
-				}
-				// if no tab is active, use the first one
-				let child = groupItem.getChild(0);
-				if(child) {
-					tabItem = child;
-					return true;
-				}
-				// if the group has no tabs, open a new one in it
-				let newTab = groupItem.newTab();
-				if(newTab) {
-					tabItem = newTab._tabViewTabItem;
-					return true;
-				}
-			}
-			return false;
-		};
-
+		let tabItem = null;
+		let activeGroupItem = this.getActiveGroupItem();
 		if(!activeGroupItem) {
-			if(groupItems.length) {
-				groupItems.some(some);
-			}
+			tabItem = this.getNextItemTabFromGroups(groupItem);
 		}
 		else {
-			let currentIndex;
-			groupItems.some(function(groupItem, index) {
-				if(!groupItem.hidden && groupItem == activeGroupItem) {
-					currentIndex = index;
-					return true;
-				}
-				return false;
-			});
+			let currentIndex = groupItems.indexOf(activeGroupItem);
 			let firstGroupItems = groupItems.slice(currentIndex + 1);
-			firstGroupItems.some(some);
+			tabItem = this.getNextItemTabFromGroups(firstGroupItems);
 			if(!tabItem) {
 				let secondGroupItems = groupItems.slice(0, currentIndex);
-				secondGroupItems.some(some);
+				tabItem = this.getNextItemTabFromGroups(secondGroupItems);
 			}
 		}
 
@@ -2071,7 +2062,7 @@ this.GroupItems = {
 
 		// add tab item to a groupItem
 		if(groupItemId) {
-			groupItem = GroupItems.groupItem(groupItemId);
+			groupItem = this.groupItem(groupItemId);
 			groupItem.add(tab._tabViewTabItem);
 			groupItem.reorderTabsBasedOnTabItemOrder()
 		} else {
@@ -2098,18 +2089,18 @@ this.GroupItems = {
 		this._removingHiddenGroups = true;
 
 		let groupItems = this.groupItems.concat();
-		groupItems.forEach(function(groupItem) {
+		for(let groupItem of groupItems) {
 			if(groupItem.hidden) {
 				groupItem.closeHidden();
 			}
-		});
+		}
 
 		this._removingHiddenGroups = false;
 	},
 
 	// Basic measure rules. Assures that item is a minimum size.
 	calcValidSize: function(size, options) {
-		return new Point(Math.max(size.x, GroupItems.minGroupWidth), Math.max(size.y, GroupItems.minGroupHeight));
+		return new Point(Math.max(size.x, this.minGroupWidth), Math.max(size.y, this.minGroupHeight));
 	},
 
 	// Temporarily disable the behavior that closes groups when they become empty.

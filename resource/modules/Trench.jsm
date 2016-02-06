@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 // Class: Trench - Class for drag-snapping regions; called "trenches" as they are long and narrow.
 // Parameters:
@@ -374,12 +374,12 @@ this.Trench.prototype = {
 		if(this.type != 'guide') { return; }
 
 		let groupItems = GroupItems.groupItems;
-		groupItems.forEach((groupItem) => {
+		for(let groupItem of groupItems) {
 			// floating groupItems don't block trenches
-			if(groupItem.isDragging) { return; }
+			if(groupItem.isDragging) { continue; }
 
 			// groupItems don't block their own trenches
-			if(this.el == groupItem.container) { return; }
+			if(this.el == groupItem.container) { continue; }
 
 			let bounds = groupItem.getBounds();
 			let activeRange = new Range();
@@ -406,7 +406,7 @@ this.Trench.prototype = {
 					this.setActiveRange(activeRange);
 				}
 			}
-		});
+		}
 	}
 };
 
@@ -476,41 +476,41 @@ this.Trenches = {
 		if(!Array.isArray(ids)) {
 			ids = [ids];
 		}
-		ids.forEach((id) => {
+		for(let id of ids) {
 			this.trenches[id].hide();
 			delete this.trenches[id];
-		});
+		}
 	},
 
 	// Activate all <Trench>es other than those projected by the current element.
 	// Parameters:
 	//   element - (DOMElement) the DOM element of the Item being dragged or resized.
 	activateOthersTrenches: function(element) {
-		this.trenches.forEach(function(t) {
-			if(t.el === element) { return; }
-			if(t.parentItem && (t.parentItem.isAFauxItem || t.parentItem.isDragging)) { return; }
+		for(let t of this.trenches) {
+			if(t.el === element) { continue; }
+			if(t.parentItem && (t.parentItem.isAFauxItem || t.parentItem.isDragging)) { continue; }
 
 			t.active = true;
 			t.calculateActiveRange();
 			t.show(); // debug
-		});
+		}
 	},
 
 	// After <activateOthersTrenches>, disactivates all the <Trench>es again.
 	disactivate: function() {
-		this.trenches.forEach(function(t) {
+		for(let t of this.trenches) {
 			t.active = false;
 			t.showGuide = false;
 			t.show();
-		});
+		}
 	},
 
 	// Hide all guides (dotted lines) en masse.
 	hideGuides: function() {
-		this.trenches.forEach(function(t) {
+		for(let t of this.trenches) {
 			t.showGuide = false;
 			t.show();
-		});
+		}
 	},
 
 	// Used to "snap" an object's bounds to active trenches and to the edge of the window.
@@ -581,9 +581,9 @@ this.Trenches = {
 
 	// <Trench.show> all <Trench>es.
 	show: function() {
-		this.trenches.forEach(function(t) {
+		for(let t of this.trenches) {
 			t.show();
-		});
+		}
 	},
 
 	// Toggle <Trenches.showDebug> and trigger <Trenches.show>

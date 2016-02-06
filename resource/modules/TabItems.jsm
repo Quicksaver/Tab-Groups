@@ -1,4 +1,4 @@
-// VERSION 1.0.10
+// VERSION 1.0.11
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -687,7 +687,7 @@ this.TabItems = {
 		let activeGroupItem = GroupItems.getActiveGroupItem();
 		let activeGroupItemId = activeGroupItem ? activeGroupItem.id : null;
 		// For each tab, create the link.
-		Tabs.notPinned.forEach((tab) => {
+		for(let tab of Tabs.notPinned) {
 			let options = { immediately: true };
 			// if tab is visible in the tabstrip and doesn't have any data stored in the session store (see TabItem__reconnect),
 			// it implies that it is a new tab which is created before Panorama is initialized.
@@ -697,7 +697,7 @@ this.TabItems = {
 			}
 			this.link(tab, options);
 			this.update(tab);
-		});
+		}
 	},
 
 	uninit: function() {
@@ -1017,9 +1017,9 @@ this.TabItems = {
 	saveAll: function() {
 		let tabItems = this.getItems();
 
-		tabItems.forEach(function(tabItem) {
+		for(let tabItem of tabItems) {
 			tabItem.save();
-		});
+		}
 	},
 
 	// Private method that returns the fontsize to use given the tab's width

@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 // Class: Item - Superclass for all visible objects (<TabItem>s and <GroupItem>s).
 // If you subclass, in addition to the things Item provides, you need to also provide these methods:
@@ -155,13 +155,16 @@ this.Item.prototype = {
 	overlapsWithOtherItems: function() {
 		let items = Items.getTopLevelItems();
 		let bounds = this.getBounds();
-		return items.some((item) => {
+		for(let item of items) {
 			// can't overlap with yourself.
-			if(item == this) { return false; }
+			if(item == this) { continue; }
 
 			let myBounds = item.getBounds();
-			return myBounds.intersects(bounds);
-		});
+			if(myBounds.intersects(bounds)) {
+				return true;
+			}
+		}
+		return false;
 	},
 
 	// Moves the Item to the specified location.
@@ -218,14 +221,14 @@ this.Item.prototype = {
 		let buffer = Math.floor(Items.defaultGutter / 2);
 
 		// setup each Item's pushAwayData attribute:
-		items.forEach(function(item) {
+		for(let item of items) {
 			let data = {};
 			data.bounds = item.getBounds();
 			data.startBounds = new Rect(data.bounds);
 			// Infinity = (as yet) unaffected
 			data.generation = Infinity;
 			item.pushAwayData = data;
-		});
+		}
 
 		// The first item is a 0-generation pushed item. It all starts here.
 		let itemsToPush = [this];
@@ -241,14 +244,14 @@ this.Item.prototype = {
 			// bbc = center of the base's bounds
 			let bbc = bb.center();
 
-			items.forEach(function(item) {
-				if(item == baseItem) { return; }
+			for(let item of items) {
+				if(item == baseItem) { continue; }
 
 				let data = item.pushAwayData;
 
 				// if the item under consideration has already been pushed, or has a lower
 				// "generation" (and thus an implictly greater placement priority) then don't move it.
-				if(data.generation <= baseData.generation) { return; }
+				if(data.generation <= baseData.generation) { continue; }
 
 				// box = this item's current bounds, with a +buffer margin.
 				let bounds = data.bounds;
@@ -293,7 +296,7 @@ this.Item.prototype = {
 					// add this item to the queue, so that it, in turn, can push some other things.
 					itemsToPush.push(item);
 				}
-			});
+			}
 		};
 
 		// push each of the itemsToPush, one at a time.
@@ -305,9 +308,9 @@ this.Item.prototype = {
 
 		// ___ Squish!
 		let pageBounds = Items.getSafeWindowBounds();
-		items.forEach(function(item) {
+		for(let item of items) {
 			let data = item.pushAwayData;
-			if(data.generation == 0) { return; }
+			if(data.generation == 0) { continue; }
 
 			let apply = function(item, posStep, posStep2, sizeStep) {
 				let data = item.pushAwayData;
@@ -352,7 +355,7 @@ this.Item.prototype = {
 				posStep.x = pageBounds.left - bounds.left;
 				sizeStep.x = posStep.x / data.generation;
 				posStep2.x = -sizeStep.x;
-			} else if (bounds.right > pageBounds.right) { // this may be less of a problem post-601534
+			} else if(bounds.right > pageBounds.right) { // this may be less of a problem post-601534
 				posStep.x = pageBounds.right - bounds.right;
 				sizeStep.x = -posStep.x / data.generation;
 				posStep.x += sizeStep.x;
@@ -363,7 +366,7 @@ this.Item.prototype = {
 				posStep.y = pageBounds.top - bounds.top;
 				sizeStep.y = posStep.y / data.generation;
 				posStep2.y = -sizeStep.y;
-			} else if (bounds.bottom > pageBounds.bottom) { // this may be less of a problem post-601534
+			} else if(bounds.bottom > pageBounds.bottom) { // this may be less of a problem post-601534
 				posStep.y = pageBounds.bottom - bounds.bottom;
 				sizeStep.y = -posStep.y / data.generation;
 				posStep.y += sizeStep.y;
@@ -373,28 +376,28 @@ this.Item.prototype = {
 			if(posStep.x || posStep.y || sizeStep.x || sizeStep.y) {
 				apply(item, posStep, posStep2, sizeStep);
 			}
-		});
+		}
 
 		// ___ Unsquish
 		let pairs = [];
-		items.forEach(function(item) {
+		for(let item of items) {
 			let data = item.pushAwayData;
 			pairs.push({
 				item: item,
 				bounds: data.bounds
 			});
-		});
+		}
 
 		Items.unsquish(pairs);
 
 		// ___ Apply changes
-		items.forEach(function(item) {
+		for(let item of items) {
 			let data = item.pushAwayData;
 			let bounds = data.bounds;
 			if(!bounds.equals(data.startBounds)) {
 				item.setBounds(bounds, immediately);
 			}
-		});
+		}
 	},
 
 	// Sets up/moves the trenches for snapping to this item.
@@ -473,7 +476,7 @@ this.Item.prototype = {
 					score: 0
 				};
 
-				droppables.forEach((droppable) => {
+				for(let droppable of droppables) {
 					let intersection = box.intersection(droppable.bounds);
 					if(intersection && intersection.area() > best.score) {
 						let possibleDropTarget = droppable.item;
@@ -490,10 +493,10 @@ this.Item.prototype = {
 							best.score = intersection.area();
 						}
 					}
-				});
+				}
 
 				return best.dropTarget;
-			}
+			};
 
 			// ___ mousemove
 			let handleMouseMove = (e) => {
@@ -577,11 +580,11 @@ this.Item.prototype = {
 
 				let cancel = false;
 				let $target = iQ(e.target);
-				cancelClasses.forEach(function(className) {
+				for(let className of cancelClasses) {
 					if($target.hasClass(className)) {
 						cancel = true;
 					}
-				});
+				}
 
 				if(cancel) {
 					e.preventDefault();
@@ -885,18 +888,18 @@ this.Items = {
 		if(!pairsProvided) {
 			let items = Items.getTopLevelItems();
 			pairs = [];
-			items.forEach(function(item) {
+			for(let item of items) {
 				pairs.push({
 					item: item,
 					bounds: item.getBounds()
 				});
-			});
+			}
 		}
 
 		let pageBounds = Items.getSafeWindowBounds();
-		pairs.forEach(function(pair) {
+		for(let pair of pairs) {
 			let item = pair.item;
-			if(item == ignore) { return; }
+			if(item == ignore) { continue; }
 
 			let bounds = pair.bounds;
 			let newBounds = new Rect(bounds);
@@ -939,25 +942,25 @@ this.Items = {
 
 			if(!bounds.equals(newBounds)) {
 				let blocked = false;
-				pairs.forEach(function(pair2) {
-					if(pair2 == pair || pair2.item == ignore) { return; }
+				for(let pair2 of pairs) {
+					if(pair2 == pair || pair2.item == ignore) { continue; }
 
 					let bounds2 = pair2.bounds;
 					if(bounds2.intersects(newBounds)) {
 						blocked = true;
 					}
-				});
+				}
 
 				if(!blocked) {
 					pair.bounds.copy(newBounds);
 				}
 			}
-		});
+		}
 
 		if(!pairsProvided) {
-			pairs.forEach(function(pair) {
+			for(let pair of pairs) {
 				pair.item.setBounds(pair.bounds);
-			});
+			}
 		}
 	}
 };

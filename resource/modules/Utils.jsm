@@ -1,4 +1,4 @@
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -414,19 +414,13 @@ this.MRUList.prototype = {
 
 	// Returns the most recently used entry. If a filter exists, gets the most recently used entry which matches the filter.
 	peek: function(filter) {
-		let match = null;
 		if(filter && typeof filter == "function") {
-			this._list.some(function(entry) {
+			for(let entry of this._list) {
 				if(filter(entry)) {
-					match = entry
-					return true;
+					return entry;
 				}
-				return false;
-			});
-		} else {
-			match = this._list.length > 0 ? this._list[0] : null;
+			}
 		}
-
-		return match;
+		return this._list.length > 0 ? this._list[0] : null;
 	},
 };

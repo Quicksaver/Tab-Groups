@@ -1,4 +1,4 @@
-// VERSION 1.0.31
+// VERSION 1.0.32
 
 this.Keys = { meta: false };
 
@@ -380,9 +380,9 @@ this.UI = {
 			box.left = pageBounds.left + welcomeWidth + 2 * padding;
 		}
 
-		GroupItems.groupItems.forEach(function(group) {
+		for(let group of GroupItems.groupItems) {
 			group.close();
-		});
+		}
 
 		let options = {
 			bounds: box,
@@ -566,9 +566,9 @@ this.UI = {
 
 		let currentTab = this._currentTab;
 
-		this._reorderTabItemsOnShow.forEach(function(groupItem) {
+		for(let groupItem of this._reorderTabItemsOnShow) {
 			groupItem.reorderTabItemsBasedOnTabOrder();
-		});
+		}
 		this._reorderTabItemsOnShow = [];
 
 		gTabViewDeck.selectedPanel = gTabViewFrame;
@@ -640,9 +640,9 @@ this.UI = {
 
 		TabItems.pausePainting();
 
-		this._reorderTabsOnHide.forEach(function(groupItem) {
+		for(let groupItem of this._reorderTabsOnHide) {
 			groupItem.reorderTabsBasedOnTabItemOrder();
-		});
+		}
 		this._reorderTabsOnHide = [];
 
 		gTabViewDeck.selectedPanel = gBrowserPanel;
@@ -865,15 +865,15 @@ this.UI = {
 	getClosestTab: function(tabCenter) {
 		let cl = null;
 		let clDist;
-		TabItems.getItems().forEach(function(item) {
-			if(!item.parent || item.parent.hidden) { return; }
+		for(let item of TabItems.getItems()) {
+			if(!item.parent || item.parent.hidden) { continue; }
 
 			let testDist = tabCenter.distance(item.bounds.center());
 			if(cl==null || testDist < clDist) {
 				cl = item;
 				clDist = testDist;
 			}
-		});
+		}
 		return cl;
 	},
 
@@ -1078,7 +1078,7 @@ this.UI = {
 				let myCenter = activeTab.bounds.center();
 				let match;
 
-				TabItems.getItems().forEach(function(item) {
+				for(let item of TabItems.getItems()) {
 					if(!item.parent.hidden && (!activeTabGroup.expanded || activeTabGroup.id == item.parent.id)) {
 						let itemCenter = item.bounds.center();
 
@@ -1089,7 +1089,7 @@ this.UI = {
 							}
 						}
 					}
-				});
+				}
 
 				return match && match[1];
 			};
@@ -1344,10 +1344,10 @@ this.UI = {
 		// We start with pageBounds so that we respect the empty space the user has left on the page.
 		itemBounds.width = 1;
 		itemBounds.height = 1;
-		items.forEach(function(item) {
+		for(let item of items) {
 			let bounds = item.getBounds();
 			itemBounds = (itemBounds ? itemBounds.union(bounds) : new Rect(bounds));
-		});
+		}
 
 		if(newPageBounds.width < this._pageBounds.width && newPageBounds.width > itemBounds.width) {
 			newPageBounds.width = this._pageBounds.width;
@@ -1368,7 +1368,7 @@ this.UI = {
 
 		let scale = Math.min(hScale, wScale);
 		let pairs = [];
-		items.forEach((item) => {
+		for(let item of items) {
 			let bounds = item.getBounds();
 			bounds.left += (UI.rtl ? -1 : 1) * (newPageBounds.left - this._pageBounds.left);
 			bounds.left *= scale;
@@ -1382,14 +1382,14 @@ this.UI = {
 				item: item,
 				bounds: bounds
 			});
-		});
+		}
 
 		Items.unsquish(pairs);
 
-		pairs.forEach(function(pair) {
+		for(let pair of pairs) {
 			pair.item.setBounds(pair.bounds, true);
 			pair.item.snap();
-		});
+		}
 
 		this._pageBounds = Items.getPageBounds();
 		this._save();
@@ -1408,12 +1408,12 @@ this.UI = {
 			let feelsCramped = false;
 			let minimalRect = new Rect(0, 0, 1, 1);
 
-			Items.getTopLevelItems().forEach(function(item) {
+			for(let item of Items.getTopLevelItems()) {
 				let bounds = new Rect(item.getBounds());
 				feelsCramped = feelsCramped || (item.userSize && (item.userSize.x > bounds.width || item.userSize.y > bounds.height));
 				bounds.inset(-Trenches.defaultRadius, -Trenches.defaultRadius);
 				minimalRect = minimalRect.union(bounds);
-			});
+			}
 
 			// ensure the minimalRect extends to, but not beyond, the origin
 			minimalRect.left = 0;
