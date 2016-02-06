@@ -1,4 +1,4 @@
-// VERSION 2.4.12
+// VERSION 2.4.13
 Modules.UTILS = true;
 
 // dependsOn - object that adds a dependson attribute functionality to xul preference elements.
@@ -188,6 +188,11 @@ this.delayPreferences = {
 
 		var nodes = $$('[delayPreference]');
 		for(let node of nodes) {
+			// Scales aren't considered "editable elements" by the preference handlers unless they specifically have this attribute.
+			if(node.localName == "scale" && !trueAttribute(node, "preference-editable")) {
+				setAttribute(node, "preference-editable", "true");
+			}
+
 			node._pref = $(node.getAttribute('delayPreference'));
 			node._pref.setElementValue(node);
 
