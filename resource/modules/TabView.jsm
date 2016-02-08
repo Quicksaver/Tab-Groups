@@ -1,4 +1,4 @@
-// VERSION 1.0.24
+// VERSION 1.0.25
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -537,13 +537,11 @@ Modules.LOADMODULE = function() {
 	}
 
 	Modules.load('AllTabs');
-	Modules.load('compatibilityFix/windowFixes');
 	Overlays.overlayWindow(window, 'TabView', TabView);
 };
 
 Modules.UNLOADMODULE = function() {
 	Overlays.removeOverlayWindow(window, 'TabView');
-	Modules.unload('compatibilityFix/windowFixes');
 	Modules.unload('AllTabs');
 
 	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
