@@ -1,4 +1,4 @@
-// VERSION 2.6.1
+// VERSION 2.6.2
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -27,15 +27,16 @@ Modules.BASEUTILS = true;
 //									The native preference will be returned to its original value when disabling the add-on. If, on alternative,
 //									you want to fully reset the preference instead (by user option for instance), just define a 'resetNative'
 //									bool preference in the initial prefList and toggle it accordingly.
+//									Important: each native preference can only be proxied once globally (all add-ons) at any one time!
 //	cPref - (string) name of our proxy preference as defined in prefList
 //	nPrefName - (string) name of the native preference we want to proxy
 //	nPrefDefaultValue - (string/bool/int) default value this preference has in Firefox.
 //	see setDefaults()
-// unProxyNative(cPref, nPrefName) - undoes proxying a native preference by the above proxyNative() method
+// unProxyNative(nPrefName) - undoes proxying a native preference by the above proxyNative() method
 //	see proxyNative()
 this.Prefs = {
 	instances: new Map(),
-	natives: new Set(),
+	natives: new Map(),
 	cleaningOnShutdown: false,
 
 	setDefaults: function(prefList, branch, trunk) {
@@ -242,19 +243,17 @@ this.Prefs = {
 			}
 		};
 
-		this.natives.add(handler);
+		this.natives.set(nPrefName, handler);
 		this[nPrefName] = this[cPref];
 		this.listen(cPref, handler);
 		this.listen(nPrefName, handler);
 	},
 
-	unProxyNative: function(cPref, nPrefName) {
-		for(let x of this.natives) {
-			if(x.nPref == nPrefName && x.cPref == cPref) {
-				this.shutdownProxy(x);
-				this.natives.delete(x);
-				break;
-			}
+	unProxyNative: function(nPrefName) {
+		let proxy = this.natives.get(nPrefName);
+		if(proxy) {
+			this.shutdownProxy(proxy);
+			this.natives.delete(proxy);
 		}
 	},
 
@@ -279,7 +278,7 @@ this.Prefs = {
 
 	cleanNatives: function() {
 		// Restore native preferences to their value before our proxy preferences changed them (if applicable).
-		for(let x of this.natives) {
+		for(let x of this.natives.values()) {
 			this.shutdownProxy(x);
 		}
 	}
