@@ -1,4 +1,4 @@
-// VERSION 1.0.12
+// VERSION 1.0.13
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -150,11 +150,6 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 		return data;
 	},
 
-	// Checks the specified data (as returned by TabItem.getStorageData) and returns true if it looks valid.
-	storageSanity: function(data) {
-		return typeof(data) == 'object' && typeof(data.groupID) == 'number';
-	},
-
 	// Store persistent for this object.
 	save: function() {
 		try {
@@ -211,7 +206,7 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 		let tabData = Storage.getTabData(this.tab);
 		let groupItem;
 
-		if(tabData && this.storageSanity(tabData)) {
+		if(TabItems.storageSanity(tabData)) {
 			// Show the cached data while we're waiting for the tabItem to be updated.
 			// If the tab isn't restored yet this acts as a placeholder until it is.
 			this.showCachedData();
@@ -1027,6 +1022,11 @@ this.TabItems = {
 		for(let tabItem of tabItems) {
 			tabItem.save();
 		}
+	},
+
+	// Checks the specified data (as returned by TabItem.getStorageData) and returns true if it looks valid.
+	storageSanity: function(data) {
+		return data && typeof(data) == 'object' && typeof(data.groupID) == 'number';
 	},
 
 	// Private method that returns the fontsize to use given the tab's width

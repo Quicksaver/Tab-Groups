@@ -1,4 +1,4 @@
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 // Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
 // Note that it implements the <Subscribable> interface.
@@ -1723,7 +1723,7 @@ this.GroupItems = {
 							// TabView will use TabItems.resumeReconnecting or UI.reset to reconnect the tabItem.
 							for(let tabItem of groupItem.getChildren()) {
 								let tabData = Storage.getTabData(tabItem.tab);
-								if(!tabData || tabData.groupID != data.id) {
+								if(!TabItems.storageSanity(tabData) || tabData.groupID != data.id) {
 									tabItem._reconnected = false;
 								}
 							}
@@ -1760,7 +1760,7 @@ this.GroupItems = {
 						// sanity check the tab's groupID
 						let tabData = Storage.getTabData(tabItem.tab);
 
-						if(tabData) {
+						if(TabItems.storageSanity(tabData)) {
 							let parentGroup = this.groupItem(tabData.groupID);
 
 							// the tab's group id could be invalid or point to a non-existing group.
