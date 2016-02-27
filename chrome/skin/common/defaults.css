@@ -29,3 +29,13 @@
 .hourglass image {
 	list-style-image: url("chrome://tabgroups/skin/utils/hourglass.png");
 }
+
+/* #matchhead promo section */
+
+#promo-matchhead-tab {
+	background-image: url("chrome://tabgroups/skin/utils/matchhead.png");
+}
+
+#promo-matchhead-image {
+	background-image: url("chrome://tabgroups/skin/utils/promo.jpg");
+}

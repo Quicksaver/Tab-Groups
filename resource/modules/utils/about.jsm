@@ -1,4 +1,4 @@
-// VERSION 1.1.4
+// VERSION 1.2.1
 
 this.about = {
 	kNS: 'http://www.w3.org/1999/xhtml',
@@ -387,10 +387,142 @@ this.about = {
 	}
 };
 
+this.promo = {
+	current: '1',
+	width: 779,
+	height: 150,
+	link: 'https://youtu.be/NuNlgEItQEk',
+
+	get container() { return $('promo-matchhead'); },
+	get tab() { return $('promo-matchhead-tab'); },
+	get anchor() { return $('promo-matchhead-anchor'); },
+	get close() { return $('promo-matchhead-close'); },
+	get hideThis() { return $('promo-matchhead-hideThisPromo'); },
+	get hideAll() { return $('promo-matchhead-hideAllPromos'); },
+
+	handleEvent: function(e) {
+		switch(e.type) {
+			case 'click':
+				switch(e.target) {
+					// User wants to close this promo, it will not be shown again, but remains visible for now so the user
+					// can decide whether this is just for this promo or for all (possible) future promos.
+					case this.close:
+						this.seen();
+						break;
+
+					// User does not want to view any more promos like this again.
+					case this.hideAll:
+						Prefs.showPromos = false;
+						// Proceed to removing the promo from the screen.
+
+					// Nothing to do at this point but to actually hide the promo from the screen.
+					case this.hideThis:
+						this.uninit();
+						break;
+				}
+				break;
+
+			case 'mouseup':
+				this.seen();
+				break;
+
+			case 'resize':
+				this.resize();
+				break;
+		}
+	},
+
+	init: function() {
+		Prefs.setDefaults({
+			showPromos: true,
+			['showPromo'+this.current]: true
+		});
+
+		// if the user doesn't want any promos, or if they've already seen/closed the current one, skip
+		if(!Prefs.showPromos || !Prefs['showPromo'+this.current]) { return; }
+
+		setAttribute(this.tab, 'href', this.link);
+		setAttribute(this.anchor, 'href', this.link);
+
+		Listeners.add(this.tab, 'mouseup', this);
+		Listeners.add(this.anchor, 'mouseup', this);
+		Listeners.add(this.close, 'click', this);
+		Listeners.add(this.hideThis, 'click', this);
+		Listeners.add(this.hideAll, 'click', this);
+		Listeners.add(window, 'resize', this);
+
+		setAttribute(document.documentElement, 'showPromo', 'true');
+		setAttribute(this.container, 'smoothSlide', 'true');
+		Timers.init('promoSmoothSlide', () => {
+			removeAttribute(this.container, 'smoothSlide');
+		}, 500);
+
+		this.resize();
+	},
+
+	uninit: function() {
+		Timers.cancel('promoSmoothSlide');
+		removeAttribute(document.documentElement, 'showPromo');
+		removeAttribute(this.container, 'smoothSlide');
+
+		Listeners.remove(this.tab, 'mouseup', this);
+		Listeners.remove(this.anchor, 'mouseup', this);
+		Listeners.remove(this.close, 'click', this);
+		Listeners.remove(this.hideThis, 'click', this);
+		Listeners.remove(this.hideAll, 'click', this);
+		Listeners.remove(window, 'resize', this);
+
+		Styles.unload('promo_'+_UUID);
+	},
+
+	resize: function() {
+		if(!trueAttribute(document.documentElement, 'showPromo')) { return; }
+
+		// The dimensions of the promo should be relative to the size of the preferences pane, and should keep the original aspect ratio.
+		let prefPane = $('mainPrefPane');
+		let width = prefPane.clientWidth;
+
+		// subtract the small corner placeholder
+		width -= 32;
+
+		// compress to image size if necessary
+		width = Math.min(width, this.width);
+
+		// keep aspect ratio
+		let height = Math.round(width * this.height / this.width);
+
+		let sscode = '\
+			@-moz-document url("'+document.baseURI+'") {\n\
+				page['+objName+'_UUID="'+_UUID+'"] #promo-matchhead-image { width: '+width+'px; }\n\
+				page['+objName+'_UUID="'+_UUID+'"] #promo-matchhead:hover #promo-matchhead-tab { height: '+height+'px; }\n\
+			}';
+
+		Styles.load('promo_'+_UUID, sscode, true);
+	},
+
+	seen: function() {
+		Prefs['showPromo'+this.current] = false;
+		this.close.hidden = true;
+		this.hideThis.hidden = false;
+		this.hideAll.hidden = false;
+	}
+};
+
 Modules.LOADMODULE = function() {
 	about.init();
+
+	// Shamelessly promoting my own Firefox fan-series: a series of very-short-films made by myself about life
+	// with Firefox, with knowledge and approval from Mozilla's marketing/social teams.
+	// These promos only appear in the About pane of the add-on's preferences tab, are very non-intrusive,
+	// they are hidden out of the way in a 32x32px corner unless the user interacts with it,
+	// and can be disabled (hidden) completely by clicking its close button.
+	// Everything is self-contained within the add-on, no remote connections are made what-so-ever.
+	// The promo is an image/banner that links to an outside YouTube page where the user can see the video,
+	// this behavior is clearly described in the promo itself.
+	promo.init();
 };
 
 Modules.UNLOADMODULE = function() {
 	about.uninit();
+	promo.uninit();
 };

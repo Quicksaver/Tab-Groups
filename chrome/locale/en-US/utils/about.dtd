@@ -7,6 +7,7 @@
 
 <!ENTITY about.description "Check out &quot;Release Notes&quot; and &quot;Known Issues&quot; for this version below. Let me know of any issues you find, or if you have any suggestions for future releases.">
 <!ENTITY about.descriptionB "The add-on is free, but fixing problems, adding new features and ensuring everything works with each new Firefox release is laborious and can be difficult at times. If you enjoy the add-on, please support its continued development. As the link says, &quot;You Can Help&quot;!">
+<!ENTITY about.descriptionC "Also watch the latest episode in my web series about life with a Firefox, made for all of you, the most supportive users a developer could ask for! Just point at the bouncing icon at the bottom corner of this page. Love it. Hate it. Share it.">
 
 <!ENTITY about.allVersions "Show notes from all previous versions">
 <!ENTITY about.notifyOnUpdates "Show me this tab on the next update">
@@ -28,3 +29,8 @@
 
 <!ENTITY about.share "Share!">
 <!ENTITY about.friends "Don't be the only one with a great browser. Let your friends in on the awesome!">
+
+<!ENTITY about.hidePromo "X">
+<!ENTITY about.hideThisPromo "show again when there's a new episode">
+<!ENTITY about.hideAllPromos "never show me promos like this">
+<!ENTITY about.clicktowatch "watch on YouTube">

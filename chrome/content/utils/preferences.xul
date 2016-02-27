@@ -26,7 +26,7 @@
 		<hbox flex="1">
 			<richlistbox id="categories"/>
 
-			<vbox class="main-wrapper" flex="1">
+			<vbox id="main-wrapper" class="main-wrapper" flex="1">
 				<vbox class="main-content" flex="1">
 					<prefpane id="mainPrefPane"/>
 				</vbox>

@@ -55,6 +55,7 @@
 					</hbox>
 					<html:p>&about.description;</html:p>
 					<html:p>&about.descriptionB;</html:p>
+					<html:p id="promo-matchhead-desc" hidden="true">&about.descriptionC;</html:p>
 					<html:p class="signature">&about.signature;</html:p>
 				</html:div>
 				<html:div id="bank" class="banked negative" invisible="true">
@@ -130,5 +131,23 @@
 			</html:div>
 		</vbox>
 	</prefpane>
+
+	<vbox id="main-wrapper">
+		<html:div id="promo-matchhead" hidden="true">
+			<html:a target="_blank" id="promo-matchhead-tab"/>
+			<html:div id="promo-matchhead-container">
+				<html:a id="promo-matchhead-anchor" target="_blank">
+					<html:div id="promo-matchhead-image"/>
+				</html:a>
+				<html:a id="promo-matchhead-hashtag" target="_blank">#matchhead</html:a>
+				<html:a id="promo-matchhead-clicktowatch" target="_blank">&about.clicktowatch;</html:a>
+				<html:div id="promo-matchhead-actions">
+					<html:a id="promo-matchhead-close" href="#">&about.hidePromo;</html:a>
+					<html:a id="promo-matchhead-hideThisPromo" href="#" hidden="true">&about.hideThisPromo;</html:a>
+					<html:a id="promo-matchhead-hideAllPromos" href="#" hidden="true">&about.hideAllPromos;</html:a>
+				</html:div>
+			</html:div>
+		</html:div>
+	</vbox>
 
 </overlay>

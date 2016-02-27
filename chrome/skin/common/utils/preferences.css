@@ -10,6 +10,10 @@ caption {
 	color: #484848;
 }
 
+#main-wrapper {
+	position: relative;
+}
+
 /* for checkboxes displayed horizontally */
 .smallindent {
 	-moz-margin-end: 14px;
