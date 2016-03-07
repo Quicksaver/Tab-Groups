@@ -1,118 +1,74 @@
-// VERSION 1.0.13
+// VERSION 1.1.0
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
-// Class: TabItem - An <Item> that represents a tab. Also implements the <Subscribable> interface.
+// Class: TabItem - An <Item> that represents a tab.
 // Parameters:
 //   tab - a xul:tab
 this.TabItem = function(tab, options) {
-	this.tab = tab;
-	// register this as the tab's tabItem
-	this.tab._tabViewTabItem = this;
-
 	if(!options) {
 		options = {};
 	}
 
-	// ___ set up div
-	document.body.appendChild(TabItems.fragment().cloneNode(true));
+	Subscribable(this);
 
-	// The document fragment contains just one Node. As per DOM3 appendChild: it will then be the last child
-	let div = document.body.lastChild;
-	let $div = iQ(div);
+	this.tab = tab;
+	// register this as the tab's tabItem
+	this.tab._tabViewTabItem = this;
+
+	// ___ set up div
+	this.container = TabItems.fragment().cloneNode(true);
+	this.container._item = this;
+	this.$container = iQ(this.container);
 
 	this._showsCachedData = false;
-	this.canvasSizeForced = false;
-	this.$thumb = iQ('.thumb', $div);
-	this.$fav = iQ('.favicon', $div);
-	this.$tabTitle = iQ('.tab-title', $div);
-	this.$canvas = iQ('.thumb canvas', $div);
-	this.$cachedThumb = iQ('img.cached-thumb', $div);
-	this.$favImage = iQ('.favicon>img', $div);
-	this.$close = iQ('.close', $div);
+	this.thumb = $$('.thumb', this.container)[0];
+	this.fav = $$('.favicon', this.container)[0];
+	this.tabTitle = $$('.tab-title', this.container)[0];
+	this.$canvas = iQ('.thumb canvas', this.$container);
+	this.cachedThumb = $$('img.cached-thumb', this.container)[0];
+	this.closeBtn = $$('.close', this.container)[0];
 
 	this.tabCanvas = new TabCanvas(this.tab, this.$canvas[0]);
 
-	this._hidden = false;
 	this.isATabItem = true;
-	this.keepProportional = true;
-	this._hasBeenDrawn = false;
 	this._reconnected = false;
-	this.isDragging = false;
 	this.isStacked = false;
-
-	// Read off the total vertical and horizontal padding on the tab container and cache this value, as it must be the same for every TabItem.
-	if(Utils.isEmptyObject(TabItems.tabItemPadding)) {
-		TabItems.tabItemPadding.x = parseInt($div.css('padding-left')) + parseInt($div.css('padding-right'));
-		TabItems.tabItemPadding.y = parseInt($div.css('padding-top')) + parseInt($div.css('padding-bottom'));
-	}
-
-	this.bounds = new Rect(0,0,1,1);
+	this.lastMouseDownTarget = null;
 
 	this._lastTabUpdateTime = Date.now();
 
-	// ___ superclass setup
-	this._init(div);
+	// Read off the total vertical and horizontal padding on the tab container and cache this value, as it must be the same for every TabItem.
+	if(!TabItems.tabItemPadding) {
+		let divStyle = getComputedStyle(this.container);
+		TabItems.tabItemPadding = {
+			x: parseInt(divStyle.getPropertyValue('padding-left')) + parseInt(divStyle.getPropertyValue('padding-right')),
+			y: parseInt(divStyle.getPropertyValue('padding-top')) + parseInt(divStyle.getPropertyValue('padding-bottom'))
+		};
+	}
+	if(!TabItems.canvasOffset) {
+		let canvasStyle = getComputedStyle(this.$canvas[0]);
+		TabItems.canvasOffset = {
+			x: parseInt(canvasStyle.getPropertyValue('border-left-width')) + parseInt(canvasStyle.getPropertyValue('border-right-width')),
+			y: parseInt(canvasStyle.getPropertyValue('border-top-width')) + parseInt(canvasStyle.getPropertyValue('border-bottom-width'))
+		};
+	}
 
-	// ___ drag/drop
-	// override dropOptions with custom tabitem methods
-	this.dropOptions.drop = function(e) {
-		let groupItem = drag.info.item.parent;
-		groupItem.add(drag.info.$el);
-	};
-
-	this.draggable();
-
-	// ___ more div setup
-	$div.mousedown((e) => {
-		if(e.button != 2) {
-			this.lastMouseDownTarget = e.target;
-		}
-	});
-
-	$div.mouseup((e) => {
-		let same = (e.target == this.lastMouseDownTarget);
-		this.lastMouseDownTarget = null;
-		if(!same) { return; }
-
-		// press close button or middle mouse click
-		if(iQ(e.target).hasClass("close") || e.button == 1) {
-			this.closedManually = true;
-			this.close();
-		} else {
-			if(!Items.item($div).isDragging) {
-				this.zoomIn();
-			}
-		}
-	});
-
-	this.droppable(true);
-
-	this.$close.attr("title", Strings.get("TabView", "closeTab"));
+	Listeners.add(this.container, 'mousedown', this);
+	Listeners.add(this.container, 'mouseup', this);
+	Listeners.add(this.container, 'dragstart', this);
+	Listeners.add(this.container, 'dragover', this);
+	Listeners.add(this.container, 'dragenter', this);
 
 	TabItems.register(this);
 
 	// ___ reconnect to data from Storage
-	if(!TabItems.reconnectingPaused()) {
+	if(!TabItems.reconnectingPaused) {
 		this._reconnect(options);
 	}
 };
 
-this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subscribable(), {
-	// Repaints the thumbnail with the given resolution, and forces it to stay that resolution until unforceCanvasSize is called.
-	forceCanvasSize: function(w, h) {
-		this.canvasSizeForced = true;
-		this.$canvas[0].width = w;
-		this.$canvas[0].height = h;
-		this.tabCanvas.paint();
-	},
-
-	// Stops holding the thumbnail resolution; allows it to shift to the size of thumbnail on screen.
-	// Note that this call does not nest, unlike <TabItems.resumePainting>; if you call forceCanvasSize multiple times, you just need a single unforce to clear them all.
-	unforceCanvasSize: function() {
-		this.canvasSizeForced = false;
-	},
-
+this.TabItem.prototype = {
 	// Returns a boolean indicates whether the cached data is being displayed or not.
 	isShowingCachedData: function() {
 		return this._showsCachedData;
@@ -123,18 +79,19 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 		let { title, url } = this.getTabState();
 		let thumbnailURL = gPageThumbnails.getThumbnailURL(url);
 
-		this.$cachedThumb.attr("src", thumbnailURL).show();
-		this.$canvas.css({ opacity: 0 });
+		setAttribute(this.cachedThumb, "src", thumbnailURL);
+		this.container.classList.add("cached-data");
 
 		let tooltip = (title && title != url ? title + "\n" + url : url);
-		this.$tabTitle.text(title).attr("title", tooltip);
+		this.tabTitle.textContent = title;
+		setAttribute(this.tabTitle, "title", tooltip);
 		this._showsCachedData = true;
 	},
 
 	// Hides the cached data i.e. image and title and show the canvas.
 	hideCachedData: function() {
-		this.$cachedThumb.attr("src", "").hide();
-		this.$canvas.css({ opacity: 1.0 });
+		setAttribute(this.cachedThumb, "src", "");
+		this.container.classList.remove("cached-data");
 		this._showsCachedData = false;
 	},
 
@@ -194,7 +151,53 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 			url = this.tab.linkedBrowser.currentURI.spec;
 		}
 
-		return { title: title, url: url };
+		return { title, url };
+	},
+
+	handleEvent: function(e) {
+		switch(e.type) {
+			case 'mousedown':
+				if(e.button != 2) {
+					this.lastMouseDownTarget = e.target;
+					if(!this.isStacked || e.button == 1) {
+						this.parent.childHandling = true;
+					}
+				}
+				break;
+
+			case 'mouseup':
+				let same = (e.target == this.lastMouseDownTarget);
+				this.lastMouseDownTarget = null;
+				if(same) {
+					this.parent.childHandling = true;
+
+					// press close button or middle mouse click
+					if(e.target == this.closeBtn || e.button == 1) {
+						this.closedManually = true;
+						this.close();
+					} else if(!this.parent.isDragging) {
+						this.zoomIn();
+					}
+				}
+				break;
+
+			case 'dragstart':
+				this.lastMouseDownTarget = null;
+				new TabDrag(e, this);
+				break;
+
+			case 'dragenter':
+				if(DraggingTab && !this.isStacked) {
+					DraggingTab.dropHere(this);
+				}
+				break;
+
+			case 'dragover':
+				if(DraggingTab) {
+					DraggingTab.canDrop(e, this.parent);
+				}
+				break;
+		}
 	},
 
 	// Load the reciever's persistent data from storage. If there is none, treats it as a new tab.
@@ -212,17 +215,17 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 			this.showCachedData();
 
 			if(this.parent) {
-				this.parent.remove(this, { immediately: true });
+				this.parent.remove(this);
 			}
 
 			if(tabData.groupID) {
 				groupItem = GroupItems.groupItem(tabData.groupID);
 			} else {
-				groupItem = new GroupItem([], { immediately: true, bounds: tabData.bounds });
+				groupItem = new GroupItem([], { immediately: true });
 			}
 
 			if(groupItem) {
-				groupItem.add(this, { immediately: true });
+				groupItem.add(this);
 
 				// restore the active tab for each group between browser sessions
 				if(tabData.active) {
@@ -241,10 +244,10 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 			}
 
 			if(groupItem) {
-				groupItem.add(this, { immediately: true });
+				groupItem.add(this);
 			} else {
 				// create tab group by double click is handled in UI_init().
-				GroupItems.newTab(this, { immediately: true });
+				GroupItems.newTab(this);
 			}
 		}
 
@@ -253,143 +256,47 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 		this._sendToSubscribers("reconnected");
 	},
 
-	// Hide/unhide this item
-	setHidden: function(val) {
-		if(val) {
-			this.addClass("tabHidden");
-		} else {
-			this.removeClass("tabHidden");
-		}
-		this._hidden = val;
+	destroy: function() {
+		Listeners.remove(this.container, 'mousedown', this);
+		Listeners.remove(this.container, 'mouseup', this);
+		Listeners.remove(this.container, 'dragstart', this);
+		Listeners.remove(this.container, 'dragover', this);
+		Listeners.remove(this.container, 'dragenter', this);
+		this.container.remove();
 	},
 
-	// Return hide state of item
-	getHidden: function() {
-		return this._hidden;
+	getBounds: function() {
+		return this.$container.bounds();
 	},
 
-	// Moves this item to the specified location and size.
-	// Parameters:
-	//   rect - a <Rect> giving the new bounds
-	//   immediately - true if it should not animate; default false
-	//   options - an object with additional parameters, see below
-	// Possible options:
-	//   force - true to always update the DOM even if the bounds haven't changed; default false
-	setBounds: function(inRect, immediately, options) {
-		if(!options) {
-			options = {};
-		}
-
-		// force the input size to be valid
-		let validSize = TabItems.calcValidSize(new Point(inRect.width, inRect.height), { hideTitle: (this.isStacked || options.hideTitle === true) });
-		let rect = new Rect(inRect.left, inRect.top, validSize.x, validSize.y);
-
-		let css = {};
-
-		if(rect.left != this.bounds.left || options.force) {
-			css.left = rect.left;
-		}
-
-		if(rect.top != this.bounds.top || options.force) {
-			css.top = rect.top;
-		}
-
-		if(rect.width != this.bounds.width || options.force) {
-			css.width = rect.width - TabItems.tabItemPadding.x;
-			css.fontSize = TabItems.getFontSizeFromWidth(rect.width);
-			css.fontSize += 'px';
-		}
-
-		if(rect.height != this.bounds.height || options.force) {
-			css.height = rect.height - TabItems.tabItemPadding.y;
-			if(!this.isStacked) {
-				css.height -= TabItems.fontSizeRange.max;
-			}
-		}
-
-		if(Utils.isEmptyObject(css)) { return; }
-
-		this.bounds.copy(rect);
-
-		// If this is a brand new tab don't animate it in from a random location (i.e., from [0,0]). Instead, just have it appear where it should be.
-		if(immediately || (!this._hasBeenDrawn)) {
-			this.$container.css(css);
+	// Sets the receiver's parent to the given <GroupItem>.
+	setParent: function(parent) {
+		if(!parent) {
+			this.container.remove();
 		} else {
-			TabItems.pausePainting();
-			this.$container.animate(css, {
-				duration: 200,
-				easing: "tabviewBounce",
-				complete: function() {
-					TabItems.resumePainting();
-				}
-			});
+			parent.tabContainer.appendChild(this.container);
 		}
-
-		if(css.fontSize && !(this.parent && this.parent.isStacked())) {
-			if(css.fontSize < TabItems.fontSizeRange.min) {
-				immediately ? this.$tabTitle.hide() : this.$tabTitle.fadeOut();
-			} else {
-				immediately ? this.$tabTitle.show() : this.$tabTitle.fadeIn();
-			}
-		}
-
-		if(css.width) {
-			TabItems.update(this.tab);
-
-			let widthRange, proportion;
-
-			if(this.parent && this.parent.isStacked()) {
-				if(UI.rtl) {
-					this.$fav.css({ top:0, right:0 });
-				} else {
-					this.$fav.css({ top:0, left:0 });
-				}
-				widthRange = new Range(70, 90);
-				proportion = widthRange.proportion(css.width); // between 0 and 1
-			} else {
-				if(UI.rtl) {
-					this.$fav.css({ top:4, right:2 });
-				} else {
-					this.$fav.css({ top:4, left:4 });
-				}
-				widthRange = new Range(40, 45);
-				proportion = widthRange.proportion(css.width); // between 0 and 1
-			}
-
-			if(proportion <= .1) {
-				this.$close.hide();
-			} else {
-				this.$close.show().css({ opacity: proportion });
-			}
-
-			let pad = 1 + 5 * proportion;
-			let alphaRange = new Range(0.1,0.2);
-			this.$fav.css({
-				"-moz-padding-start": pad + "px",
-				"-moz-padding-end": pad + 2 + "px",
-				"padding-top": pad + "px",
-				"padding-bottom": pad + "px",
-				"border-color": "rgba(0,0,0,"+ alphaRange.scale(proportion) +")",
-			});
-		}
-
-		this._hasBeenDrawn = true;
-
-		UI.clearShouldResizeItems();
-
-		rect = this.getBounds(); // ensure that it's a <Rect>
-
-		if(!this.parent && Utils.isValidXULTab(this.tab)) {
-			this.setTrenches(rect);
-		}
-
+		this.parent = parent;
 		this.save();
+	},
+
+	get hidden() {
+		try { return this.container.classList.contains('tabHidden'); } catch(ex) { LOG(arguments.callee.caller); throw ex; }
+	},
+
+	set hidden(v) {
+		this.container.classList[v ? 'add' : 'remove']('tabHidden');
 	},
 
 	// Sets the z-index for this item.
 	setZ: function(value) {
-		this.zIndex = value;
-		this.$container.css({ zIndex: value });
+		this.container.style.zIndex = value;
+	},
+
+	// Rotates the object to the given number of degrees.
+	setRotation: function(degrees) {
+		let value = degrees ? "rotate("+degrees+"deg)" : null;
+		this.$container.css({ "transform": value });
 	},
 
 	// Closes this item (actually closes the tab associated with it, which automatically closes the item).
@@ -417,17 +324,17 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 
 	// Adds the specified CSS class to this item's container DOM element.
 	addClass: function(className) {
-		this.$container.addClass(className);
+		this.container.classList.add(className);
 	},
 
 	// Removes the specified CSS class from this item's container DOM element.
 	removeClass: function(className) {
-		this.$container.removeClass(className);
+		this.container.classList.remove(className);
 	},
 
 	// Updates this item to visually indicate that it's active.
 	makeActive: function() {
-		this.$container.addClass("focus");
+		this.container.classList.add("focus");
 
 		if(this.parent) {
 			this.parent.setActiveTab(this);
@@ -436,7 +343,7 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 
 	// Updates this item to visually indicate that it's not active.
 	makeDeactive: function() {
-		this.$container.removeClass("focus");
+		this.container.classList.remove("focus");
 	},
 
 	// Allows you to select the tab and zoom in on it, thereby bringing you to the tab in Firefox to interact with.
@@ -554,8 +461,6 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 		// Taking the bounds of the container (as opposed to the canvas) makes us immune to any transformations applied to the canvas.
 		let { left, top, width, height, right, bottom } = this.$container.bounds();
 
-		let { innerWidth: windowWidth, innerHeight: windowHeight } = window;
-
 		// The scaleCheat is a clever way to speed up the zoom-in code.
 		// Because image scaling is slowest on big images, we cheat and stop the image at scaled-down size and placed accordingly.
 		// Because the animation is fast, you can't see the difference but it feels a lot zippier.
@@ -586,9 +491,9 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 	updateCanvas: function() {
 		// ___ thumbnail
 		let $canvas = this.$canvas;
-		let w = $canvas.width();
-		let h = $canvas.height();
-		let dimsChanged = !this.canvasSizeForced && (w != $canvas[0].width || h != $canvas[0].height);
+		let w = $canvas.width() - TabItems.canvasOffset.x;
+		let h = $canvas.height() - TabItems.canvasOffset.y;
+		let dimsChanged = w != $canvas[0].width || h != $canvas[0].height;
 
 		TabItems._lastUpdateTime = Date.now();
 		this._lastTabUpdateTime = TabItems._lastUpdateTime;
@@ -609,26 +514,33 @@ this.TabItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subs
 
 		this._sendToSubscribers("updated");
 	}
-});
+};
 
 // Singleton for managing <TabItem>s
 this.TabItems = {
-	minTabWidth: 40,
+	minTabWidth: 60,
 	tabWidth: 160,
-	tabHeight: 120,
+	tabHeight: 160,
 	tabAspect: 0, // set in init
 	invTabAspect: 0, // set in init
-	fontSize: 9,
 	fontSizeRange: new Range(8,15),
 	_fragment: null,
-	items: [],
+	items: new Set(),
 	paintingPaused: 0,
 	_tabsWaitingForUpdate: null,
 	_heartbeatTiming: 200, // milliseconds between calls
 	_maxTimeForUpdating: 200, // milliseconds that consecutive updates can take
 	_lastUpdateTime: Date.now(),
-	_reconnectingPaused: false,
-	tabItemPadding: {},
+	reconnectingPaused: false,
+	tabItemPadding: null,
+	canvasOffset: null,
+
+	get size() { return this.items.size; },
+	[Symbol.iterator]: function* () {
+		for(let item of this.items) {
+			yield item;
+		}
+	},
 
 	// Called when a web page is painted.
 	receiveMessage: function(m) {
@@ -671,13 +583,9 @@ this.TabItems = {
 	init: function() {
 		// Set up tab priority queue
 		this._tabsWaitingForUpdate = new TabPriorityQueue();
-		this.minTabHeight = this.minTabWidth * this.tabHeight / this.tabWidth;
+		this.minTabHeight = Math.floor(this.minTabWidth * this.tabHeight / this.tabWidth);
 		this.tabAspect = this.tabHeight / this.tabWidth;
 		this.invTabAspect = 1 / this.tabAspect;
-
-		let $canvas = iQ("<canvas>").attr('moz-opaque', '');
-		$canvas.appendTo(iQ("body"));
-		$canvas.hide();
 
 		Messenger.listenWindow(gWindow, "MozAfterPaint", this);
 
@@ -708,17 +616,11 @@ this.TabItems = {
 		Tabs.unlisten("TabAttrModified", this);
 		Tabs.unlisten("TabClose", this);
 
-		for(let tabItem of this.items) {
+		for(let tabItem of this) {
 			delete tabItem.tab._tabViewTabItem;
-
-			for(let x in tabItem) {
-				if(typeof tabItem[x] == "object") {
-					tabItem[x] = null;
-				}
-			}
 		}
 
-		this.items = [];
+		this.items = new Set();
 		this._lastUpdateTime = Date.now();
 		this._tabsWaitingForUpdate.clear();
 	},
@@ -732,6 +634,7 @@ this.TabItems = {
 
 		let div = document.createElement("div");
 		div.classList.add("tab");
+		div.setAttribute('draggable', 'true');
 
 		let thumb = document.createElement("div");
 		thumb.classList.add('thumb');
@@ -739,7 +642,6 @@ this.TabItems = {
 
 		let img = document.createElement('img');
 		img.classList.add('cached-thumb');
-		img.style.display = 'none';
 		thumb.appendChild(img);
 
 		let canvas = document.createElement('canvas');
@@ -748,8 +650,7 @@ this.TabItems = {
 
 		let favicon = document.createElement('div');
 		favicon.classList.add('favicon');
-		favicon.appendChild(document.createElement('img'));
-		div.appendChild(favicon);
+		thumb.appendChild(favicon);
 
 		let span = document.createElement('span');
 		span.classList.add('tab-title');
@@ -758,10 +659,10 @@ this.TabItems = {
 
 		let close = document.createElement('div');
 		close.classList.add('close');
-		div.appendChild(close);
+		setAttribute(close, "title", Strings.get("TabView", "closeTab"));
+		thumb.appendChild(close);
 
-		this._fragment = document.createDocumentFragment();
-		this._fragment.appendChild(div);
+		this._fragment = div;
 
 		return this._fragment;
 	},
@@ -817,27 +718,22 @@ this.TabItems = {
 
 			// Even if the page hasn't loaded, display the favicon and title
 			FavIcons.getFavIconUrlForTab(tab, function(iconUrl) {
-				let favImage = tabItem.$favImage[0];
-				let fav = tabItem.$fav;
 				if(iconUrl) {
-					if(favImage.src != iconUrl) {
-						favImage.src = iconUrl;
-					}
-					fav.show();
+					tabItem.fav._iconUrl = iconUrl;
+					tabItem.fav.style.backgroundImage = 'url("'+iconUrl+'")';
+					tabItem.fav.hidden = false;
 				} else {
-					if(favImage.hasAttribute("src")) {
-						favImage.removeAttribute("src");
-					}
-					fav.hide();
+					tabItem.fav._iconUrl = '';
+					tabItem.fav.style.backgroundImage = '';
+					tabItem.fav.hidden = true;
 				}
 				tabItem._sendToSubscribers("iconUpdated");
 			});
 
 			// ___ label
 			let label = tab.label;
-			let $name = tabItem.$tabTitle;
-			if($name.text() != label) {
-				$name.text(label);
+			if(tabItem.tabTitle.textContent != label) {
+				tabItem.tabTitle.textContent = label;
 			}
 
 			// ___ remove from waiting list now that we have no other early returns
@@ -846,7 +742,7 @@ this.TabItems = {
 			// ___ URL
 			let tabUrl = tab.linkedBrowser.currentURI.spec;
 			let tooltip = (label == tabUrl ? label : label + "\n" + tabUrl);
-			tabItem.$container.attr("title", tooltip);
+			setAttribute(tabItem.container, "title", tooltip);
 
 			// ___ Make sure the tab is complete and ready for updating.
 			if(options && options.force) {
@@ -879,14 +775,11 @@ this.TabItems = {
 	},
 
 	// Takes in a xul:tab and destroys the TabItem associated with it.
-	// note that it's ok to unlink an app tab; see .handleTabUnpin
 	unlink: function(tab) {
 		try {
+			tab._tabViewTabItem.destroy();
 			this.unregister(tab._tabViewTabItem);
 			tab._tabViewTabItem._sendToSubscribers("close", tab._tabViewTabItem);
-			tab._tabViewTabItem.$container.remove();
-			tab._tabViewTabItem.removeTrenches();
-			Items.unsquish(null, tab._tabViewTabItem);
 
 			tab._tabViewTabItem.tab = null;
 			tab._tabViewTabItem.tabCanvas.tab = null;
@@ -977,49 +870,32 @@ this.TabItems = {
 
 	// Don't reconnect any new tabs until resume is called.
 	pauseReconnecting: function() {
-		this._reconnectingPaused = true;
+		this.reconnectingPaused = true;
 	},
 
 	// Reconnect all of the tabs that were created since we paused.
 	resumeReconnecting: function() {
-		this._reconnectingPaused = false;
-		for(let item of this.items) {
+		this.reconnectingPaused = false;
+		for(let item of this) {
 			if(!item._reconnected) {
 				item._reconnect();
 			}
 		}
 	},
 
-	// Returns true if reconnecting is paused.
-	reconnectingPaused: function() {
-		return this._reconnectingPaused;
-	},
-
 	// Adds the given <TabItem> to the master list.
 	register: function(item) {
-		if(this.items.indexOf(item) == -1) {
-			this.items.push(item);
-		}
+		this.items.add(item);
 	},
 
 	// Removes the given <TabItem> from the master list.
 	unregister: function(item) {
-		let index = this.items.indexOf(item);
-		if(index != -1) {
-			this.items.splice(index, 1);
-		}
-	},
-
-	// Returns a copy of the master array of <TabItem>s.
-	getItems: function() {
-		return Utils.copy(this.items);
+		this.items.delete(item);
 	},
 
 	// Saves all open <TabItem>s.
 	saveAll: function() {
-		let tabItems = this.getItems();
-
-		for(let tabItem of tabItems) {
+		for(let tabItem of this) {
 			tabItem.save();
 		}
 	},
@@ -1034,7 +910,7 @@ this.TabItems = {
 		let widthRange = new Range(0, TabItems.tabWidth);
 		let proportion = widthRange.proportion(width - TabItems.tabItemPadding.x, true);
 		// proportion is in [0,1]
-		return TabItems.fontSizeRange.scale(proportion);
+		return Math.max(TabItems.fontSizeRange.scale(proportion), TabItems.fontSizeRange.min);
 	},
 
 	// Private method that returns the tabitem width given a height.
@@ -1047,12 +923,53 @@ this.TabItems = {
 		return width * TabItems.tabAspect;
 	},
 
+	// Arranges the given items in a grid within the given bounds, maximizing item size but maintaining standard tab aspect ratio for each
+	// Parameters:
+	//   items - an array of <TabItem>s. Can be null.
+	//   bounds - a <Rect> defining the space to arrange within
+	//   columns - pass an initial value for the number of columns to assume the items will be displayed in, if not set the loop will start at 1
+	// Returns:
+	//   an object with the width value of the child items (`tabWIdth` and `tabHeight`) and the number of columns (`columns`).
+	arrange: function(items, bounds, columns) {
+		let count = items.length;
+		columns = columns || 1;
+		// We'll assume that all the items have the same styling and that the margin is the same width around.
+		let rows;
+		let tabWidth;
+		let tabHeight;
+		let totalHeight;
+
+		let figure = function() {
+			rows = Math.ceil(count / columns);
+			let validSize = TabItems.calcValidSize(new Point(bounds.width / columns, -1));
+			tabWidth = validSize.x;
+			tabHeight = validSize.y;
+
+			totalHeight = tabHeight * rows;
+		}
+
+		figure();
+		while(rows > 1 && totalHeight > bounds.height) {
+			columns++;
+			figure();
+		}
+
+		if(rows == 1) {
+			let validSize = TabItems.calcValidSize(new Point(tabWidth, bounds.height));
+			tabWidth = validSize.x;
+			tabHeight = validSize.y;
+		}
+
+		tabWidth = Math.floor(tabWidth) -TabItems.tabItemPadding.x;
+		tabHeight = Math.floor(tabHeight) -TabItems.tabItemPadding.y;
+
+		return { tabWidth, tabHeight, columns, rows };
+	},
+
 	// Pass in a desired size, and receive a size based on proper title size and aspect ratio.
-	calcValidSize: function(size, options) {
+	calcValidSize: function(size) {
 		let width = Math.max(TabItems.minTabWidth, size.x);
-		let showTitle = !options || !options.hideTitle;
-		let titleSize = showTitle ? TabItems.fontSizeRange.max : 0;
-		let height = Math.max(TabItems.minTabHeight, size.y - titleSize);
+		let height = Math.max(TabItems.minTabHeight, size.y);
 		let retSize = new Point(width, height);
 
 		if(size.x > -1) {
@@ -1068,10 +985,6 @@ this.TabItems = {
 			} else {
 				retSize.x = this._getWidthForHeight(retSize.y);
 			}
-		}
-
-		if(showTitle) {
-			retSize.y += titleSize;
 		}
 
 		return retSize;
@@ -1110,7 +1023,7 @@ this.TabPriorityQueue.prototype = {
 		// If it already exists in the destination queue, leave it.
 		// If it exists in a different queue, remove it first and push onto new queue.
 		let item = tab._tabViewTabItem;
-		if(item.parent && (item.parent.isStacked() && !item.parent.isTopOfStack(item) && !item.parent.expanded)) {
+		if(item.parent && (item.parent.isStacked && !item.parent.isTopOfStack(item) && !item.parent.expanded)) {
 			let idx = this._high.indexOf(tab);
 			if(idx != -1) {
 				this._high.splice(idx, 1);
@@ -1168,11 +1081,13 @@ this.TabPriorityQueue.prototype = {
 
 // Class: TabCanvas - Takes care of the actual canvas for the tab thumbnail
 this.TabCanvas = function(tab, canvas) {
+	Subscribable(this);
+
 	this.tab = tab;
 	this.canvas = canvas;
 };
 
-this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
+this.TabCanvas.prototype = {
 	paint: function(evt) {
 		let w = this.canvas.width;
 		let h = this.canvas.height;
@@ -1227,4 +1142,4 @@ this.TabCanvas.prototype = Utils.extend(new Subscribable(), {
 	toImageData: function() {
 		return this.canvas.toDataURL("image/png");
 	}
-});
+};

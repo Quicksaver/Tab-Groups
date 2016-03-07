@@ -1,4 +1,5 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
+Modules.UTILS = true;
 
 this.Tabs = {
 	get length() {

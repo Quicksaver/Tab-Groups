@@ -15,40 +15,21 @@ body {
 
 /* Tabs */
 
-.tab {
-	margin: 4px;
+.thumb {
 	background-color: #D7D7D7;
 }
 
-html[dir=rtl] .tab {
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px rgba(255, 255, 255, 0.4) inset,
-		-1px 0 1px rgba(255, 255, 255, 0.4) inset,
-		1px 0 1px rgba(255, 255, 255, 0.4) inset,
-		0 1px 1.5px rgba(0, 0, 0, 0.4);
-}
-
-.tab canvas,
-.cached-thumb {
+.thumb > *:-moz-any(canvas,.cached-thumb) {
 	border: 1px solid rgba(0,0,0,0.2);
-}
-
-.thumb {
-	box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.2);
-}
-
-html[dir=rtl] .thumb {
-	box-shadow: -1px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .favicon {
 	background-color: #D7D7D7;
 	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, -1px 0 0 rgba(225, 225, 225, 0.8) inset;
-	-moz-border-end: 1px solid rgba(0, 0, 0, 0.3);
+	border-top: 1px solid transparent;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-	height: 16px;
-	width: 16px;
+	-moz-border-start: 1px solid transparent;
+	-moz-border-end: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 html[dir=rtl] .favicon {
@@ -72,40 +53,19 @@ html[dir=rtl] .favicon {
 .close:hover,
 .appTabIcon:hover {
 	opacity: 1.0;
-}
-
-.expander {
-	right: 6px;
-	width: 16px;
-	height: 16px;
-}
-
-.expander:hover {
-	opacity: 1.0;
-}
-
-.close:hover,
-.expander:hover,
-.appTabIcon:hover {
 	transition-property: opacity;
 	transition-duration: 0.5s;
 	transition-timing-function: ease-out;
 }
 
-.favicon img:hover,
-.close img:hover,
-.expander img:hover {
-	opacity: 1;
-	border: none;
-}
-
-.tab-title {
-	top: 100%;
-}
-
-.tab.focus {
+.tab.focus .thumb {
 	box-shadow: Highlight 0px 0px 5px 1px !important;
-	border: 1px solid Highlight;
+	border-color: Highlight;
+}
+
+.tab.focus:not(.stacked) .favicon {
+	border-top: 1px solid rgba(0, 0, 0, 0.3);
+	-moz-border-start: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 /* Tab GroupItem */

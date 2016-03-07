@@ -1,4 +1,4 @@
-// VERSION 1.1.4
+// VERSION 1.2.0
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -259,44 +259,38 @@ this.Range.prototype = {
 	}
 };
 
-// Class: Subscribable - A mix-in for allowing objects to collect subscribers for custom events.
-this.Subscribable = function() {
-	// we can't set the map here directly, otherwise that map would be shared across all instances based on this object, for Loki reasons...
-	this.subscribers = null;
-};
+// Subscribable - A mix-in for allowing objects to collect subscribers for custom events.
+this.Subscribable = function(obj) {
+	obj.subscribers = new Map();
 
-this.Subscribable.prototype = {
 	// The given callback will be called when the Subscribable fires the given event.
-	addSubscriber: function(eventName, callback) {
-		if(!this.subscribers) {
-			this.subscribers = new Map();
-		}
+	obj.addSubscriber = function(eventName, callback) {
 		if(!this.subscribers.has(eventName)) {
 			this.subscribers.set(eventName, new Set());
 		}
 
 		let subscribers = this.subscribers.get(eventName);
 		subscribers.add(callback);
-	},
+	};
 
 	// Removes the subscriber associated with the event for the given callback.
-	removeSubscriber: function(eventName, callback) {
-		if(!this.subscribers || !this.subscribers.has(eventName)) { return; }
+	obj.removeSubscriber = function(eventName, callback) {
+		if(!this.subscribers.has(eventName)) { return; }
 
 		let subscribers = this.subscribers.get(eventName);
 		subscribers.delete(callback);
-	},
+	};
 
 	// Internal routine. Used by the Subscribable to fire events.
-	_sendToSubscribers: function(eventName, eventInfo) {
-		if(!this.subscribers || !this.subscribers.has(eventName)) { return; }
+	obj._sendToSubscribers = function(eventName, eventInfo) {
+		if(!this.subscribers.has(eventName)) { return; }
 
 		let subscribers = this.subscribers.get(eventName);
 		for(let callback of subscribers) {
 			try { callback(eventInfo); }
 			catch(ex) { Cu.reportError(ex); }
 		}
-	}
+	};
 };
 
 // Class: Utils - Singelton with common utility functions.
@@ -335,18 +329,6 @@ this.Utils = {
 		return true;
 	},
 
-	// Returns a copy of the argument. Note that this is a shallow copy; if the argument
-	// has properties that are themselves objects, those properties will be copied by reference.
-	copy: function(value) {
-		if(value && typeof(value) == 'object') {
-			if(Array.isArray(value)) {
-				return this.extend([], value);
-			}
-			return this.extend({}, value);
-		}
-		return value;
-	},
-
 	// Merge two array-like objects into the first and return it.
 	merge: function(first, second) {
 		Array.forEach(second, el => Array.push(first, el));
@@ -367,7 +349,7 @@ this.Utils = {
 		for(let i = 1; i < length; i++) {
 			// Only deal with non-null/undefined values
 			let options = arguments[i];
-			if(options != null) {
+			if(options) {
 				// Extend the base object
 				for(let name in options) {
 					let copy = options[name];

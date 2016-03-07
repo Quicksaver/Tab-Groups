@@ -27,50 +27,70 @@ body {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	z-index: -999999;
+	z-index: -100;
 }
 
 /* Tabs */
 
 .tab {
-	position: absolute;
-	overflow: visible !important;
-	padding-top: 4px;
-	-moz-padding-end: 6px;
-	padding-bottom: 6px;
-	-moz-padding-start: 4px;
-	border-radius: 0.4em;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	overflow: hidden;
+	padding: 10px;
+	margin: 0;
 	cursor: pointer;
-}
-
-.tab canvas,
-.cached-thumb {
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	top: 0px;
-	left: 0px;
 }
 
 .tabHidden {
 	display: none;
 }
 
+body.DraggingTab .tab {
+	transition: margin 150ms linear;
+}
+
+body.DraggingTab .tab * {
+	pointer-events: none;
+}
+
 .thumb {
 	position: relative;
-	width: 100%;
-	height: 100%;
+	flex: 1 1 auto;
+	display: flex;
+	overflow: hidden;
+}
+
+.thumb > *:-moz-any(canvas,.cached-thumb) {
+	flex: 1 1 auto;
 	background-color: white;
+	background-clip: content-box;
+}
+
+.tab.cached-data .cached-thumb,
+.tab:not(.cached-data) canvas {
+	/* minus the borders, canvas are insane because they need width/height attributes to work properly,
+	   which completely messes up their layout in flex. */
+	width: calc(100% - 2px) !important;
+	height: calc(100% - 2px) !important;
+}
+
+.tab.cached-data canvas,
+.tab:not(.cached-data) .cached-thumb {
+	visibility: collapse;
 }
 
 .favicon {
 	position: absolute;
-	padding-top: 4px;
-	-moz-padding-end: 6px;
-	padding-bottom: 6px;
-	-moz-padding-start: 4px;
-	top: 4px;
-	left: 4px;
+	min-width: 17px;
+	min-height: 17px;
+	max-width: 27px;
+	max-height: 27px;
+	width: calc(100% - 10px - 4px);
+	height: calc(100% - 10px - 4px);
+	background-repeat: no-repeat;
+	background-size: 16px 16px;
+	background-position: center center;
 }
 
 html[dir=ltr] .favicon {
@@ -79,64 +99,66 @@ html[dir=ltr] .favicon {
 
 html[dir=rtl] .favicon {
 	border-bottom-left-radius: 0.4em;
-	left: auto;
-	right: 2px;
 }
 
-.favicon img {
-	border: none;
-	width: 16px;
-	height: 16px;
-}
+.tab:not(.stacked) .favicon { top: 0; }
+html[dir=ltr] .tab:not(.stacked) .favicon { left: 0; }
+html[dir=rtl] .tab:not(.stacked) .favicon { right: 0; }
+
+.tab.stacked .favicon { top: 1px; }
+html[dir=ltr] .tab.stacked .favicon { left: 1px; }
+html[dir=rtl] .tab.stacked .favicon { right: 1px; }
 
 /* Apply crisp rendering for favicons at exactly 2dppx resolution */
 @media (resolution: 2dppx) {
-	.favicon > img {
+	.favicon {
 		image-rendering: -moz-crisp-edges;
 	}
 }
 
 .close {
-	position: absolute;
 	cursor: pointer;
-	top: 6px;
-	right: 6px;
-	width: 16px;
-	height: 16px;
 	background-repeat: no-repeat;
+	background-position: center center;
 }
 
-html[dir=rtl] .close {
-	right: auto;
-	left: 6px;
-}
-
-.expander {
+.tab .close {
 	position: absolute;
-	right: 6px;
-	width: 16px;
-	height: 16px;
-	background: url(chrome://global/skin/icons/resizer.png) no-repeat;
-	opacity: 0.2;
+	top: 0;
+	width: 22px;
+	height: 22px;
 }
 
-html[dir=rtl] .expander {
-	right: auto;
-	left: 6px;
-	transform: scaleX(-1);
+html[dir=ltr] .tab .close {
+	right: 0;
+}
+
+html[dir=rtl] .tab .close {
+	left: 0;
 }
 
 .tab-title {
-	position: absolute;
+	display: block;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	text-align: center;
-	width: 94.5%;
+	margin: 3px 0;
+	flex: 0 0 auto;
 }
 
 .stacked {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
 	padding: 0;
+	overflow: visible;
+}
+
+.stacked.behind {
+	pointer-events: none;
 }
 
 .stacked .tab-title {
@@ -152,7 +174,6 @@ html[dir=rtl] .stacked .thumb {
 }
 
 .stack-trayed .tab-title {
-	display: block !important;
 	text-shadow: rgba(0,0,0,1) 1px 1px 1.5px;
 	color: #EEE;
 	font-size: 11px;
@@ -162,14 +183,10 @@ html[dir=rtl] .stack-trayed .tab-title {
 	text-shadow: rgba(0,0,0,1) -1px 1px 1.5px;
 }
 
-.stack-trayed .thumb {
-	box-shadow: none !important;
-}
-
 /* Tab: Zooming */
 
 .front {
-	z-index: 999999 !important;
+	z-index: 200 !important;
 	image-rendering: -moz-crisp-edges;
 }
 
@@ -181,7 +198,6 @@ html[dir=rtl] .stack-trayed .tab-title {
 .front .tab-title,
 .front .close,
 .front .favicon,
-.front .expander,
 .front .thumb-shadow {
 	display: none;
 }
@@ -196,6 +212,19 @@ html[dir=rtl] .stack-trayed .tab-title {
 	position: absolute;
 	cursor: pointer;
 	border-radius: 0.4em;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+body:not(.searching) .groupItem:not(.phantom) {
+	resize: both;
+}
+
+.groupItem:not(.phantom) {
+	/* Keep in sync with GroupsItems.minGroupHeight/Width */
+	min-height: 145px;
+	min-width: 120px;
 }
 
 .groupItem.activeGroupItem {
@@ -207,18 +236,25 @@ html[dir=rtl] .groupItem.activeGroupItem {
 }
 
 .groupItem .close {
-	z-index: 10;
-	top: 0px;
-	right: 0px;
-	width: 22px;
-	height: 22px;
-	background-position: bottom left;
+	width: 26px;
+	background-position: center center;
 }
 
-html[dir=rtl] .groupItem .close {
-	right: auto;
-	left: 0px;
-	background-position: bottom right;
+.groupItem .contents {
+	flex: 1 1 auto;
+	margin: 6px;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.tab-container {
+	position: relative;
+	flex: 1 1 auto;
+	display: flex;
+	flex-wrap: wrap;
+	align-content: flex-start;
+	overflow: hidden;
 }
 
 .overlay {
@@ -248,20 +284,19 @@ html[dir=rtl] .overlay {
 }
 
 .undo .close {
-	position: static;
 	width: 16px;
 	-moz-padding-end: 0.75em;
 	opacity: 0.5;
 	background-position: 0 50%;
-	/* can remove these later when rewriting .close above */
-	top: auto;
-	right: auto;
-	left: auto;
-	height: auto;
 }
 
 .undo .close:hover {
 	opacity: 1.0;
+}
+
+.phantom {
+	position: absolute;
+	cursor: default;
 }
 
 /* Trenches */
@@ -273,25 +308,25 @@ html[dir=rtl] .overlay {
 }
 
 .guideTrench {
-	z-index: -101;
+	z-index: 202;
 	opacity: 0.9;
-	border: 1px dashed rgba(0,0,0,.12);
+	border: 1px dashed ThreeDHighlight;
 	border-bottom: none;
 	-moz-border-end: none;
-	box-shadow: 1px 1px 0 rgba(255,255,255,.15);
+	box-shadow: 1px 1px 0 ThreeDShadow;
 }
 
 html[dir=rtl] .guideTrench {
-	box-shadow: -1px 1px 0 rgba(255,255,255,.15);
+	box-shadow: -1px 1px 0 ThreeDShadow;
 }
 
 .visibleTrench {
-	z-index: -103;
+	z-index: 200;
 	opacity: 0.05;
 }
 
 .activeVisibleTrench {
-	z-index: -102;
+	z-index: 201;
 	opacity: 0;
 }
 
@@ -312,6 +347,11 @@ html[dir=rtl] .guideTrench {
 /* Other */
 
 .dragging {
+	z-index: 100;
+}
+
+.dragging,
+.dragging * {
 	cursor: grabbing !important;
 }
 
@@ -323,35 +363,33 @@ html[dir=rtl] .active {
 	box-shadow: -5px 5px 3px rgba(0,0,0,.5);
 }
 
-.acceptsDrop {
+/* Can't use :-moz-drag-over because hovering its children nodes while dragging
+ * would set the pseudo-class on those and not on the group node. */
+.groupItem.dragOver {
 	box-shadow: 2px 2px 7px -1px rgba(0,0,0,.6);
 }
 
-html[dir=rtl] .acceptsDrop {
+html[dir=rtl] .groupItem.dragOver {
 	box-shadow: -2px 2px 7px -1px rgba(0,0,0,.6);
 }
 
 .titlebar {
-	position: absolute;
+	display: flex;
 	cursor: move;
 	font-size: 12px;
-	height: 18px;
 }
 
 .title-container {
-	/* We want the title container to leave out width, position of the .close button and space between input and .close button.
-	Keep an eye on LTR and RTL differences in .close. */
-	width: calc(100% - 16px - 6px - 6px);
+	position: relative;
+	flex: 1 1 auto;
 }
 
 input.name {
 	text-overflow: ellipsis;
-	width: -moz-available;
+	width: 100%;
 	background: transparent;
 	border: 1px solid transparent;
 	margin-top: 3px;
-	-moz-margin-end: 0;
-	margin-bottom: 0;
 	-moz-margin-start: 3px;
 	padding: 1px;
 }
@@ -366,19 +404,14 @@ input.name:focus {
 
 .title-container:hover input.name,
 .title-container input.name:focus {
-	border: 1px solid #ddd;
-}
-
-.title-container:hover input.name-locked {
-	border: 1px solid transparent !important;
-	cursor: default;
+	border-bottom: 1px solid #ddd;
 }
 
 input.name::-moz-placeholder {
 	opacity: 1.0;
 	font-style: italic !important;
 	color: transparent;
-	background-image: url(chrome://tabgroups/skin/edit-light.png);
+	background-image: url("chrome://tabgroups/skin/edit-light.png");
 	background-repeat: no-repeat;
 }
 
@@ -394,17 +427,7 @@ input.name:focus::-moz-placeholder {
 	width: -moz-available;
 	height: 100%;
 	z-index: 10;
-	margin-top: 3px;
-	-moz-margin-end: 0;
-	margin-bottom: 0;
-	-moz-margin-start: 3px;
-	padding: 1px;
 	cursor: text;
-}
-
-html[dir=rtl] .title-shield {
-	left: auto;
-	right: 0;
 }
 
 .transparentBorder {
@@ -412,17 +435,26 @@ html[dir=rtl] .title-shield {
 	border: 1px solid transparent !important;
 }
 
+.groupItem:not(.stackedGroup) .stackExpander {
+	visibility: collapse;
+}
+
 .stackExpander {
-	position: absolute;
 	cursor: pointer;
 	bottom: 8px;
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/stack-expander.png), 0, 48, 24, 24);
 	width: 24px;
 	height: 24px;
+	margin: 0 auto;
 }
 
 .stackExpander:hover {
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/stack-expander.png), 0, 24, 24, 0);
+}
+
+.expandedTray {
+	padding: 6px;
+	display: flex;
 }
 
 .shield {
@@ -431,6 +463,7 @@ html[dir=rtl] .title-shield {
 	width: 100%;
 	height: 100%;
 	position: absolute;
+	z-index: 10;
 }
 
 .banner {
@@ -439,7 +472,7 @@ html[dir=rtl] .title-shield {
 	right: 0;
 	padding: 10px 0;
 	position: absolute;
-	z-index: 1000060;
+	z-index: 500;
 	background: #000;
 	color: #fff;
 	opacity: 0;
@@ -469,53 +502,11 @@ html[dir=rtl] .title-shield {
 }
 
 #sessionRestoreNotice .close {
-	top: calc(50% - 8px);
-}
-
-/* Resizable */
-
-.resizer {
 	position: absolute;
-	background-image: url(chrome://global/skin/icons/resizer.png);
+	top: calc(50% - 8px);
+	right: 6px;
 	width: 16px;
 	height: 16px;
-	bottom: 0px;
-	right: 0px;
-	opacity: .2;
-}
-
-html[dir=rtl] .resizer {
-	right: auto;
-	left: 0;
-	transform: scaleX(-1);
-}
-
-.iq-resizable-handle {
-	position: absolute;
-	z-index: 99999;
-	display: block;
-	font-size: 0.1px;
-}
-
-.iq-resizable-disabled .iq-resizable-handle,
-.iq-resizable-autohide .iq-resizable-handle {
-	display: none;
-}
-
-.iq-resizable-se {
-	cursor: se-resize;
-	width: 12px;
-	height: 12px;
-	padding-right: 3px;
-	padding-bottom: 3px;
-	right: -2px;
-	bottom: -2px;
-}
-
-html[dir=rtl] .iq-resizable-se {
-	cursor: sw-resize;
-	right: auto;
-	left: 1px;
 }
 
 /* Side buttons */
@@ -527,7 +518,7 @@ html[dir=rtl] .iq-resizable-se {
 	right: -3px;
 	padding: 3px 0;
 	-moz-padding-end: 3px;
-	z-index: 1000000;
+	z-index: 500;
 	width: 29px;
 	text-align: center;
 	border-radius: 0.4em;
@@ -584,11 +575,16 @@ html[dir=rtl] #pinnedTabs {
 
 /* Search */
 
+body:not(.searching) #searchshade,
+body:not(.searching) #search {
+	display: none;
+}
+
 #searchshade {
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	z-index: 1000001;
+	z-index: 100;
 	background-color: rgba(0,0,0,.42);
 	width: 100%;
 	height: 100%;
@@ -599,9 +595,9 @@ html[dir=rtl] #pinnedTabs {
 	top: 0px;
 	left: 0px;
 	pointer-events: none;
-	z-index: 1000050;
+	z-index: 175;
 	width: 100%;
-	height: calc(100% - 1.7em - 20px); /* leave room for banner */
+	height: 100%;
 }
 
 html[dir=rtl] #search {
@@ -632,49 +628,53 @@ html[dir=rtl] #searchbox {
 	left: 20px;
 }
 
-.notMainMatch{
-	opacity: .70;
-}
-
 #otherresults {
 	position: absolute;
-	opacity: 0;
 	overflow: hidden;
+	display: flex;
 	left: 0px;
 	bottom: 0px;
 	width: 100%;
-	height: 30px;
+	padding: 4px 2px;
 	background-color: rgba(0,0,0,.3);
 	box-shadow: 0px -1px 0px rgba(255,255,255,.1), inset 0px 2px 5px rgba(0,0,0,.3);
 }
 
-html[dir=rtl] #otherresults {
-	left: auto;
-	right: 0;
+#otherresults:not(.hasMatches) {
+	display: none;
 }
 
 #otherresults .label {
 	color: #999;
-	line-height: 30px;
-	-moz-margin-start: 5px;
-	-moz-margin-end: 5px;
+	margin: 4px 7px;
+}
+
+#results {
+	display: flex;
+	flex-wrap: wrap;
+	align-content: flex-start;
+	flex: 1 1 auto;
 }
 
 .onTop {
-	z-index: 1000010 !important;
+	z-index: 150 !important;
+}
+
+.notMainMatch {
+	opacity: 0.7;
 }
 
 .inlineMatch {
-	display: inline-block;
+	display: flex;
 	pointer-events: auto;
 	background-color: #EBEBEB;
 	border-radius: 0.4em;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 	border: 1px solid rgba(255, 255, 255, 0.5);
-	-moz-padding-start: 3px;
-	-moz-padding-end: 3px;
-	height: 20px;
-	-moz-margin-end: 5px;
+	padding: 2px 3px;
+	margin-top: 1px;
+	margin-bottom: 1px;
+	-moz-margin-end: 7px;
 	cursor: pointer;
 }
 
@@ -685,14 +685,14 @@ html[dir=rtl] #otherresults {
 .inlineMatch > img {
 	-moz-margin-end: 5px;
 	position: relative;
-	top: 2px;
+	top: calc(50% - 8px);
 	width: 16px;
 	height: 16px;
 }
 
 .inlineMatch > span {
-	display: inline-block;
 	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 	max-width: 200px;
-	height: 15px;
 }

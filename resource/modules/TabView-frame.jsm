@@ -1,4 +1,4 @@
-// VERSION 1.0.9
+// VERSION 1.0.10
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -21,11 +21,9 @@ this.TabView = {
 	shims: [
 		'Point', 'Rect', 'Range', 'Subscribable', 'Utils', 'MRUList',
 		'iQ',
-		'Item', 'Items',
-		'GroupItem', 'GroupItems',
+		'GroupItem', 'GroupItems', 'PinnedItems',
 		'TabItem', 'TabItems', 'TabPriorityQueue', 'TabCanvas',
 		'FavIcons',
-		'drag', 'resize', 'Drag',
 		'Trench', 'Trenches',
 		'TabUtils', 'TabMatcher', 'TabHandlers', 'Search',
 		'Keys', 'UI'
@@ -50,7 +48,6 @@ Modules.LOADMODULE = function() {
 	Modules.load('AllTabs');
 	Modules.load('iQ');
 	Modules.load('FavIcons');
-	Modules.load('Items');
 	Modules.load('GroupItems');
 	Modules.load('TabItems');
 	Modules.load('Drag');
@@ -66,7 +63,6 @@ Modules.UNLOADMODULE = function() {
 	Modules.unload('Drag');
 	Modules.unload('TabItems');
 	Modules.unload('GroupItems');
-	Modules.unload('Items');
 	Modules.unload('FavIcons');
 	Modules.unload('iQ');
 	Modules.unload('AllTabs');

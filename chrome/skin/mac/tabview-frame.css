@@ -22,31 +22,21 @@ body {
 
 /* Tabs */
 
-.tab {
-	margin: 8px;
+.thumb {
 	background-color: rgb(240,240,240);
 }
 
-.tab canvas,
-.cached-thumb {
+.thumb > *:-moz-any(canvas,.cached-thumb) {
 	border: 1px solid rgba(0, 0, 0, 0.3);
-}
-
-.thumb {
-	box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.2);
-}
-
-html[dir=rtl] .thumb {
-	box-shadow: -1px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .favicon {
 	background-color: rgb(240,240,240);
 	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, -1px 0 0 rgba(225, 225, 225, 0.8) inset;
-	-moz-border-end: 1px solid rgba(0, 0, 0, 0.3);
+	border-top: 1px solid transparent;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-	height: 16px;
-	width: 16px;
+	-moz-border-start: 1px solid transparent;
+	-moz-border-end: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 html[dir=rtl] .favicon {
@@ -63,14 +53,6 @@ html[dir=rtl] .favicon {
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/close.png), 0, 48, 16, 32);
 }
 
-.expander {
-	bottom: 8px;
-	transition-property: opacity;
-	transition-duration: 0.5s;
-	transition-timing-function: ease-out;
-}
-
-.expander:hover,
 .appTabIcon:hover {
 	transition-property: opacity;
 	transition-duration: 0.5s;
@@ -78,20 +60,18 @@ html[dir=rtl] .favicon {
 	opacity: 1.0;
 }
 
-.favicon img:hover,
-.expander img:hover {
-	opacity: 1;
-	border: none;
-}
-
 .tab-title {
-	bottom: -20px;
 	text-shadow: 0 1px rgba(255, 255, 255, 0.6);
 }
 
-.tab.focus {
+.tab.focus .thumb {
 	box-shadow: 0 0 5.5px -moz-mac-menuselect/*#0060D6*/;
 	border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.tab.focus:not(.stacked) .favicon {
+	border-top: 1px solid rgba(0, 0, 0, 0.3);
+	-moz-border-start: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 /* Tab: Zooming */

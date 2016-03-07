@@ -11,6 +11,8 @@
 <!ENTITY buttonOptionsTabGroups.label "Change tab groups preferences">
 <!ENTITY buttonHelpTabGroups.label "How to use tab groups">
 
+<!ENTITY searchOtherWindowTabs.label "Tabs from other windows">
+
 <!ENTITY sessionRestoreNotice.label "Your tabs and groups will not be restored the next time you start the browser! Click here to fix it.">
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Dismiss this warning until I restart the browser">
 <!ENTITY sessionRestoreAutoChanged.label "Your tabs and groups will be restored automatically the next time you start the browser.">

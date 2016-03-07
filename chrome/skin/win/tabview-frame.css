@@ -14,39 +14,20 @@ body {
 
 /* Tabs */
 
-.tab {
-	margin: 4px;
+.thumb {
 	background-color: #E0EAF5;
 }
 
-html[dir=rtl] .tab {
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
-		-1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		0 1px 1.5px rgba(4, 38, 60, 0.4);
-}
-
-.tab canvas,
-.cached-thumb {
+.thumb > *:-moz-any(canvas,.cached-thumb) {
 	border: 1px solid rgba(73, 99, 119, 0.3);
-}
-
-.thumb {
-	box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.1);
-}
-
-html[dir=rtl] .thumb {
-	box-shadow: -1px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .favicon {
 	background-color: #E0EAF5;
-	-moz-border-end: 1px solid rgba(73, 99, 119, 0.3);
+	border-top: 1px solid transparent;
 	border-bottom: 1px solid rgba(73, 99, 119, 0.3);
-	height: 17px;
-	width: 17px;
+	-moz-border-start: 1px solid transparent;
+	-moz-border-end: 1px solid rgba(73, 99, 119, 0.3);
 }
 
 .close {
@@ -61,14 +42,6 @@ html[dir=rtl] .thumb {
 	background-image: -moz-image-rect(url("chrome://tabgroups-os/skin/close.png"), 0, 48, 16, 32);
 }
 
-.expander {
-	bottom: 6px;
-	transition-property: opacity;
-	transition-duration: 0.5s;
-	transition-timing-function: ease-out;
-}
-
-.expander:hover,
 .appTabIcon:hover {
 	transition-property: opacity;
 	transition-duration: 0.5s;
@@ -76,19 +49,11 @@ html[dir=rtl] .thumb {
 	opacity: 1.0;
 }
 
-.favicon img:hover,
-.close img:hover,
-.expander img:hover {
-	opacity: 1;
-	border: none;
-}
-
 .tab-title {
-	bottom: -20px;
 	text-shadow: 0 1px rgba(255, 255, 255, 0.6);
 }
 
-.tab.focus {
+.tab.focus .thumb {
 	box-shadow:
 		0 1px 0 #FFFFFF inset,
 		0 -1px 1px #FFFFFF inset,
@@ -97,13 +62,18 @@ html[dir=rtl] .thumb {
 		0 0 5.5px #007ECE;
 }
 
-html[dir=rtl] .tab.focus {
+html[dir=rtl] .tab.focus .thumb {
 	box-shadow:
 		0 1px 0 #FFFFFF inset,
 		0 -1px 1px #FFFFFF inset,
 		-1px 0 1px #FFFFFF inset,
 		1px 0 1px #FFFFFF inset,
 		0 0 5.5px #007ECE;
+}
+
+.tab.focus:not(.stacked) .favicon {
+	border-top: 1px solid rgba(73, 99, 119, 0.3);
+	-moz-border-start: 1px solid rgba(73, 99, 119, 0.3);
 }
 
 /* Tab: Zooming */

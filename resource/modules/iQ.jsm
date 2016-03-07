@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.1.0
 
 // Returns an iQClass object which represents an individual element or a group of elements. It works pretty much like jQuery(), with a few exceptions,
 // most notably that you can't use strings with complex html, just simple tags like '<div>'.
@@ -145,18 +145,6 @@ this.iQClass.prototype = {
 		return this;
 	},
 
-	// Returns true is the receiver has the given css class.
-	hasClass: function(singleClassName) {
-		for(let i = 0; i < this.length; i++) {
-			if(this[i].nodeType !== 1) { continue; }
-
-			if(this[i].classList.contains(singleClassName)) {
-				return true;
-			}
-		}
-		return false;
-	},
-
 	// Searches the receiver and its children, returning a new iQ object with elements that match the given selector.
 	find: function(selector) {
 		let ret = [];
@@ -172,36 +160,6 @@ this.iQClass.prototype = {
 		}
 
 		return iQ(ret);
-	},
-
-	// Check to see if a given DOM node descends from the receiver.
-	contains: function(selector) {
-		let object = iQ(selector);
-		return isAncestor(object[0], this[0]);
-	},
-
-	// Removes the receiver from the DOM.
-	remove: function(options) {
-		if(!options || !options.preserveEventHandlers) {
-			this.unbindAll();
-		}
-
-		for(let i = 0; this[i] != null; i++) {
-			this[i].remove();
-		}
-		return this;
-	},
-
-	// Removes all of the reciever's children and HTML content from the DOM.
-	empty: function() {
-		for(let i = 0; this[i] != null; i++) {
-			let elem = this[i];
-			while(elem.firstChild) {
-				iQ(elem.firstChild).unbindAll();
-				elem.firstChild.remove();
-			}
-		}
-		return this;
 	},
 
 	// Returns the width of the receiver, including padding and border.
@@ -224,74 +182,6 @@ this.iQClass.prototype = {
 	bounds: function() {
 		let rect = this[0].getBoundingClientRect();
 		return new Rect(Math.floor(rect.left), Math.floor(rect.top), Math.floor(rect.width), Math.floor(rect.height));
-	},
-
-	// Pass in both key and value to attach some data to the receiver;
-	// pass in just key to retrieve it.
-	data: function(key, value) {
-		let data = null;
-		if(value === undefined) {
-			data = this[0].iQData;
-			return (data) ? data[key] : null;
-		}
-
-		for(let i = 0; this[i] != null; i++) {
-			let elem = this[i];
-			data = elem.iQData;
-
-			if(!data) {
-				data = elem.iQData = {};
-			}
-
-			data[key] = value;
-		}
-
-		return this;
-	},
-
-	// Given a value, sets the receiver's textContent to it; otherwise returns what's already there.
-	text: function(value) {
-		if(value === undefined) {
-			return this[0].textContent;
-		}
-
-		return this.empty().append((this[0] && this[0].ownerDocument || document).createTextNode(value));
-	},
-
-	// Given a value, sets the receiver's value to it; otherwise returns what's already there.
-	val: function(value) {
-		if(value === undefined) {
-			return this[0].value;
-		}
-
-		this[0].value = value;
-		return this;
-	},
-
-	// Appends the receiver to the result of iQ(selector).
-	appendTo: function(selector) {
-		iQ(selector).append(this);
-		return this;
-	},
-
-	// Appends the result of iQ(selector) to the receiver.
-	append: function(selector) {
-		let object = iQ(selector);
-		this[0].appendChild(object[0]);
-		return this;
-	},
-
-	// Sets or gets an attribute on the element(s).
-	attr: function(key, value) {
-		if(value === undefined) {
-			return this[0].getAttribute(key);
-		}
-
-		for(let i = 0; this[i] != null; i++) {
-			this[i].setAttribute(key, value);
-		}
-
-		return this;
 	},
 
 	// Sets or gets CSS properties on the receiver. When setting certain numerical properties,
@@ -460,119 +350,5 @@ this.iQClass.prototype = {
 	show: function() {
 		this.css({ display: '', opacity: 1 });
 		return this;
-	},
-
-	// Binds the given function to the given event type. Also wraps the function in a try/catch so it doesn't block on any errors.
-	bind: function(type, func) {
-		let handler = function(event) {
-			return func.apply(this, [event]);
-		};
-
-		for(let i = 0; this[i] != null; i++) {
-			let elem = this[i];
-			if(!elem.iQEventData) {
-				elem.iQEventData = {};
-			}
-
-			if(!elem.iQEventData[type]) {
-				elem.iQEventData[type] = [];
-			}
-
-			elem.iQEventData[type].push({
-				original: func,
-				modified: handler
-			});
-
-			elem.addEventListener(type, handler, false);
-		}
-
-		return this;
-	},
-
-	// Binds the given function to the given event type, but only for one call;
-	// automatically unbinds after the event fires once.
-	one: function(type, func) {
-		let handler = function(e) {
-			iQ(this).unbind(type, handler);
-			return func.apply(this, [e]);
-		};
-
-		return this.bind(type, handler);
-	},
-
-	// Unbinds the given function from the given event type.
-	unbind: function(type, func) {
-		for(let i = 0; this[i] != null; i++) {
-			let elem = this[i];
-			let handler = func;
-			if(elem.iQEventData && elem.iQEventData[type]) {
-				let count = elem.iQEventData[type].length;
-				for(let a = 0; a < count; a++) {
-					let pair = elem.iQEventData[type][a];
-					if(pair.original == func) {
-						handler = pair.modified;
-						elem.iQEventData[type].splice(a, 1);
-						if(!elem.iQEventData[type].length) {
-							delete elem.iQEventData[type];
-							if(!Object.keys(elem.iQEventData).length) {
-								delete elem.iQEventData;
-							}
-						}
-						break;
-					}
-				}
-			}
-
-			elem.removeEventListener(type, handler, false);
-		}
-
-		return this;
-	},
-
-	// Unbinds all event handlers.
-	unbindAll: function() {
-		for(let i = 0; this[i] != null; i++) {
-			let elem = this[i];
-
-			for(let j = 0; j < elem.childElementCount; j++) {
-				iQ(elem.children[j]).unbindAll();
-			}
-
-			if(!elem.iQEventData) {
-				continue;
-			}
-
-			Object.keys(elem.iQEventData).forEach(function(type) {
-				while(elem.iQEventData && elem.iQEventData[type]) {
-					this.unbind(type, elem.iQEventData[type][0].original);
-				}
-			}, this);
-		}
-
-		return this;
 	}
-};
-
-Modules.LOADMODULE = function() {
-	// Create various event aliases
-	[
-		'keyup',
-		'keydown',
-		'keypress',
-		'mouseup',
-		'mousedown',
-		'mouseover',
-		'mouseout',
-		'mousemove',
-		'click',
-		'dblclick',
-		'resize',
-		'change',
-		'blur',
-		'focus'
-	].forEach(function(event) {
-		iQClass.prototype[event] = function(func) {
-			return this.bind(event, func);
-		};
-	});
 };

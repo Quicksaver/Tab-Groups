@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.1.0
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -8,7 +8,7 @@ this.TabUtils = {
 		// We can have two types of tabs: A <TabItem> or a <xul:tab> because we have to deal with both tabs represented inside
 		// of active Panoramas as well as for windows in which Panorama has yet to be activated. We uses object sniffing to
 		// determine the type of tab and then returns its name.
-		return tab.label != undefined ? tab.label : tab.$tabTitle[0].textContent;
+		return tab.label != undefined ? tab.label : tab.tabTitle.textContent;
 	},
 
 	// Given a <TabItem> or a <xul:tab> returns the URL of tab.
@@ -22,7 +22,7 @@ this.TabUtils = {
 
 	// Given a <TabItem> or a <xul:tab> returns the URL of tab's favicon.
 	faviconURLOf: function(tab) {
-		return tab.image != undefined ? tab.image : tab.$favImage[0].src;
+		return tab.image != undefined ? tab.image : tab.fav._iconUrl;
 	},
 
 	// Given a <TabItem> or a <xul:tab>, focuses it and it's window.
@@ -62,7 +62,7 @@ this.TabMatcher.prototype = {
 	// Given an array of <TabItem>s returns an unsorted array of tabs whose name does not match the the search term.
 	_filterForUnmatches: function(tabs) {
 		return tabs.filter((tab) => {
-			let name = tab.$tabTitle[0].textContent;
+			let name = tab.tabTitle.textContent;
 			let url = TabUtils.URLOf(tab);
 			return !name.match(new RegExp(this.term, "i")) && !url.match(new RegExp(this.term, "i"));
 		});
@@ -96,6 +96,14 @@ this.TabMatcher.prototype = {
 		return this._filterAndSortForMatches(tabs);
 	},
 
+	getTabItems: function() {
+		let tabs = [];
+		for(let tabItem of TabItems) {
+			tabs.push(tabItem);
+		}
+		return tabs;
+	},
+
 	// Returns an array of <TabItem>s which match the current search term.
 	// If the term is less than 2 characters in length, it returns nothing.
 	matched: function() {
@@ -103,13 +111,13 @@ this.TabMatcher.prototype = {
 			return [];
 		}
 
-		let tabs = TabItems.getItems();
+		let tabs = this.getTabItems();
 		return this._filterAndSortForMatches(tabs);
 	},
 
 	// Returns all of <TabItem>s that .matched() doesn't return.
 	unmatched: function() {
-		let tabs = TabItems.getItems();
+		let tabs = this.getTabItems();
 		if(this.term.length < 2) {
 			return tabs;
 		}
@@ -121,21 +129,23 @@ this.TabMatcher.prototype = {
 	// The first is on all matched tabs in the window, the second on all unmatched tabs in the window, and the third on all matched tabs in other windows.
 	// The first two functions take two parameters: A <TabItem> and its integer index indicating the absolute rank of the <TabItem> in terms of match to the search term.
 	// The last function also takes two paramaters, but can be passed both <TabItem>s and <xul:tab>s and the index is offset by the number of matched tabs inside the window.
-	doSearch: function(matchFunc, unmatchFunc, otherFunc) {
+	doSearch: function() {
+		TabHandlers.clearOtherMatches();
+
 		let matches = this.matched();
 		let unmatched = this.unmatched();
 		let otherMatches = this.matchedTabsFromOtherWindows();
 
 		matches.forEach(function(tab, i) {
-			matchFunc(tab, i);
+			TabHandlers.onMatch(tab, i);
 		});
 
-		otherMatches.forEach(function(tab,i) {
-			otherFunc(tab, i+matches.length);
+		otherMatches.forEach(function(tab, i) {
+			TabHandlers.onOther(tab, i + matches.length);
 		});
 
-		unmatched.forEach(function(tab, i) {
-			unmatchFunc(tab, i);
+		unmatched.forEach(function(tab) {
+			TabHandlers.onUnmatch(tab);
 		});
 	},
 
@@ -199,113 +209,169 @@ this.TabMatcher.prototype = {
 this.TabHandlers = {
 	_mouseDownLocation: null,
 
+	get results() { return $('results'); },
+
 	// Adds styles and event listeners to the matched tab items.
 	onMatch: function(tab, index) {
 		tab.addClass("onTop");
 		index != 0 ? tab.addClass("notMainMatch") : tab.removeClass("notMainMatch");
 
-		// Remove any existing handlers before adding the new ones. If we don't do this, then we may add more handlers than we remove.
-		tab.$canvas
-			.unbind("mousedown", TabHandlers._hideHandler)
-			.unbind("mouseup", TabHandlers._showHandler);
-
-		tab.$canvas
-			.mousedown(TabHandlers._hideHandler)
-			.mouseup(TabHandlers._showHandler);
+		Listeners.add(tab.container, 'mousedown', this);
 	},
 
 	// Removes styles and event listeners from the unmatched tab items.
-	onUnmatch: function(tab, index) {
-		tab.$container.removeClass("onTop");
+	onUnmatch: function(tab) {
+		tab.removeClass("onTop");
 		tab.removeClass("notMainMatch");
 
-		tab.$canvas
-			.unbind("mousedown", TabHandlers._hideHandler)
-			.unbind("mouseup", TabHandlers._showHandler);
+		Listeners.remove(tab.container, 'mousedown', this);
 	},
 
 	// Removes styles and event listeners from the unmatched tabs.
 	onOther: function(tab, index) {
 		// Unlike the other on* functions, in this function tab can either be a <TabItem> or a <xul:tab>. In other functions it is always a <TabItem>.
 		// Also note that index is offset by the number of matches within the window.
-		let item = iQ("<div/>")
-			.addClass("inlineMatch")
-			.click(function(event) {
-				Search.hide(event);
-				TabUtils.focus(tab);
-			});
+		let item = document.createElement("div");
+		item.classList.add('inlineMatch');
+		item.handleEvent = function(e) {
+			// click
+			Search.hide(e);
+			TabUtils.focus(tab);
+		};
+		item.addEventListener('click', item);
 
-		iQ("<img/>")
-			.attr("src", TabUtils.faviconURLOf(tab))
-			.appendTo(item);
+		let img = document.createElement('img');
+		img.setAttribute('src', TabUtils.faviconURLOf(tab));
+		item.appendChild(img);
 
-		iQ("<span/>")
-			.text(TabUtils.nameOf(tab))
-			.appendTo(item);
+		let span = document.createElement('span');
+		span.textContent = TabUtils.nameOf(tab);
+		item.appendChild(span);
 
-		index != 0 ? item.addClass("notMainMatch") : item.removeClass("notMainMatch");
-		item.appendTo("#results");
-		iQ("#otherresults").show();
+		index != 0 ? item.classList.add("notMainMatch") : item.classList.remove("notMainMatch");
+		this.results.appendChild(item);
+		this.results.parentNode.classList.add('hasMatches');
+	},
+
+	clearOtherMatches: function() {
+		let results = this.results;
+		while(results.firstChild) {
+			results.firstChild.remove();
+		}
+		results.parentNode.classList.remove('hasMatches');
+	},
+
+	handleEvent: function(e) {
+		switch(e.type) {
+			case 'mousedown':
+				this._hideHandler(e);
+				break;
+
+			case 'mouseup':
+			case 'dragend':
+				this._showHandler(e);
+				break;
+		}
 	},
 
 	// Performs when mouse down on a canvas of tab item.
-	_hideHandler: function(event) {
-		iQ("#search").fadeOut();
-		iQ("#searchshade").fadeOut();
-		TabHandlers._mouseDownLocation = { x:event.clientX, y:event.clientY };
+	_hideHandler: function(e) {
+		this._mouseDownLocation = { x: e.clientX, y: e.clientY };
+		Listeners.add(window, 'mouseup', this);
+		Listeners.add(window, 'dragend', this);
+
+		// Don't hide the shade right away, we won't need to if zooming into a tab or closing it, the shade should remain after closing a tab.
+		aSync(function() {
+			document.body.classList.remove('searching');
+		}, 100);
 	},
 
 	// Performs when mouse up on a canvas of tab item.
-	_showHandler: function(event) {
+	_showHandler: function(e) {
+		Listeners.remove(window, 'mouseup', this);
+		Listeners.remove(window, 'dragend', this);
+
 		// If the user clicks on a tab without moving the mouse then they are zooming into the tab and we need to exit search mode.
-		if(TabHandlers._mouseDownLocation.x == event.clientX && TabHandlers._mouseDownLocation.y == event.clientY) {
+		if(this._mouseDownLocation.x == e.clientX && this._mouseDownLocation.y == e.clientY) {
 			Search.hide();
 			return;
 		}
 
-		iQ("#searchshade").show();
-		iQ("#search").show();
-		iQ("#searchbox")[0].focus();
+		document.body.classList.add('searching');
+		Search.searchbox.focus();
 
 		// Marshal the search.
-		aSync(Search.perform, 0);
+		aSync(() => { Search.perform(); }, 0);
 	}
 };
 
 // Class: Search - A object that handles the search feature.
 this.Search = {
-	_initiatedBy: "",
+	inSearch: false,
+	_initiatedByKeypress: false,
 	_blockClick: false,
-	_currentHandler: null,
+
+	get searchbox() { return $('searchbox'); },
+	get searchshade() { return $('searchshade'); },
+	get searchbutton() { return $('searchbutton'); },
+
+	handleEvent: function(e) {
+		switch(e.type) {
+			// target == this.searchbox
+			case 'keyup':
+				this.perform();
+				break;
+
+			case 'mousedown':
+				switch(e.target) {
+					case this.searchshade:
+						if(!this._blockClick) {
+							this.hide();
+						}
+						break;
+
+					case this.searchbutton:
+						this.ensureShown();
+						break;
+				}
+				break;
+
+			// target == window
+			case 'focus':
+				if(this.inSearch) {
+					this._blockClick = true;
+					aSync(() => {
+						this._blockClick = false;
+					}, 0);
+				}
+				break;
+
+			// target == window
+			case 'keydown':
+				if(this.inSearch) {
+					this._inSearchKeyHandler(e);
+				} else {
+					this._beforeSearchKeyHandler(e);
+				}
+				break;
+		}
+	},
 
 	// Initializes the searchbox to be focused, and everything else to be hidden, and to have everything have the appropriate event handlers.
 	init: function() {
-		iQ("#search").hide();
-		iQ("#searchshade").hide().mousedown((event) => {
-			if(event.target.id != "searchbox" && !this._blockClick)
-			this.hide();
-		});
+		Listeners.add(this.searchshade, 'mousedown', this);
+		Listeners.add(this.searchbox, 'keyup', this);
+		Listeners.add(this.searchbutton, 'mousedown', this);
+		Listeners.add(window, 'focus', this);
+		Listeners.add(window, 'keydown', this);
+	},
 
-		iQ("#searchbox").keyup(() => {
-			this.perform();
-		});
-
-		iQ("#searchbutton").mousedown(() => {
-			this._initiatedBy = "buttonclick";
-			this.ensureShown();
-			this.switchToInMode();
-		});
-
-		window.addEventListener("focus", () => {
-			if(this.isEnabled()) {
-				this._blockClick = true;
-				aSync(() => {
-					this._blockClick = false;
-				}, 0);
-			}
-		}, false);
-
-		this.switchToBeforeMode();
+	uninit: function() {
+		Listeners.remove(this.searchshade, 'mousedown', this);
+		Listeners.remove(this.searchbox, 'keyup', this);
+		Listeners.remove(this.searchbutton, 'mousedown', this);
+		Listeners.remove(window, 'focus', this);
+		Listeners.remove(window, 'keydown', this);
 	},
 
 	// Handles all keydown before the search interface is brought up.
@@ -335,16 +401,14 @@ this.Search = {
 			e.preventDefault();
 		}
 
-		this.switchToInMode();
-		this._initiatedBy = "keydown";
 		this.ensureShown(true);
 	},
 
 	// Handles all keydown while search mode.
 	_inSearchKeyHandler: function(e) {
-		let term = iQ("#searchbox").val();
+		let term = this.searchbox.value;
 		if((e.keyCode == e.DOM_VK_ESCAPE)
-		|| (e.keyCode == e.DOM_VK_BACK_SPACE && term.length <= 1 && this._initiatedBy == "keydown")) {
+		|| (e.keyCode == e.DOM_VK_BACK_SPACE && term.length <= 1 && this._initiatedByKeypress)) {
 			this.hide(e);
 			return;
 		}
@@ -362,56 +426,26 @@ this.Search = {
 		}
 	},
 
-	// Make sure the event handlers are appropriate for the before-search mode.
-	switchToBeforeMode: function() {
-		if(this._currentHandler) {
-			iQ(window).unbind("keydown", this._currentHandler);
-		}
-		this._currentHandler = (e) => {
-			this._beforeSearchKeyHandler(e);
-		}
-		iQ(window).keydown(this._currentHandler);
-	},
-
-	// Make sure the event handlers are appropriate for the in-search mode.
-	switchToInMode: function() {
-		if(this._currentHandler) {
-			iQ(window).unbind("keydown", this._currentHandler);
-		}
-		this._currentHandler = (e) => {
-			this._inSearchKeyHandler(e);
-		}
-		iQ(window).keydown(this._currentHandler);
-	},
-
 	createSearchTabMatcher: function() {
-		return new TabMatcher(iQ("#searchbox").val());
-	},
-
-	// Checks whether search mode is enabled or not.
-	isEnabled: function() {
-		return iQ("#search").css("display") != "none";
+		return new TabMatcher(this.searchbox.value);
 	},
 
 	// Hides search mode.
 	hide: function(e) {
-		if(!this.isEnabled()) { return; }
+		if(!this.inSearch) { return; }
+		this.inSearch = false;
+		document.body.classList.remove('searching');
 
-		iQ("#searchbox").val("");
-		iQ("#searchshade").hide();
-		iQ("#search").hide();
-
-		iQ("#searchbutton").css({ opacity:.8 });
+		this.searchbox.value = "";
 
 		if(DARWIN) {
 			UI.setTitlebarColors(true);
 		}
 
 		this.perform();
-		this.switchToBeforeMode();
 
 		if(e) {
-			// when hiding the search mode, we need to prevent the keypress handler in UI__setTabViewFrameKeyHandlers to handle the key press again.
+			// when hiding the search mode, we need to prevent the keypress handler in the keypress listeners to handle the key press again.
 			// e.g. Esc which is already handled by the key down in this class.
 			if(e.type == "keydown") {
 				UI.ignoreKeypressForSearch = true;
@@ -430,27 +464,18 @@ this.Search = {
 	// Performs a search.
 	perform: function() {
 		let matcher =  this.createSearchTabMatcher();
-
-		// Remove any previous other-window search results and hide the display area.
-		iQ("#results").empty();
-		iQ("#otherresults").hide();
-		iQ("#otherresults>.label").text(Strings.get("TabView", "searchOtherWindowTabs"));
-
-		matcher.doSearch(TabHandlers.onMatch, TabHandlers.onUnmatch, TabHandlers.onOther);
+		matcher.doSearch();
 	},
 
 	// Ensures the search feature is displayed.  If not, display it.
 	// Parameters:
 	//  - a boolean indicates whether this is triggered by a keypress or not
 	ensureShown: function(activatedByKeypress) {
-		let $search = iQ("#search");
-		let $searchShade = iQ("#searchshade");
-		let $searchbox = iQ("#searchbox");
-		iQ("#searchbutton").css({ opacity: 1 });
+		this._initiatedByKeypress = !!activatedByKeypress;
 
-		if(!this.isEnabled()) {
-			$searchShade.show();
-			$search.show();
+		if(!this.inSearch) {
+			this.inSearch = true;
+			document.body.classList.add('searching');
 
 			if(DARWIN) {
 				UI.setTitlebarColors({active: "#717171", inactive: "#EDEDED"});
@@ -458,16 +483,21 @@ this.Search = {
 
 			if(activatedByKeypress) {
 				// set the focus so key strokes are entered into the textbox.
-				$searchbox[0].focus();
-				dispatch(window, { type: "tabviewsearchenabled", cancelable: false, bubbles: false });
+				this.focus();
 			} else {
-				// marshal the focusing, otherwise it ends up with searchbox[0].focus gets called before the search button gets the focus after being pressed.
-				aSync(function() {
-					$searchbox[0].focus();
-					dispatch(window, { type: "tabviewsearchenabled", cancelable: false, bubbles: false });
+				// marshal the focusing, otherwise it ends up with searchbox.focus gets called before the search button gets the focus after being pressed.
+				aSync(() => {
+					this.focus();
 				}, 0);
 			}
 		}
+	},
+
+	// Focuses the search box and selects its contents.
+	focus: function() {
+		this.searchbox.select();
+		this.searchbox.focus();
+		dispatch(window, { type: "tabviewsearchenabled", cancelable: false, bubbles: false });
 	}
 };
 

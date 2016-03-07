@@ -1,4 +1,4 @@
-// VERSION 1.0.25
+// VERSION 1.0.26
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -225,6 +225,8 @@ this.TabView = {
 		Listeners.remove(this.tooltip, "popupshowing", this, true);
 		Listeners.remove(this.tabMenuPopup, "popupshowing", this);
 		Listeners.remove($('tabContextMenu'), "popupshowing", this);
+		Tabs.unlisten("TabShow", this);
+		Tabs.unlisten("TabClose", this);
 
 		this._initialized = false;
 		this._deinitFrame();
@@ -279,9 +281,6 @@ this.TabView = {
 		if(this._initialized) {
 			Tabs.listen("TabShow", this);
 			Tabs.listen("TabClose", this);
-		} else {
-			Tabs.unlisten("TabShow", this);
-			Tabs.unlisten("TabClose", this);
 		}
 
 		this._deck = null;
@@ -356,7 +355,7 @@ this.TabView = {
 			this.emptyContextMenu(popup, separator);
 
 			let activeGroup = tab._tabViewTabItem.parent;
-			let groupItems = this._window[objName].GroupItems.groupItems;
+			let groupItems = this._window[objName].GroupItems;
 			let menuItems = [];
 
 			for(let groupItem of groupItems) {
@@ -394,14 +393,14 @@ this.TabView = {
 			return title;
 		}
 
-		if(!groupItem.getChildren().length) {
+		if(!groupItem.children.length) {
 			return Strings.get('TabView', 'groupItemUnnamed', [
 				[ "$num", groupItem.id ]
 			]);
 		}
 
 		let topChildLabel = groupItem.getTopChild().tab.label;
-		let childNum = groupItem.getChildren().length;
+		let childNum = groupItem.children.length;
 		if(childNum > 1) {
 			let num = childNum -1;
 			return Strings.get('TabView', 'moveToUnnamedGroup', [

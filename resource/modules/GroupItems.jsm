@@ -1,7 +1,6 @@
-// VERSION 1.1.4
+// VERSION 1.2.0
 
-// Class: GroupItem - A single groupItem in the TabView window. Descended from <Item>.
-// Note that it implements the <Subscribable> interface.
+// Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
 //   listOfEls - an array of DOM elements for tabs to be added to this groupItem
 //   options - various options for this groupItem (see below). In addition, gets passed to <add> along with the elements provided.
@@ -12,31 +11,37 @@
 //   container - a DOM element to use as the container for this groupItem; otherwise will create
 //   title - the title for the groupItem; otherwise blank
 //   focusTitle - focus the title's input field after creation
-//   dontPush - true if this groupItem shouldn't push away or snap on creation; default is false
 //   immediately - true if we want all placement immediately, not with animation
 this.GroupItem = function(listOfEls, options) {
 	if(!options) {
 		options = {};
 	}
 
+	Subscribable(this);
+
 	this._inited = false;
 	this._uninited = false;
-	this._children = []; // an array of Items
+	this.children = []; // an array of Items
 	this.isAGroupItem = true;
 	this.id = options.id || GroupItems.getNextID();
-	this._isStacked = false;
+	this.isStacked = false;
 	this.expanded = null;
 	this.hidden = false;
+	this.childHandling = false;
 	this.fadeAwayUndoButtonDelay = 15000;
 	this.fadeAwayUndoButtonDuration = 300;
+	this.lastMouseDownTarget = null;
 
-	this.keepProportional = false;
-	this._frozenItemSizeData = {};
+	this._itemSizeFrozen = false;
+	this._delaySetCurrentSize = null;
 
-	this._onChildClose = this._onChildClose.bind(this);
+	// A <Point> that describes the last size specifically chosen by the user.
+	this.userSize = null;
 
 	// The <TabItem> for the groupItem's active tab.
 	this._activeTab = null;
+
+	this._onChildClose = this._onChildClose.bind(this);
 
 	if(Utils.isPoint(options.userSize)) {
 		this.userSize = new Point(options.userSize);
@@ -52,127 +57,142 @@ this.GroupItem = function(listOfEls, options) {
 		rectToBe.inset(-42, -42);
 	}
 
-	let immediately = !!options.immediately;
-	let $container = iQ('<div>')
-		.addClass('groupItem')
-		.css({ position: 'absolute' })
-		.css(rectToBe);
+	this.container = document.createElement('div');
+	this.container.id = 'group'+this.id;
+	this.container.classList.add('groupItem');
+	this.container._item = this;
 
-	this.bounds = $container.bounds();
+	this.$container = iQ(this.container).css(rectToBe);
+	this.bounds = this.$container.bounds();
 
 	this.isDragging = false;
-	$container
-		.css({ zIndex: -100 })
-		.attr("data-id", this.id)
-		.appendTo("body");
-
-	// ___ Resizer
-	this.$resizer = iQ("<div>")
-		.addClass('resizer')
-		.appendTo($container)
-		.hide();
+	this.isResizing = false;
+	document.body.appendChild(this.container);
 
 	// ___ Titlebar
-	this.$titlebar = iQ('<div>')
-		.addClass('titlebar')
-		.appendTo($container);
+	this.titlebar = document.createElement('div');
+	this.titlebar.classList.add('titlebar');
+	this.container.appendChild(this.titlebar);
 
-	let tbContainer = iQ('<div>')
-		.addClass('title-container')
-		.appendTo(this.$titlebar);
+	let tbContainer = document.createElement('div');
+	tbContainer.classList.add('title-container');
+	this.titlebar.appendChild(tbContainer);
 
-	let tbInput = iQ('<input>')
-		.addClass('name')
-		.appendTo(tbContainer);
+	this.title = document.createElement('input');
+	this.title.classList.add('name');
+	this.title.setAttribute('placeholder', this.defaultName);
+	this.title.setAttribute("title", Strings.get("TabView", "groupItemDefaultName"));
+	this.title.handleEvent = (e) => {
+		switch(e.type) {
+			case 'mousedown':
+				e.stopPropagation();
+				break;
 
-	let tbShield = iQ('<div>')
-		.addClass('title-shield')
-		.appendTo(tbContainer);
+			case 'mouseout':
+				this.title.classList.remove("transparentBorder");
+				Listeners.remove(this.title, 'mouseout', this.title);
+				break;
 
-	this.$closeButton = iQ('<div>')
-		.addClass('close')
-		.click(() => {
-			this.closeAll();
-		})
-		.attr("title", Strings.get("TabView", "groupItemCloseGroup"))
-		.appendTo($container);
+			case 'keypress':
+				if(e.key == "Escape" || e.key == "Enter") {
+					this.title.blur();
+					this.title.classList.add("transparentBorder");
+					Listeners.add(this.title, 'mouseout', this.title);
+					e.stopPropagation();
+					e.preventDefault();
+				}
+				break;
 
-	// ___ Title
-	this.$titleContainer = iQ('.title-container', this.$titlebar);
-	this.$title = iQ('.name', this.$titlebar).attr('placeholder', this.defaultName);
-	this.$titleShield = iQ('.title-shield', this.$titlebar);
-	this.setTitle(options.title);
+			case 'keypup':
+				// NOTE: When user commits or cancels IME composition, the last key event fires only a keyup event.
+				// Then, we shouldn't take any reactions but we should update our status.
+				this.save();
+				break;
 
-	let handleKeyPress = (e) => {
-		if(e.keyCode == e.DOM_VK_ESCAPE || e.keyCode == e.DOM_VK_RETURN) {
-			this.$title[0].blur();
-			this.$title
-				.addClass("transparentBorder")
-				.one("mouseout", () => {
-					this.$title.removeClass("transparentBorder");
-				});
-			e.stopPropagation();
-			e.preventDefault();
+			case 'blur':
+				this._titleFocused = false;
+				this.title.setSelectionRange(0, 0);
+				this.titleShield.hidden = false;
+				this.save();
+				break;
+
+			case 'focus':
+				this._unfreezeItemSize();
+				if(!this._titleFocused) {
+					this.title.select();
+					this._titleFocused = true;
+				}
+				break;
 		}
 	};
+	this.title.addEventListener('mousedown', this.title, true);
+	this.title.addEventListener('keypress', this.title, true);
+	this.title.addEventListener('keyup', this.title);
+	this.title.addEventListener('focus', this.title);
+	this.title.addEventListener('blur', this.title);
+	tbContainer.appendChild(this.title);
 
-	let handleKeyUp = (e) => {
-		// NOTE: When user commits or cancels IME composition, the last key event fires only a keyup event.
-		// Then, we shouldn't take any reactions but we should update our status.
-		this.save();
+	this.titleShield = document.createElement('div');
+	this.titleShield.classList.add('title-shield');
+	this.titleShield.setAttribute('title', Strings.get("TabView", "groupItemDefaultName"));
+	this.titleShield.handleEvent = (e) => {
+		switch(e.type) {
+			case 'mousedown':
+				this.lastMouseDownTarget = (e.button == 0 ? e.target : null);
+				break;
+
+			case 'mouseup':
+				let same = (e.target == this.lastMouseDownTarget);
+				this.lastMouseDownTarget = null;
+				if(same && !this.isDragging && !this.isResizing) {
+					this.focusTitle();
+				}
+				break;
+		}
 	};
+	this.titleShield.addEventListener('mousedown', this.titleShield);
+	this.titleShield.addEventListener('mouseup', this.titleShield);
+	tbContainer.appendChild(this.titleShield);
 
-	this.$title
-		.blur(() => {
-			this._titleFocused = false;
-			this.$title[0].setSelectionRange(0, 0);
-			this.$titleShield.show();
-			this.save();
-		})
-		.focus(() => {
-			this._unfreezeItemSize();
-			if(!this._titleFocused) {
-				this.$title[0].select();
-				this._titleFocused = true;
-			}
-		})
-		.mousedown(function(e) {
-			e.stopPropagation();
-		})
-		.keypress(handleKeyPress)
-		.keyup(handleKeyUp)
-		.attr("title", Strings.get("TabView", "groupItemDefaultName"));
-
-	this.$titleShield
-		.mousedown((e) => {
-			this.lastMouseDownTarget = (e.button == 0 ? e.target : null);
-		})
-		.mouseup((e) => {
-			let same = (e.target == this.lastMouseDownTarget);
-			this.lastMouseDownTarget = null;
-			if(!same) { return; }
-
-			if(!this.isDragging) {
-				this.focusTitle();
-			}
-		})
-		.attr("title", Strings.get("TabView", "groupItemDefaultName"));
-
+	this.setTitle(options.title);
 	if(options.focusTitle) {
 		this.focusTitle();
 	}
 
+	this.closeButton = document.createElement('div');
+	this.closeButton.classList.add('close');
+	this.closeButton.setAttribute("title", Strings.get("TabView", "groupItemCloseGroup"));
+	this.closeButton.handleEvent = () => {
+		// click
+		this.closeAll();
+	};
+	this.closeButton.addEventListener('click', this.closeButton);
+	this.titlebar.appendChild(this.closeButton);
+
+	// content area
+	this.contents = document.createElement('div');
+	this.contents.classList.add('contents');
+	this.container.appendChild(this.contents);
+	this.$contents = iQ(this.contents);
+
+	// tabs container
+	this.tabContainer = document.createElement('div');
+	this.tabContainer.classList.add('tab-container');
+	this.contents.appendChild(this.tabContainer);
+	this.$tabContainer = iQ(this.tabContainer);
+
 	// ___ Stack Expander
-	this.$expander = iQ("<div/>")
-		.addClass("stackExpander")
-		.appendTo($container)
-		.hide();
+	this.expander = document.createElement("div");
+	this.expander.classList.add("stackExpander");
+	this.expander.handleEvent = () => {
+		// click
+		this.expand();
+	};
+	this.expander.addEventListener("click", this.expander);
+	this.contents.appendChild(this.expander);
 
 	// ___ Undo Close
-	this.$undoContainer = null;
-
-	// ___ Superclass initialization
-	this._init($container[0]);
+	this.undoContainer = null;
 
 	// ___ Children
 	// We explicitly set dontArrange=true to prevent the groupItem from re-arranging its children after a tabItem has been added.
@@ -183,21 +203,18 @@ this.GroupItem = function(listOfEls, options) {
 	}
 
 	// ___ Finish Up
-	this._addHandlers($container);
-
-	this.setResizable(true, immediately);
+	this.container.addEventListener('mousedown', this);
+	this.container.addEventListener('mouseup', this);
+	this.container.addEventListener('dragover', this);
+	this.container.addEventListener('dragenter', this);
 
 	GroupItems.register(this);
 
 	// ___ Position
-	this.setBounds(rectToBe, immediately);
-	if(options.dontPush) {
-		this.setZ(drag.zIndex);
-		drag.zIndex++;
-	} else {
-		// Calling snap will also trigger pushAway
-		this.snap(immediately);
-	}
+	this.setBounds(rectToBe, options.immediately);
+
+	// Calling snap will also trigger pushAway
+	this.snap(options.immediately);
 
 	if(!options.immediately && listOfEls.length) {
 		$container.hide().fadeIn();
@@ -207,7 +224,7 @@ this.GroupItem = function(listOfEls, options) {
 	this.save();
 };
 
-this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Subscribable(), {
+this.GroupItem.prototype = {
 	// The prompt text for the title field.
 	defaultName: Strings.get("TabView", "groupItemDefaultName"),
 
@@ -215,8 +232,8 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	setActiveTab: function(tab) {
 		this._activeTab = tab;
 
-		if(this.isStacked()) {
-			this.arrange({ immediately: true });
+		if(this.isStacked) {
+			this.arrange();
 		}
 	},
 
@@ -243,18 +260,13 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 	// Returns true if the tab groupItem is empty and unnamed.
 	isEmpty: function() {
-		return !this._children.length && !this.getTitle();
-	},
-
-	// Returns true if this item is in a stacked groupItem.
-	isStacked: function() {
-		return this._isStacked;
+		return !this.children.length && !this.getTitle();
 	},
 
 	// Returns true if the item is showing on top of this group's stack, determined by whether the tab is this group's topChild,
 	// or if it doesn't have one, its first child.
 	isTopOfStack: function(item) {
-		return this.isStacked() && item == this.getTopChild();
+		return this.isStacked && item == this.getTopChild();
 	},
 
 	// Saves this groupItem to persistent storage.
@@ -276,41 +288,29 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 	// Returns the title of this groupItem as a string.
 	getTitle: function() {
-		return this.$title ? this.$title.val() : '';
+		return this.title ? this.title.value : '';
 	},
 
 	// Sets the title of this groupItem with the given string
 	setTitle: function(value) {
-		this.$title.val(value);
+		this.title.value = value || "";
 		this.save();
 	},
 
 	// Hide the title's shield and focus the underlying input field.
 	focusTitle: function() {
-		this.$titleShield.hide();
-		this.$title[0].focus();
+		this.titleShield.hidden = true;
+		this.title.focus();
 	},
 
 	// Returns a <Rect> for the groupItem's content area (which doesn't include the title, etc).
-	// Parameters:
-	//   options - an object with additional parameters, see below
-	// Possible options:
-	//   stacked - true to get content bounds for stacked mode
-	getContentBounds: function(options) {
-		let box = this.getBounds();
-		let titleHeight = this.$titlebar.height();
-		box.top += titleHeight;
-		box.height -= titleHeight;
+	getContentBounds: function(justTabs) {
+		return (justTabs) ? this.$tabContainer.bounds() : this.$contents.bounds();
+	},
 
-		// Make the computed bounds' "padding" and expand button margin actually be themeable --OR-- compute this from actual bounds. Bug 586546
-		box.inset(6, 6);
-
-		// make some room for the expand button in stacked mode
-		if(options && options.stacked) {
-			box.height -= this.$expander.height() + 9; // the button height plus padding
-		}
-
-		return box;
+	// Returns a copy of the Item's bounds as a <Rect>.
+	getBounds: function() {
+		return new Rect(this.bounds);
 	},
 
 	// Sets the bounds with the given <Rect>, animating unless "immediately" is false.
@@ -329,12 +329,8 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			options = {};
 		}
 
-		let titleHeight = this.$titlebar.height();
-
 		// ___ Determine what has changed
 		let css = {};
-		let titlebarCSS = {};
-		let contentCSS = {};
 
 		if(rect.left != this.bounds.left || options.force) {
 			css.left = rect.left;
@@ -346,13 +342,10 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 		if(rect.width != this.bounds.width || options.force) {
 			css.width = rect.width;
-			titlebarCSS.width = rect.width;
-			contentCSS.width = rect.width;
 		}
 
 		if(rect.height != this.bounds.height || options.force) {
 			css.height = rect.height;
-			contentCSS.height = rect.height - titleHeight;
 		}
 
 		if(Utils.isEmptyObject(css)) { return; }
@@ -360,34 +353,23 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		let offset = new Point(rect.left - this.bounds.left, rect.top - this.bounds.top);
 		this.bounds = new Rect(rect);
 
-		// ___ Deal with children
-		if(css.width || css.height) {
-			this.arrange({ animate: !immediately });
-		} else if(css.left || css.top) {
-			for(let child of this._children) {
-				if(!child.getHidden()) {
-					let box = child.getBounds();
-					child.setPosition(box.left + offset.x, box.top + offset.y, immediately);
-				}
-			}
-		}
-
 		// ___ Update our representation
 		if(immediately) {
 			iQ(this.container).css(css);
-			this.$titlebar.css(titlebarCSS);
+			if(css.width || css.height) {
+				this.arrange();
+			}
 		} else {
 			TabItems.pausePainting();
 			iQ(this.container).animate(css, {
 				duration: 350,
 				easing: "tabviewBounce",
-				complete: function() {
+				complete: () => {
 					TabItems.resumePainting();
+					if(css.width || css.height) {
+						this.arrange();
+					}
 				}
-			});
-
-			this.$titlebar.animate(titlebarCSS, {
-				duration: 350
 			});
 		}
 
@@ -396,23 +378,329 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		this.save();
 	},
 
-	// Set the Z order for the groupItem's container, as well as its children.
-	setZ: function(value) {
-		this.zIndex = value;
+	setSize: function(bounds, options) {
+		if(this._delaySetCurrentSize) {
+			this._delaySetCurrentSize.cancel();
+			this._delaySetCurrentSize = null;
+		}
 
-		iQ(this.container).css({ zIndex: value });
+		if(!options) {
+			options = {};
+		}
 
-		let count = this._children.length;
-		if(count) {
-			let topZIndex = value +count +1;
-			let zIndex = topZIndex;
-			for(let child of this._children) {
-				if(child == this.getTopChild()) {
-					child.setZ(topZIndex + 1);
-				} else {
-					child.setZ(zIndex);
-					zIndex--;
+		// Trigger handlers only if needed.
+		if(!bounds) {
+			let box = this.$container.bounds();
+			let valid = GroupItems.calcValidSize(new Point(box.width, box.height));
+			bounds = new Rect(box.left, box.top, valid.x, valid.y);
+		}
+		if(!bounds.equals(this.bounds) || options.force) {
+			this.bounds = bounds;
+			UI.clearShouldResizeItems();
+			this.setTrenches(bounds);
+			this.save();
+
+			if(options.immediate) {
+				this.arrange();
+			} else {
+				this.delayArrange(350);
+			}
+		}
+	},
+
+	// Pushes all other items away so none overlap this Item.
+	// Parameters:
+	//  immediately - boolean for doing the pushAway without animation
+	pushAway: function(immediately) {
+		// we need at least two top-level items to push something away
+		if(GroupItems.size < 2) { return; }
+
+		let buffer = Math.floor(GroupItems.defaultGutter / 2);
+
+		// setup each Item's pushAwayData attribute:
+		for(let item of GroupItems) {
+			let data = {};
+			data.bounds = item.getBounds();
+			data.startBounds = new Rect(data.bounds);
+			// Infinity = (as yet) unaffected
+			data.generation = Infinity;
+			item.pushAwayData = data;
+		}
+
+		// The first item is a 0-generation pushed item. It all starts here.
+		let itemsToPush = [this];
+		this.pushAwayData.generation = 0;
+
+		let pushOne = function(baseItem) {
+			// the baseItem is an n-generation pushed item. (n could be 0)
+			let baseData = baseItem.pushAwayData;
+			let bb = new Rect(baseData.bounds);
+
+			// make the bounds larger, adding a +buffer margin to each side.
+			bb.inset(-buffer, -buffer);
+			// bbc = center of the base's bounds
+			let bbc = bb.center();
+
+			for(let item of GroupItems) {
+				if(item == baseItem) { continue; }
+
+				let data = item.pushAwayData;
+
+				// if the item under consideration has already been pushed, or has a lower
+				// "generation" (and thus an implictly greater placement priority) then don't move it.
+				if(data.generation <= baseData.generation) { continue; }
+
+				// box = this item's current bounds, with a +buffer margin.
+				let bounds = data.bounds;
+				let box = new Rect(bounds);
+				box.inset(-buffer, -buffer);
+
+				// if the item under consideration overlaps with the base item let's push it a little.
+				if(box.intersects(bb)) {
+					// First, decide in which direction and how far to push. This is the offset.
+					let offset = new Point();
+					// center = the current item's center.
+					let center = box.center();
+
+					// Consider the relationship between the current item (box) + the base item.
+					// If it's more vertically stacked than "side by side" push vertically.
+					if(Math.abs(center.x - bbc.x) < Math.abs(center.y - bbc.y)) {
+						if(center.y > bbc.y) {
+							offset.y = bb.bottom - box.top;
+						} else {
+							offset.y = bb.top - box.bottom;
+						}
+					}
+
+					// if they're more "side by side" than stacked vertically push horizontally.
+					else {
+						if(center.x > bbc.x) {
+							offset.x = bb.right - box.left;
+						} else {
+							offset.x = bb.left - box.right;
+						}
+					}
+
+					// Actually push the Item.
+					bounds.offset(offset);
+
+					// This item now becomes an (n+1)-generation pushed item.
+					data.generation = baseData.generation +1;
+
+					// keep track of who pushed this item.
+					data.pusher = baseItem;
+
+					// add this item to the queue, so that it, in turn, can push some other things.
+					itemsToPush.push(item);
 				}
+			}
+		};
+
+		// push each of the itemsToPush, one at a time.
+		// itemsToPush starts with just [this], but pushOne can add more items to the stack.
+		// Maximally, this could run through all Items on the screen.
+		while(itemsToPush.length) {
+			pushOne(itemsToPush.shift());
+		}
+
+		// ___ Squish!
+		let pageBounds = GroupItems.getSafeWindowBounds();
+		for(let item of GroupItems) {
+			let data = item.pushAwayData;
+			if(data.generation == 0) { continue; }
+
+			let apply = function(item, posStep, posStep2, sizeStep) {
+				let data = item.pushAwayData;
+				if(data.generation == 0) { return; }
+
+				let bounds = data.bounds;
+				bounds.width -= sizeStep.x;
+				bounds.height -= sizeStep.y;
+				bounds.left += posStep.x;
+				bounds.top += posStep.y;
+
+				let validSize = GroupItems.calcValidSize(new Point(bounds.width, bounds.height));
+				bounds.width = validSize.x;
+				bounds.height = validSize.y;
+
+				let pusher = data.pusher;
+				if(pusher) {
+					var newPosStep = new Point(posStep.x + posStep2.x, posStep.y + posStep2.y);
+					apply(pusher, newPosStep, posStep2, sizeStep);
+				}
+			};
+
+			let bounds = data.bounds;
+			let posStep = new Point();
+			let posStep2 = new Point();
+			let sizeStep = new Point();
+
+			if(bounds.left < pageBounds.left) {
+				posStep.x = pageBounds.left - bounds.left;
+				sizeStep.x = posStep.x / data.generation;
+				posStep2.x = -sizeStep.x;
+			} else if(bounds.right > pageBounds.right) { // this may be less of a problem post-601534
+				posStep.x = pageBounds.right - bounds.right;
+				sizeStep.x = -posStep.x / data.generation;
+				posStep.x += sizeStep.x;
+				posStep2.x = sizeStep.x;
+			}
+
+			if(bounds.top < pageBounds.top) {
+				posStep.y = pageBounds.top - bounds.top;
+				sizeStep.y = posStep.y / data.generation;
+				posStep2.y = -sizeStep.y;
+			} else if(bounds.bottom > pageBounds.bottom) { // this may be less of a problem post-601534
+				posStep.y = pageBounds.bottom - bounds.bottom;
+				sizeStep.y = -posStep.y / data.generation;
+				posStep.y += sizeStep.y;
+				posStep2.y = sizeStep.y;
+			}
+
+			if(posStep.x || posStep.y || sizeStep.x || sizeStep.y) {
+				apply(item, posStep, posStep2, sizeStep);
+			}
+		}
+
+		// ___ Unsquish
+		let pairs = [];
+		for(let item of GroupItems) {
+			let data = item.pushAwayData;
+			pairs.push({
+				item: item,
+				bounds: data.bounds
+			});
+		}
+
+		GroupItems.unsquish(pairs);
+
+		// ___ Apply changes
+		for(let item of GroupItems) {
+			let data = item.pushAwayData;
+			let bounds = data.bounds;
+			if(!bounds.equals(data.startBounds)) {
+				item.setBounds(bounds, immediately);
+			}
+		}
+	},
+
+	// Sets up/moves the trenches for snapping to this item.
+	setTrenches: function(rect) {
+		if(!this.borderTrenches) {
+			this.borderTrenches = Trenches.registerWithItem(this, "border");
+		}
+
+		let bT = this.borderTrenches;
+		Trenches.getById(bT.left).setWithRect(rect);
+		Trenches.getById(bT.right).setWithRect(rect);
+		Trenches.getById(bT.top).setWithRect(rect);
+		Trenches.getById(bT.bottom).setWithRect(rect);
+
+		if(!this.guideTrenches) {
+			this.guideTrenches = Trenches.registerWithItem(this, "guide");
+		}
+
+		let gT = this.guideTrenches;
+		Trenches.getById(gT.left).setWithRect(rect);
+		Trenches.getById(gT.right).setWithRect(rect);
+		Trenches.getById(gT.top).setWithRect(rect);
+		Trenches.getById(gT.bottom).setWithRect(rect);
+	},
+
+	// Removes the trenches for snapping to this item.
+	removeTrenches: function() {
+		for(let edge in this.borderTrenches) {
+			Trenches.unregister(this.borderTrenches[edge]); // unregister can take an array
+		}
+		this.borderTrenches = null;
+		for(let edge in this.guideTrenches) {
+			Trenches.unregister(this.guideTrenches[edge]); // unregister can take an array
+		}
+		this.guideTrenches = null;
+	},
+
+	// The snap function used during groupItem creation via drag-out
+	// Parameters:
+	//  immediately - bool for having the drag do the final positioning without animation
+	snap: function(immediately) {
+		// make the snapping work with a wider range!
+		let defaultRadius = Trenches.defaultRadius;
+		Trenches.defaultRadius = 2 * defaultRadius; // bump up from 10 to 20!
+
+		new GroupDrag(this);
+		DraggingGroup.start();
+		DraggingGroup.snap('none');
+		DraggingGroup.stop(immediately);
+
+		Trenches.defaultRadius = defaultRadius;
+	},
+
+	handleEvent: function(e) {
+		switch(e.type) {
+			case 'mouseup': {
+				let same = (e.target == this.lastMouseDownTarget);
+				this.lastMouseDownTarget = null;
+
+				if(!this.childHandling && same && !this.isDragging && !this.isResizing) {
+					if(Tabs.selected.pinned
+					&& UI.getActiveTab() != this.getActiveTab()
+					&& this.children.length) {
+						UI.setActive(this, { dontSetActiveTabInGroup: true });
+						UI.goToTab(Tabs.selected);
+					} else {
+						let tabItem = this.getTopChild();
+						if(tabItem) {
+							tabItem.zoomIn();
+						} else {
+							this.newTab();
+						}
+					}
+				}
+
+				this.childHandling = false;
+				break;
+			}
+
+			case 'mousedown':
+				// only set the last mouse down target if it is a left click, not on the close button,
+				// not on the expand button, not on the title bar and its elements
+				this.lastMouseDownTarget = null;
+				if(e.button == 0) {
+					// Make sure it knows to snap to another group's edges when being resized.
+					if(e.originalTarget.localName == 'resizer' && e.originalTarget.parentNode == this.container) {
+						new GroupDrag(this, e, true);
+					}
+					else if(this.closeButton != e.target
+					&& this.expander != e.target) {
+						if(!this.childHandling) {
+							new GroupDrag(this, e);
+						}
+						if(!isAncestor(e.target, this.titlebar)) {
+							this.lastMouseDownTarget = e.target;
+						}
+					}
+				}
+
+				this.childHandling = false;
+				break;
+
+			case 'dragover':
+			case 'dragenter':
+				if(DraggingTab) {
+					DraggingTab.canDrop(e, this);
+				}
+				break;
+
+			case 'tabviewhidden':
+				this._unfreezeItemSize()
+				break;
+
+			case 'mousemove': {
+				let cursor = new Point(e.pageX, e.pageY);
+				if(!this.bounds.contains(cursor)) {
+					this._unfreezeItemSize();
+				}
+				break;
 			}
 		}
 	},
@@ -427,16 +715,17 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		GroupItems.unregister(this);
 
 		// remove unfreeze event handlers, if item size is frozen
-		this._unfreezeItemSize({dontArrange: true });
+		this._unfreezeItemSize(true);
 
 		let destroyGroup = () => {
-			iQ(this.container).remove();
-			if(this.$undoContainer) {
-				this.$undoContainer.remove();
-				this.$undoContainer = null;
+			this.container.remove();
+			if(this.undoContainer) {
+				this.undoContainer.remove();
+				this.undoContainer = null;
 			}
 			this.removeTrenches();
-			Items.unsquish();
+			Styles.unload('group_'+this.id+'_'+_UUID);
+			GroupItems.unsquish();
 			this._sendToSubscribers("close");
 		};
 
@@ -457,11 +746,8 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 	// Closes the groupItem and all of its children.
 	closeAll: function() {
-		if(this._children.length) {
+		if(this.children.length) {
 			this._unfreezeItemSize();
-			for(let child of this._children) {
-				iQ(child.container).hide();
-			}
 
 			let container = iQ(this.container);
 			container.animate({
@@ -474,7 +760,6 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				}
 			});
 
-			this.droppable(false);
 			this.removeTrenches();
 			this._createUndoButton();
 		}
@@ -527,14 +812,9 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		this._cancelFadeAwayUndoButtonTimer();
 		this.hidden = false;
 		this.removeUndoButton();
-		this.droppable(true);
 		this.setTrenches(this.bounds);
 
 		let finalize = () => {
-			for(let child of this._children) {
-				iQ(child.container).show();
-			}
-
 			UI.setActive(this);
 			this._sendToSubscribers("groupShown");
 		};
@@ -560,18 +840,27 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	closeHidden: function() {
 		this._cancelFadeAwayUndoButtonTimer();
 
-		// When the last non-empty groupItem is closed and there are no pinned tabs then create a new group with a blank tab.
-		let remainingGroups = GroupItems.groupItems.filter((groupItem) => {
-			return (groupItem != this && groupItem.getChildren().length);
-		});
+		// When the last non-empty groupItem is closed then create a new group with a blank tab.
+		let remainingGroups = false;
+		for(let groupItem of GroupItems) {
+			if(groupItem != this && groupItem.children.length) {
+				remainingGroups = true;
+				break;
+			}
+		}
 
 		let tab = null;
-
-		if(!Tabs.numPinned && !remainingGroups.length) {
-			let emptyGroups = GroupItems.groupItems.filter((groupItem) => {
-				return (groupItem != this && !groupItem.getChildren().length);
-			});
-			let group = (emptyGroups.length ? emptyGroups[0] : GroupItems.newGroup());
+		if(!remainingGroups) {
+			let group;
+			for(let groupItem of GroupItems) {
+				if(groupItem != this && !groupItem.children.length) {
+					group = groupItem;
+					break;
+				}
+			}
+			if(!group) {
+				group = GroupItems.newGroup();
+			}
 			tab = group.newTab(null, { dontZoomIn: true });
 		}
 
@@ -599,7 +888,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		// when "TabClose" event is fired, the browser tab is about to close and our item "close" event is fired. And then, the browser tab gets closed.
 		// In other words, the group "close" event is fired before all browser tabs in the group are closed.
 		// The below code would fire the group "close" event only after all browser tabs in that group are closed.
-		for(let child of this._children.concat()) {
+		for(let child of this.children.concat()) {
 			child.removeSubscriber("close", this._onChildClose);
 
 			if(child.close(true)) {
@@ -611,11 +900,9 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			}
 		}
 
-		if(this._children.length) {
-			if(this.hidden) {
-				if(!this.clickUndoButton()) {
-					this._unhide();
-				}
+		if(this.children.length) {
+			if(this.hidden && !this.clickUndoButton()) {
+				this._unhide();
 			}
 
 			return false;
@@ -627,13 +914,13 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 	// Fades away the undo button
 	_fadeAwayUndoButton: function() {
-		if(this.$undoContainer) {
+		if(this.undoContainer) {
 			// if there is more than one group and other groups are not empty, fade away the undo button.
 			let shouldFadeAway = false;
 
-			if(GroupItems.groupItems.length > 1) {
-				for(let groupItem of GroupItems.groupItems) {
-					if(groupItem != this && groupItem.getChildren().length > 0) {
+			if(GroupItems.size > 1) {
+				for(let groupItem of GroupItems) {
+					if(groupItem != this && groupItem.children.length > 0) {
 						shouldFadeAway = true;
 						break;
 					}
@@ -641,7 +928,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			}
 
 			if(shouldFadeAway) {
-				this.$undoContainer.animate({
+				iQ(this.undoContainer).animate({
 					color: "transparent",
 					opacity: 0
 				}, {
@@ -654,22 +941,33 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 	// Makes the affordance for undo a close group action
 	_createUndoButton: function() {
-		this.$undoContainer = iQ("<div/>")
-			.addClass("undo")
-			.attr("type", "button")
-			.attr("data-group-id", this.id)
-			.appendTo("body");
-		iQ("<span/>")
-			.text(Strings.get("TabView", "groupItemUndoCloseGroup"))
-			.appendTo(this.$undoContainer);
-		let undoClose = iQ("<div/>")
-			.addClass("close")
-			.attr("title", Strings.get("TabView", "groupItemDiscardClosedGroup"))
-			.appendTo(this.$undoContainer);
+		this.undoContainer = document.createElement('div');
+		this.undoContainer.classList.add('undo');
+		this.undoContainer.setAttribute('type', 'button');
+		document.body.appendChild(this.undoContainer);
 
-		this.$undoContainer.css({
-			left: this.bounds.left + this.bounds.width /2 - iQ(this.$undoContainer).width() /2,
-			top:  this.bounds.top + this.bounds.height /2 - iQ(this.$undoContainer).height() /2,
+		let $undoContainer = iQ(this.undoContainer);
+
+		let span = document.createElement('span');
+		span.textContent = Strings.get("TabView", "groupItemUndoCloseGroup");
+		this.undoContainer.appendChild(span);
+
+		let undoClose = document.createElement('div');
+		undoClose.classList.add('close');
+		undoClose.setAttribute('title', Strings.get("TabView", "groupItemDiscardClosedGroup"));
+		undoClose.handleEvent = (e) => {
+			// click
+			e.preventDefault();
+			e.stopPropagation();
+			this._cancelFadeAwayUndoButtonTimer();
+			$undoContainer.fadeOut(() => { this.closeHidden(); });
+		};
+		undoClose.addEventListener('click', undoClose, true);
+		this.undoContainer.appendChild(undoClose);
+
+		$undoContainer.css({
+			left: this.bounds.left + this.bounds.width /2 - $undoContainer.width() /2,
+			top:  this.bounds.top + this.bounds.height /2 - $undoContainer.height() /2,
 			"transform": "scale(.1)",
 			opacity: 0
 		});
@@ -677,7 +975,7 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 		// hide group item and show undo container.
 		aSync(() => {
-			this.$undoContainer.animate({
+			$undoContainer.animate({
 				"transform": "scale(1)",
 				"opacity": 1
 			}, {
@@ -688,31 +986,30 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		}, 50);
 
 		// add click handlers
-		this.$undoContainer.click((e) => {
-			// don't do anything if the close button is clicked.
-			if(e.originalTarget == undoClose[0]) {
-				return;
+		this.undoContainer.handleEvent = (e) => {
+			switch(e.type) {
+				case 'click':
+					// don't do anything if the close button is clicked.
+					if(e.originalTarget == undoClose) { break; }
+
+					this.clickUndoButton();
+					break;
+
+				// Cancel the fadeaway if you move the mouse over the undo button, and restart the countdown once you move out of it.
+				case 'mouseover':
+					this._cancelFadeAwayUndoButtonTimer();
+					break;
+
+				case 'mouseout':
+					this.setupFadeAwayUndoButtonTimer();
+					break;
 			}
-
-			this.clickUndoButton();
-		});
-
-		undoClose.click((e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			this._cancelFadeAwayUndoButtonTimer();
-			this.$undoContainer.fadeOut(() => { this.closeHidden(); });
-		});
+		};
+		this.undoContainer.addEventListener('click', this.undoContainer);
+		this.undoContainer.addEventListener('mouseover', this.undoContainer);
+		this.undoContainer.addEventListener('mouseout', this.undoContainer);
 
 		this.setupFadeAwayUndoButtonTimer();
-
-		// Cancel the fadeaway if you move the mouse over the undo button, and restart the countdown once you move out of it.
-		this.$undoContainer.mouseover(() => {
-			this._cancelFadeAwayUndoButtonTimer();
-		});
-		this.$undoContainer.mouseout(() => {
-			this.setupFadeAwayUndoButtonTimer();
-		});
 	},
 
 	// Sets up fade away undo button timeout.
@@ -735,23 +1032,23 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	removeUndoButton: function() {
 		this._cancelFadeAwayUndoButtonTimer();
 		// Only remove the container if it's not animating out, it will remove itself when it finishes.
-		if(this.$undoContainer) {
-			this.$undoContainer.remove();
-			this.$undoContainer = null;
+		if(this.undoContainer) {
+			this.undoContainer.remove();
+			this.undoContainer = null;
 		}
 	},
 
 	clickUndoButton: function() {
-		if(!this.$undoContainer) { return false; }
+		if(!this.undoContainer) { return false; }
 
 		this._cancelFadeAwayUndoButtonTimer();
 
 		// This makes it so we can begin restoring the group without having to remove the undo button first == better animation.
 		// After this animation finished, the undo button will self remove.
-		let undoContainer = this.$undoContainer;
-		this.$undoContainer = null;
+		let undoContainer = this.undoContainer;
+		this.undoContainer = null;
 
-		undoContainer.animate({
+		iQ(undoContainer).animate({
 			opacity: 0,
 			"transform": "scale(.1)",
 		}, {
@@ -771,59 +1068,41 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 	// Adds an item to the groupItem.
 	// Parameters:
-	//   a - The item to add. Can be an <Item>, a DOM element or an iQ object. The latter two must refer to the container of an <Item>.
+	//   a - The item to add. Can be an <Item>.
 	//   options - An object with optional settings for this call.
 	// Options:
 	//   index - (int) if set, add this tab at this index
-	//   immediately - (bool) if true, no animation will be used
 	//   dontArrange - (bool) if true, will not trigger an arrange on the group
-	add: function(a, options) {
+	add: function(item, options) {
 		try {
-			let item;
-			let $el;
-			if(a.isAnItem) {
-				item = a;
-				$el = iQ(a.container);
-			} else {
-				$el = iQ(a);
-				item = Items.item($el);
-			}
-
 			// safeguard to remove the item from its previous group
 			if(item.parent && item.parent !== this) {
 				item.parent.remove(item);
 			}
-
-			item.removeTrenches();
 
 			if(!options) {
 				options = {};
 			}
 
 			let wasAlreadyInThisGroupItem = false;
-			let oldIndex = this._children.indexOf(item);
+			let oldIndex = this.children.indexOf(item);
 			if(oldIndex != -1) {
-				this._children.splice(oldIndex, 1);
+				this.children.splice(oldIndex, 1);
 				wasAlreadyInThisGroupItem = true;
 			}
 
 			// Insert the tab into the right position.
-			let index = ("index" in options) ? options.index : this._children.length;
-			this._children.splice(index, 0, item);
-
-			item.setZ(this.getZ() + 1);
+			let index = this.children.length;
+			if(options.index !== undefined && options.index < index && options.index > -1) {
+				index = options.index;
+			}
+			this.children.splice(index, 0, item);
 
 			if(!wasAlreadyInThisGroupItem) {
-				item.droppable(false);
 				item.groupItemData = {};
 
 				item.addSubscriber("close", this._onChildClose);
 				item.setParent(this);
-				$el.attr("data-group-id", this.id);
-
-				if(typeof item.setResizable == 'function') {
-					item.setResizable(false, options.immediately);
-				}
 
 				if(item == UI.getActiveTab() || !this._activeTab) {
 					this.setActiveTab(item);
@@ -835,11 +1114,11 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				}
 			}
 
+			this._unfreezeItemSize(true);
 			if(!options.dontArrange) {
-				this.arrange({ animate: !options.immediately });
+				this.arrange();
 			}
 
-			this._unfreezeItemSize({ dontArrange: true });
 			this._sendToSubscribers("childAdded", { item: item });
 
 			UI.setReorderTabsOnHide(this);
@@ -853,16 +1132,15 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	// Parameters:
 	//   tabItem - The tabItem that is closed.
 	_onChildClose: function(tabItem) {
-		let count = this._children.length;
-		let dontArrange = tabItem.closedManually && (this.expanded || !this.shouldStack(count));
+		let dontArrange = tabItem.closedManually && (this.expanded || !this.shouldStack());
 		let dontClose = !tabItem.closedManually && Tabs.numPinned;
 		this.remove(tabItem, { dontArrange: dontArrange, dontClose: dontClose });
 
 		if(dontArrange) {
-			this._freezeItemSize(count);
+			this._freezeItemSize();
 		}
 
-		if(this._children.length && this._activeTab && tabItem.closedManually) {
+		if(this.children.length && this._activeTab && tabItem.closedManually) {
 			UI.setActive(this);
 		}
 	},
@@ -874,59 +1152,34 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	// Possible options:
 	//   dontArrange - don't rearrange the remaining items
 	//   dontClose - don't close the group even if it normally would
-	//   immediately - don't animate
-	remove: function(a, options) {
+	remove: function(item, options) {
 		try {
-			let $el;
-			let item;
-
-			if(a.isAnItem) {
-				item = a;
-				$el = iQ(item.container);
-			} else {
-				$el = iQ(a);
-				item = Items.item($el);
-			}
-
 			if(!options) {
 				options = {};
 			}
 
-			let index = this._children.indexOf(item);
+			let index = this.children.indexOf(item);
 			let prevIndex = 0;
 			if(index != -1) {
-				this._children.splice(index, 1);
+				this.children.splice(index, 1);
 				prevIndex = Math.max(0, index -1);
 			}
 
 			if(item == this._activeTab || !this._activeTab) {
-				if(this._children.length) {
-					this._activeTab = this._children[prevIndex];
+				if(this.children.length) {
+					this._activeTab = this.children[prevIndex];
 				} else {
 					this._activeTab = null;
 				}
 			}
 
-			$el[0].removeAttribute("data-group-id");
 			item.setParent(null);
 			item.removeClass("stacked");
-			item.isStacked = false;
-			item.setHidden(false);
 			item.removeClass("stack-trayed");
+			item.isStacked = false;
+			item.hidden = false;
 			item.setRotation(0);
-
-			// Force tabItem resize if it's dragged out of a stacked groupItem.
-			// The tabItems's title will be visible and that's why we need to recalculate its height.
-			if(item.isDragging && this.isStacked()) {
-				item.setBounds(item.getBounds(), true, { force: true });
-			}
-
-			item.droppable(true);
 			item.removeSubscriber("close", this._onChildClose);
-
-			if(typeof item.setResizable == 'function') {
-				item.setResizable(true, options.immediately);
-			}
 
 			// if a blank tab is selected while restoring a tab the blank tab gets removed. we need to keep the group alive for the restored tab.
 			if(item.isRemovedAfterRestore) {
@@ -934,11 +1187,10 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			}
 
 			let closed = options.dontClose ? false : this.closeIfEmpty();
-			if(closed || (!this._children.length && !Tabs.numPinned && !item.isDragging)) {
+			if(closed || (!this.children.length && !Tabs.numPinned && !item.isDragging)) {
 				this._makeLastActiveGroupItemActive();
 			} else if(!options.dontArrange) {
-				this.arrange({ animate: !options.immediately });
-				this._unfreezeItemSize({ dontArrange: true });
+				this._unfreezeItemSize();
 			}
 
 			this._sendToSubscribers("childRemoved", { item: item });
@@ -955,182 +1207,144 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			Utils.extend(newOptions, options);
 		}
 
-		for(let child of this._children.concat()) {
+		for(let child of this.children.concat()) {
 			this.remove(child, newOptions);
 		}
 	},
 
-	// Hide the control which expands a stacked groupItem into a quick-look view.
-	hideExpandControl: function() {
-		this.$expander.hide();
-	},
-
-	// Show the control which expands a stacked groupItem into a quick-look view.
-	showExpandControl: function() {
-		let parentBB = this.getBounds();
-		let childBB = this.getChild(0).getBounds();
-		this.$expander
-			.show()
-			.css({
-				left: parentBB.width /2 - this.$expander.width() /2
-			});
-	},
-
-	// Returns true if the groupItem, given "count", should stack (instead of grid).
-	shouldStack: function(count) {
-		let bb = this.getContentBounds();
+	// Returns true if the groupItem should stack (instead of grid).
+	shouldStack: function() {
 		let options = {
-			return: 'widthAndColumns',
-			count: count || this._children.length,
-			hideTitle: false
+			getDimensions: true,
+			count: this.children.length
 		};
-		let arrObj = Items.arrange(this._children, bb, options);
+		let box = this.getContentBounds();
+		let arrObj = TabItems.arrange(this.children, box);
 
-		let shouldStack = arrObj.childWidth < TabItems.minTabWidth * 1.35;
+		let shouldStack = arrObj.tabWidth < TabItems.minTabWidth;
 		this._columns = shouldStack ? null : arrObj.columns;
 
 		return shouldStack;
 	},
 
 	// Freezes current item size (when removing a child).
-	// Parameters:
-	//   itemCount - the number of children before the last one was removed
-	_freezeItemSize: function(itemCount) {
-		let data = this._frozenItemSizeData;
+	_freezeItemSize: function() {
+		if(this._itemSizeFrozen) { return; }
+		this._itemSizeFrozen = true;
 
-		if(!data.lastItemCount) {
-			data.lastItemCount = itemCount;
+		// unfreeze item size when tabview is hidden
+		Listeners.add(window, 'tabviewhidden', this);
 
-			// unfreeze item size when tabview is hidden
-			data.onTabViewHidden = () => this._unfreezeItemSize();
-			window.addEventListener('tabviewhidden', data.onTabViewHidden, false);
-
-			// we don't need to observe mouse movement when expanded because the tray is closed when we leave it and collapse causes unfreezing
-			if(!this.expanded) {
-				// unfreeze item size when cursor is moved out of group bounds
-				data.onMouseMove = (e) => {
-					let cursor = new Point(e.pageX, e.pageY);
-					if(!this.bounds.contains(cursor)) {
-						this._unfreezeItemSize();
-					}
-				}
-				iQ(window).mousemove(data.onMouseMove);
-			}
+		// unfreeze item size when cursor is moved out of group bounds
+		// we don't need to observe mouse movement when expanded because the tray is closed when we leave it and collapse causes unfreezing
+		if(!this.expanded) {
+			Listeners.add(window, 'mousemove', this);
 		}
-
-		this.arrange({ animate: true, count: data.lastItemCount });
 	},
 
 	// Unfreezes and updates item size.
 	// Parameters:
-	//   options - various options (see below)
-	// Possible options:
 	//   dontArrange - do not arrange items when unfreezing
-	_unfreezeItemSize: function(options) {
-		let data = this._frozenItemSizeData;
-		if(!data.lastItemCount) { return; }
+	_unfreezeItemSize: function(dontArrange) {
+		if(!this._itemSizeFrozen) { return; }
+		this._itemSizeFrozen = false;
 
-		if(!options || !options.dontArrange) {
-			this.arrange({ animate: true });
+		Listeners.remove(window, 'tabviewhidden', this);
+		Listeners.remove(window, 'mousemove', this);
+
+		if(!dontArrange) {
+			this.arrange();
 		}
+	},
 
-		// unbind event listeners
-		window.removeEventListener('tabviewhidden', data.onTabViewHidden, false);
-		if(data.onMouseMove) {
-			iQ(window).unbind('mousemove', data.onMouseMove);
-		}
+	_delayArrange: null,
+	delayArrange: function(delay) {
+		if(this._delayArrange) { return; }
 
-		// reset freeze status
-		this._frozenItemSizeData = {};
+		this._delayArrange = aSync(() => {
+			this._delayArrange = null;
+			this.arrange();
+		}, delay);
 	},
 
 	// Lays out all of the children.
-	// Parameters:
-	//   options - passed to <Items.arrange> or <_stackArrange>, except those below
-	// Options:
-	//   addTab - (boolean) if true, we add one to the child count
-	//   oldDropIndex - if set, we will only set any bounds if the dropIndex has changed
-	//   dropPos - (<Point>) a position where a tab is currently positioned, above this group.
-	//   animate - (boolean) if true, movement of children will be animated.
-	// Returns:
-	//   dropIndex - an index value for where an item would be dropped, if options.dropPos is given.
-	arrange: function(options) {
-		if(!options) {
-			options = {};
+	arrange: function() {
+		if(this._delayArrange) {
+			this._delayArrange.cancel();
+			this._delayArrange = null;
 		}
 
-		let childrenToArrange = [];
-		for(let child of this._children) {
-			if(child.isDragging) {
-				options.addTab = true;
-			} else {
-				childrenToArrange.push(child);
-			}
-		}
+		if(this._itemSizeFrozen) { return; }
 
 		if(GroupItems._arrangePaused) {
-			GroupItems.pushArrange(this, options);
-			return false;
+			GroupItems.pushArrange(this);
+			return;
 		}
 
-		let shouldStack = this.shouldStack(childrenToArrange.length + (options.addTab ? 1 : 0));
-		let shouldStackArrange = (shouldStack && !this.expanded);
-		let box;
+		// Ensure the tab nodes are shown in the right order.
+		let tabs = this.tabContainer.childNodes;
+		for(let i = 0; i < this.children.length; i++) {
+			let tab = this.children[i].container;
+			tab.style.order = i;
+		}
+
+		let shouldStack = this.shouldStack() && !this.expanded;
 
 		// if we should stack and we're not expanded
-		if(shouldStackArrange) {
-			this.showExpandControl();
-			box = this.getContentBounds({ stacked: true });
-			this._stackArrange(childrenToArrange, box, options);
-			return false;
+		if(shouldStack) {
+			this.container.classList.add('stackedGroup');
+			// When first opening groups mode, the expanders icons are only 1px high, for clown reasons of course.
+			let expanderHeight;
+			while(expanderHeight != this.expander.clientHeight) {
+				expanderHeight = this.expander.clientHeight;
+				this._stackArrange();
+			}
 		} else {
-			this.hideExpandControl();
-			box = this.getContentBounds();
-			// a dropIndex is returned
-			return this._gridArrange(childrenToArrange, box, options);
+			this.container.classList.remove('stackedGroup');
+			this._gridArrange();
 		}
 	},
 
 	// Arranges the children in a stack.
-	// Parameters:
-	//   childrenToArrange - array of <TabItem> children
-	//   bb - <Rect> to arrange within
-	//   options - see below
-	// Possible "options" properties:
-	//   animate - whether to animate; default: true.
-	_stackArrange: function(childrenToArrange, bb, options) {
-		if(!options) {
-			options = {};
-		}
-		let animate = "animate" in options ? options.animate : true;
-
+	_stackArrange: function() {
+		let childrenToArrange = this.children.concat();
 		let count = childrenToArrange.length;
 		if(!count) { return; }
 
-		let itemAspect = TabItems.tabHeight / TabItems.tabWidth;
-		let zIndex = this.getZ() + count + 1;
-		let maxRotation = 35; // degress
+		let itemAspect = TabItems.tabAspect;
 		let scale = 0.7;
-		let newTabsPad = 10;
+		let bb = this.getContentBounds(true);
 		let bbAspect = bb.height / bb.width;
 		let numInPile = 6;
+		let zIndex = numInPile;
 		let angleDelta = 3.5; // degrees
 
 		// compute size of the entire stack, modulo rotation.
 		let size;
 		if(bbAspect > itemAspect) {
 			// Tall, thin groupItem
-			size = TabItems.calcValidSize(new Point(bb.width * scale, -1), { hideTitle:true });
+			size = TabItems.calcValidSize(new Point(bb.width * scale, -1));
 		} else {
 			// Short, wide groupItem
-			size = TabItems.calcValidSize(new Point(-1, bb.height * scale), { hideTitle:true });
+			size = TabItems.calcValidSize(new Point(-1, bb.height * scale));
 		}
 
 		// x is the left margin that the stack will have, within the content area (bb)
 		// y is the vertical margin
-		let x = (bb.width - size.x) / 2;
-		let y = Math.min(size.x, (bb.height - size.y) / 2);
-		let box = new Rect(bb.left + x, bb.top + y, size.x, size.y);
+		let position = {
+			x: (bb.width - size.x) / 2,
+			y: (bb.height - size.y) / 2
+		};
+
+		let sscode = '\
+			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab {\n\
+				width: '+size.x+'px;\n\
+				height: '+size.y+'px;\n\
+				top: '+position.y+'px;\n\
+				left: '+position.x+'px;\n\
+			}';
+
+		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);
 
 		let children = [];
 
@@ -1138,119 +1352,123 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 		let topChild = this.getTopChild();
 		let topChildPos = childrenToArrange.indexOf(topChild);
 		if(topChildPos > 0) {
-			childrenToArrange.splice(topChildPos, 1);
-			childrenToArrange.unshift(topChild);
+			childrenToArrange = childrenToArrange.concat(childrenToArrange.splice(0, topChildPos));
 		}
 
 		for(let child of childrenToArrange) {
 			// Children are still considered stacked even if they're hidden later.
 			child.addClass("stacked");
 			child.isStacked = true;
+			setAttribute(child.container, 'draggable', 'false');
 			if(numInPile-- > 0) {
 				children.push(child);
 			} else {
-				child.setHidden(true);
+				child.hidden = true;
 			}
 		}
 
-		this._isStacked = true;
+		this.isStacked = true;
+		removeAttribute(this.tabContainer, 'columns');
 
 		let angleAccum = 0;
 		for(let child of children) {
-			child.setZ(zIndex);
-			zIndex--;
+			if(angleAccum != 0) {
+				child.addClass('behind');
+			} else {
+				child.removeClass('behind');
+			}
 
-			// Force a recalculation of height because we've changed how the title is shown.
-			child.setBounds(box, !animate || child.getHidden(), { force:true });
+			child.setZ(zIndex--);
 			child.setRotation((UI.rtl ? -1 : 1) * angleAccum);
-			child.setHidden(false);
+			child.hidden = false;
 			angleAccum += angleDelta;
 		}
 	},
 
 	// Arranges the children into a grid.
-	// Parameters:
-	//   childrenToArrange - array of <TabItem> children
-	//   box - <Rect> to arrange within
-	//   options - see below
-	// Possible "options" properties:
-	//   animate - whether to animate; default: true.
-	//   z - (int) a z-index to assign the children
-	//   columns - the number of columns to use in the layout, if known in advance
-	// Returns:
-	//   dropIndex - (int) the index at which a dragged item (if there is one) should be added if it is dropped. Otherwise (boolean) false.
-	_gridArrange: function(childrenToArrange, box, options) {
-		let arrangeOptions;
-		if(this.expanded) {
-			// if we're expanded, we actually want to use the expanded tray's bounds.
-			box = new Rect(this.expanded.bounds);
-			box.inset(8, 8);
-			arrangeOptions = Utils.extend({}, options, { z: 99999 });
-		} else {
-			this._isStacked = false;
-			arrangeOptions = Utils.extend({}, options, {
-				columns: this._columns
-			});
-
-			for(let child of childrenToArrange) {
-				child.removeClass("stacked");
-				child.isStacked = false;
-				child.setHidden(false);
-			}
+	_gridArrange: function() {
+		let cols;
+		if(!this.expanded) {
+			this.isStacked = false;
+			cols = this._columns;
 		}
 
-		if(!childrenToArrange.length) { return false; }
+		if(!this.children.length) { return; }
 
-		// Items.arrange will determine where/how the child items should be placed, but will *not* actually move them for us. This is our job.
-		let result = Items.arrange(childrenToArrange, box, arrangeOptions);
-		let { dropIndex, rects, columns } = result;
-		if("oldDropIndex" in options && options.oldDropIndex === dropIndex) {
-			return dropIndex;
-		}
-
-		this._columns = columns;
-		let index = 0;
-		for(let child of childrenToArrange) {
-			// If dropIndex spacing is active and this is a child after index, bump it up one so we actually use the correct rect (and skip one for the dropPos)
-			if(this._dropSpaceActive && index === dropIndex) {
-				index++;
-			}
-			child.setBounds(rects[index], !options.animate);
+		for(let child of this.children) {
+			child.removeClass("stacked");
+			child.isStacked = false;
 			child.setRotation(0);
-			if(arrangeOptions.z) {
-				child.setZ(arrangeOptions.z);
-			}
-			index++;
+			child.hidden = false;
+			setAttribute(child.container, 'draggable', 'true');
 		}
 
-		return dropIndex;
+		let box = this.getContentBounds(true);
+		this._lastTabSize = TabItems.arrange(this.children, box, cols);
+		let { tabWidth, tabHeight, columns } = this._lastTabSize;
+		let fontSize = TabItems.getFontSizeFromWidth(tabWidth);
+		let spaceWidth = tabWidth + TabItems.tabItemPadding.x;
+		let spaceHeight = tabHeight + TabItems.tabItemPadding.y;
+
+		setAttribute(this.tabContainer, 'columns', columns);
+
+		let sscode = '\
+			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab,\n\
+			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab {\n\
+				width: '+tabWidth+'px;\n\
+				height: '+tabHeight+'px;\n\
+				font-size: '+fontSize+'px;\n\
+			}\n\
+			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container:not([columns="1"]) .tab.space-before,\n\
+			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container:not([columns="1"]) .tab.space-before {\n\
+				-moz-margin-start: '+spaceWidth+'px;\n\
+			}\n\
+			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container:not([columns="1"]) .tab.space-after,\n\
+			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container:not([columns="1"]) .tab.space-after {\n\
+				-moz-margin-end: '+spaceWidth+'px;\n\
+			}\n\
+			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container[columns="1"] .tab.space-before,\n\
+			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container[columns="1"] .tab.space-before {\n\
+				margin-top: '+spaceHeight+'px;\n\
+			}\n\
+			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container[columns="1"] .tab.space-after,\n\
+			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container[columns="1"] .tab.space-after {\n\
+				margin-bottom: '+spaceHeight+'px;\n\
+			}';
+
+		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);
 	},
 
 	expand: function() {
-		// ___ we're stacked, and command is held down so expand
 		UI.setActive(this.getTopChild());
 
-		let startBounds = this.getChild(0).getBounds();
+		let startBounds = this.getBounds();
 		let $tray = iQ("<div>").css({
 			top: startBounds.top,
 			left: startBounds.left,
 			width: startBounds.width,
 			height: startBounds.height,
 			position: "absolute",
-			zIndex: 99998
-		}).appendTo("body");
-		$tray[0].id = "expandedTray";
+			zIndex: 50
+		});
+
+		let tray = $tray[0];
+		document.body.appendChild(tray);
+
+		tray.classList.add("expandedTray");
+		tray.setAttribute('group', this.id);
+		Listeners.add(tray, 'dragover', this);
 
 		let w = 180;
 		let h = w * (TabItems.tabHeight / TabItems.tabWidth) * 1.1;
 		let padding = 20;
-		let col = Math.ceil(Math.sqrt(this._children.length));
-		let row = Math.ceil(this._children.length/col);
+		let col = Math.ceil(Math.sqrt(this.children.length));
+		let row = Math.ceil(this.children.length/col);
 
 		let overlayWidth = Math.min(window.innerWidth - (padding * 2), w*col + padding*(col+1));
 		let overlayHeight = Math.min(window.innerHeight - (padding * 2), h*row + padding*(row+1));
 
-		let pos = {left: startBounds.left, top: startBounds.top};
+		let pos = { left: startBounds.left, top: startBounds.top };
 		pos.left -= overlayWidth / 3;
 		pos.top  -= overlayHeight / 3;
 
@@ -1267,6 +1485,17 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 			pos.left = window.innerWidth - overlayWidth - 20;
 		}
 
+		let shield = document.createElement('div');
+		shield.classList.add('shield');
+		shield.handleEvent = (e) => {
+			this.collapse();
+		};
+		shield.addEventListener('click', shield);
+		document.body.appendChild(shield);
+
+		let bounds = new Rect(pos.left, pos.top, overlayWidth, overlayHeight);
+		this.expanded = { tray, $tray, shield, bounds };
+
 		$tray
 			.animate({
 				width:  overlayWidth,
@@ -1277,54 +1506,33 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				duration: 200,
 				easing: "tabviewBounce",
 				complete: () => {
+					if(!this.expanded) { return; }
+
+					// There is a race-condition here. If there is a mouse-move while the shield is coming up it will collapse, which we don't want.
+					// Thus, we wait a little bit before adding this event handler.
+					shield.addEventListener('mouseover', shield);
+
+					tray.appendChild(this.tabContainer);
+					this.arrange();
+
 					this._sendToSubscribers("expanded");
 				}
 			})
 			.addClass("overlay");
 
-		for(let child of this._children) {
+		for(let child of this.children) {
 			child.addClass("stack-trayed");
-			child.setHidden(false);
 		}
-
-		let $shield = iQ('<div>')
-			.addClass('shield')
-			.css({
-				zIndex: 99997
-			})
-			.appendTo('body')
-			.click(() => { // just in case
-				this.collapse();
-			});
-
-		// There is a race-condition here. If there is a mouse-move while the shield is coming up it will collapse, which we don't want.
-		// Thus, we wait a little bit before adding this event handler.
-		aSync(() => {
-			$shield.mouseover(() => {
-				this.collapse();
-			});
-		}, 200);
-
-		this.expanded = {
-			$tray: $tray,
-			$shield: $shield,
-			bounds: new Rect(pos.left, pos.top, overlayWidth, overlayHeight)
-		};
-
-		this.arrange();
 	},
 
 	// Collapses the groupItem from the expanded "tray" mode.
 	collapse: function() {
 		if(!this.expanded) { return }
 
-		let z = this.getZ();
 		let box = this.getBounds();
-		let tray = this.expanded.$tray;
-		tray
-			.css({
-				zIndex: z + 1
-			})
+		let $tray = this.expanded.$tray;
+		let tray = this.expanded.tray;
+		$tray
 			.animate({
 				width:  box.width,
 				height: box.height,
@@ -1335,175 +1543,22 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 				duration: 350,
 				easing: "tabviewBounce",
 				complete: () => {
-					iQ(tray).remove();
+					tray.remove();
 					this._sendToSubscribers("collapsed");
 				}
 			});
 
-		this.expanded.$shield.remove();
+		Listeners.remove(this.expanded.tray, 'dragover', this);
+
+		this.expanded.shield.remove();
 		this.expanded = null;
 
-		for(let child of this._children) {
+		for(let child of this.children) {
 			child.removeClass("stack-trayed");
 		}
 
-		this.arrange({ z: z + 2 });
-		this._unfreezeItemSize({ dontArrange: true });
-	},
-
-	// Helper routine for the constructor; adds various event handlers to the container.
-	_addHandlers: function(container) {
-		let lastMouseDownTarget;
-
-		container.mousedown((e) => {
-			let target = e.target;
-			// only set the last mouse down target if it is a left click, not on the close button, not on the expand button, not on the title bar and its elements
-			if(e.button == 0
-			&& this.$closeButton[0] != target
-			&& this.$titlebar[0] != target
-			&& this.$expander[0] != target
-			&& !this.$titlebar.contains(target)) {
-				lastMouseDownTarget = target;
-			} else {
-				lastMouseDownTarget = null;
-			}
-		});
-		container.mouseup((e) => {
-			let same = (e.target == lastMouseDownTarget);
-			lastMouseDownTarget = null;
-
-			if(same && !this.isDragging) {
-				if(Tabs.selected.pinned
-				&& UI.getActiveTab() != this.getActiveTab()
-				&& this.getChildren().length) {
-					UI.setActive(this, { dontSetActiveTabInGroup: true });
-					UI.goToTab(Tabs.selected);
-				} else {
-					let tabItem = this.getTopChild();
-					if(tabItem) {
-						tabItem.zoomIn();
-					} else {
-						this.newTab();
-					}
-				}
-			}
-		});
-
-		let dropIndex = false;
-		let dropSpaceTimer = null;
-
-		// When the _dropSpaceActive flag is turned on on a group, and a tab is dragged on top, a space will open up.
-		this._dropSpaceActive = false;
-
-		this.dropOptions.over = (event) => {
-			iQ(this.container).addClass("acceptsDrop");
-		};
-		this.dropOptions.move = (event) => {
-			let oldDropIndex = dropIndex;
-			let dropPos = drag.info.item.getBounds().center();
-			let options = {
-				dropPos: dropPos,
-				addTab: this._dropSpaceActive && drag.info.item.parent != this,
-				oldDropIndex: oldDropIndex
-			};
-			let newDropIndex = this.arrange(options);
-			// If this is a new drop index, start a timer!
-			if(newDropIndex !== oldDropIndex) {
-				dropIndex = newDropIndex;
-				if(this._dropSpaceActive) { return; }
-
-				if(dropSpaceTimer) {
-					dropSpaceTimer.cancel();
-					dropSpaceTimer = null;
-				}
-
-				dropSpaceTimer = aSync(() => {
-					// Note that dropIndex's scope is GroupItem__addHandlers, but newDropIndex's scope is GroupItem_dropOptions_move.
-					// Thus, dropIndex may change with other movement events before we come back and check this.
-					// If it's still the same dropIndex, activate drop space display!
-					if(dropIndex === newDropIndex) {
-						this._dropSpaceActive = true;
-						dropIndex = this.arrange({
-							dropPos: dropPos,
-							addTab: drag.info.item.parent != this,
-							animate: true
-						});
-					}
-					dropSpaceTimer = null;
-				}, 250);
-			}
-		};
-		this.dropOptions.drop = (event) => {
-			iQ(this.container).removeClass("acceptsDrop");
-			let options = {};
-			if(this._dropSpaceActive) {
-				this._dropSpaceActive = false;
-			}
-
-			if(dropSpaceTimer) {
-				dropSpaceTimer.cancel();
-				dropSpaceTimer = null;
-
-				// If we drop this item before the timed rearrange was executed, we won't have an accurate dropIndex value. Get that now.
-				let dropPos = drag.info.item.getBounds().center();
-				dropIndex = this.arrange({
-					dropPos: dropPos,
-					addTab: drag.info.item.parent != this,
-					animate: true
-				});
-			}
-
-			if(dropIndex !== false) {
-				options = { index: dropIndex };
-			}
-			this.add(drag.info.$el, options);
-			UI.setActive(this);
-			dropIndex = false;
-		};
-		this.dropOptions.out = (event) => {
-			dropIndex = false;
-			if(this._dropSpaceActive) {
-				this._dropSpaceActive = false;
-			}
-
-			if(dropSpaceTimer) {
-				dropSpaceTimer.cancel();
-				dropSpaceTimer = null;
-			}
-			this.arrange();
-			let groupItem = drag.info.item.parent;
-			if(groupItem) {
-				groupItem.remove(drag.info.$el, { dontClose: true });
-			}
-			iQ(this.container).removeClass("acceptsDrop");
-		}
-
-		this.draggable();
-		this.droppable(true);
-
-		this.$expander.click(() => {
-			this.expand();
-		});
-	},
-
-	// Sets whether the groupItem is resizable and updates the UI accordingly.
-	setResizable: function(value, immediately) {
-		this.resizeOptions.minWidth = GroupItems.minGroupWidth;
-		this.resizeOptions.minHeight = GroupItems.minGroupHeight;
-
-		let start = this.resizeOptions.start;
-		this.resizeOptions.start = (e) => {
-			start(e);
-			this._unfreezeItemSize();
-		}
-
-		if(value) {
-			immediately ? this.$resizer.show() : this.$resizer.fadeIn();
-			this.resizable(true);
-		} else {
-			immediately ? this.$resizer.hide() : this.$resizer.fadeOut();
-			this.resizable(false);
-		}
+		this.contents.insertBefore(this.tabContainer, this.contents.firstChild);
+		this._unfreezeItemSize();
 	},
 
 	// Creates a new tab within this groupItem.
@@ -1526,16 +1581,16 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 	// Reorders the tabs in a groupItem based on the arrangement of the tabs shown in the tab bar.
 	// It does it by sorting the children of the groupItem by the positions of their respective tabs in the tab bar.
 	reorderTabItemsBasedOnTabOrder: function() {
-		this._children.sort((a,b) => a.tab._tPos - b.tab._tPos);
+		this.children.sort((a,b) => a.tab._tPos - b.tab._tPos);
 
-		this.arrange({ animate: false });
+		this.arrange();
 		// this.arrange calls this.save for us
 	},
 
 	// Reorders the tabs in the tab bar based on the arrangment of the tabs shown in the groupItem.
 	reorderTabsBasedOnTabItemOrder: function() {
 		let indices;
-		let tabs = this._children.map(tabItem => tabItem.tab);
+		let tabs = this.children.map(tabItem => tabItem.tab);
 
 		tabs.forEach(function(tab, index) {
 			if(!indices) {
@@ -1555,66 +1610,56 @@ this.GroupItem.prototype = (!this.Item) ? null : Utils.extend(new Item(), new Su
 
 	// Gets the <Item> that should be displayed on top when in stack mode.
 	getTopChild: function() {
-		if(!this.getChildren().length) {
+		if(!this.children.length) {
 			return null;
 		}
 
-		return this.getActiveTab() || this.getChild(0);
-	},
-
-	// Returns the nth child tab or null if index is out of range.
-	// Parameters:
-	//  index - the index of the child tab to return, use negative numbers to index from the end (-1 is the last child)
-	getChild: function(index) {
-		if(index < 0) {
-			index = this._children.length + index;
-		}
-		if(index >= this._children.length || index < 0) {
-			return null;
-		}
-		return this._children[index];
-	},
-
-	// Returns all children.
-	getChildren: function() {
-		return this._children;
+		return this.getActiveTab() || this.children[0] || null;
 	}
-});
+};
 
 // Singleton for managing all <GroupItem>s.
 this.GroupItems = {
-	groupItems: [],
+	groupItems: new Map(),
 	nextID: 1,
 	_inited: false,
 	_activeGroupItem: null,
 	_arrangePaused: false,
-	_arrangesPending: [],
+	_arrangesPending: new Set(),
 	_removingHiddenGroups: false,
 	_autoclosePaused: false,
-	minGroupHeight: 110,
-	minGroupWidth: 125,
 	_lastActiveList: null,
+	workSpace: document,
 
-	handleEvent: function(e) {
-		switch(e.type) {
+	get size() { return this.groupItems.size; },
+	[Symbol.iterator]: function* () {
+		for(let groupItem of this.groupItems.values()) {
+			yield groupItem;
 		}
 	},
+
+	// Keep in sync with the CSS values
+	minGroupHeight: 145,
+	minGroupWidth: 120,
+
+	// How far apart Items should be from each other and from bounds
+	defaultGutter: 15,
+	// set the top gutter separately, as the top of the window has its own extra chrome which makes a large top gutter unnecessary.
+	topGutter: 5,
 
 	// Function: init
 	init: function() {
 		this._lastActiveList = new MRUList();
-
-		Tabs.listen("TabAttrModified", this);
-		Tabs.listen("TabClose", this);
 	},
 
 	// Function: uninit
 	uninit: function() {
-		Tabs.unlisten("TabAttrModified", this);
-		Tabs.unlisten("TabClose", this);
+		for(let group of this) {
+			Styles.unload('group_'+group.id+'_'+_UUID);
+		}
 
 		// additional clean up
-		this.groupItems = [];
+		this.groupItems = new Map();
 	},
 
 	// Creates a new empty group.
@@ -1628,33 +1673,18 @@ this.GroupItems = {
 		this._arrangePaused = true;
 	},
 
-	// Push an arrange() call and its arguments onto an arrayto be resolved in resumeArrange()
+	// Push an arrange() call and its arguments onto a map to be resolved in resumeArrange()
 	pushArrange: function(groupItem, options) {
-		let i;
-		for(i = 0; i < this._arrangesPending.length; i++) {
-			if(this._arrangesPending[i].groupItem === groupItem) {
-				break;
-			}
-		}
-		let arrangeInfo = {
-			groupItem: groupItem,
-			options: options
-		};
-		if(i < this._arrangesPending.length) {
-			this._arrangesPending[i] = arrangeInfo;
-		} else {
-			this._arrangesPending.push(arrangeInfo);
-		}
+		this._arrangesPending.add(groupItem);
 	},
 
 	// Resolve bypassed and collected arrange() calls
 	resumeArrange: function() {
 		this._arrangePaused = false;
-		for(let i = 0; i < this._arrangesPending.length; i++) {
-			let g = this._arrangesPending[i];
-			g.groupItem.arrange(g.options);
+		for(let groupItem of this._arrangesPending) {
+			groupItem.arrange();
 		}
-		this._arrangesPending = [];
+		this._arrangesPending = new Set();
 	},
 
 	// Returns the next unused groupItem ID.
@@ -1668,7 +1698,7 @@ this.GroupItems = {
 	// Saves GroupItems state, as well as the state of all of the groupItems.
 	saveAll: function() {
 		this._save();
-		for(let groupItem of this.groupItems) {
+		for(let groupItem of this) {
 			groupItem.save();
 		}
 	},
@@ -1682,7 +1712,7 @@ this.GroupItems = {
 		Storage.saveGroupItemsData(gWindow, {
 			nextID: this.nextID,
 			activeGroupId: activeGroupId,
-			totalNumber: this.groupItems.length
+			totalNumber: this.size
 		});
 	},
 
@@ -1712,7 +1742,7 @@ this.GroupItems = {
 			}
 
 			if(groupItemData) {
-				let toClose = this.groupItems.concat();
+				let toClose = new Set(this);
 				for(let id in groupItemData) {
 					let data = groupItemData[id];
 					if(this.storageSanityGroupItem(data)) {
@@ -1721,7 +1751,7 @@ this.GroupItems = {
 							// (TMP) In case this group is re-used by session restore, make sure all of its children still belong to this group.
 							// Do it before setBounds trigger data save that will overwrite session restore data.
 							// TabView will use TabItems.resumeReconnecting or UI.reset to reconnect the tabItem.
-							for(let tabItem of groupItem.getChildren()) {
+							for(let tabItem of groupItem.children) {
 								let tabData = Storage.getTabData(tabItem.tab);
 								if(!TabItems.storageSanity(tabData) || tabData.groupID != data.id) {
 									tabItem._reconnected = false;
@@ -1732,15 +1762,11 @@ this.GroupItems = {
 							groupItem.setTitle(data.title);
 							groupItem.setBounds(data.bounds, true);
 
-							let index = toClose.indexOf(groupItem);
-							if(index != -1) {
-								toClose.splice(index, 1);
-							}
+							toClose.delete(groupItem);
 						} else {
 							let options = {
 								// we always push when first appending the group, in case new groups (from other add-ons, or imported in prefs)
 								// overlap existing groups
-								dontPush: false,
 								immediately: true
 							};
 							new GroupItem([], Utils.extend({}, data, options));
@@ -1750,7 +1776,7 @@ this.GroupItems = {
 
 				for(let groupItem of toClose) {
 					// all tabs still existing in closed groups will be moved to new groups. prepare them to be reconnected later.
-					for(let tabItem of groupItem.getChildren()) {
+					for(let tabItem of groupItem.children) {
 						if(tabItem.parent.hidden) {
 							iQ(tabItem.container).show();
 						}
@@ -1765,7 +1791,7 @@ this.GroupItems = {
 
 							// the tab's group id could be invalid or point to a non-existing group.
 							// correct it by assigning the active group id or the first group of the just restored session.
-							if(!parentGroup || -1 < toClose.indexOf(parentGroup)) {
+							if(!parentGroup || toClose.has(parentGroup)) {
 								tabData.groupID = activeGroupId || Object.keys(groupItemData)[0];
 								Storage.saveTab(tabItem.tab, tabData);
 							}
@@ -1811,7 +1837,7 @@ this.GroupItems = {
 
 		// For compatibility with other add-ons that might modify (read: create) groups, instead of discarting invalid groups we "fix" them.
 		if(!groupItemData.bounds || !Utils.isRect(groupItemData.bounds)) {
-			let pageBounds = Items.getPageBounds();
+			let pageBounds = UI.getPageBounds();
 			pageBounds.inset(20, 20);
 
 			let box = new Rect(pageBounds);
@@ -1827,24 +1853,19 @@ this.GroupItems = {
 
 	// Adds the given <GroupItem> to the list of groupItems we're tracking.
 	register: function(groupItem) {
-		this.groupItems.push(groupItem);
+		this.groupItems.set(groupItem.id, groupItem);
 		UI.updateTabButton();
 	},
 
 	// Removes the given <GroupItem> from the list of groupItems we're tracking.
 	unregister: function(groupItem) {
-		let index = this.groupItems.indexOf(groupItem);
-		if(index != -1) {
-			this.groupItems.splice(index, 1);
-		}
+		this.groupItems.delete(groupItem.id);
 
 		if(groupItem == this._activeGroupItem) {
 			this._activeGroupItem = null;
 		}
 
-		this._arrangesPending = this._arrangesPending.filter(function(pending) {
-			return groupItem != pending.groupItem;
-		});
+		this._arrangesPending.delete(groupItem);
 
 		this._lastActiveList.remove(groupItem);
 		UI.updateTabButton();
@@ -1852,24 +1873,12 @@ this.GroupItems = {
 
 	// Given some sort of identifier, returns the appropriate groupItem. Currently only supports groupItem ids.
 	groupItem: function(a) {
-		if(!this.groupItems) {
-			// uninit has been called
-			return null;
-		}
-
-		for(let candidate of this.groupItems) {
-			if(candidate.id == a) {
-				return candidate;
-			}
-		}
-
-		return null;
+		return this.groupItems.get(a) || null;
 	},
 
 	// Removes all tabs from all groupItems (which automatically closes all unnamed groupItems).
 	removeAll: function() {
-		let toRemove = this.groupItems.concat();
-		for(let groupItem of toRemove) {
+		for(let groupItem of this) {
 			groupItem.removeAll();
 		}
 	},
@@ -1902,7 +1911,7 @@ this.GroupItems = {
 		}
 
 		// find the first visible group item
-		for(let groupItem of this.groupItems) {
+		for(let groupItem of this) {
 			if(!groupItem.hidden) {
 				groupItem.add(tabItem);
 				UI.setActive(groupItem);
@@ -1911,10 +1920,7 @@ this.GroupItems = {
 		}
 
 		// create new group for the new tabItem
-		tabItem.setPosition(60, 60, true);
-		let newGroupItemBounds = tabItem.getBounds();
-
-		newGroupItemBounds.inset(-40,-40);
+		let newGroupItemBounds = new Rect(20, 20, 250, 200);;
 		let newGroupItem = new GroupItem([tabItem], { bounds: newGroupItemBounds });
 		newGroupItem.snap();
 		UI.setActive(newGroupItem);
@@ -1943,7 +1949,7 @@ this.GroupItems = {
 	// Gets last active group item. Returns the <groupItem>. If nothing is found, return null.
 	getLastActiveGroupItem: function() {
 		return this._lastActiveList.peek(function(groupItem) {
-			return (groupItem && !groupItem.hidden && groupItem.getChildren().length)
+			return (groupItem && !groupItem.hidden && groupItem.children.length)
 		});
 	},
 
@@ -1952,7 +1958,7 @@ this.GroupItems = {
 		// called too soon
 		if(!window[objName] || !window[objName].UI) { return; }
 
-		let tabItems = this._activeGroupItem._children;
+		let tabItems = this._activeGroupItem.children;
 		gBrowser.showOnlyTheseTabs(tabItems.map(item => item.tab));
 		gTabView.updateAeroPeek();
 	},
@@ -1977,7 +1983,7 @@ this.GroupItems = {
 			}
 
 			// if no tab is active, use the first one
-			let child = groupItem.getChild(0);
+			let child = groupItem.children[0];
 			if(child) {
 				return child;
 			}
@@ -1998,7 +2004,10 @@ this.GroupItems = {
 	//  reverse - the boolean indicates the direction to look for the next groupItem.
 	// Returns the <tabItem>. If nothing is found, return null.
 	getNextGroupItemTab: function(reverse) {
-		let groupItems = this.groupItems.concat([]);
+		let groupItems = [];
+		for(let groupItem of this) {
+			groupItems.push(groupItem);
+		}
 
 		// When cycling through groups, order them by their titles, otherwise it's far too arbitrary.
 		for(let groupItem of groupItems) {
@@ -2069,7 +2078,7 @@ this.GroupItems = {
 			groupItem.add(tab._tabViewTabItem);
 			groupItem.reorderTabsBasedOnTabItemOrder()
 		} else {
-			let pageBounds = Items.getPageBounds();
+			let pageBounds = UI.getPageBounds();
 			pageBounds.inset(20, 20);
 
 			let box = new Rect(pageBounds);
@@ -2091,8 +2100,7 @@ this.GroupItems = {
 		if(this._removingHiddenGroups) { return; }
 		this._removingHiddenGroups = true;
 
-		let groupItems = this.groupItems.concat();
-		for(let groupItem of groupItems) {
+		for(let groupItem of this) {
 			if(groupItem.hidden) {
 				groupItem.closeHidden();
 			}
@@ -2102,8 +2110,93 @@ this.GroupItems = {
 	},
 
 	// Basic measure rules. Assures that item is a minimum size.
-	calcValidSize: function(size, options) {
+	calcValidSize: function(size) {
 		return new Point(Math.max(size.x, this.minGroupWidth), Math.max(size.y, this.minGroupHeight));
+	},
+
+	// Returns the bounds within which it is safe to place all non-stationary <Item>s.
+	getSafeWindowBounds: function() {
+		// the safe bounds that would keep it "in the window"
+		let gutter = this.defaultGutter;
+		let topGutter = this.topGutter;
+		return new Rect(gutter, topGutter, window.innerWidth - 2 * gutter, window.innerHeight - gutter - topGutter);
+	},
+
+	// Checks to see which items can now be unsquished.
+	// Parameters:
+	//   pairs - an array of objects, each with two properties: item and bounds. The bounds are modified as appropriate, but the items are not changed.
+	//     If pairs is null, the operation is performed directly on all of the top level items.
+	//   ignore - an <Item> to not include in calculations (because it's about to be closed, for instance)
+	unsquish: function(pairs, ignore) {
+		let pairsProvided = (pairs ? true : false);
+		if(!pairsProvided) {
+			pairs = [];
+			for(let item of GroupItems) {
+				pairs.push({
+					item: item,
+					bounds: item.getBounds()
+				});
+			}
+		}
+
+		let pageBounds = this.getSafeWindowBounds();
+		for(let pair of pairs) {
+			let item = pair.item;
+			if(item == ignore) { continue; }
+
+			let bounds = pair.bounds;
+			let newBounds = new Rect(bounds);
+
+			let newSize;
+			if(Utils.isPoint(item.userSize)) {
+				newSize = new Point(item.userSize);
+			} else {
+				newSize = GroupItems.calcValidSize(new Point(GroupItems.minGroupWidth, -1));
+			}
+
+			newBounds.width = Math.max(newBounds.width, newSize.x);
+			newBounds.height = Math.max(newBounds.height, newSize.y);
+
+			newBounds.left -= (newBounds.width - bounds.width) / 2;
+			newBounds.top -= (newBounds.height - bounds.height) / 2;
+
+			let offset = new Point();
+			if(newBounds.left < pageBounds.left) {
+				offset.x = pageBounds.left - newBounds.left;
+			} else if(newBounds.right > pageBounds.right) {
+				offset.x = pageBounds.right - newBounds.right;
+			}
+
+			if(newBounds.top < pageBounds.top) {
+				offset.y = pageBounds.top - newBounds.top;
+			} else if(newBounds.bottom > pageBounds.bottom) {
+				offset.y = pageBounds.bottom - newBounds.bottom;
+			}
+
+			newBounds.offset(offset);
+
+			if(!bounds.equals(newBounds)) {
+				let blocked = false;
+				for(let pair2 of pairs) {
+					if(pair2 == pair || pair2.item == ignore) { continue; }
+
+					let bounds2 = pair2.bounds;
+					if(bounds2.intersects(newBounds)) {
+						blocked = true;
+					}
+				}
+
+				if(!blocked) {
+					pair.bounds.copy(newBounds);
+				}
+			}
+		}
+
+		if(!pairsProvided) {
+			for(let pair of pairs) {
+				pair.item.setBounds(pair.bounds);
+			}
+		}
 	},
 
 	// Temporarily disable the behavior that closes groups when they become empty.
@@ -2118,7 +2211,7 @@ this.GroupItems = {
 	}
 };
 
-this.PinnedTabs = {
+this.PinnedItems = {
 	get tray() { return $('pinnedTabs'); },
 
 	icons: new Map(),
@@ -2252,8 +2345,6 @@ this.PinnedTabs = {
 			this.icons.set(tab, icon);
 			this.tray.appendChild(icon);
 			this.updateTray();
-
-			this._sendToSubscribers("appTabIconAdded", { item: icon });
 		});
 	},
 

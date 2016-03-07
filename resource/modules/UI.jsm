@@ -1,4 +1,4 @@
-// VERSION 1.0.32
+// VERSION 1.1.0
 
 this.Keys = { meta: false };
 
@@ -26,13 +26,14 @@ this.UI = {
 	_reorderTabItemsOnShow: [],
 
 	// Keeps track of the <GroupItem>s which their tab items have been moved in TabView UI and re-orders the tabs when switcing back to main browser.
-	_reorderTabsOnHide: [],
+	_reorderTabsOnHide: new Set(),
 
 	// Keeps track of which xul:tab we are currently on. Used to facilitate zooming down from a previous tab.
 	_currentTab: null,
 
 	// If the UI is in the middle of an operation, this is the max amount of milliseconds to wait between input events before we no longer consider the operation interactive.
 	_maxInteractiveWait: 250,
+	lastMoveTime: 0,
 
 	// Tells whether the storage is currently busy or not.
 	_storageBusy: false,
@@ -59,6 +60,10 @@ this.UI = {
 	get sessionRestoreAutoChanged() { return $('sessionRestoreAutoChanged'); },
 	get sessionRestorePrivate() { return $('sessionRestorePrivate'); },
 
+	get exitBtn() { return $("exit-button"); },
+	get optionsBtn() { return $("optionsbutton"); },
+	get helpBtn() { return $("helpbutton"); },
+
 	_els: Cc["@mozilla.org/eventlistenerservice;1"].getService(Ci.nsIEventListenerService),
 
 	// Called when a web page is about to show a modal dialog.
@@ -81,17 +86,7 @@ this.UI = {
 		switch(e.type) {
 			// ___ setup event listener to save canvas images
 			case 'SSWindowClosing':
-				Listeners.remove(gWindow, "SSWindowClosing", this);
-
-				// XXX bug #635975 - don't unlink the tab if the dom window is closing.
-				this.isDOMWindowClosing = true;
-
-				if(this.isTabViewVisible()) {
-					GroupItems.removeHiddenGroups();
-				}
-
-				TabItems.saveAll();
-				this._save();
+				this.storageClosing();
 				break;
 
 			case 'SSWindowStateBusy':
@@ -102,18 +97,95 @@ this.UI = {
 				this.storageReady();
 				break;
 
-			// clicking the #sessionRestoreNotice banner
-			case 'mousedown':
-				// see if we just want to dismiss the warning
-				if(e.originalTarget.classList.contains('close')) {
-					e.preventDefault();
-					e.stopPropagation();
-					this.sessionRestoreNotice.hidden = true;
-					this._noticeDismissed = true;
-					break;
-				}
+			case 'resize':
+				this._resize();
+				break;
 
-				this.goToPreferences({ jumpto: 'sessionRestore' });
+			case 'keyup':
+				if(!e.metaKey) {
+					Keys.meta = false;
+				}
+				break;
+
+			case 'keypress':
+				if(e.metaKey) {
+					Keys.meta = true;
+				}
+				this._onKeypress(e);
+				break;
+
+			case 'mousedown':
+				switch(e.target) {
+					case this.sessionRestoreNotice:
+						// see if we just want to dismiss the warning
+						if(e.originalTarget.classList.contains('close')) {
+							e.preventDefault();
+							e.stopPropagation();
+							this.sessionRestoreNotice.hidden = true;
+							this._noticeDismissed = true;
+							break;
+						}
+
+						this.goToPreferences({ jumpto: 'sessionRestore' });
+						break;
+
+					// target == document
+					default: {
+						let focused = $$(":focus");
+						if(focused.length > 0) {
+							for(let element of focused) {
+								// don't fire blur event if the same input element is clicked.
+								if(e.target != element && element.nodeName == "input") {
+									element.blur();
+								}
+							}
+						}
+						if(e.originalTarget.id == "content" && e.button == 0 && e.detail == 1) {
+							this._createGroupItemOnDrag(e);
+						}
+						break;
+					}
+				}
+				break;
+
+			case 'dblclick': {
+				if(e.originalTarget.id != "content") { return; }
+
+				// Create a group with one tab on double click
+				let w = TabItems.tabWidth;
+				let h = TabItems.tabHeight;
+				let y = e.clientY - Math.floor(h/2);
+				let x = e.clientX - Math.floor(w/2);
+				let box = new Rect(x, y, w, h);
+				box.inset(-30, -30);
+
+				let opts = { immediately: true, bounds: box };
+				let groupItem = new GroupItem([], opts);
+				groupItem.newTab();
+				break;
+			}
+
+			case 'click':
+				switch(e.target) {
+					case this.exitBtn:
+						this.exit();
+						this.blurAll();
+						break;
+
+					case this.optionsBtn:
+						this.goToPreferences();
+						break;
+
+					case this.helpBtn:
+						this.goToPreferences({ pane: 'paneHowTo' });
+						break;
+				}
+				break;
+
+			case 'dragover':
+				if(DraggingTab && e.target.id == 'content') {
+					DraggingTab.canDrop(e, e.target);
+				}
 				break;
 
 			case 'TabOpen':
@@ -143,7 +215,7 @@ this.UI = {
 				let groupItem = GroupItems.getActiveGroupItem();
 
 				// 1) Only go back to the TabView tab when there you close the last tab of a groupItem.
-				let closingLastOfGroup = (groupItem && groupItem._children.length == 1 && groupItem._children[0].tab == tab);
+				let closingLastOfGroup = (groupItem && groupItem.children.length == 1 && groupItem.children[0].tab == tab);
 
 				// 2) When a blank tab is active while restoring a closed tab the blank tab gets removed.
 				// The active group is not closed as this is where the restored tab goes. So do not show the TabView.
@@ -158,7 +230,7 @@ this.UI = {
 				break;
 			}
 			case 'TabMove':
-				if(!tab.pinned && GroupItems.groupItems.length) {
+				if(!tab.pinned && GroupItems.size) {
 					let activeGroupItem = GroupItems.getActiveGroupItem();
 					if(activeGroupItem) {
 						if(!this.isTabViewVisible() || this._isChangingVisibility) {
@@ -219,60 +291,39 @@ this.UI = {
 			// ___ currentTab
 			this._currentTab = Tabs.selected;
 
-			// ___ exit button
-			iQ("#exit-button").click(() => {
-				this.exit();
-				this.blurAll();
-			});
-
-			iQ("#optionsbutton").mousedown(() => {
-				this.goToPreferences();
-			});
-
-			iQ("#helpbutton").mousedown(() => {
-				this.goToPreferences({ pane: 'paneHowTo' });
-			});
+			Listeners.add(this.exitBtn, 'click', this);
+			Listeners.add(this.optionsBtn, 'click', this);
+			Listeners.add(this.helpBtn, 'click', this);
+			Listeners.add(GroupItems.workSpace, 'dragover', this);
 
 			// When you click on the background/empty part of TabView, we create a new groupItem.
-			iQ(gTabViewFrame.contentDocument).mousedown((e) => {
-				if(iQ(":focus").length > 0) {
-					iQ(":focus").each(function(element) {
-						// don't fire blur event if the same input element is clicked.
-						if(e.target != element && element.nodeName == "input") {
-							element.blur();
-						}
-					});
-				}
-				if(e.originalTarget.id == "content" && e.button == 0 && e.detail == 1) {
-					this._createGroupItemOnDrag(e);
-				}
-			});
-
-			iQ(gTabViewFrame.contentDocument).dblclick(function(e) {
-				if(e.originalTarget.id != "content") { return; }
-
-				// Create a group with one tab on double click
-				let box = new Rect(e.clientX - Math.floor(TabItems.tabWidth/2), e.clientY - Math.floor(TabItems.tabHeight/2), TabItems.tabWidth, TabItems.tabHeight);
-				box.inset(-30, -30);
-
-				let opts = { immediately: true, bounds: box };
-				let groupItem = new GroupItem([], opts);
-				groupItem.newTab();
-			});
+			Listeners.add(GroupItems.workSpace, 'mousedown', this);
+			Listeners.add(GroupItems.workSpace, 'dblclick', this);
 
 			Messenger.listenWindow(gWindow, "DOMWillOpenModalDialog", this);
 
 			// ___ setup key handlers
-			this._setTabViewFrameKeyHandlers();
+			this._setupBrowserKeys();
+			Listeners.add(window, 'keyup', this);
+			Listeners.add(window, 'keypress', this, true);
+
+			Listeners.add(gWindow, "SSWindowStateBusy", this);
+			Listeners.add(gWindow, "SSWindowStateReady", this);
+			Listeners.add(gWindow, "SSWindowClosing", this);
 
 			// ___ add tab action handlers
-			this._addTabActionHandlers();
+			Tabs.listen("TabOpen", this);
+			Tabs.listen("TabClose", this);
+			Tabs.listen("TabMove", this);
+			Tabs.listen("TabSelect", this);
+			Tabs.listen("TabPinned", this);
+			Tabs.listen("TabUnpinned", this);
 
 			// ___ groups
 			GroupItems.init();
 			GroupItems.pauseArrange();
 			let hasGroupItemsData = GroupItems.load();
-			PinnedTabs.init();
+			PinnedItems.init();
 
 			// ___ tabs
 			TabItems.init();
@@ -289,14 +340,9 @@ this.UI = {
 			if(this._pageBounds) {
 				this._resize(true);
 			} else {
-				this._pageBounds = Items.getPageBounds();
+				this._pageBounds = this.getPageBounds();
 			}
-
-			iQ(window).resize(() => {
-				this._resize();
-			});
-
-			Listeners.add(gWindow, "SSWindowClosing", this);
+			Listeners.add(window, 'resize', this);
 
 			// ___ load frame script
 			Messenger.loadInWindow(gWindow, 'TabView');
@@ -321,10 +367,21 @@ this.UI = {
 
 	// Should be called when window is unloaded.
 	uninit: function() {
+		Listeners.remove(window, 'keyup', this);
+		Listeners.remove(window, 'keypress', this, true);
+		Listeners.remove(window, 'resize', this);
 		Listeners.remove(gWindow, "SSWindowClosing", this);
 		Listeners.remove(gWindow, "SSWindowStateBusy", this);
 		Listeners.remove(gWindow, "SSWindowStateReady", this);
 		Listeners.remove(this.sessionRestoreNotice, 'mousedown', this, true);
+
+		Listeners.remove(GroupItems.workSpace, 'mousedown', this);
+		Listeners.remove(GroupItems.workSpace, 'dblclick', this);
+
+		Listeners.remove(this.exitBtn, 'click', this);
+		Listeners.remove(this.optionsBtn, 'click', this);
+		Listeners.remove(this.helpBtn, 'click', this);
+		Listeners.remove(GroupItems.workSpace, 'dragover', this);
 
 		pageWatch.unregister(this);
 
@@ -333,14 +390,21 @@ this.UI = {
 
 		// additional clean up
 		TabItems.uninit();
-		PinnedTabs.uninit();
+		PinnedItems.uninit();
 		GroupItems.uninit();
+		Search.uninit();
 
-		this._removeTabActionHandlers();
+		Tabs.unlisten("TabOpen", this);
+		Tabs.unlisten("TabClose", this);
+		Tabs.unlisten("TabMove", this);
+		Tabs.unlisten("TabSelect", this);
+		Tabs.unlisten("TabPinned", this);
+		Tabs.unlisten("TabUnpinned", this);
+
 		this._currentTab = null;
 		this._pageBounds = null;
 		this._reorderTabItemsOnShow = null;
-		this._reorderTabsOnHide = null;
+		this._reorderTabsOnHide = new Set();
 		this._frameInitialized = false;
 	},
 
@@ -361,7 +425,7 @@ this.UI = {
 
 		let padding = Trenches.defaultRadius;
 		let welcomeWidth = 300;
-		let pageBounds = Items.getPageBounds();
+		let pageBounds = this.getPageBounds();
 		pageBounds.inset(padding, padding);
 
 		let $actions = iQ("#actions");
@@ -380,7 +444,7 @@ this.UI = {
 			box.left = pageBounds.left + welcomeWidth + 2 * padding;
 		}
 
-		for(let group of GroupItems.groupItems) {
+		for(let group of GroupItems) {
 			group.close();
 		}
 
@@ -397,7 +461,7 @@ this.UI = {
 			if(gWindow.Tabmix) {
 				item._reconnected = true;
 			}
-			groupItem.add(item, { immediately: true });
+			groupItem.add(item);
 		}
 		this.setActive(groupItem);
 	},
@@ -413,8 +477,7 @@ this.UI = {
 	// Used to determine whether interactivity would be sacrificed if the CPU was to become busy.
 	isIdle: function() {
 		let time = Date.now();
-		let maxEvent = Math.max(drag.lastMoveTime, resize.lastMoveTime);
-		return (time - maxEvent) > this._maxInteractiveWait;
+		return (time - this.lastMoveTime) > this._maxInteractiveWait;
 	},
 
 	// Returns the currently active tab as a <TabItem>
@@ -547,6 +610,13 @@ this.UI = {
 		this.rtl = dir;
 	},
 
+	// Returns a <Rect> defining the area of the page <Item>s should stay within.
+	getPageBounds: function() {
+		let width = Math.max(100, window.innerWidth);
+		let height = Math.max(100, window.innerHeight);
+		return new Rect(0, 0, width, height);
+	},
+
 	// Shows TabView and hides the main browser UI.
 	// Parameters:
 	//   zoomOut - true for zoom out animation, false for nothing.
@@ -603,7 +673,7 @@ this.UI = {
 				dispatch(window, { type: "tabviewshown", cancelable: false });
 
 				// Flush pending updates
-				PinnedTabs.flushUpdates();
+				PinnedItems.flushUpdates();
 
 				TabItems.resumePainting();
 			});
@@ -615,7 +685,7 @@ this.UI = {
 			dispatch(window, { type: "tabviewshown", cancelable: false });
 
 			// Flush pending updates
-			PinnedTabs.flushUpdates();
+			PinnedItems.flushUpdates();
 
 			TabItems.resumePainting();
 		}
@@ -641,9 +711,11 @@ this.UI = {
 		TabItems.pausePainting();
 
 		for(let groupItem of this._reorderTabsOnHide) {
-			groupItem.reorderTabsBasedOnTabItemOrder();
+			if(!groupItem.hidden && groupItem.container.parentNode) {
+				groupItem.reorderTabsBasedOnTabItemOrder();
+			}
 		}
-		this._reorderTabsOnHide = [];
+		this._reorderTabsOnHide = new Set();
 
 		gTabViewDeck.selectedPanel = gBrowserPanel;
 		gWindow.TabsInTitlebar.allowedBy("tabview-open", true);
@@ -682,6 +754,20 @@ this.UI = {
 		}
 	},
 
+	storageClosing: function() {
+		Listeners.remove(gWindow, "SSWindowClosing", this);
+
+		// XXX bug #635975 - don't unlink the tab if the dom window is closing.
+		this.isDOMWindowClosing = true;
+
+		if(this.isTabViewVisible()) {
+			GroupItems.removeHiddenGroups();
+		}
+
+		TabItems.saveAll();
+		this._save();
+	},
+
 	// Pauses the storage activity that conflicts with sessionstore updates. Calls can be nested.
 	storageBusy: function() {
 		if(this._storageBusy) { return; }
@@ -704,38 +790,6 @@ this.UI = {
 		TabItems.resumeReconnecting();
 		GroupItems._updateTabBar();
 		GroupItems.resumeAutoclose();
-	},
-
-	// Adds handlers to handle tab actions.
-	_addTabActionHandlers: function() {
-		// session restore events
-		this.handleSSWindowStateBusy = () => {
-			this.storageBusy();
-		}
-
-		this.handleSSWindowStateReady = () => {
-			this.storageReady();
-		}
-
-		Listeners.add(gWindow, "SSWindowStateBusy", this);
-		Listeners.add(gWindow, "SSWindowStateReady", this);
-
-		Tabs.listen("TabOpen", this);
-		Tabs.listen("TabClose", this);
-		Tabs.listen("TabMove", this);
-		Tabs.listen("TabSelect", this);
-		Tabs.listen("TabPinned", this);
-		Tabs.listen("TabUnpinned", this);
-	},
-
-	// Removes handlers to handle tab actions.
-	_removeTabActionHandlers: function() {
-		Tabs.unlisten("TabOpen", this);
-		Tabs.unlisten("TabClose", this);
-		Tabs.unlisten("TabMove", this);
-		Tabs.unlisten("TabSelect", this);
-		Tabs.unlisten("TabPinned", this);
-		Tabs.unlisten("TabUnpinned", this);
 	},
 
 	// Selects the given xul:tab in the browser.
@@ -808,7 +862,7 @@ this.UI = {
 
 		// update the tab bar for the new tab's group
 		if(tab && tab._tabViewTabItem) {
-			if(!TabItems.reconnectingPaused()) {
+			if(!TabItems.reconnectingPaused) {
 				newItem = tab._tabViewTabItem;
 				GroupItems.updateActiveGroupItemAndTabBar(newItem);
 			}
@@ -834,10 +888,7 @@ this.UI = {
 	//   groupItem - the groupItem which would be used for re-ordering tabs.
 	setReorderTabsOnHide: function(groupItem) {
 		if(this.isTabViewVisible()) {
-			let index = this._reorderTabsOnHide.indexOf(groupItem);
-			if(index == -1) {
-				this._reorderTabsOnHide.push(groupItem);
-			}
+			this._reorderTabsOnHide.add(groupItem);
 		}
 	},
 
@@ -854,10 +905,9 @@ this.UI = {
 	},
 
 	updateTabButton: function() {
-		let exitButton = $("exit-button");
-		let numberOfGroups = GroupItems.groupItems.length;
+		let numberOfGroups = GroupItems.size;
 
-		setAttribute(exitButton, "groups", numberOfGroups);
+		setAttribute(this.exitBtn, "groups", numberOfGroups);
 		gTabView.updateGroupNumberBroadcaster(numberOfGroups);
 	},
 
@@ -865,11 +915,11 @@ this.UI = {
 	getClosestTab: function(tabCenter) {
 		let cl = null;
 		let clDist;
-		for(let item of TabItems.getItems()) {
+		for(let item of TabItems) {
 			if(!item.parent || item.parent.hidden) { continue; }
 
-			let testDist = tabCenter.distance(item.bounds.center());
-			if(cl==null || testDist < clDist) {
+			let testDist = tabCenter.distance(item.getBounds().center());
+			if(cl == null || testDist < clDist) {
 				cl = item;
 				clDist = testDist;
 			}
@@ -979,344 +1029,269 @@ this.UI = {
 		);
 	},
 
-	// Sets up the key handlers for navigating between tabs within the TabView UI.
-	_setTabViewFrameKeyHandlers: function() {
-		this._setupBrowserKeys();
+	_onKeypress: function(e) {
+		let processBrowserKeys = (e, input) => {
+			// let any keys with alt to pass through
+			if(e.altKey) { return; }
 
-		iQ(window).keyup(function(e) {
-			if(!e.metaKey) {
-				Keys.meta = false;
-			}
-		});
-
-		iQ(window).keypress((e) => {
-			if(e.metaKey) {
-				Keys.meta = true;
+			// make sure our keyboard shortcuts also work, such as to toggle out of tab view
+			for(let key of keysets) {
+				if(Keysets.isRegistered(key) && Keysets.compareWithEvent(key, e)) { return; }
 			}
 
-			let processBrowserKeys = (e, input) => {
-				// let any keys with alt to pass through
-				if(e.altKey) { return; }
-
-				// make sure our keyboard shortcuts also work, such as to toggle out of tab view
-				for(let key of keysets) {
-					if(Keysets.isRegistered(key) && Keysets.compareWithEvent(key, e)) { return; }
-				}
-
-				let accel = (DARWIN && e.metaKey) || (!DARWIN && e.ctrlKey);
-				if(accel) {
-					let alt = e.altKey;
-					let shift = e.shiftKey;
-					let key = Keysets.translateFromConstantCode(e.key); // mostly to capitalize single char keys
-
-					// let ctrl+edit keys work while typing in a text field (group name or search box)
-					if(input) {
-						switch(key) {
-							case 'ArrowLeft':
-							case 'ArrowRight':
-							case 'Backspace':
-							case 'Delete':
-								return;
-						}
-					}
-					else {
-						for(let k of this._browserKeys) {
-							if(k.key == key && k.accel == accel && k.alt == alt && k.shift == shift) {
-								switch(k.name) {
-									case "find":
-										this.enableSearch();
-										break;
-
-									case "close":
-									case "closeNotMac":
-										this.closeActiveTab();
-										break;
-
-									case "moveTabForward":
-										this.moveActiveTab("forward");
-										break;
-
-									case "moveTabBackward":
-										this.moveActiveTab("backward");
-										break;
-
-									case "moveTabToStart":
-										this.moveActiveTab("tostart");
-										break;
-
-									case "moveTabToEnd":
-										this.moveActiveTab("toend");
-										break;
-
-									default: return;
-								}
-								break;
-							}
-						}
-					}
-
-					// We cancel most shortcuts that shouldn't take place while TabView is shown.
-					e.preventDefault();
-					e.stopPropagation();
-				}
-			};
-
-			let focused = iQ(":focus");
-			if((focused.length && focused[0].nodeName == "input") || Search.isEnabled() || this.ignoreKeypressForSearch) {
-				this.ignoreKeypressForSearch = false;
-				processBrowserKeys(e, true);
-				return;
-			}
-
-			let getClosestTabBy = (norm) => {
-				if(!this.getActiveTab()) {
-					return null;
-				}
-
-				let activeTab = this.getActiveTab();
-				let activeTabGroup = activeTab.parent;
-				let myCenter = activeTab.bounds.center();
-				let match;
-
-				for(let item of TabItems.getItems()) {
-					if(!item.parent.hidden && (!activeTabGroup.expanded || activeTabGroup.id == item.parent.id)) {
-						let itemCenter = item.bounds.center();
-
-						if(norm(itemCenter, myCenter)) {
-							let itemDist = myCenter.distance(itemCenter);
-							if(!match || match[0] > itemDist) {
-								match = [itemDist, item];
-							}
-						}
-					}
-				}
-
-				return match && match[1];
-			};
-
-			let preventDefault = true;
-			let activeTab;
-			let activeGroupItem;
-			let norm = null;
 			let accel = (DARWIN && e.metaKey) || (!DARWIN && e.ctrlKey);
-			if(!accel) {
-				switch(e.key) {
-					case "ArrowRight":
-						norm = function(a, me) { return a.x > me.x };
-						break;
+			if(accel) {
+				let alt = e.altKey;
+				let shift = e.shiftKey;
+				let key = Keysets.translateFromConstantCode(e.key); // mostly to capitalize single char keys
 
-					case "ArrowLeft":
-						norm = function(a, me) { return a.x < me.x };
-						break;
-
-					case "ArrowDown":
-						norm = function(a, me) { return a.y > me.y };
-						break;
-
-					case "ArrowUp":
-						norm = function(a, me) { return a.y < me.y }
-						break;
-				}
-			}
-
-			if(norm != null) {
-				let nextTab = getClosestTabBy(norm);
-				if(nextTab) {
-					if(nextTab.isStacked && !nextTab.parent.expanded) {
-						nextTab = nextTab.parent.getChild(0);
+				// let ctrl+edit keys work while typing in a text field (group name or search box)
+				if(input) {
+					switch(key) {
+						case 'ArrowLeft':
+						case 'ArrowRight':
+						case 'Backspace':
+						case 'Delete':
+							return;
 					}
-					this.setActive(nextTab);
 				}
-			} else {
-				switch(e.key) {
-					case "Escape":
-						activeGroupItem = GroupItems.getActiveGroupItem();
-						if(activeGroupItem && activeGroupItem.expanded) {
-							activeGroupItem.collapse();
-						} else {
-							this.exit();
-						}
-						break;
+				else {
+					for(let k of this._browserKeys) {
+						if(k.key == key && k.accel == accel && k.alt == alt && k.shift == shift) {
+							switch(k.name) {
+								case "find":
+									this.enableSearch();
+									break;
 
-					case "Enter":
-						activeGroupItem = GroupItems.getActiveGroupItem();
-						if(activeGroupItem) {
-							activeTab = this.getActiveTab();
+								case "close":
+								case "closeNotMac":
+									this.closeActiveTab();
+									break;
 
-							if(!activeTab || activeTab.parent != activeGroupItem) {
-								activeTab = activeGroupItem.getActiveTab();
+								case "moveTabForward":
+									this.moveActiveTab("forward");
+									break;
+
+								case "moveTabBackward":
+									this.moveActiveTab("backward");
+									break;
+
+								case "moveTabToStart":
+									this.moveActiveTab("tostart");
+									break;
+
+								case "moveTabToEnd":
+									this.moveActiveTab("toend");
+									break;
+
+								default: return;
 							}
-
-							if(activeTab) {
-								activeTab.zoomIn();
-							} else {
-								activeGroupItem.newTab();
-							}
+							break;
 						}
-						break;
-
-					case "Tab":
-						// tab/shift + tab to go to the next tab.
-						activeTab = this.getActiveTab();
-						if(activeTab) {
-							let tabItems = (activeTab.parent ? activeTab.parent.getChildren() : [activeTab]);
-							let length = tabItems.length;
-							let currentIndex = tabItems.indexOf(activeTab);
-
-							if(length > 1) {
-								let newIndex;
-								if(e.shiftKey) {
-									if(currentIndex == 0) {
-										newIndex = (length - 1);
-									} else {
-										newIndex = (currentIndex - 1);
-									}
-								} else {
-									if(currentIndex == (length - 1)) {
-										newIndex = 0;
-									} else {
-										newIndex = (currentIndex + 1);
-									}
-								}
-								this.setActive(tabItems[newIndex]);
-							}
-						}
-						break;
-
-					default:
-						processBrowserKeys(e);
-						preventDefault = false;
-						break;
+					}
 				}
 
-				if(preventDefault) {
-					e.stopPropagation();
-					e.preventDefault();
+				// We cancel most shortcuts that shouldn't take place while TabView is shown.
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		};
+
+		let focused = iQ(":focus");
+		if((focused.length && focused[0].nodeName == "input") || Search.inSearch || this.ignoreKeypressForSearch) {
+			this.ignoreKeypressForSearch = false;
+			processBrowserKeys(e, true);
+			return;
+		}
+
+		let getClosestTabBy = (norm) => {
+			if(!this.getActiveTab()) {
+				return null;
+			}
+
+			let activeTab = this.getActiveTab();
+			let activeTabGroup = activeTab.parent;
+			let myCenter = activeTab.getBounds().center();
+			let match;
+
+			for(let item of TabItems) {
+				if(!item.parent.hidden && (!activeTabGroup.expanded || activeTabGroup.id == item.parent.id)) {
+					let itemCenter = item.getBounds().center();
+
+					if(norm(itemCenter, myCenter)) {
+						let itemDist = myCenter.distance(itemCenter);
+						if(!match || match[0] > itemDist) {
+							match = [itemDist, item];
+						}
+					}
 				}
 			}
-		});
+
+			return match && match[1];
+		};
+
+		let activeTab;
+		let activeGroupItem;
+		let norm = null;
+		let accel = (DARWIN && e.metaKey) || (!DARWIN && e.ctrlKey);
+		if(!accel) {
+			switch(e.key) {
+				case "ArrowRight":
+					norm = function(a, me) { return a.x > me.x };
+					break;
+
+				case "ArrowLeft":
+					norm = function(a, me) { return a.x < me.x };
+					break;
+
+				case "ArrowDown":
+					norm = function(a, me) { return a.y > me.y };
+					break;
+
+				case "ArrowUp":
+					norm = function(a, me) { return a.y < me.y }
+					break;
+			}
+		}
+
+		if(norm != null) {
+			let nextTab = getClosestTabBy(norm);
+			if(nextTab) {
+				if(nextTab.isStacked && !nextTab.parent.expanded) {
+					nextTab = nextTab.parent.children[0];
+				}
+				this.setActive(nextTab);
+			}
+			return;
+		}
+
+		let preventDefault = true;
+		switch(e.key) {
+			case "Escape":
+				activeGroupItem = GroupItems.getActiveGroupItem();
+				if(activeGroupItem && activeGroupItem.expanded) {
+					activeGroupItem.collapse();
+				} else {
+					this.exit();
+				}
+				break;
+
+			case "Enter":
+				activeGroupItem = GroupItems.getActiveGroupItem();
+				if(activeGroupItem) {
+					activeTab = this.getActiveTab();
+
+					if(!activeTab || activeTab.parent != activeGroupItem) {
+						activeTab = activeGroupItem.getActiveTab();
+					}
+
+					if(activeTab) {
+						activeTab.zoomIn();
+					} else {
+						activeGroupItem.newTab();
+					}
+				}
+				break;
+
+			case "Tab":
+				// tab/shift + tab to go to the next tab.
+				activeTab = this.getActiveTab();
+				if(activeTab) {
+					let tabItems = (activeTab.parent ? activeTab.parent.children : [activeTab]);
+					let length = tabItems.length;
+					let currentIndex = tabItems.indexOf(activeTab);
+
+					if(length > 1) {
+						let newIndex;
+						if(e.shiftKey) {
+							if(currentIndex == 0) {
+								newIndex = (length - 1);
+							} else {
+								newIndex = (currentIndex - 1);
+							}
+						} else {
+							if(currentIndex == (length - 1)) {
+								newIndex = 0;
+							} else {
+								newIndex = (currentIndex + 1);
+							}
+						}
+						this.setActive(tabItems[newIndex]);
+					}
+				}
+				break;
+
+			default:
+				processBrowserKeys(e);
+				preventDefault = false;
+				break;
+		}
+
+		if(preventDefault) {
+			e.stopPropagation();
+			e.preventDefault();
+		}
 	},
 
 	// Enables the search feature.
 	enableSearch: function() {
-		if(!Search.isEnabled()) {
+		if(!Search.inSearch) {
 			Search.ensureShown();
-			Search.switchToInMode();
 		}
 	},
 
 	// Called in response to a mousedown in empty space in the TabView UI; creates a new groupItem based on the user's drag.
 	_createGroupItemOnDrag: function(e) {
-		let minSize = 60;
-		let minMinSize = 15;
-
 		let lastActiveGroupItem = GroupItems.getActiveGroupItem();
 
-		let startPos = { x: e.clientX, y: e.clientY };
-		let phantom = iQ("<div>")
-			.addClass("groupItem phantom activeGroupItem dragRegion")
-			.css({
-				position: "absolute",
-				zIndex: -1,
-				cursor: "default"
-			})
-			.appendTo("body");
+		let phantom = document.createElement("div");
+		phantom.classList.add("groupItem");
+		phantom.classList.add("phantom");
+		phantom.classList.add("activeGroupItem");
+		phantom.classList.add("dragRegion");
+		document.body.appendChild(phantom);
 
 		// a faux-Item
 		let item = {
 			container: phantom,
+			$container: iQ(phantom),
 			isAFauxItem: true,
 			bounds: {},
 			getBounds: function() {
-				return this.container.bounds();
+				return this.$container.bounds();
 			},
 			setBounds: function(bounds) {
-				this.container.css(bounds);
-			},
-			setZ: function(z) {
-				// don't set a z-index because we want to force it to be low.
-			},
-			setOpacity: function(opacity) {
-				this.container.css("opacity", opacity);
+				this.$container.css(bounds);
 			},
 			// we don't need to pushAway the phantom item at the end, because when we create a new GroupItem, it'll do the actual pushAway.
 			pushAway: function() {},
 		};
-		item.setBounds(new Rect(startPos.y, startPos.x, 0, 0));
 
-		let dragOutInfo = new Drag(item, e);
-
-		let updateSize = function(e) {
-			let box = new Rect();
-			box.left = Math.min(startPos.x, e.clientX);
-			box.right = Math.max(startPos.x, e.clientX);
-			box.top = Math.min(startPos.y, e.clientY);
-			box.bottom = Math.max(startPos.y, e.clientY);
-			item.setBounds(box);
-
-			// compute the stationaryCorner
-			let stationaryCorner = "";
-
-			if(startPos.y == box.top) {
-				stationaryCorner += "top";
-			} else {
-				stationaryCorner += "bottom";
-			}
-
-			if(startPos.x == box.left) {
-				stationaryCorner += "left";
-			} else {
-				stationaryCorner += "right";
-			}
-
-			dragOutInfo.snap(stationaryCorner, false, false); // null for ui, which we don't use anyway.
-
-			box = item.getBounds();
-			if(box.width > minMinSize && box.height > minMinSize && (box.width > minSize || box.height > minSize)) {
-				item.setOpacity(1);
-			} else {
-				item.setOpacity(0.7);
-			}
-
-			e.preventDefault();
-		};
-
-		let collapse = () => {
-			let center = phantom.bounds().center();
-			phantom.animate({
-				width: 0,
-				height: 0,
-				top: center.y,
-				left: center.x
-			}, {
-				duration: 300,
-				complete: function() {
-					phantom.remove();
-				}
-			});
-			this.setActive(lastActiveGroupItem);
-		};
-
-		let finalize = (e) => {
-			iQ(window).unbind("mousemove", updateSize);
-			item.container.removeClass("dragRegion");
-			dragOutInfo.stop();
-			let box = item.getBounds();
-			if(box.width > minMinSize && box.height > minMinSize && (box.width > minSize || box.height > minSize)) {
-				let opts = { bounds: item.getBounds(), focusTitle: true };
-				let groupItem = new GroupItem([], opts);
+		let finalize = () => {
+			let bounds = item.getBounds();
+			if(bounds.width > GroupItems.minGroupWidth && bounds.height > GroupItems.minGroupHeight) {
+				let groupItem = new GroupItem([], { bounds, focusTitle: true });
 				this.setActive(groupItem);
 				phantom.remove();
-				dragOutInfo = null;
 			} else {
-				collapse();
+				let center = bounds.center();
+				item.$container.animate({
+					width: 0,
+					height: 0,
+					top: center.y,
+					left: center.x
+				}, {
+					duration: 300,
+					complete: function() {
+						item.container.remove();
+					}
+				});
+				this.setActive(lastActiveGroupItem);
 			}
 		}
 
-		iQ(window).mousemove(updateSize)
-		iQ(gWindow).one("mouseup", finalize);
-		e.preventDefault();
-		return false;
+		new GroupDrag(item, e, false, finalize);
+		DraggingGroup.start();
 	},
 
 	// Update the TabView UI contents in response to a window size change. Won't do anything if it doesn't deem the resize necessary.
@@ -1332,19 +1307,17 @@ this.UI = {
 		if(!force && !this.isTabViewVisible()) { return; }
 
 		let oldPageBounds = new Rect(this._pageBounds);
-		let newPageBounds = Items.getPageBounds();
+		let newPageBounds = this.getPageBounds();
 		if(newPageBounds.equals(oldPageBounds)) { return; }
 
 		if(!this.shouldResizeItems()) { return; }
-
-		let items = Items.getTopLevelItems();
 
 		// compute itemBounds: the union of all the top-level items' bounds.
 		let itemBounds = new Rect(this._pageBounds);
 		// We start with pageBounds so that we respect the empty space the user has left on the page.
 		itemBounds.width = 1;
 		itemBounds.height = 1;
-		for(let item of items) {
+		for(let item of GroupItems) {
 			let bounds = item.getBounds();
 			itemBounds = (itemBounds ? itemBounds.union(bounds) : new Rect(bounds));
 		}
@@ -1368,7 +1341,7 @@ this.UI = {
 
 		let scale = Math.min(hScale, wScale);
 		let pairs = [];
-		for(let item of items) {
+		for(let item of GroupItems) {
 			let bounds = item.getBounds();
 			bounds.left += (UI.rtl ? -1 : 1) * (newPageBounds.left - this._pageBounds.left);
 			bounds.left *= scale;
@@ -1384,21 +1357,21 @@ this.UI = {
 			});
 		}
 
-		Items.unsquish(pairs);
+		GroupItems.unsquish(pairs);
 
 		for(let pair of pairs) {
 			pair.item.setBounds(pair.bounds, true);
 			pair.item.snap();
 		}
 
-		this._pageBounds = Items.getPageBounds();
+		this._pageBounds = this.getPageBounds();
 		this._save();
 	},
 
 	// Returns whether we should resize the items on the screen, based on whether the top-level items fit in the screen or not and whether they feel "cramped" or not.
 	// These computations may be done using cached values. The cache can be cleared with UI.clearShouldResizeItems().
 	shouldResizeItems: function() {
-		let newPageBounds = Items.getPageBounds();
+		let newPageBounds = this.getPageBounds();
 
 		// If we don't have cached cached values...
 		if(this._minimalRect === undefined || this._feelsCramped === undefined) {
@@ -1408,7 +1381,7 @@ this.UI = {
 			let feelsCramped = false;
 			let minimalRect = new Rect(0, 0, 1, 1);
 
-			for(let item of Items.getTopLevelItems()) {
+			for(let item of GroupItems) {
 				let bounds = new Rect(item.getBounds());
 				feelsCramped = feelsCramped || (item.userSize && (item.userSize.x > bounds.width || item.userSize.y > bounds.height));
 				bounds.inset(-Trenches.defaultRadius, -Trenches.defaultRadius);
@@ -1436,7 +1409,7 @@ this.UI = {
 	exit: function() {
 		let zoomedIn = false;
 
-		if(Search.isEnabled()) {
+		if(Search.inSearch) {
 			let matcher = Search.createSearchTabMatcher();
 			let matches = matcher.matched();
 
@@ -1449,20 +1422,29 @@ this.UI = {
 
 		if(zoomedIn) { return; }
 
-		let unhiddenGroups = GroupItems.groupItems.filter(function(groupItem) {
-			return (!groupItem.hidden && groupItem.getChildren().length > 0);
-		});
+		let unhiddenGroup = null;
+		for(let groupItem of GroupItems) {
+			if(!groupItem.hidden && groupItem.children.length > 0) {
+				unhiddenGroup = groupItem;
+				break;
+			}
+		}
 
 		// no pinned tabs and no visible groups: open a new group. open a blank tab and return
-		if(!unhiddenGroups.length) {
-			let emptyGroups = GroupItems.groupItems.filter(function(groupItem) {
-				return (!groupItem.hidden && !groupItem.getChildren().length);
-			});
-			let group = (emptyGroups.length ? emptyGroups[0] : GroupItems.newGroup());
-			if(!Tabs.numPinned) {
-				group.newTab(null, { closedLastTab: true });
-				return;
+		if(!unhiddenGroup && !Tabs.numPinned) {
+			let group;
+			for(let groupItem of GroupItems) {
+				if(!groupItem.hidden && !groupItem.children.length) {
+					group = groupItem;
+					break;
+				}
 			}
+			if(!group) {
+				group = GroupItems.newGroup();
+			}
+
+			group.newTab(null, { closedLastTab: true });
+			return;
 		}
 
 		// If there's an active TabItem, zoom into it. If not (for instance when the selected tab is an app tab), just go there.
@@ -1474,8 +1456,8 @@ this.UI = {
 					activeTabItem = tabItem;
 				} else {
 					// set active tab item if there is at least one unhidden group
-					if(unhiddenGroups.length) {
-						activeTabItem = unhiddenGroups[0].getActiveTab();
+					if(unhiddenGroup) {
+						activeTabItem = unhiddenGroup.getActiveTab();
 					}
 				}
 			}
