@@ -74,16 +74,6 @@ html[dir=rtl] .favicon {
 	-moz-border-start: 1px solid rgba(0, 0, 0, 0.3);
 }
 
-/* Tab: Zooming */
-
-.front .thumb {
-	box-shadow: none !important;
-}
-
-.front.focus {
-	border: none !important;
-}
-
 /* Tab GroupItem */
 
 .groupItem {

@@ -1,4 +1,4 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -353,138 +353,32 @@ this.TabItem.prototype = {
 		// don't allow zoom in if its group is hidden
 		if(this.parent && this.parent.hidden) { return; }
 
-		let $tabEl = this.$container;
-		let $canvas = this.$canvas;
-
 		Search.hide();
 
 		UI.setActive(this);
-		TabItems._update(this.tab, { force: true });
 
 		// Zoom in!
-		let tab = this.tab;
-
-		let onZoomDone = () => {
-			$canvas.css({ 'transform': null });
-			$tabEl.removeClass("front");
-
-			UI.goToTab(tab);
+		aSync(() => {
+			UI.goToTab(this.tab);
 
 			// tab might not be selected because hideTabView() is invoked after
 			// UI.goToTab() so we need to setup everything for the gBrowser.selectedTab
-			if (!tab.selected) {
+			if(!this.tab.selected) {
 				UI.onTabSelect(Tabs.selected);
-			} else {
-				if(isNewBlankTab) {
-					gWindow.gURLBar.focus();
-				}
+			} else if(isNewBlankTab) {
+				gWindow.gURLBar.focus();
 			}
 			if(this.parent && this.parent.expanded) {
 				this.parent.collapse();
 			}
 
 			this._sendToSubscribers("zoomedIn");
-		};
-
-		if(Prefs.animateZoom) {
-			let transform = this.getZoomTransform();
-			TabItems.pausePainting();
-
-			if(this.parent && this.parent.expanded) {
-				$tabEl.removeClass("stack-trayed");
-			}
-			$tabEl.addClass("front");
-			$canvas
-				.css({ 'transform-origin': transform.transformOrigin })
-				.animate({ 'transform': transform.transform }, {
-					duration: 230,
-					easing: 'fast',
-					complete: function() {
-						onZoomDone();
-
-						aSync(function() {
-							TabItems.resumePainting();
-						}, 0);
-					}
-				});
-		} else {
-			aSync(onZoomDone, 0);
-		}
+		}, 0);
 	},
 
 	// Handles the zoom down animation after returning to TabView. It is expected that this routine will be called from the chrome thread
-	// Parameters:
-	//   complete - a function to call after the zoom down animation
-	zoomOut: function(complete) {
-		let $tab = this.$container;
-		let $canvas = this.$canvas;
-
-		let onZoomDone = function() {
-			$tab.removeClass("front");
-			$canvas.css("transform", null);
-
-			if(typeof complete == "function") {
-				complete();
-			}
-		};
-
+	zoomOut: function() {
 		UI.setActive(this);
-		TabItems._update(this.tab, { force: true });
-
-		$tab.addClass("front");
-
-		if(Prefs.animateZoom) {
-			// The scaleCheat of 2 here is a clever way to speed up the zoom-out code. See getZoomTransform() below.
-			let transform = this.getZoomTransform(2);
-			TabItems.pausePainting();
-
-			$canvas.css({
-				'transform': transform.transform,
-				'transform-origin': transform.transformOrigin
-			});
-
-			$canvas.animate({ "transform": "scale(1.0)" }, {
-				duration: 300,
-				easing: 'cubic-bezier', // note that this is legal easing, even without parameters
-				complete: function() {
-					TabItems.resumePainting();
-					onZoomDone();
-				}
-			});
-		} else {
-			onZoomDone();
-		}
-	},
-
-	// Returns the transform function which represents the maximum bounds of the tab thumbnail in the zoom animation.
-	getZoomTransform: function(scaleCheat) {
-		// Taking the bounds of the container (as opposed to the canvas) makes us immune to any transformations applied to the canvas.
-		let { left, top, width, height, right, bottom } = this.$container.bounds();
-
-		// The scaleCheat is a clever way to speed up the zoom-in code.
-		// Because image scaling is slowest on big images, we cheat and stop the image at scaled-down size and placed accordingly.
-		// Because the animation is fast, you can't see the difference but it feels a lot zippier.
-		// The only trick is choosing the right animation function so that you don't see a change in percieved animation speed from frame #1
-		// (the tab) to frame #2 (the half-size image) to frame #3 (the first frame of real animation). Choosing an animation that starts fast is key.
-
-		if(!scaleCheat) {
-			scaleCheat = 1.7;
-		}
-
-		let zoomWidth = width + (window.innerWidth - width) / scaleCheat;
-		let zoomScaleFactor = zoomWidth / width;
-
-		let zoomHeight = height * zoomScaleFactor;
-		let zoomTop = top * (1 - 1/scaleCheat);
-		let zoomLeft = left * (1 - 1/scaleCheat);
-
-		let xOrigin = (left - zoomLeft) / ((left - zoomLeft) + (zoomLeft + zoomWidth - right)) * 100;
-		let yOrigin = (top - zoomTop) / ((top - zoomTop) + (zoomTop + zoomHeight - bottom)) * 100;
-
-		return {
-			transformOrigin: xOrigin + "% " + yOrigin + "%",
-			transform: "scale(" + zoomScaleFactor + ")"
-		};
 	},
 
 	// Updates the tabitem's canvas.

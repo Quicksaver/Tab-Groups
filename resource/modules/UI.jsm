@@ -1,4 +1,4 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 this.Keys = { meta: false };
 
@@ -656,27 +656,25 @@ this.UI = {
 
 		if(zoomOut && currentTab && currentTab._tabViewTabItem) {
 			let item = currentTab._tabViewTabItem;
-			// If there was a previous currentTab we want to animate its thumbnail (canvas) for the zoom out.
-			// Note that we start the animation on the chrome thread.
 
 			// Zoom out!
-			item.zoomOut(() => {
-				// if the tab's been destroyed
-				if(!currentTab._tabViewTabItem) {
-					item = null;
-				}
+			item.zoomOut();
 
-				this.setActive(item);
+			// if the tab's been destroyed
+			if(!currentTab._tabViewTabItem) {
+				item = null;
+			}
 
-				this._resize(true);
-				this._isChangingVisibility = false;
-				dispatch(window, { type: "tabviewshown", cancelable: false });
+			this.setActive(item);
 
-				// Flush pending updates
-				PinnedItems.flushUpdates();
+			this._resize(true);
+			this._isChangingVisibility = false;
+			dispatch(window, { type: "tabviewshown", cancelable: false });
 
-				TabItems.resumePainting();
-			});
+			// Flush pending updates
+			PinnedItems.flushUpdates();
+
+			TabItems.resumePainting();
 		} else {
 			if(!currentTab || !currentTab._tabViewTabItem) {
 				this.clearActiveTab();
@@ -694,7 +692,9 @@ this.UI = {
 	},
 
 	// Hides TabView and shows the main browser UI.
-	hideTabView: function() {
+	// Parameters:
+	//   fullfill - a callback-like method to be called when we're sure to exit tabview but *before* that actually happens
+	hideTabView: function(fulfill) {
 		if(!this.isTabViewVisible() || this._isChangingVisibility) { return; }
 
 		Timers.cancel('focusTabView');
@@ -716,6 +716,10 @@ this.UI = {
 			}
 		}
 		this._reorderTabsOnHide = new Set();
+
+		if(fulfill) {
+			fulfill();
+		}
 
 		gTabViewDeck.selectedPanel = gBrowserPanel;
 		gWindow.TabsInTitlebar.allowedBy("tabview-open", true);
@@ -852,19 +856,23 @@ this.UI = {
 				tab._tabViewTabItem.parent._unhide({ immediately: true });
 			}
 
-			this.hideTabView();
+			this.hideTabView(() => {
+				// another tab might be selected when hideTabView() is invoked so a validation is needed.
+				if(this._currentTab != tab) { return; }
+
+				this.updateShownTabs(tab);
+			});
 		}
+		else {
+			this.updateShownTabs(tab);
+		}
+	},
 
-		// another tab might be selected when hideTabView() is invoked so a validation is needed.
-		if(this._currentTab != tab) { return; }
-
-		let newItem = null;
-
+	updateShownTabs: function(tab) {
 		// update the tab bar for the new tab's group
 		if(tab && tab._tabViewTabItem) {
 			if(!TabItems.reconnectingPaused) {
-				newItem = tab._tabViewTabItem;
-				GroupItems.updateActiveGroupItemAndTabBar(newItem);
+				GroupItems.updateActiveGroupItemAndTabBar(tab._tabViewTabItem);
 			}
 		} else {
 			// No tabItem; must be an app tab. Base the tab bar on the current group.

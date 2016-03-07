@@ -1,4 +1,4 @@
-// VERSION 1.4.0
+// VERSION 1.4.1
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -15,8 +15,6 @@ addonUris = {
 };
 
 prefList = {
-	animateZoom: true,
-
 	tabViewKeycode: 'E',
 	tabViewAccel: true,
 	tabViewShift: true,

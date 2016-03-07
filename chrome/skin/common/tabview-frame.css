@@ -183,29 +183,6 @@ html[dir=rtl] .stack-trayed .tab-title {
 	text-shadow: rgba(0,0,0,1) -1px 1px 1.5px;
 }
 
-/* Tab: Zooming */
-
-.front {
-	z-index: 200 !important;
-	image-rendering: -moz-crisp-edges;
-}
-
-.front canvas {
-	border: none !important;
-	padding: 1px !important;
-}
-
-.front .tab-title,
-.front .close,
-.front .favicon,
-.front .thumb-shadow {
-	display: none;
-}
-
-.front.focus {
-	box-shadow: none !important;
-}
-
 /* Tab GroupItem */
 
 .groupItem {

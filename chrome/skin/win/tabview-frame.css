@@ -76,12 +76,6 @@ html[dir=rtl] .tab.focus .thumb {
 	-moz-border-start: 1px solid rgba(73, 99, 119, 0.3);
 }
 
-/* Tab: Zooming */
-
-.front .thumb {
-	box-shadow: none !important;
-}
-
 /* Tab GroupItem */
 
 .groupItem {
