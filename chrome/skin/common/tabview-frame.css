@@ -430,8 +430,10 @@ input.name:focus::-moz-placeholder {
 }
 
 .expandedTray {
-	padding: 6px;
+	position: absolute;
 	display: flex;
+	z-index: 50;
+	padding: 6px;
 }
 
 .shield {

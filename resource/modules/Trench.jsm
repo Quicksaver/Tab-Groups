@@ -1,4 +1,4 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 // Class: Trench - Class for drag-snapping regions; called "trenches" as they are long and narrow.
 // Parameters:
@@ -19,8 +19,6 @@ this.Trench = function(element, xory, type, edge) {
 	this.xory = xory; // either "x" or "y"
 	this.type = type; // "border" or "guide"
 	this.edge = edge; // "top", "left", "bottom", or "right"
-
-	this.$el = iQ(this.el);
 
 	// (array) DOM elements for visible reflexes of the Trench
 	this.dom = [];
@@ -444,10 +442,10 @@ this.Trenches = {
 	registerWithItem: function(item, type) {
 		let container = item.container;
 		let ids = {};
-		ids.left = Trenches.register(container, "x", type, "left");
-		ids.right = Trenches.register(container, "x", type, "right");
-		ids.top = Trenches.register(container, "y", type, "top");
-		ids.bottom = Trenches.register(container, "y", type, "bottom");
+		ids.left = this.register(container, "x", type, "left");
+		ids.right = this.register(container, "x", type, "right");
+		ids.top = this.register(container, "y", type, "top");
+		ids.bottom = this.register(container, "y", type, "bottom");
 
 		this.getById(ids.left).parentItem = item;
 		this.getById(ids.right).parentItem = item;

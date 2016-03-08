@@ -1,4 +1,4 @@
-// VERSION 1.2.0
+// VERSION 1.2.1
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -355,13 +355,13 @@ this.GroupItem.prototype = {
 
 		// ___ Update our representation
 		if(immediately) {
-			iQ(this.container).css(css);
+			this.$container.css(css);
 			if(css.width || css.height) {
 				this.arrange();
 			}
 		} else {
 			TabItems.pausePainting();
-			iQ(this.container).animate(css, {
+			this.$container.animate(css, {
 				duration: 350,
 				easing: "tabviewBounce",
 				complete: () => {
@@ -732,7 +732,7 @@ this.GroupItem.prototype = {
 		if(this.hidden || (options && options.immediately)) {
 			destroyGroup();
 		} else {
-			iQ(this.container).animate({
+			this.$container.animate({
 				opacity: 0,
 				"transform": "scale(.3)",
 			}, {
@@ -749,14 +749,13 @@ this.GroupItem.prototype = {
 		if(this.children.length) {
 			this._unfreezeItemSize();
 
-			let container = iQ(this.container);
-			container.animate({
+			this.$container.animate({
 				opacity: 0,
 				"transform": "scale(.3)",
 			}, {
 				duration: 170,
-				complete: function() {
-					container.hide();
+				complete: () => {
+					this.$container.hide();
 				}
 			});
 
@@ -819,10 +818,9 @@ this.GroupItem.prototype = {
 			this._sendToSubscribers("groupShown");
 		};
 
-		let $container = iQ(this.container).show();
-
+		this.$container.show();
 		if(!options || !options.immediately) {
-			$container.animate({
+			this.$container.animate({
 				"transform": "scale(1)",
 				"opacity": 1
 			}, {
@@ -830,7 +828,7 @@ this.GroupItem.prototype = {
 				complete: finalize
 			});
 		} else {
-			$container.css({ "transform": "none", opacity: 1 });
+			this.$container.css({ "transform": "none", opacity: 1 });
 			finalize();
 		}
 	},
@@ -1443,16 +1441,13 @@ this.GroupItem.prototype = {
 		UI.setActive(this.getTopChild());
 
 		let startBounds = this.getBounds();
-		let $tray = iQ("<div>").css({
+		let tray = document.createElement('div');
+		let $tray = iQ(tray).css({
 			top: startBounds.top,
 			left: startBounds.left,
 			width: startBounds.width,
-			height: startBounds.height,
-			position: "absolute",
-			zIndex: 50
+			height: startBounds.height
 		});
-
-		let tray = $tray[0];
 		document.body.appendChild(tray);
 
 		tray.classList.add("expandedTray");
@@ -1518,7 +1513,7 @@ this.GroupItem.prototype = {
 					this._sendToSubscribers("expanded");
 				}
 			})
-			.addClass("overlay");
+		tray.classList.add("overlay");
 
 		for(let child of this.children) {
 			child.addClass("stack-trayed");
@@ -1718,7 +1713,7 @@ this.GroupItems = {
 
 	// Given an array of DOM elements, returns a <Rect> with (roughly) the union of their locations.
 	getBoundingBox: function(els) {
-		let bounds = els.map(el => iQ(el).bounds());
+		let bounds = els.map(el => el.$container.bounds());
 		let left   = Math.min.apply({}, bounds.map(b => b.left));
 		let top    = Math.min.apply({}, bounds.map(b => b.top));
 		let right  = Math.max.apply({}, bounds.map(b => b.right));
@@ -1778,7 +1773,7 @@ this.GroupItems = {
 					// all tabs still existing in closed groups will be moved to new groups. prepare them to be reconnected later.
 					for(let tabItem of groupItem.children) {
 						if(tabItem.parent.hidden) {
-							iQ(tabItem.container).show();
+							tabItem.$container.show();
 						}
 
 						tabItem._reconnected = false;
@@ -1936,10 +1931,10 @@ this.GroupItems = {
 	//  groupItem - the active <GroupItem>
 	setActiveGroupItem: function(groupItem) {
 		if(this._activeGroupItem) {
-			iQ(this._activeGroupItem.container).removeClass('activeGroupItem');
+			this._activeGroupItem.container.classList.remove('activeGroupItem');
 		}
 
-		iQ(groupItem.container).addClass('activeGroupItem');
+		groupItem.container.classList.add('activeGroupItem');
 
 		this._lastActiveList.update(groupItem);
 		this._activeGroupItem = groupItem;

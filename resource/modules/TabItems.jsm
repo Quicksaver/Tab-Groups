@@ -1,4 +1,4 @@
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -25,11 +25,12 @@ this.TabItem = function(tab, options) {
 	this.thumb = $$('.thumb', this.container)[0];
 	this.fav = $$('.favicon', this.container)[0];
 	this.tabTitle = $$('.tab-title', this.container)[0];
-	this.$canvas = iQ('.thumb canvas', this.$container);
+	this.canvas = $$('.thumb canvas', this.container)[0];
+	this.$canvas = iQ(this.canvas);
 	this.cachedThumb = $$('img.cached-thumb', this.container)[0];
 	this.closeBtn = $$('.close', this.container)[0];
 
-	this.tabCanvas = new TabCanvas(this.tab, this.$canvas[0]);
+	this.tabCanvas = new TabCanvas(this.tab, this.canvas);
 
 	this.isATabItem = true;
 	this._reconnected = false;
@@ -47,7 +48,7 @@ this.TabItem = function(tab, options) {
 		};
 	}
 	if(!TabItems.canvasOffset) {
-		let canvasStyle = getComputedStyle(this.$canvas[0]);
+		let canvasStyle = getComputedStyle(this.canvas);
 		TabItems.canvasOffset = {
 			x: parseInt(canvasStyle.getPropertyValue('border-left-width')) + parseInt(canvasStyle.getPropertyValue('border-right-width')),
 			y: parseInt(canvasStyle.getPropertyValue('border-top-width')) + parseInt(canvasStyle.getPropertyValue('border-bottom-width'))
@@ -384,10 +385,9 @@ this.TabItem.prototype = {
 	// Updates the tabitem's canvas.
 	updateCanvas: function() {
 		// ___ thumbnail
-		let $canvas = this.$canvas;
-		let w = $canvas.width() - TabItems.canvasOffset.x;
-		let h = $canvas.height() - TabItems.canvasOffset.y;
-		let dimsChanged = w != $canvas[0].width || h != $canvas[0].height;
+		let w = this.$canvas.width() - TabItems.canvasOffset.x;
+		let h = this.$canvas.height() - TabItems.canvasOffset.y;
+		let dimsChanged = w != this.canvas.width || h != this.canvas.height;
 
 		TabItems._lastUpdateTime = Date.now();
 		this._lastTabUpdateTime = TabItems._lastUpdateTime;

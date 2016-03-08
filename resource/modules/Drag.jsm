@@ -1,4 +1,4 @@
-// VERSION 2.0.0
+// VERSION 2.0.1
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -13,7 +13,6 @@ this.GroupDrag = function(item, e, resizing, callback) {
 	DraggingGroup = this;
 	this.item = item;
 	this.el = item.container;
-	this.$el = item.$container;
 	this.callback = callback;
 	this.started = false;
 
@@ -345,7 +344,7 @@ this.GroupDrag.prototype = {
 		Trenches.hideGuides();
 		this.item.isDragging = false;
 		this.item.isResizing = false;
-		this.$el.removeClass('dragging');
+		this.el.classList.remove('dragging');
 
 		this.item.pushAway(immediately);
 

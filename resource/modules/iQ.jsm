@@ -1,175 +1,28 @@
-// VERSION 1.1.0
+// VERSION 1.2.0
 
-// Returns an iQClass object which represents an individual element or a group of elements. It works pretty much like jQuery(), with a few exceptions,
-// most notably that you can't use strings with complex html, just simple tags like '<div>'.
-this.iQ = function(selector, context) {
+// Returns an iQClass object which represents an individual element. selector can only be a DOM node.
+// I'm keeping this only because I don't feel like rewritting all the bounds/animation/fadein/out code.
+this.iQ = function(selector) {
 	// The iQ object is actually just the init constructor 'enhanced'
-	return new iQClass(selector, context);
+	return new iQClass(selector);
 };
 
-// A simple way to check for HTML strings or ID strings (both of which we optimize for)
-this.quickExpr = /^[^<]*(<[\w\W]+>)[^>]*$|^#([\w-]+)$/;
-
-// Match a standalone tag
-this.rsingleTag = /^<(\w+)\s*\/?>(?:<\/\1>)?$/;
-
-// The actual class of iQ result objects, representing an individual element or a group of elements.
+// The actual class of iQ result objects, representing an individual element.
 // You don't call this directly; this is what's called by iQ().
-this.iQClass = function(selector, context) {
-	// Handle iQ(""), iQ(null), or iQ(undefined)
-	if(!selector) { return this; }
-
-	// Handle iQ(DOMElement)
-	if(selector.nodeType) {
-		this.context = selector;
-		this[0] = selector;
-		this.length = 1;
-		return this;
-	}
-
-	// The body element only exists once, optimize finding it
-	if(selector === "body" && !context) {
-		this.context = document;
-		this[0] = document.body;
-		this.selector = "body";
-		this.length = 1;
-		return this;
-	}
-
-	// Handle HTML strings
-	if(typeof selector === "string") {
-		// Are we dealing with HTML string or an ID?
-		let match = quickExpr.exec(selector);
-
-		// Verify a match, and that no context was specified for #id
-		if(match && (match[1] || !context)) {
-			// HANDLE iQ(html). single tags only!
-			if(match[1]) {
-				let doc = (context ? context.ownerDocument || context : document);
-
-				// If a single string is passed in and it's a single tag just do a createElement and skip the rest
-				let ret = rsingleTag.exec(selector);
-				selector = [ doc.createElement(ret[1]) ];
-				return Utils.merge(this, selector);
-			}
-			// HANDLE iQ("#id")
-			else {
-				let elem = $(match[2]);
-
-				if(elem) {
-					this.length = 1;
-					this[0] = elem;
-				}
-
-				this.context = document;
-				this.selector = selector;
-				return this;
-			}
-		}
-
-		// HANDLE iQ("TAG")
-		else if(!context && /^\w+$/.test(selector)) {
-			this.selector = selector;
-			this.context = document;
-			selector = document.getElementsByTagName(selector);
-			return Utils.merge(this, selector);
-		}
-
-		// HANDLE iQ(expr, iQ(...))
-		else if(!context || context.iq) {
-			return (context || iQ(document)).find(selector);
-		}
-
-		// HANDLE iQ(expr, context)
-		// (which is just equivalent to: $(context).find(expr)
-		else {
-			return iQ(context).find(selector);
-		}
-	}
-
-	if("selector" in selector) {
-		this.selector = selector.selector;
-		this.context = selector.context;
-	}
-
-	let ret = this || [];
-	if(selector != null) {
-		// The window, strings (and functions) also have 'length'
-		if(selector.length == null || typeof selector == "string" || selector.setInterval) {
-			Array.push(ret, selector);
-		} else {
-			Utils.merge(ret, selector);
-		}
-	}
-	return ret;
+this.iQClass = function(selector) {
+	this.context = selector;
+	return this;
 };
 
 this.iQClass.prototype = {
-	// Start with an empty selector
-	selector: "",
-
-	// The default length of a iQ object is 0
-	length: 0,
-
-	// Execute a callback for every element in the matched set.
-	each: function(callback) {
-		for(let i = 0; i < this.length; i++) {
-			if(callback(this[i]) === false) { break; }
-		}
-		return this;
-	},
-
-	// Adds the given class(es) to the receiver.
-	addClass: function(value) {
-		for(let i = 0; i < this.length; i++) {
-			if(this[i].nodeType !== 1) { continue; }
-
-			value.split(/\s+/).forEach((className) => {
-				this[i].classList.add(className);
-			});
-		}
-
-		return this;
-	},
-
-	// Removes the given class(es) from the receiver.
-	removeClass: function(value) {
-		for(let i = 0; i < this.length; i++) {
-			if(this[i].nodeType !== 1) { continue; }
-
-			value.split(/\s+/).forEach((className) => {
-				this[i].classList.remove(className);
-			});
-		}
-
-		return this;
-	},
-
-	// Searches the receiver and its children, returning a new iQ object with elements that match the given selector.
-	find: function(selector) {
-		let ret = [];
-		let length = 0;
-
-		for(let i = 0; i < this.length; i++) {
-			let found = $$(selector, this[i]);
-			for(let node of found) {
-				if(ret.indexOf(node) == -1) {
-					ret.push(node);
-				}
-			}
-		}
-
-		return iQ(ret);
-	},
-
 	// Returns the width of the receiver, including padding and border.
 	width: function() {
-		return Math.floor(this[0].offsetWidth);
+		return Math.floor(this.context.offsetWidth);
 	},
 
 	// Returns the height of the receiver, including padding and border.
 	height: function() {
-		return Math.floor(this[0].offsetHeight);
+		return Math.floor(this.context.offsetHeight);
 	},
 
 	// Returns an object with the receiver's position in left and top properties.
@@ -180,7 +33,7 @@ this.iQClass.prototype = {
 
 	// Returns a <Rect> with the receiver's bounds.
 	bounds: function() {
-		let rect = this[0].getBoundingClientRect();
+		let rect = this.context.getBoundingClientRect();
 		return new Rect(Math.floor(rect.left), Math.floor(rect.top), Math.floor(rect.width), Math.floor(rect.height));
 	},
 
@@ -193,10 +46,10 @@ this.iQClass.prototype = {
 	css: function(a, b) {
 		let properties = null;
 
-		if(typeof a === 'string') {
+		if(typeof(a) === 'string') {
 			let key = a;
 			if(b === undefined) {
-				return getComputedStyle(this[0]).getPropertyValue(key);
+				return getComputedStyle(this.context).getPropertyValue(key);
 			}
 			properties = {};
 			properties[key] = b;
@@ -221,22 +74,19 @@ this.iQClass.prototype = {
 			'height': true
 		};
 
-		for(let i = 0; this[i] != null; i++) {
-			let elem = this[i];
-			for (let key in properties) {
-				let value = properties[key];
+		for(let key in properties) {
+			let value = properties[key];
 
-				if(pixels[key] && typeof value != 'string') {
-					value += 'px';
-				}
+			if(pixels[key] && typeof value != 'string') {
+				value += 'px';
+			}
 
-				if(value == null) {
-					elem.style.removeProperty(key);
-				} else if(key.indexOf('-') != -1) {
-					elem.style.setProperty(key, value, '');
-				} else {
-					elem.style[key] = value;
-				}
+			if(value == null) {
+				this.context.style.removeProperty(key);
+			} else if(key.indexOf('-') != -1) {
+				this.context.style.setProperty(key, value, '');
+			} else {
+				this.context.style[key] = value;
 			}
 		}
 
@@ -280,13 +130,11 @@ this.iQClass.prototype = {
 		// The latest versions of Firefox do not animate from a non-explicitly set css properties.
 		// So for each element to be animated, go through and explicitly define 'em.
 		let rupper = /([A-Z])/g;
-		this.each(function(elem) {
-			let cStyle = getComputedStyle(elem);
-			for(let prop in css) {
-				prop = prop.replace(rupper, "-$1").toLowerCase();
-				iQ(elem).css(prop, cStyle.getPropertyValue(prop));
-			}
-		});
+		let cStyle = getComputedStyle(this.context);
+		for(let prop in css) {
+			prop = prop.replace(rupper, "-$1").toLowerCase();
+			this.css(prop, cStyle.getPropertyValue(prop));
+		}
 
 		this.css({
 			'transition-property': Object.keys(css).join(", "),
@@ -303,7 +151,7 @@ this.iQClass.prototype = {
 				'transition-timing-function': ''
 			});
 
-			if(typeof options.complete == "function") {
+			if(typeof(options.complete) == "function") {
 				options.complete();
 			}
 		}, duration);
@@ -318,9 +166,9 @@ this.iQClass.prototype = {
 		}, {
 			duration: 400,
 			complete: () => {
-				iQ(this).css({ display: 'none' });
-				if(typeof callback == "function") {
-					callback.apply(this);
+				this.css({ display: 'none' });
+				if(typeof(callback) == "function") {
+					callback();
 				}
 			}
 		});

@@ -1,4 +1,4 @@
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 this.Keys = { meta: false };
 
@@ -428,8 +428,9 @@ this.UI = {
 		let pageBounds = this.getPageBounds();
 		pageBounds.inset(padding, padding);
 
-		let $actions = iQ("#actions");
-		if($actions) {
+		let actions = $("actions");
+		if(actions) {
+			let $actions = iQ(actions);
 			pageBounds.width -= $actions.width();
 			if(UI.rtl) {
 				pageBounds.left += $actions.width() - padding;
@@ -468,9 +469,9 @@ this.UI = {
 
 	// Blurs any currently focused element
 	blurAll: function() {
-		iQ(":focus").each(function(element) {
+		for(let element of $$(":focus")) {
 			element.blur();
-		});
+		}
 	},
 
 	// Returns true if the last interaction was long enough ago to consider the UI idle.
@@ -1105,7 +1106,7 @@ this.UI = {
 			}
 		};
 
-		let focused = iQ(":focus");
+		let focused = $$(":focus");
 		if((focused.length && focused[0].nodeName == "input") || Search.inSearch || this.ignoreKeypressForSearch) {
 			this.ignoreKeypressForSearch = false;
 			processBrowserKeys(e, true);
