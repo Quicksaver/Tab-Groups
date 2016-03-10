@@ -1,4 +1,4 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 this.paneSession = {
 	manualAction: false,
@@ -11,6 +11,7 @@ this.paneSession = {
 		recoveryBackup: 'recovery.bak',
 		upgrade: 'upgrade.js-',
 		manual: objName+'-manual',
+		update: objName+'-update.js-'
 	},
 
 	// backups are placed in profileDir/sessionstore-backups folder by default, where all other session-related backups are saved
@@ -296,6 +297,12 @@ this.paneSession = {
 				else if(file.name.startsWith(this.filenames.upgrade)) {
 					this.deferredPromise((deferred) => {
 						this.checkRecoveryFile(deferred, file.path, 'upgradeBackup', 'upgrade');
+					});
+				}
+				// backups created when the add-on is updated
+				else if(file.name.startsWith(this.filenames.update)) {
+					this.deferredPromise((deferred) => {
+						this.checkRecoveryFile(deferred, file.path, 'addonUpdateBackup', 'upgrade');
 					});
 				}
 				// this could be one of the backups manually created by the user, try to load it and see if we recognize it
