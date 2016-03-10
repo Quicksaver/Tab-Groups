@@ -18,6 +18,7 @@
 
 <!ENTITY session.backup.button "Create Backup File">
 <!ENTITY session.backup.description "Export your tab groups into a backup file for safe-keeping, so that you can restore them at a later time if necessary.">
+<!ENTITY session.backup.description2 "Suggestion: use the default file name and save location; when clicking 'Load Groups and Tabs from...' below, the backup will appear directly in the quick access menu.">
 <!ENTITY session.backup.autoloaded "The saved file has been loaded below. Please confirm that your groups and tabs have been backed up correctly.">
 <!ENTITY session.backup.alldata.checkbox.label "Backup session data">
 <!ENTITY session.backup.alldata.checkbox.tooltip.a "This may be useful for later when restoring groups from this backup file. Otherwise, you will only be able to restore the groups themselves and what tabs are currently open in them.">
@@ -25,9 +26,8 @@
 <!ENTITY session.backup.alldata.caution.a "Warning! This will export all current session data as well.">
 <!ENTITY session.backup.alldata.caution.b "Be cautious of who has access to this file, it will contain information from all your tabs, including page history, form data, and other private and potentially sensitive information.">
 
-<!ENTITY session.restore.load.button "Load Backup File">
-<!ENTITY session.restore.migrated.button "Load Migration Backup">
-<!ENTITY session.restore.migrated.tooltip "This is the backup created by Firefox when it updated, following the removal of its native Tab Groups. It should contain all your groups and tabs from before the update.">
+<!ENTITY session.restore.button "Load Groups and Tabs From...">
+<!ENTITY session.restore.from.file "File...">
 <!ENTITY session.restore.import.button "Import selected items into this window">
 <!ENTITY session.restore.import.tooltip.a "After pressing this button, you can enter Tab Groups mode and arrange the newly imported groups as usual.">
 <!ENTITY session.restore.import.tooltip.b "Note that you can only import new groups, you can't import tabs into already existing groups. This means that you can very easily end up with duplicate groups if you import the same group twice. In this case, just go into Tab Groups mode and close the ones you don't want.">

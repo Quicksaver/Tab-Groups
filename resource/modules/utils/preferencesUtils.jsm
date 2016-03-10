@@ -1,5 +1,10 @@
-// VERSION 2.4.14
+// VERSION 2.4.15
 Modules.UTILS = true;
+
+XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "FileUtils", "resource://gre/modules/FileUtils.jsm");
+XPCOMUtils.defineLazyGetter(this, "TextEncoder", () => { return Cu.import("resource://gre/modules/osfile.jsm").TextEncoder; });
+XPCOMUtils.defineLazyGetter(this, "TextDecoder", () => { return Cu.import("resource://gre/modules/osfile.jsm").TextDecoder; });
 
 // dependsOn - object that adds a dependson attribute functionality to xul preference elements.
 // Just add the attribute to the desired xul element and let the script do its thing. dependson accepts comma-separated or semicolon-separated strings in the following format:
@@ -995,8 +1000,6 @@ this.controllers = {
 
 	export: function() {
 		this.showFilePicker(Ci.nsIFilePicker.modeSave, objPathString+'-prefs', function(aFile) {
-			let { TextEncoder, OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
-
 			let list = { [objName]: AddonData.version };
 			for(let pref in prefList) {
 				list[pref] = Prefs[pref];
@@ -1013,8 +1016,6 @@ this.controllers = {
 
 	import: function() {
 		this.showFilePicker(Ci.nsIFilePicker.modeOpen, null, function(aFile) {
-			let { TextDecoder, OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
-
 			OS.File.open(aFile.path, { read: true }).then(function(ref) {
 				ref.read().then(function(saved) {
 					ref.close();
@@ -1038,15 +1039,25 @@ this.controllers = {
 		});
 	},
 
-	showFilePicker: function(mode, prefix, aCallback) {
+	showFilePicker: function(mode, prefix, aCallback, path) {
 		let fileExt = '.json';
 		let fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
 		fp.defaultExtension = 'json';
 		fp.appendFilter('JSON data', '*.json');
 
+		if(path) {
+			fp.displayDirectory = new FileUtils.File(path);
+		}
+
 		if(mode == Ci.nsIFilePicker.modeSave) {
 			let date = new Date();
-			let dateStr = date.getFullYear()+'-'+(date.getMonth() +1)+'-'+date.getDate()+'-'+date.getHours()+'-'+date.getMinutes()+'-'+date.getSeconds();
+			let y = date.getFullYear();
+			let m = (date.getMonth() +1); if(m < 10) { m = "0"+m; }
+			let d = date.getDate(); if(d < 10) { d = "0"+d; }
+			let h = date.getHours(); if(h < 10) { h = "0"+h; }
+			let mm = date.getMinutes(); if(mm < 10) { mm = "0"+mm; }
+			let s = date.getSeconds(); if(s < 10) { s = "0"+s; }
+			let dateStr = ""+y+m+d+"-"+h+mm+s;
 			fp.defaultString = prefix+'-'+dateStr+fileExt;
 		}
 

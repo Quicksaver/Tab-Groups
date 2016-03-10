@@ -1,16 +1,34 @@
-// VERSION 1.0.4
+// VERSION 1.1.0
 
 this.paneSession = {
 	manualAction: false,
 	migratedBackupFile: null,
+	_deferredPromises: new Set(),
+
+	filenames: {
+		previous: 'previous.js',
+		recovery: 'recovery.js',
+		recoveryBackup: 'recovery.bak',
+		upgrade: 'upgrade.js-',
+		manual: objName+'-manual',
+	},
+
+	// backups are placed in profileDir/sessionstore-backups folder by default, where all other session-related backups are saved
+	get backupsPath() {
+		delete this.backupsPath;
+		let profileDir = OS.Constants.Path.profileDir;
+		this.backupsPath = OS.Path.join(profileDir, "sessionstore-backups");
+		return this.backupsPath;
+	},
 
 	get alldataCheckbox() { return $('paneSession-backup-alldata'); },
 	get alldata() { return this.alldataCheckbox.checked; },
 
 	get backupBtn() { return $('paneSession-backup-button'); },
-	get loadBtn() { return $('paneSession-load-button'); },
-	get migratedBtn() { return $('paneSession-migrated-button'); },
 	get importBtn() { return $('paneSession-import-button'); },
+	get loadFromFile() { return $('paneSession-load-from-file'); },
+	get backups() { return $('paneSession-load-menu'); },
+
 	get clearBtn1() { return $('paneSession-clear-button-1'); },
 	get clearBtn2() { return $('paneSession-clear-button-2'); },
 	get clearBtn3() { return $('paneSession-clear-button-3'); },
@@ -33,7 +51,7 @@ this.paneSession = {
 						this.backup();
 						break;
 
-					case this.loadBtn:
+					case this.loadFromFile:
 						this.loadBackup();
 						break;
 
@@ -45,10 +63,6 @@ this.paneSession = {
 					case this.clearBtn2:
 					case this.clearBtn3:
 						this.clearData();
-						break;
-
-					case this.migratedBtn:
-						this.loadSessionFile(this.migratedBackupFile);
 						break;
 				}
 				break;
@@ -73,13 +87,18 @@ this.paneSession = {
 					this.toggleRowChecked(cell.row);
 				}
 				break;
+
+			case 'popupshowing':
+				this.buildBackupsMenu();
+				break;
 		}
 	},
 
 	init: function() {
 		Listeners.add(this.alldataCheckbox, 'command', this);
 		Listeners.add(this.backupBtn, 'command', this);
-		Listeners.add(this.loadBtn, 'command', this);
+		Listeners.add(this.loadFromFile, 'command', this);
+		Listeners.add(this.backups, 'popupshowing', this);
 		Listeners.add(this.importBtn, 'command', this);
 		Listeners.add(this.clearBtn1, 'command', this);
 		Listeners.add(this.clearBtn2, 'command', this);
@@ -87,8 +106,6 @@ this.paneSession = {
 		Listeners.add(this.tabList, 'keydown', this);
 		Listeners.add(this.tabList, 'click', this);
 		Listeners.add(this.tabList, 'dblclick', this);
-
-		this.checkMigrationBackup();
 	},
 
 	uninit: function() {
@@ -96,8 +113,8 @@ this.paneSession = {
 
 		Listeners.remove(this.alldataCheckbox, 'command', this);
 		Listeners.remove(this.backupBtn, 'command', this);
-		Listeners.remove(this.loadBtn, 'command', this);
-		Listeners.remove(this.migratedBtn, 'command', this);
+		Listeners.remove(this.loadFromFile, 'command', this);
+		Listeners.remove(this.backups, 'popupshowing', this);
 		Listeners.remove(this.importBtn, 'command', this);
 		Listeners.remove(this.clearBtn1, 'command', this);
 		Listeners.remove(this.clearBtn2, 'command', this);
@@ -108,9 +125,7 @@ this.paneSession = {
 	},
 
 	backup: function() {
-		controllers.showFilePicker(Ci.nsIFilePicker.modeSave, objName, (aFile) => {
-			let { TextEncoder, OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
-
+		controllers.showFilePicker(Ci.nsIFilePicker.modeSave, this.filenames.manual, (aFile) => {
 			let state = SessionStore.getCurrentState();
 			let save;
 
@@ -123,6 +138,7 @@ this.paneSession = {
 				// We'll skip closed windows and tabs, at least for now, I think this will work for most use cases though.
 				let saveData = {
 					version: [ objName, 1 ],
+					session: state.session,
 					windows: []
 				};
 
@@ -200,8 +216,10 @@ this.paneSession = {
 				ref.write(save).then(() => {
 					ref.close();
 
-					// Load the newly created file in the Restore Tab Groups block, so that the user can confirm all the tabs and groups were backed up properly.
-					// We read from the newly created file so that we're sure to show the info that was actually saved, and not the info that's still in memory.
+					// Load the newly created file in the Restore Tab Groups block,
+					// so that the user can confirm all the tabs and groups were backed up properly.
+					// We read from the newly created file so that we're sure to show the info that was actually saved,
+					// and not the info that's still in memory.
 					OS.File.open(aFile.path, { read: true }).then((ref) => {
 						ref.read().then((savedState) => {
 							ref.close();
@@ -212,50 +230,174 @@ this.paneSession = {
 					});
 				});
 			});
-		});
+		}, this.backupsPath);
 	},
 
-	// if Firefox created its migration backup when it updated to 45, we can add a helper button to load it directly,
-	// so users can import back their groups easily
-	checkMigrationBackup: function() {
-		// the backup is placed in the profile folder by default
-		let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
-		let dest = Services.dirsvc.get("ProfD", Ci.nsIFile);
-		dest.append("tabgroups-session-backup.json");
-		OS.File.exists(dest.path).then((exists) => {
-			if(exists) {
-				this.showMigratedButton(dest);
-				return;
-			}
+	buildBackupsMenu: function() {
+		// Reject any pending tasks, we'll reschedule these ops again.
+		// There's no need to clear afterwards, rejecting the promise removes it from the Set.
+		for(let deferred of this._deferredPromises) {
+			deferred.reject();
+		}
 
-			// for a time in Nightly, this backup was placed in the desktop.
-			// This whole method will probably be removed some time after FF45, when it is no longer needed; this part will probably be removed even sooner.
-			let alt = Services.dirsvc.get("Desk", Ci.nsIFile);
-			alt.append("Firefox-tabgroups-backup.json");
-			OS.File.exists(alt.path).then((altExists) => {
-				if(altExists) {
-					this.showMigratedButton(alt);
+		// Always clean up old entries.
+		let child = this.backups.firstChild;
+		while(child) {
+			let next = child.nextSibling;
+			if(!child.id) {
+				child.remove();
+			} else if(child != this.loadFromFile) {
+				child.hidden = true;
+			}
+			child = next;
+		}
+
+		// if Firefox created its migration backup when it updated to 45, we can add an item to load it directly,
+		// so users can import back their groups from that point easily
+		this.deferredPromise((deferred) => {
+			// the migration backup is placed in the profile folder
+			let profileDir = OS.Constants.Path.profileDir;
+			let path = OS.Path.join(profileDir, "tabgroups-session-backup.json");
+			OS.File.exists(path).then((exists) => {
+				if(exists) {
+					this.checkRecoveryFile(deferred, path, 'groupsMigrationBackup', 'upgrade');
 				}
+			});
+		});
+
+		// Don't throw immediately if any iteration fails, run all it can to add all the possible (valid) items.
+		let exn = null;
+
+		// iterate through all files in sessionstore-backups folder and add an item for each (valid) one
+		let iterator;
+		let iterating;
+		try {
+			iterator = new OS.File.DirectoryIterator(this.backupsPath);
+			iterating = iterator.forEach((file) => {
+				// a copy of the current session, for crash-protection
+				if(file.name == this.filenames.recovery) {
+					this.deferredPromise((deferred) => {
+						this.checkRecoveryFile(deferred, file.path, 'sessionRecovery', 'recovery');
+					});
+				}
+				// another crash-protection of the current session
+				else if(file.name == this.filenames.recoveryBackup) {
+					this.deferredPromise((deferred) => {
+						this.checkRecoveryFile(deferred, file.path, 'recoveryBackup', 'recovery');
+					});
+				}
+				// the previous session
+				else if(file.name == this.filenames.previous) {
+					this.deferredPromise((deferred) => {
+						this.checkRecoveryFile(deferred, file.path, 'previousSession', 'recovery');
+					});
+				}
+				// backups made when Firefox updates itself
+				else if(file.name.startsWith(this.filenames.upgrade)) {
+					this.deferredPromise((deferred) => {
+						this.checkRecoveryFile(deferred, file.path, 'upgradeBackup', 'upgrade');
+					});
+				}
+				// this could be one of the backups manually created by the user, try to load it and see if we recognize it
+				else if(file.name.startsWith(this.filenames.manual)) {
+					this.deferredPromise((deferred) => {
+						this.checkRecoveryFile(deferred, file.path, 'manualBackup', 'manual');
+					});
+				}
+			});
+		}
+		catch(ex) {
+			exn = exn || ex;
+		}
+		finally {
+			if(iterating) {
+				iterating.then(
+					function() { iterator.close(); },
+					function(reason) { iterator.close(); throw reason; }
+				);
+			}
+		}
+
+		if(exn) { throw exn; }
+	},
+
+	// Constructs a deferred promise object to be stored in a Set() that either self-removes or can be rejected and cleaned from the outside.
+	// The executor is passed this deferred object as its single argument.
+	deferredPromise: function(executor) {
+		// This is the basis of this deferred object, with accessor methods for resolving and rejecting its promise.
+		let deferred = {
+			resolve: function() {
+				paneSession._deferredPromises.delete(this);
+				this._resolve();
+			},
+
+			reject: function() {
+				paneSession._deferredPromises.delete(this);
+				this._reject();
+			}
+		};
+
+		// Init the actual promise.
+		deferred.promise = new Promise((resolve, reject) => {
+			// Store the resolve and reject methods in the deferred object.
+			deferred._resolve = resolve;
+			deferred._reject = reject;
+
+			// Pass the deferred object to the executor, so it can resolve itself as well.
+			executor(deferred);
+		});
+
+		// Add this deferred promise to the Set() so we can keep track of it.
+		this._deferredPromises.add(deferred);
+
+		return deferred;
+	},
+
+	// If at any point this fails, it simply doesn't add the corresponding item to the menu
+	// (if it fails here it's unlikely it will work when actually loading groups from this file anyway).
+	checkRecoveryFile: function(aDeferred, aPath, aName, aWhere) {
+		OS.File.open(aPath, { read: true }).then((ref) => {
+			ref.read().then((savedState) => {
+				let state = JSON.parse((new TextDecoder()).decode(savedState));
+				let date = state.session.lastUpdate;
+				this.createBackupEntry(aPath, aName, date, aWhere);
+				aDeferred.resolve();
 			});
 		});
 	},
 
-	showMigratedButton: function(aPath) {
-		this.migratedBackupFile = aPath;
-		this.migratedBtn.hidden = false;
-		Listeners.add(this.migratedBtn, 'command', this);
+	createBackupEntry: function(aPath, aName, aDate, aWhere) {
+		let date = new Date(aDate).toLocaleString();
+
+		let item = document.createElement('menuitem');
+		item.setAttribute('label', Strings.get('options', aName, [ [ '$date', date ] ]));
+		item._date = aDate;
+		item.handleEvent = (e) => {
+			this.loadSessionFile(aPath);
+		};
+		item.addEventListener('command', item);
+
+		// make sure we unhide the separator for this category of backup entries
+		let sibling = $('paneSession-load-separator-'+aWhere);
+		sibling.hidden = false;
+
+		// try to sort by date desc within this category
+		while(sibling.previousSibling) {
+			if(sibling.previousSibling.nodeName == 'menuseparator' || aDate <= sibling.previousSibling._date) { break; }
+			sibling = sibling.previousSibling;
+		}
+
+		this.backups.insertBefore(item, sibling);
 	},
 
 	loadBackup: function() {
 		controllers.showFilePicker(Ci.nsIFilePicker.modeOpen, null, (aFile) => {
 			this.loadSessionFile(aFile);
-		});
+		}, this.backupsPath);
 	},
 
 	loadSessionFile: function(aFile) {
-		let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
-
-		OS.File.open(aFile.path, { read: true }).then((ref) => {
+		OS.File.open(aFile.path || aFile, { read: true }).then((ref) => {
 			ref.read().then((savedState) => {
 				ref.close();
 
@@ -266,8 +408,6 @@ this.paneSession = {
 	},
 
 	readState: function(savedState) {
-		let { TextDecoder } = Cu.import("resource://gre/modules/osfile.jsm", {});
-
 		let state;
 		let pinnedGroupIdx = 0;
 		let tabGroupIdx = 0;

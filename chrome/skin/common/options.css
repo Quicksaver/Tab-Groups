@@ -36,16 +36,17 @@
 
 #paneSession-backup-button,
 #paneSession-load-button,
-#paneSession-migrated-button,
 #paneSession-import-button {
 	margin: 1em 4em;
 }
 
-#paneSession-load-button {
-	-moz-margin-end: 0.5em;
+#paneSession-load-button .button-box {
+	-moz-margin-start: 10px;
+	-moz-margin-end: 10px;
 }
-#paneSession-migrated-button {
-	-moz-margin-start: 0.5em;
+
+#paneSession-load-button dropmarker {
+	display: none;
 }
 
 #paneSession-restore-tabList {
