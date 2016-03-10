@@ -1,4 +1,4 @@
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 this.paneSession = {
 	manualAction: false,
@@ -221,19 +221,14 @@ this.paneSession = {
 					// so that the user can confirm all the tabs and groups were backed up properly.
 					// We read from the newly created file so that we're sure to show the info that was actually saved,
 					// and not the info that's still in memory.
-					OS.File.open(aFile.path, { read: true }).then((ref) => {
-						ref.read().then((savedState) => {
-							ref.close();
-
-							this.manualAction = false;
-							this.readState(savedState);
-						});
-					});
+					this.loadSessionFile(aFile, false);
 				});
 			});
 		}, this.backupsPath);
 	},
 
+	// If at any point this fails, it simply doesn't add the corresponding item to the menu
+	// (if it fails here it's unlikely it will work when actually loading groups from these files anyway).
 	buildBackupsMenu: function() {
 		// Reject any pending tasks, we'll reschedule these ops again.
 		// There's no need to clear afterwards, rejecting the promise removes it from the Set.
@@ -253,11 +248,12 @@ this.paneSession = {
 			child = next;
 		}
 
+		let profileDir = OS.Constants.Path.profileDir;
+
 		// if Firefox created its migration backup when it updated to 45, we can add an item to load it directly,
 		// so users can import back their groups from that point easily
 		this.deferredPromise((deferred) => {
 			// the migration backup is placed in the profile folder
-			let profileDir = OS.Constants.Path.profileDir;
 			let path = OS.Path.join(profileDir, "tabgroups-session-backup.json");
 			OS.File.exists(path).then((exists) => {
 				if(exists) {
@@ -325,6 +321,38 @@ this.paneSession = {
 			}
 		}
 
+		// Let's look for Session Manager's session backups as well, since we can also import from those.
+		AddonManager.getAddonByID('{1280606b-2510-4fe0-97ef-9b5a22eafe30}', (addon) => {
+			if(addon && addon.isActive) {
+				let smiterator;
+				let smiterating;
+				let sm = {};
+				Cu.import("chrome://sessionmanager/content/modules/session_file_io.jsm", sm);
+				let smdir = sm.SessionIo.getSessionDir();
+				try {
+					smiterator = new OS.File.DirectoryIterator(smdir.path);
+					smiterating = smiterator.forEach((file) => {
+						if(file.name.endsWith('.session')) {
+							this.deferredPromise((deferred) => {
+								this.checkSessionManagerFile(deferred, file, 'sessionManager', 'sessionManager');
+							});
+						}
+					});
+				}
+				catch(ex) {
+					exn = exn || ex;
+				}
+				finally {
+					if(smiterating) {
+						smiterating.then(
+							function() { smiterator.close(); },
+							function(reason) { smiterator.close(); throw reason; }
+						);
+					}
+				}
+			}
+		});
+
 		if(exn) { throw exn; }
 	},
 
@@ -360,17 +388,48 @@ this.paneSession = {
 		return deferred;
 	},
 
-	// If at any point this fails, it simply doesn't add the corresponding item to the menu
-	// (if it fails here it's unlikely it will work when actually loading groups from this file anyway).
 	checkRecoveryFile: function(aDeferred, aPath, aName, aWhere) {
 		OS.File.open(aPath, { read: true }).then((ref) => {
 			ref.read().then((savedState) => {
 				let state = JSON.parse((new TextDecoder()).decode(savedState));
-				let date = state.session.lastUpdate;
-				this.createBackupEntry(aPath, aName, date, aWhere);
+				if(state.session) {
+					let date = state.session.lastUpdate;
+					this.createBackupEntry(aPath, aName, date, aWhere);
+				}
 				aDeferred.resolve();
 			});
 		});
+	},
+
+	checkSessionManagerFile: function(aDeferred, aFile, aName, aWhere) {
+		let sm = {};
+		Cu.import("chrome://sessionmanager/content/modules/session_file_io.jsm", sm);
+		Cu.import("resource://gre/modules/FileUtils.jsm", sm);
+
+		let bFile = new sm.FileUtils.File(aFile.path);
+		sm.SessionIo.readSessionFile(bFile, false, (state) => {
+			state = this.getStateForSessionManagerData(state);
+			if(state.session) {
+				let date = state.session.lastUpdate;
+				this.createBackupEntry(bFile, aName, date, aWhere);
+			}
+			aDeferred.resolve();
+		});
+	},
+
+	getStateForSessionManagerData: function(data) {
+		let sm = {};
+		Cu.import("chrome://sessionmanager/content/modules/utils.jsm", sm);
+
+		data = data.split("\n")[4];
+		data = sm.Utils.decrypt(data);
+		if(data) {
+			data = sm.Utils.JSON_decode(data);
+			if(data && !data._JSON_decode_failed) {
+				return data;
+			}
+		}
+		return null;
 	},
 
 	createBackupEntry: function(aPath, aName, aDate, aWhere) {
@@ -380,7 +439,7 @@ this.paneSession = {
 		item.setAttribute('label', Strings.get('options', aName, [ [ '$date', date ] ]));
 		item._date = aDate;
 		item.handleEvent = (e) => {
-			this.loadSessionFile(aPath);
+			this.loadSessionFile(aPath, true, aWhere);
 		};
 		item.addEventListener('command', item);
 
@@ -399,36 +458,53 @@ this.paneSession = {
 
 	loadBackup: function() {
 		controllers.showFilePicker(Ci.nsIFilePicker.modeOpen, null, (aFile) => {
-			this.loadSessionFile(aFile);
+			this.loadSessionFile(aFile, true);
 		}, this.backupsPath);
 	},
 
-	loadSessionFile: function(aFile) {
+	loadSessionFile: function(aFile, aManualAction, aSpecial) {
+		if(aSpecial == 'sessionManager') {
+			let sm = {};
+			Cu.import("chrome://sessionmanager/content/modules/session_file_io.jsm", sm);
+
+			sm.SessionIo.readSessionFile(aFile, false, (state) => {
+				this.manualAction = aManualAction;
+
+				state = this.getStateForSessionManagerData(state);
+				this.readState(state);
+			});
+			return;
+		}
+
 		OS.File.open(aFile.path || aFile, { read: true }).then((ref) => {
 			ref.read().then((savedState) => {
 				ref.close();
 
-				this.manualAction = true;
-				this.readState(savedState, true);
+				this.manualAction = aManualAction;
+
+				let state;
+				try {
+					state = this.getStateForData(savedState);
+				}
+				catch(ex) {
+					Cu.reportError(ex);
+
+					this.invalidNotice.hidden = false;
+					this.tabList.hidden = true;
+					return;
+				}
+				this.readState(state);
 			});
 		});
 	},
 
-	readState: function(savedState) {
-		let state;
+	getStateForData: function(data) {
+		return JSON.parse((new TextDecoder()).decode(data));
+	},
+
+	readState: function(state) {
 		let pinnedGroupIdx = 0;
 		let tabGroupIdx = 0;
-
-		try {
-			state = JSON.parse((new TextDecoder()).decode(savedState));
-		}
-		catch(ex) {
-			Cu.reportError(ex);
-
-			this.invalidNotice.hidden = false;
-			this.tabList.hidden = true;
-			return;
-		}
 
 		treeView.data = [];
 		for(let win of state.windows) {

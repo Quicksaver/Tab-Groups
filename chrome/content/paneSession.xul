@@ -63,6 +63,7 @@
 						label="&session.restore.button;">
 						<menupopup id="paneSession-load-menu" position="end_before">
 							<menuseparator id="paneSession-load-separator-manual"/>
+							<menuseparator id="paneSession-load-separator-sessionManager"/>
 							<menuseparator id="paneSession-load-separator-recovery"/>
 							<menuseparator id="paneSession-load-separator-upgrade"/>
 							<menuitem id="paneSession-load-from-file" label="&session.restore.from.file;"/>
