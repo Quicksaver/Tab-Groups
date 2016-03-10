@@ -1,4 +1,4 @@
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 this.paneSession = {
 	manualAction: false,
@@ -391,6 +391,8 @@ this.paneSession = {
 	checkRecoveryFile: function(aDeferred, aPath, aName, aWhere) {
 		OS.File.open(aPath, { read: true }).then((ref) => {
 			ref.read().then((savedState) => {
+				ref.close();
+
 				let state = JSON.parse((new TextDecoder()).decode(savedState));
 				if(state.session) {
 					let date = state.session.lastUpdate;
