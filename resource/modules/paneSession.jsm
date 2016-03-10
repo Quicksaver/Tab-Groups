@@ -1,4 +1,4 @@
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 this.paneSession = {
 	manualAction: false,
@@ -10,6 +10,7 @@ this.paneSession = {
 		recovery: 'recovery.js',
 		recoveryBackup: 'recovery.bak',
 		upgrade: 'upgrade.js-',
+		sessionManager: '.session',
 		manual: objName+'-manual',
 		update: objName+'-update.js-'
 	},
@@ -332,7 +333,7 @@ this.paneSession = {
 				try {
 					smiterator = new OS.File.DirectoryIterator(smdir.path);
 					smiterating = smiterator.forEach((file) => {
-						if(file.name.endsWith('.session')) {
+						if(file.name.endsWith(this.filenames.sessionManager)) {
 							this.deferredPromise((deferred) => {
 								this.checkSessionManagerFile(deferred, file, 'sessionManager', 'sessionManager');
 							});
