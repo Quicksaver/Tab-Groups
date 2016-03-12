@@ -1,4 +1,4 @@
-// VERSION 1.1.6
+// VERSION 1.1.7
 
 this.paneSession = {
 	manualAction: false,
@@ -15,7 +15,6 @@ this.paneSession = {
 		recovery: /^recovery.js$/,
 		recoveryBackup: /^recovery.bak$/,
 		upgrade: /^upgrade.js-[0-9]{14}$/,
-		sessionManager: /\.session$/,
 		tabMixPlus: /^tabmix_sessions-[0-9]{4}-[0-9]{2}-[0-9]{2}.rdf$/,
 		manual: /^tabGroups-manual-[0-9]{8}-[0-9]{6}.json$/,
 		update: /^tabGroups-update.js-[0-9]{13,14}$/
@@ -350,26 +349,10 @@ this.paneSession = {
 					Cu.import("resource://gre/modules/FileUtils.jsm", this);
 				}
 				let smdir = this.SessionIo.getSessionDir();
-				try {
-					smiterator = new OS.File.DirectoryIterator(smdir.path);
-					smiterating = smiterator.forEach((file) => {
-						if(this.filenames.sessionManager.test(file.name)) {
-							this.deferredPromise((deferred) => {
-								this.checkSessionManagerFile(deferred, file, 'sessionManager', 'sessionManager');
-							});
-						}
-					});
-				}
-				catch(ex) {
-					exn = exn || ex;
-				}
-				finally {
-					if(smiterating) {
-						smiterating.then(
-							function() { smiterator.close(); },
-							function(reason) { smiterator.close(); throw reason; }
-						);
-					}
+				let smsessions = this.SessionIo.getSessions();
+				for(let session of smsessions) {
+					let path = OS.Path.join(smdir.path, session.fileName);
+					this.checkSessionManagerFile(session, path);
 				}
 			}
 		});
@@ -390,7 +373,7 @@ this.paneSession = {
 					tmpiterator = new OS.File.DirectoryIterator(tmpdir);
 					tmpiterating = tmpiterator.forEach((file) => {
 						if(this.filenames.tabMixPlus.test(file.name)) {
-							this.checkTabMixPlusFile(file, 'tabMixPlus', 'tabMixPlus');
+							this.checkTabMixPlusFile(file);
 						}
 					});
 				}
@@ -454,15 +437,17 @@ this.paneSession = {
 		});
 	},
 
-	checkSessionManagerFile: function(aDeferred, aFile, aName, aWhere) {
-		let bFile = new this.FileUtils.File(aFile.path);
-		this.SessionIo.readSessionFile(bFile, false, (state) => {
-			state = this.getStateForSessionManagerData(state);
-			this.verifyState(aDeferred, state, bFile, aName, aWhere);
+	checkSessionManagerFile: function(session, path) {
+		this.deferredPromise((deferred) => {
+			let file = new this.FileUtils.File(path);
+			this.SessionIo.readSessionFile(file, false, (state) => {
+				state = this.getStateForSessionManagerData(session, state);
+				this.verifyState(deferred, state, { file, session }, 'sessionManager', 'sessionManager');
+			});
 		});
 	},
 
-	checkTabMixPlusFile: function(aFile, aName, aWhere) {
+	checkTabMixPlusFile: function(aFile) {
 		let tmpDATASource;
 
 		try {
@@ -477,7 +462,7 @@ this.paneSession = {
 				let session = x;
 				this.deferredPromise((deferred) => {
 					let state = this.getStateForTabMixPlusData(session);
-					this.verifyState(deferred, state, { path, session }, aName, aWhere);
+					this.verifyState(deferred, state, { path, session }, 'tabMixPlus', 'tabMixPlus');
 				});
 			}
 		}
@@ -492,12 +477,16 @@ this.paneSession = {
 		}
 	},
 
-	getStateForSessionManagerData: function(data) {
+	getStateForSessionManagerData: function(session, data) {
 		data = data.split("\n")[4];
 		data = this.Utils.decrypt(data);
 		if(data) {
 			data = this.Utils.JSON_decode(data);
 			if(data && !data._JSON_decode_failed) {
+				// Use the timestamp from the session file header as the lastUpdate property for these files.
+				// It's more accurate (and some session files don't actually have a lastUpdate property.
+				if(!data.session) { data.session = {}; }
+				data.session.lastUpdate = session.timestamp;
 				return data;
 			}
 		}
@@ -572,10 +561,10 @@ this.paneSession = {
 
 	loadSessionFile: function(aFile, aManualAction, aSpecial) {
 		if(aSpecial == 'sessionManager') {
-			this.SessionIo.readSessionFile(aFile, false, (state) => {
+			this.SessionIo.readSessionFile(aFile.file, false, (state) => {
 				this.manualAction = aManualAction;
 
-				state = this.getStateForSessionManagerData(state);
+				state = this.getStateForSessionManagerData(aFile.session, state);
 				this.readState(state);
 			});
 			return;
