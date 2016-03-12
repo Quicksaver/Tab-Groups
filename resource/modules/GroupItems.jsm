@@ -1,4 +1,4 @@
-// VERSION 1.2.1
+// VERSION 1.2.2
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -217,7 +217,7 @@ this.GroupItem = function(listOfEls, options) {
 	this.snap(options.immediately);
 
 	if(!options.immediately && listOfEls.length) {
-		$container.hide().fadeIn();
+		this.$container.hide().fadeIn();
 	}
 
 	this._inited = true;
