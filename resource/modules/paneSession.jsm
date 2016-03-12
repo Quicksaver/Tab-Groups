@@ -1,9 +1,10 @@
-// VERSION 1.1.5
+// VERSION 1.1.6
 
 this.paneSession = {
 	manualAction: false,
 	migratedBackupFile: null,
 	_deferredPromises: new Set(),
+	_quickaccess: null,
 
 	filestrings: {
 		manual: objName+'-manual'
@@ -15,9 +16,20 @@ this.paneSession = {
 		recoveryBackup: /^recovery.bak$/,
 		upgrade: /^upgrade.js-[0-9]{14}$/,
 		sessionManager: /\.session$/,
+		tabMixPlus: /^tabmix_sessions-[0-9]{4}-[0-9]{2}-[0-9]{2}.rdf$/,
 		manual: /^tabGroups-manual-[0-9]{8}-[0-9]{6}.json$/,
 		update: /^tabGroups-update.js-[0-9]{13,14}$/
 	},
+
+	// some things needed to import from Session Manager files
+	SessionIo: null,
+	FileUtils: null,
+	Utils: null,
+
+	// some things needed to import from tab mix plus sessions
+	TabmixSessionManager: null,
+	TabmixConvertSession: null,
+	RDFService: null,
 
 	// backups are placed in profileDir/sessionstore-backups folder by default, where all other session-related backups are saved
 	get backupsPath() {
@@ -238,8 +250,9 @@ this.paneSession = {
 		// Reject any pending tasks, we'll reschedule these ops again.
 		// There's no need to clear afterwards, rejecting the promise removes it from the Set.
 		for(let deferred of this._deferredPromises) {
-			deferred.reject();
+			deferred.resolve();
 		}
+		this._quickaccess = new Set();
 
 		// Always clean up old entries.
 		let child = this.backups.firstChild;
@@ -331,9 +344,12 @@ this.paneSession = {
 			if(addon && addon.isActive) {
 				let smiterator;
 				let smiterating;
-				let sm = {};
-				Cu.import("chrome://sessionmanager/content/modules/session_file_io.jsm", sm);
-				let smdir = sm.SessionIo.getSessionDir();
+				if(!this.SessionIo) {
+					Cu.import("chrome://sessionmanager/content/modules/session_file_io.jsm", this);
+					Cu.import("chrome://sessionmanager/content/modules/utils.jsm", this);
+					Cu.import("resource://gre/modules/FileUtils.jsm", this);
+				}
+				let smdir = this.SessionIo.getSessionDir();
 				try {
 					smiterator = new OS.File.DirectoryIterator(smdir.path);
 					smiterating = smiterator.forEach((file) => {
@@ -358,6 +374,40 @@ this.paneSession = {
 			}
 		});
 
+		// Let's look for Tab Mix Plus's sessions and try to import from those as well.
+		AddonManager.getAddonByID('{dc572301-7619-498c-a57d-39143191b318}', (addon) => {
+			if(addon && addon.isActive) {
+				if(!this.TabmixSessionManager) {
+					this.TabmixSessionManager = gWindow.TabmixSessionManager;
+					this.TabmixConvertSession = gWindow.TabmixConvertSession;
+					this.RDFService = Cc["@mozilla.org/rdf/rdf-service;1"].getService(Ci.nsIRDFService);
+				}
+
+				let tmpiterator;
+				let tmpiterating;
+				let tmpdir = OS.Path.join(profileDir, "sessionbackups");
+				try {
+					tmpiterator = new OS.File.DirectoryIterator(tmpdir);
+					tmpiterating = tmpiterator.forEach((file) => {
+						if(this.filenames.tabMixPlus.test(file.name)) {
+							this.checkTabMixPlusFile(file, 'tabMixPlus', 'tabMixPlus');
+						}
+					});
+				}
+				catch(ex) {
+					exn = exn || ex;
+				}
+				finally {
+					if(tmpiterating) {
+						tmpiterating.then(
+							function() { tmpiterator.close(); },
+							function(reason) { tmpiterator.close(); throw reason; }
+						);
+					}
+				}
+			}
+		});
+
 		if(exn) { throw exn; }
 	},
 
@@ -371,9 +421,9 @@ this.paneSession = {
 				this._resolve();
 			},
 
-			reject: function() {
+			reject: function(r) {
 				paneSession._deferredPromises.delete(this);
-				this._reject();
+				this._reject(r);
 			}
 		};
 
@@ -405,25 +455,48 @@ this.paneSession = {
 	},
 
 	checkSessionManagerFile: function(aDeferred, aFile, aName, aWhere) {
-		let sm = {};
-		Cu.import("chrome://sessionmanager/content/modules/session_file_io.jsm", sm);
-		Cu.import("resource://gre/modules/FileUtils.jsm", sm);
-
-		let bFile = new sm.FileUtils.File(aFile.path);
-		sm.SessionIo.readSessionFile(bFile, false, (state) => {
+		let bFile = new this.FileUtils.File(aFile.path);
+		this.SessionIo.readSessionFile(bFile, false, (state) => {
 			state = this.getStateForSessionManagerData(state);
 			this.verifyState(aDeferred, state, bFile, aName, aWhere);
 		});
 	},
 
-	getStateForSessionManagerData: function(data) {
-		let sm = {};
-		Cu.import("chrome://sessionmanager/content/modules/utils.jsm", sm);
+	checkTabMixPlusFile: function(aFile, aName, aWhere) {
+		let tmpDATASource;
 
+		try {
+			tmpDATASource = this.TabmixSessionManager.DATASource;
+
+			let path = OS.Path.toFileURI(aFile.path);
+			this.TabmixSessionManager.DATASource = this.RDFService.GetDataSourceBlocking(path);
+
+			// Each TMP file can hold several sessions.
+			let sessions = this.TabmixSessionManager.getSessionList();
+			for(let x of sessions.path) {
+				let session = x;
+				this.deferredPromise((deferred) => {
+					let state = this.getStateForTabMixPlusData(session);
+					this.verifyState(deferred, state, { path, session }, aName, aWhere);
+				});
+			}
+		}
+		catch(ex) {
+			Cu.reportError(ex);
+		}
+		// Always make sure we restore TMP's current session state if there's one.
+		finally {
+			if(tmpDATASource) {
+				this.TabmixSessionManager.DATASource = tmpDATASource;
+			}
+		}
+	},
+
+	getStateForSessionManagerData: function(data) {
 		data = data.split("\n")[4];
-		data = sm.Utils.decrypt(data);
+		data = this.Utils.decrypt(data);
 		if(data) {
-			data = sm.Utils.JSON_decode(data);
+			data = this.Utils.JSON_decode(data);
 			if(data && !data._JSON_decode_failed) {
 				return data;
 			}
@@ -431,10 +504,38 @@ this.paneSession = {
 		return null;
 	},
 
+	getStateForTabMixPlusData: function(session) {
+		let state = this.TabmixConvertSession.getSessionState(session);
+		if(!state.tabsCount) { return state; }
+
+		// TMP doesn't retrieve a lastUpdate value here, we need to get it ourselves
+		let node = this.RDFService.GetResource(session);
+		state.session = {
+			lastUpdate: this.TabmixSessionManager.getLiteralValue(node, "timestamp", 0)
+		};
+		if(!state.session.lastUpdate) {
+			let container = this.TabmixSessionManager.initContainer(node);
+			let windowEnum = container.GetElements();
+			while(windowEnum.hasMoreElements()) {
+				let windowNode = windowEnum.getNext();
+				let timestamp = this.TabmixSessionManager.getLiteralValue(windowNode, "timestamp", 0);
+				state.session.lastUpdate = Math.max(state.session.lastUpdate, timestamp);
+			}
+		}
+
+		return state;
+	},
+
 	verifyState: function(aDeferred, aState, aFile, aName, aWhere) {
 		if(aState.session) {
-			let date = aState.session.lastUpdate;
-			this.createBackupEntry(aFile, aName, date, aWhere);
+			// Some sessions may not be modified between files, so they're essentially duplicates spread out over several files.
+			// There's no need to show these in the quick access menu.
+			let stateStr = JSON.stringify(aState);
+			if(!this._quickaccess.has(stateStr)) {
+				let date = aState.session.lastUpdate;
+				this.createBackupEntry(aFile, aName, date, aWhere);
+				this._quickaccess.add(stateStr);
+			}
 		}
 		aDeferred.resolve();
 	},
@@ -471,15 +572,33 @@ this.paneSession = {
 
 	loadSessionFile: function(aFile, aManualAction, aSpecial) {
 		if(aSpecial == 'sessionManager') {
-			let sm = {};
-			Cu.import("chrome://sessionmanager/content/modules/session_file_io.jsm", sm);
-
-			sm.SessionIo.readSessionFile(aFile, false, (state) => {
+			this.SessionIo.readSessionFile(aFile, false, (state) => {
 				this.manualAction = aManualAction;
 
 				state = this.getStateForSessionManagerData(state);
 				this.readState(state);
 			});
+			return;
+		}
+
+		if(aSpecial == 'tabMixPlus') {
+			let tmpDATASource;
+			try {
+				tmpDATASource = this.TabmixSessionManager.DATASource;
+				this.TabmixSessionManager.DATASource = this.RDFService.GetDataSourceBlocking(aFile.path);
+
+				let state = this.getStateForTabMixPlusData(aFile.session);
+				this.readState(state);
+			}
+			catch(ex) {
+				Cu.reportError(ex);
+			}
+			// Always make sure we restore TMP's current session state if there's one.
+			finally {
+				if(tmpDATASource) {
+					this.TabmixSessionManager.DATASource = tmpDATASource;
+				}
+			}
 			return;
 		}
 
