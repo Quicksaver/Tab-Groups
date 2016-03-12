@@ -1,4 +1,4 @@
-// VERSION 1.1.7
+// VERSION 1.1.8
 
 this.paneSession = {
 	manualAction: false,
@@ -625,11 +625,10 @@ this.paneSession = {
 		for(let win of state.windows) {
 			if(!win.tabs) { continue; }
 
-			let winGroups;
 			let groups;
 			let activeGroupId;
 			try {
-				winGroups = JSON.parse(win.extData[Storage.kGroupsIdentifier]);
+				let winGroups = JSON.parse(win.extData[Storage.kGroupsIdentifier]);
 				groups = JSON.parse(win.extData[Storage.kGroupIdentifier]);
 				if(winGroups.activeGroupId in groups) {
 					activeGroupId = winGroups.activeGroupId;
@@ -645,9 +644,9 @@ this.paneSession = {
 				}
 			}
 			catch(ex) {
-				Cu.reportError(ex);
+				console.log(ex.name+': '+ex.message);
 
-				// groups data is corrupted, consider the whole window its own group
+				// groups data is corrupted or missing, consider the whole window its own group
 				activeGroupId = 1;
 				groups = {
 					1: { id: 1 }
@@ -668,7 +667,7 @@ this.paneSession = {
 						}
 					}
 					catch(ex) {
-						Cu.reportError(ex);
+						console.log(ex.name+': '+ex.message);
 
 						// I think it's possible that tabs created while TabView is closed could somehow skip the group registration.
 						// Even if not, we squeeze in any ungrouped tabs into the "current" group of that window,
