@@ -1,5 +1,17 @@
-// VERSION 2.4.15
+// VERSION 2.4.16
 Modules.UTILS = true;
+
+XPCOMUtils.defineLazyGetter(this, "gWindow", function() {
+	// TODO: investigate when exactly I can use windowRoot
+	return	window.windowRoot
+		? window.windowRoot.ownerGlobal
+		: window.QueryInterface(Ci.nsIInterfaceRequestor)
+			.getInterface(Ci.nsIWebNavigation)
+			.QueryInterface(Ci.nsIDocShellTreeItem)
+			.rootTreeItem
+			.QueryInterface(Ci.nsIInterfaceRequestor)
+			.getInterface(Ci.nsIDOMWindow);
+});
 
 XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "FileUtils", "resource://gre/modules/FileUtils.jsm");
@@ -585,7 +597,6 @@ this.helptext = {
 	kPanelWidth: 311, // roughly the maximum size of the panel node
 	kContentsWidth: 275, // the actual maximum size of the helptext contents
 
-	root: null,
 	panel: null,
 	contents: null,
 	main: null,
@@ -729,8 +740,8 @@ this.helptext = {
 	},
 
 	onLoad: function() {
-		this.panel = this.root.document.getElementById(objName+'-helptext');
-		this.contents = this.root.document.getElementById(objName+'-helptext-contents');
+		this.panel = gWindow.document.getElementById(objName+'-helptext');
+		this.contents = gWindow.document.getElementById(objName+'-helptext-contents');
 		this.main = $$('.main-content')[0];
 		this.prefPane = this.main.firstChild;
 
@@ -1210,7 +1221,7 @@ this.DnDproxy = {
 
 Modules.LOADMODULE = function() {
 	alwaysRunOnClose.push(function() {
-		Overlays.removeOverlayWindow(helptext.root, 'utils/helptext');
+		Overlays.removeOverlayWindow(gWindow, 'utils/helptext');
 	});
 
 	callOnLoad(window, function() {
@@ -1221,17 +1232,7 @@ Modules.LOADMODULE = function() {
 		categories.init();
 		controllers.init();
 
-		// investigate when exactly I can use windowRoot
-		helptext.root = window.windowRoot
-			? window.windowRoot.ownerGlobal
-			: window.QueryInterface(Ci.nsIInterfaceRequestor)
-				.getInterface(Ci.nsIWebNavigation)
-				.QueryInterface(Ci.nsIDocShellTreeItem)
-				.rootTreeItem
-				.QueryInterface(Ci.nsIInterfaceRequestor)
-				.getInterface(Ci.nsIDOMWindow);
-
-		Overlays.overlayWindow(helptext.root, 'utils/helptext', helptext);
+		Overlays.overlayWindow(gWindow, 'utils/helptext', helptext);
 	});
 };
 
@@ -1244,7 +1245,7 @@ Modules.UNLOADMODULE = function() {
 	controllers.uninit();
 	helptext.uninit();
 
-	Overlays.removeOverlayWindow(helptext.root, 'utils/helptext');
+	Overlays.removeOverlayWindow(gWindow, 'utils/helptext');
 
 	if(UNLOADED) {
 		window.close();

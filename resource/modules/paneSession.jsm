@@ -1,18 +1,22 @@
-// VERSION 1.1.4
+// VERSION 1.1.5
 
 this.paneSession = {
 	manualAction: false,
 	migratedBackupFile: null,
 	_deferredPromises: new Set(),
 
+	filestrings: {
+		manual: objName+'-manual'
+	},
+
 	filenames: {
-		previous: 'previous.js',
-		recovery: 'recovery.js',
-		recoveryBackup: 'recovery.bak',
-		upgrade: 'upgrade.js-',
-		sessionManager: '.session',
-		manual: objName+'-manual',
-		update: objName+'-update.js-'
+		previous: /^previous.js$/,
+		recovery: /^recovery.js$/,
+		recoveryBackup: /^recovery.bak$/,
+		upgrade: /^upgrade.js-[0-9]{14}$/,
+		sessionManager: /\.session$/,
+		manual: /^tabGroups-manual-[0-9]{8}-[0-9]{6}.json$/,
+		update: /^tabGroups-update.js-[0-9]{13,14}$/
 	},
 
 	// backups are placed in profileDir/sessionstore-backups folder by default, where all other session-related backups are saved
@@ -127,7 +131,7 @@ this.paneSession = {
 	},
 
 	backup: function() {
-		controllers.showFilePicker(Ci.nsIFilePicker.modeSave, this.filenames.manual, (aFile) => {
+		controllers.showFilePicker(Ci.nsIFilePicker.modeSave, this.filestrings.manual, (aFile) => {
 			let state = SessionStore.getCurrentState();
 			let save;
 
@@ -273,37 +277,37 @@ this.paneSession = {
 			iterator = new OS.File.DirectoryIterator(this.backupsPath);
 			iterating = iterator.forEach((file) => {
 				// a copy of the current session, for crash-protection
-				if(file.name == this.filenames.recovery) {
+				if(this.filenames.recovery.test(file.name)) {
 					this.deferredPromise((deferred) => {
 						this.checkRecoveryFile(deferred, file.path, 'sessionRecovery', 'recovery');
 					});
 				}
 				// another crash-protection of the current session
-				else if(file.name == this.filenames.recoveryBackup) {
+				else if(this.filenames.recoveryBackup.test(file.name)) {
 					this.deferredPromise((deferred) => {
 						this.checkRecoveryFile(deferred, file.path, 'recoveryBackup', 'recovery');
 					});
 				}
 				// the previous session
-				else if(file.name == this.filenames.previous) {
+				else if(this.filenames.previous.test(file.name)) {
 					this.deferredPromise((deferred) => {
 						this.checkRecoveryFile(deferred, file.path, 'previousSession', 'recovery');
 					});
 				}
 				// backups made when Firefox updates itself
-				else if(file.name.startsWith(this.filenames.upgrade)) {
+				else if(this.filenames.upgrade.test(file.name)) {
 					this.deferredPromise((deferred) => {
 						this.checkRecoveryFile(deferred, file.path, 'upgradeBackup', 'upgrade');
 					});
 				}
 				// backups created when the add-on is updated
-				else if(file.name.startsWith(this.filenames.update)) {
+				else if(this.filenames.update.test(file.name)) {
 					this.deferredPromise((deferred) => {
 						this.checkRecoveryFile(deferred, file.path, 'addonUpdateBackup', 'upgrade');
 					});
 				}
 				// this could be one of the backups manually created by the user, try to load it and see if we recognize it
-				else if(file.name.startsWith(this.filenames.manual)) {
+				else if(this.filenames.manual.test(file.name)) {
 					this.deferredPromise((deferred) => {
 						this.checkRecoveryFile(deferred, file.path, 'manualBackup', 'manual');
 					});
@@ -333,7 +337,7 @@ this.paneSession = {
 				try {
 					smiterator = new OS.File.DirectoryIterator(smdir.path);
 					smiterating = smiterator.forEach((file) => {
-						if(file.name.endsWith(this.filenames.sessionManager)) {
+						if(this.filenames.sessionManager.test(file.name)) {
 							this.deferredPromise((deferred) => {
 								this.checkSessionManagerFile(deferred, file, 'sessionManager', 'sessionManager');
 							});
@@ -395,11 +399,7 @@ this.paneSession = {
 				ref.close();
 
 				let state = JSON.parse((new TextDecoder()).decode(savedState));
-				if(state.session) {
-					let date = state.session.lastUpdate;
-					this.createBackupEntry(aPath, aName, date, aWhere);
-				}
-				aDeferred.resolve();
+				this.verifyState(aDeferred, state, aPath, aName, aWhere);
 			});
 		});
 	},
@@ -412,11 +412,7 @@ this.paneSession = {
 		let bFile = new sm.FileUtils.File(aFile.path);
 		sm.SessionIo.readSessionFile(bFile, false, (state) => {
 			state = this.getStateForSessionManagerData(state);
-			if(state.session) {
-				let date = state.session.lastUpdate;
-				this.createBackupEntry(bFile, aName, date, aWhere);
-			}
-			aDeferred.resolve();
+			this.verifyState(aDeferred, state, bFile, aName, aWhere);
 		});
 	},
 
@@ -433,6 +429,14 @@ this.paneSession = {
 			}
 		}
 		return null;
+	},
+
+	verifyState: function(aDeferred, aState, aFile, aName, aWhere) {
+		if(aState.session) {
+			let date = aState.session.lastUpdate;
+			this.createBackupEntry(aFile, aName, date, aWhere);
+		}
+		aDeferred.resolve();
 	},
 
 	createBackupEntry: function(aPath, aName, aDate, aWhere) {
@@ -678,15 +682,14 @@ this.paneSession = {
 		if(!importGroups.length) { return; }
 
 		// first make sure the TabView frame isn't initialized, we don't want it interfering
-		let root = this._getRootWindow();
-		root[objName].TabView._deinitFrame();
+		gWindow[objName].TabView._deinitFrame();
 
 		// initialize window if necessary, just in case
-		Storage._scope.SessionStoreInternal.onLoad(root);
+		Storage._scope.SessionStoreInternal.onLoad(gWindow);
 
 		// get the next id to be used for the imported groups
-		let groups = Storage.readGroupItemData(root);
-		let groupItems = Storage.readGroupItemsData(root);
+		let groups = Storage.readGroupItemData(gWindow);
+		let groupItems = Storage.readGroupItemsData(gWindow);
 		if(!groupItems) {
 			groupItems = {};
 		}
@@ -707,7 +710,7 @@ this.paneSession = {
 					tab._tab.pinned = true;
 					tab._tab.hidden = false;
 
-					this.restoreTab(root, tab._tab);
+					this.restoreTab(gWindow, tab._tab);
 				}
 				continue;
 			}
@@ -717,7 +720,7 @@ this.paneSession = {
 			groupData.id = groupID;
 
 			// first append the imported group into the session data
-			Storage.saveGroupItem(root, groupData);
+			Storage.saveGroupItem(gWindow, groupData);
 			groupItems.totalNumber++;
 
 			for(let tab of group.tabs) {
@@ -730,12 +733,12 @@ this.paneSession = {
 				delete tab._tab.pinned;
 				tab._tab.hidden = true;
 
-				this.restoreTab(root, tab._tab);
+				this.restoreTab(gWindow, tab._tab);
 			}
 		}
 
 		// don't forget to insert back the updated data
-		Storage.saveGroupItemsData(root, {
+		Storage.saveGroupItemsData(gWindow, {
 			nextID: groupItems.nextID,
 			activeGroupId: groupItems.activeGroupId || null,
 			totalNumber: groupItems.totalNumber
@@ -820,8 +823,7 @@ this.paneSession = {
 				// The current window can't be closed, otherwise the new session data for other opened windows wouldn't be properly saved.
 				// (http://mxr.mozilla.org/mozilla-central/source/browser/components/sessionstore/SessionStore.jsm -> SessionStoreInternal.setBrowserState())
 				// Instead, we'll force an unloaded state of all tabs, since they will be forced to reload when reselected (we don't do this, SessionRestore does).
-				let root = this._getRootWindow();
-				for(let tab of root.gBrowser.tabs) {
+				for(let tab of gWindow.gBrowser.tabs) {
 					if(!tab.pinned) {
 						tab.linkedBrowser.loadURI("about:blank");
 					}
@@ -830,7 +832,7 @@ this.paneSession = {
 				let wins = [];
 				Windows.callOnAll(function(win) {
 					// don't close the current window
-					if(win != root) {
+					if(win != gWindow) {
 						wins.unshift(win);
 					}
 				}, 'navigator:browser');
@@ -924,18 +926,6 @@ this.paneSession = {
 		}
 
 		tabs.splice(i, 1);
-	},
-
-	_getRootWindow: function() {
-		// investigate when exactly I can use windowRoot
-		return window.windowRoot
-			? window.windowRoot.ownerGlobal
-			: window.QueryInterface(Ci.nsIInterfaceRequestor)
-				.getInterface(Ci.nsIWebNavigation)
-				.QueryInterface(Ci.nsIDocShellTreeItem)
-				.rootTreeItem
-				.QueryInterface(Ci.nsIInterfaceRequestor)
-				.getInterface(Ci.nsIDOMWindow);
 	}
 };
 

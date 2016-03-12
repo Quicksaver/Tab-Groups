@@ -1,4 +1,4 @@
-// VERSION 1.2.1
+// VERSION 1.2.2
 
 this.about = {
 	kNS: 'http://www.w3.org/1999/xhtml',
@@ -373,17 +373,7 @@ this.about = {
 	},
 
 	openAddonsMgr: function() {
-		this._getChrome().BrowserOpenAddonsMgr();
-	},
-
-	_getChrome: function() {
-		return window
-			.QueryInterface(Ci.nsIInterfaceRequestor)
-			.getInterface(Ci.nsIWebNavigation)
-			.QueryInterface(Ci.nsIDocShellTreeItem)
-			.rootTreeItem
-			.QueryInterface(Ci.nsIInterfaceRequestor)
-			.getInterface(Ci.nsIDOMWindow);
+		gWindow.BrowserOpenAddonsMgr();
 	}
 };
 
