@@ -1,4 +1,4 @@
-// VERSION 1.0.13
+// VERSION 1.0.14
 Modules.UTILS = true;
 
 // PrefPanes - handles the preferences tab and all its contents for the add-on
@@ -78,8 +78,8 @@ this.PrefPanes = {
 					classID: Components.ID(addonUUID),
 					contractID: '@mozilla.org/network/protocol/about;1?what='+objPathString,
 					QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule]),
-					newChannel: function(aURI) {
-						let chan = Services.io.newChannelFromURI(this.uri);
+					newChannel: function(aURI, aLoadInfo) {
+						let chan = Services.io.newChannelFromURIWithLoadInfo(this.uri, aLoadInfo);
 						chan.originalURI = aURI;
 						return chan;
 					},
