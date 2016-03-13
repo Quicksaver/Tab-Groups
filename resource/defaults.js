@@ -1,4 +1,4 @@
-// VERSION 1.4.2
+// VERSION 1.4.3
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -130,9 +130,7 @@ function onStartup() {
 	Modules.load('nativePrefs');
 	Modules.load('migrate');
 	Modules.load('compatibilityFix/sandboxFixes');
-	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
-		Modules.load('keysets');
-	}
+	Modules.load('keysets');
 
 	// Apply the add-on to every window opened and to be opened
 	Windows.callOnAll(startAddon, 'navigator:browser');
@@ -143,9 +141,7 @@ function onShutdown() {
 	// remove the add-on from all windows
 	Windows.callOnAll(stopAddon, null, null, true);
 
-	if(Services.vc.compare(Services.appinfo.version, "45.0a1") >= 0) {
-		Modules.unload('keysets');
-	}
+	Modules.unload('keysets');
 	Modules.unload('compatibilityFix/sandboxFixes');
 	Modules.unload('migrate');
 	Modules.unload('nativePrefs');

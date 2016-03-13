@@ -1,4 +1,4 @@
-// VERSION 1.0.7
+// VERSION 1.0.8
 
 // Prefs - Object to contain and manage all preferences related to the add-on (and others if necessary)
 this.__defineGetter__('Prefs', function() { delete this.Prefs; Modules.load('utils/Prefs'); return Prefs; });
@@ -42,9 +42,6 @@ this.toggleAttribute = function(obj, attr, condition, trueval, falseval) { loadA
 // trueAttribute() - checks if attr on obj has value 'true'; once again, I'm uber lazy
 this.trueAttribute = function(obj, attr) { loadAttributesTools(); return trueAttribute(obj, attr); };
 
-// innerText() - returns the equivalent of IE's .innerText property of node; essentially returns .textContent without the script tags
-this.innerText = function(node) { loadHTMLElementsTools(); return innerText(node); };
-
 // Piggyback - This module allows me to Piggyback methods of any object. It also gives me access to the CustomizableUI module backstage pass, so I can do the same to it.
 if(this.isChrome) {
 	this.__defineGetter__('Piggyback', function() { delete this.Piggyback; delete this.CustomizableUI; delete this.CUIBackstage; Modules.load('utils/Piggyback'); return Piggyback; });
@@ -74,10 +71,4 @@ this.loadAttributesTools = function() {
 	delete this.trueAttribute;
 	delete this.loadAttributesTools;
 	Modules.load('utils/attributes');
-};
-
-this.loadHTMLElementsTools = function() {
-	delete this.innerText;
-	delete this.loadHTMLElementsTools;
-	Modules.load('utils/HTMLElements');
 };
