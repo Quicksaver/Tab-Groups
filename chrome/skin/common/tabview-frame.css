@@ -490,8 +490,7 @@ input.name:focus::-moz-placeholder {
 
 /* Side buttons */
 
-#actions,
-#pinnedTabs {
+#actions {
 	position: absolute;
 	top: 0px;
 	right: -3px;
@@ -503,13 +502,12 @@ input.name:focus::-moz-placeholder {
 	border-radius: 0.4em;
 }
 
-html[dir=rtl] #actions,
-html[dir=rtl] #pinnedTabs {
+html[dir=rtl] #actions {
 	right: auto;
 	left: -3px;
 }
 
-.tabview-button {
+#actions input {
 	background-color: transparent;
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
@@ -520,7 +518,7 @@ html[dir=rtl] #pinnedTabs {
 	height: 24px;
 }
 
-.tabview-button:hover {
+#actions input:hover {
 	cursor: pointer;
 	background-color: rgba(128,128,128,.15);
 }
@@ -540,16 +538,12 @@ html[dir=rtl] #pinnedTabs {
 /* Pinned Tabs group */
 
 #pinnedTabs {
-	top: 135px;
+	margin-top: 3px;
+	padding-top: 3px;
 }
 
 .appTabIcon {
-	width: 16px;
-	height: 16px;
-	cursor: pointer;
-	opacity: 0.8;
-	padding: 4px;
-	display: block;
+	background-size: 18px 18px;
 }
 
 /* Search */

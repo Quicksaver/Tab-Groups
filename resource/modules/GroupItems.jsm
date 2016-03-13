@@ -1,4 +1,4 @@
-// VERSION 1.2.2
+// VERSION 1.2.3
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2325,9 +2325,10 @@ this.PinnedItems = {
 			// The tab might have been removed or unpinned while waiting.
 			if(!Utils.isValidXULTab(tab) || !tab.pinned) { return; }
 
-			let icon = document.createElement("img");
+			let icon = document.createElement("input");
 			icon.classList.add("appTabIcon");
-			icon.setAttribute("src", iconUrl);
+			icon.setAttribute('type', 'button');
+			icon.style.backgroundImage = "url('"+iconUrl+"')";
 			icon.handleEvent = function(e) {
 				// "click" event only
 				// left-clicks only

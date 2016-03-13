@@ -50,8 +50,7 @@ html[dir=rtl] .favicon {
 	background-image: -moz-image-rect(url("chrome://global/skin/icons/close.svg"), 0, 48, 16, 32);
 }
 
-.close:hover,
-.appTabIcon:hover {
+.close:hover {
 	opacity: 1.0;
 	transition-property: opacity;
 	transition-duration: 0.5s;
@@ -116,15 +115,13 @@ input.name:focus {
 
 /* Side buttons */
 
-#actions,
-#pinnedTabs {
+#actions {
 	border: 1px solid rgba(230,230,230,1);
 	background-color: rgba(248,248,248,1);
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) 1px 1px 3px;
 }
 
-html[dir=rtl] #actions,
-html[dir=rtl] #pinnedTabs {
+html[dir=rtl] #actions {
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) -1px 1px 3px;
 }
 
@@ -146,6 +143,12 @@ html[dir=rtl] #pinnedTabs {
 
 #exit-button[groups="3"] {
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 64, 16, 48);
+}
+
+/* Pinned Tabs group */
+
+#pinnedTabs {
+	border-top: 1px solid rgba(230,230,230,1);
 }
 
 /* Search */
