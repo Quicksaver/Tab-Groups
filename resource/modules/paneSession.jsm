@@ -1,4 +1,4 @@
-// VERSION 1.1.8
+// VERSION 1.1.9
 
 this.paneSession = {
 	manualAction: false,
@@ -932,7 +932,13 @@ this.paneSession = {
 				// Instead, we'll force an unloaded state of all tabs, since they will be forced to reload when reselected (we don't do this, SessionRestore does).
 				for(let tab of gWindow.gBrowser.tabs) {
 					if(!tab.pinned) {
-						tab.linkedBrowser.loadURI("about:blank");
+						let browser = tab.linkedBrowser;
+						// Browser freezes when trying to load a uri into a locked tab with TMP enabled;
+						// see http://tabmixplus.org/forum/viewtopic.php?f=2&t=19506&sid=84a9d8b600b8df0b83196f70e547a75e&p=70286#p70286
+						if(gWindow.Tabmix) {
+							browser.tabmix_allowLoad = true;
+						}
+						browser.loadURI("about:blank");
 					}
 				}
 
