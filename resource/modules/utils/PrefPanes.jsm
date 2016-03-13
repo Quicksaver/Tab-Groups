@@ -1,4 +1,4 @@
-// VERSION 1.0.14
+// VERSION 1.0.15
 Modules.UTILS = true;
 
 // PrefPanes - handles the preferences tab and all its contents for the add-on
@@ -57,15 +57,6 @@ this.PrefPanes = {
 	},
 
 	init: function() {
-		// we set the add-on status in the API webpage from within the add-on itself
-		Messenger.loadInAll('utils/api');
-
-		// always add the about pane to the preferences dialog, it should be the last category in the list
-		this.register('utils/about', { paneAbout: 'utils/about' });
-
-		Browsers.callOnAll(aWindow => { this.initWindow(aWindow); }, this.chromeUri);
-		Browsers.register(this, 'pageshow', this.chromeUri);
-
 		// if defaults.js supplies an addonUUID, use it to register the about: uri linking to the add-on's preferences
 		if(addonUUID) {
 			this.aboutUri = {
@@ -86,12 +77,20 @@ this.PrefPanes = {
 					getURIFlags: function(aURI) { return 0; }
 				},
 
+				loaded: function() {
+					return this.manager.isContractIDRegistered(this.handler.contractID);
+				},
+
 				load: function() {
-					this.manager.registerFactory(this.handler.classID, this.handler.classDescription, this.handler.contractID, this);
+					if(!this.loaded()) {
+						this.manager.registerFactory(this.handler.classID, this.handler.classDescription, this.handler.contractID, this);
+					}
 				},
 
 				unload: function() {
-					this.manager.unregisterFactory(this.handler.classID, this);
+					if(this.loaded()) {
+						this.manager.unregisterFactory(this.handler.classID, this);
+					}
 				},
 
 				createInstance: function(outer, iid) {
@@ -103,9 +102,26 @@ this.PrefPanes = {
 			};
 			this.aboutUri.load();
 
-			Browsers.callOnAll(aWindow => { this.initWindow(aWindow); }, this.aboutUri.spec);
-			Browsers.register(this, 'pageshow', this.aboutUri.spec);
+			if(isChrome) {
+				// We still need to register the about: handler in the content process, so that web navigation works;
+				// see https://bugzilla.mozilla.org/show_bug.cgi?id=1215793#c7
+				Messenger.loadInAll('utils/PrefPanes');
+				Browsers.callOnAll(aWindow => { this.initWindow(aWindow); }, this.aboutUri.spec);
+				Browsers.register(this, 'pageshow', this.aboutUri.spec);
+			}
 		}
+
+		// In the content process we really only need to register the about: handler.
+		if(isContent) { return; }
+
+		// we set the add-on status in the API webpage from within the add-on itself
+		Messenger.loadInAll('utils/api');
+
+		// always add the about pane to the preferences dialog, it should be the last category in the list
+		this.register('utils/about', { paneAbout: 'utils/about' });
+
+		Browsers.callOnAll(aWindow => { this.initWindow(aWindow); }, this.chromeUri);
+		Browsers.register(this, 'pageshow', this.chromeUri);
 
 		// if we're in a dev version, ignore all this
 		if(AddonData.version.includes('a') || AddonData.version.includes('b')) { return; }
@@ -128,6 +144,16 @@ this.PrefPanes = {
 	},
 
 	uninit: function() {
+		if(this.aboutUri) {
+			if(isChrome) {
+				Messenger.unloadFromAll('utils/PrefPanes');
+				Browsers.unregister(this, 'pageshow', this.aboutUri.spec);
+			}
+			this.aboutUri.unload();
+		}
+
+		if(isContent) { return; }
+
 		Messenger.unloadFromAll('utils/api');
 
 		this.closeAll();
@@ -136,11 +162,6 @@ this.PrefPanes = {
 		Styles.unload('PrefPanesXulFix');
 
 		Browsers.unregister(this, 'pageshow', this.chromeUri);
-
-		if(this.aboutUri) {
-			Browsers.unregister(this, 'pageshow', this.aboutUri.spec);
-			this.aboutUri.unload();
-		}
 	},
 
 	// we have to wait for Session Store to finish, otherwise our tab will be overriden by a session-restored tab
@@ -298,12 +319,15 @@ this.PrefPanes = {
 };
 
 Modules.LOADMODULE = function() {
-	Prefs.setDefaults({
-		lastPrefPane: '',
-		lastVersionNotify: '0',
-		showTabOnUpdates: true,
-		userNoticedTabOnUpdates: false
-	});
+	if(isChrome) {
+		// Initialize some pref dependencies.
+		Prefs.setDefaults({
+			lastPrefPane: '',
+			lastVersionNotify: '0',
+			showTabOnUpdates: true,
+			userNoticedTabOnUpdates: false
+		});
+	}
 
 	PrefPanes.init();
 };

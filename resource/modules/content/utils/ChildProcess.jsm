@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 // This script should be loaded by defaultsContent.js, which is in turn loaded directly by the Messenger module.
 // defaultsContent.js call its .init(objPathString, frame) method, where frame is the enviroment of the frame script.
@@ -455,6 +455,9 @@ var ChildProcess = {
 		'disable'
 	],
 
+	// modules that are found in modules/utils/ and not in modules/content/utils/
+	nonContentModules: new Set([ 'utils/PrefPanes' ]),
+
 	receiveMessage: function(m) {
 		let name = messageName(m);
 
@@ -534,11 +537,17 @@ var ChildProcess = {
 	},
 
 	loadModule: function(name) {
-		Modules.load('content/'+name);
+		if(!this.nonContentModules.has(name)) {
+			name = 'content/'+name;
+		}
+		Modules.load(name);
 	},
 
 	unloadModule: function(name) {
-		Modules.unload('content/'+name);
+		if(!this.nonContentModules.has(name)) {
+			name = 'content/'+name;
+		}
+		Modules.unload(name);
 	},
 
 	// clean up this object
