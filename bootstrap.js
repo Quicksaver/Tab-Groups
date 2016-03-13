@@ -1,4 +1,4 @@
-// VERSION 1.8.7
+// VERSION 1.8.8
 
 // This looks for file defaults.js in resource folder, expects:
 //	objName - (string) main object name for the add-on, to be added to window element
@@ -256,7 +256,21 @@ function startup(aData, aReason) {
 	Modules.load("utils/sandboxUtils");
 
 	if(typeof(startConditions) != 'function' || startConditions(aReason)) {
-		continueStartup(aReason);
+		if(aReason == APP_STARTUP) {
+			continueStartup(aReason);
+		}
+		// In non-e10s, loadFrameScript from this startup can run load content script even before the previous sandboxed content module had a chance to shutdown.
+		// Case: enable add-on (instance A). Disable add-on. Re-enable add-on (instance B).
+		// This has to happen in immediate succession, i.e. when updating add-on, but not only.
+		// Sandbox content B tries to load before sandbox A received the shutdown message, so sandbox B never loads (because A is still loaded).
+		// Then A receives the shutdown message, it shuts down, and we are left with nothing initialized in the child process.
+		// Here's hoping that a delay of 500ms covers the vast majority of cases, edge-cases (ultra-busy CPU during add-on update?) may still suffer from this.
+		// This doesn't seem to happen in e10s, but I'm leaving the delay there as well because why not. Maybe when e10s is norm this can be removed.
+		else {
+			aSync(function() {
+				continueStartup(aReason);
+			}, 500);
+		}
 	}
 }
 
