@@ -32,7 +32,7 @@ body {
 	-moz-border-end: 1px solid rgba(0, 0, 0, 0.3);
 }
 
-html[dir=rtl] .favicon {
+.favicon:-moz-locale-dir(rtl) {
 	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, 1px 0 0 rgba(225, 225, 225, 0.8) inset;
 }
 
@@ -76,7 +76,7 @@ html[dir=rtl] .favicon {
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) 1px 1px 3px;
 }
 
-html[dir=rtl] .groupItem {
+.groupItem:-moz-locale-dir(rtl) {
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) -1px 1px 3px;
 }
 
@@ -121,7 +121,7 @@ input.name:focus {
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) 1px 1px 3px;
 }
 
-html[dir=rtl] #actions {
+#actions:-moz-locale-dir(rtl) {
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) -1px 1px 3px;
 }
 

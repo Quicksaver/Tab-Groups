@@ -55,7 +55,7 @@ body {
 		0 0 5.5px #007ECE;
 }
 
-html[dir=rtl] .tab.focus .thumb {
+.tab.focus .thumb:-moz-locale-dir(rtl) {
 	box-shadow:
 		0 1px 0 #FFFFFF inset,
 		0 -1px 1px #FFFFFF inset,
@@ -81,7 +81,7 @@ html[dir=rtl] .tab.focus .thumb {
 		0 1px 3px rgba(4, 38, 60, 0.6);
 }
 
-html[dir=rtl] .groupItem {
+.groupItem:-moz-locale-dir(rtl) {
 	box-shadow:
 		0 1px 0 #FFFFFF inset,
 		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
@@ -132,7 +132,7 @@ input.name:focus {
 		0 1px 3px rgba(4, 38, 60, 0.6);
 }
 
-html[dir=rtl] #actions {
+#actions:-moz-locale-dir(rtl) {
 	box-shadow:
 		0 1px 0 #FFFFFF inset,
 		0 -1px 1px rgba(255, 255, 255, 0.8) inset,

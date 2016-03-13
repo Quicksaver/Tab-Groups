@@ -1,4 +1,4 @@
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 this.Keys = { meta: false };
 
@@ -274,9 +274,6 @@ this.UI = {
 	// Must be called after the object is created.
 	init: function() {
 		try {
-			// initialize the direction of the page
-			this._initPageDirection();
-
 			if(Storage.readWindowBusyState(gWindow)) {
 				this.storageBusy();
 			}
@@ -432,7 +429,7 @@ this.UI = {
 		if(actions) {
 			let $actions = iQ(actions);
 			pageBounds.width -= $actions.width();
-			if(UI.rtl) {
+			if(RTL) {
 				pageBounds.left += $actions.width() - padding;
 			}
 		}
@@ -441,7 +438,7 @@ this.UI = {
 		let box = new Rect(pageBounds);
 		box.width = Math.min(box.width * 0.667, pageBounds.width - (welcomeWidth + padding));
 		box.height = box.height * 0.667;
-		if(UI.rtl) {
+		if(RTL) {
 			box.left = pageBounds.left + welcomeWidth + 2 * padding;
 		}
 
@@ -603,14 +600,6 @@ this.UI = {
 		this._activeTab.parent.reorderTabItemsBasedOnTabOrder();
 	},
 
-	// Initializes the page base direction
-	_initPageDirection: function() {
-		let chromeReg = Cc["@mozilla.org/chrome/chrome-registry;1"].getService(Ci.nsIXULChromeRegistry);
-		let dir = chromeReg.isLocaleRTL("global");
-		document.documentElement.setAttribute("dir", dir ? "rtl" : "ltr");
-		this.rtl = dir;
-	},
-
 	// Returns a <Rect> defining the area of the page <Item>s should stay within.
 	getPageBounds: function() {
 		let width = Math.max(100, window.innerWidth);
@@ -631,9 +620,6 @@ this.UI = {
 		let tabStrip = gBrowser.tabContainer.mTabstrip;
 		this._originalSmoothScroll = tabStrip.smoothScroll;
 		tabStrip.smoothScroll = false;
-
-		// initialize the direction of the page
-		this._initPageDirection();
 
 		let currentTab = this._currentTab;
 
@@ -1352,7 +1338,7 @@ this.UI = {
 		let pairs = [];
 		for(let item of GroupItems) {
 			let bounds = item.getBounds();
-			bounds.left += (UI.rtl ? -1 : 1) * (newPageBounds.left - this._pageBounds.left);
+			bounds.left += (RTL ? -1 : 1) * (newPageBounds.left - this._pageBounds.left);
 			bounds.left *= scale;
 			bounds.width *= scale;
 

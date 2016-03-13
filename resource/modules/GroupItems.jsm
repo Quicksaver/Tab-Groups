@@ -1,4 +1,4 @@
-// VERSION 1.2.3
+// VERSION 1.2.4
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1377,7 +1377,7 @@ this.GroupItem.prototype = {
 			}
 
 			child.setZ(zIndex--);
-			child.setRotation((UI.rtl ? -1 : 1) * angleAccum);
+			child.setRotation((RTL ? -1 : 1) * angleAccum);
 			child.hidden = false;
 			angleAccum += angleDelta;
 		}

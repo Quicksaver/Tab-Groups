@@ -93,21 +93,21 @@ body.DraggingTab .tab * {
 	background-position: center center;
 }
 
-html[dir=ltr] .favicon {
+.favicon:-moz-locale-dir(ltr) {
 	border-bottom-right-radius: 0.4em;
 }
 
-html[dir=rtl] .favicon {
+.favicon:-moz-locale-dir(rtl) {
 	border-bottom-left-radius: 0.4em;
 }
 
 .tab:not(.stacked) .favicon { top: 0; }
-html[dir=ltr] .tab:not(.stacked) .favicon { left: 0; }
-html[dir=rtl] .tab:not(.stacked) .favicon { right: 0; }
+.tab:not(.stacked) .favicon:-moz-locale-dir(ltr) { left: 0; }
+.tab:not(.stacked) .favicon:-moz-locale-dir(rtl) { right: 0; }
 
 .tab.stacked .favicon { top: 1px; }
-html[dir=ltr] .tab.stacked .favicon { left: 1px; }
-html[dir=rtl] .tab.stacked .favicon { right: 1px; }
+.tab.stacked .favicon:-moz-locale-dir(ltr) { left: 1px; }
+.tab.stacked .favicon:-moz-locale-dir(rtl) { right: 1px; }
 
 /* Apply crisp rendering for favicons at exactly 2dppx resolution */
 @media (resolution: 2dppx) {
@@ -129,11 +129,11 @@ html[dir=rtl] .tab.stacked .favicon { right: 1px; }
 	height: 22px;
 }
 
-html[dir=ltr] .tab .close {
+.tab .close:-moz-locale-dir(ltr) {
 	right: 0;
 }
 
-html[dir=rtl] .tab .close {
+.tab .close:-moz-locale-dir(rtl) {
 	left: 0;
 }
 
@@ -169,7 +169,7 @@ html[dir=rtl] .tab .close {
 	box-shadow: rgba(0,0,0,.2) 1px 1px 4px;
 }
 
-html[dir=rtl] .stacked .thumb {
+.stacked .thumb:-moz-locale-dir(rtl) {
 	box-shadow: rgba(0,0,0,.2) -1px 1px 4px;
 }
 
@@ -179,7 +179,7 @@ html[dir=rtl] .stacked .thumb {
 	font-size: 11px;
 }
 
-html[dir=rtl] .stack-trayed .tab-title {
+.stack-trayed .tab-title:-moz-locale-dir(rtl) {
 	text-shadow: rgba(0,0,0,1) -1px 1px 1.5px;
 }
 
@@ -208,7 +208,7 @@ body:not(.searching) .groupItem:not(.phantom) {
 	box-shadow: rgba(0,0,0,0.8) 2px 2px 8px;
 }
 
-html[dir=rtl] .groupItem.activeGroupItem {
+.groupItem.activeGroupItem:-moz-locale-dir(rtl) {
 	box-shadow: rgba(0,0,0,0.8) -2px 2px 8px;
 }
 
@@ -240,7 +240,7 @@ html[dir=rtl] .groupItem.activeGroupItem {
 	border-radius: 0.4em;
 }
 
-html[dir=rtl] .overlay {
+.overlay:-moz-locale-dir(rtl) {
 	box-shadow: -3px 3px 5.5px rgba(0,0,0,.5);
 }
 
@@ -293,7 +293,7 @@ html[dir=rtl] .overlay {
 	box-shadow: 1px 1px 0 ThreeDShadow;
 }
 
-html[dir=rtl] .guideTrench {
+.guideTrench:-moz-locale-dir(rtl) {
 	box-shadow: -1px 1px 0 ThreeDShadow;
 }
 
@@ -336,7 +336,7 @@ html[dir=rtl] .guideTrench {
 	box-shadow: 5px 5px 3px rgba(0,0,0,.5);
 }
 
-html[dir=rtl] .active {
+.active:-moz-locale-dir(rtl) {
 	box-shadow: -5px 5px 3px rgba(0,0,0,.5);
 }
 
@@ -346,7 +346,7 @@ html[dir=rtl] .active {
 	box-shadow: 2px 2px 7px -1px rgba(0,0,0,.6);
 }
 
-html[dir=rtl] .groupItem.dragOver {
+.groupItem.dragOver:-moz-locale-dir(rtl) {
 	box-shadow: -2px 2px 7px -1px rgba(0,0,0,.6);
 }
 
@@ -371,7 +371,7 @@ input.name {
 	padding: 1px;
 }
 
-html[dir=rtl] input.name {
+input.name:-moz-locale-dir(rtl) {
 	background-position: right top;
 }
 
@@ -502,7 +502,7 @@ input.name:focus::-moz-placeholder {
 	border-radius: 0.4em;
 }
 
-html[dir=rtl] #actions {
+#actions:-moz-locale-dir(rtl) {
 	right: auto;
 	left: -3px;
 }
@@ -573,7 +573,7 @@ body:not(.searching) #search {
 	height: 100%;
 }
 
-html[dir=rtl] #search {
+#search:-moz-locale-dir(rtl) {
 	left: auto;
 	right: 0;
 }
@@ -596,7 +596,7 @@ html[dir=rtl] #search {
 	font-size: 14px;
 }
 
-html[dir=rtl] #searchbox {
+#searchbox:-moz-locale-dir(rtl) {
 	right: auto;
 	left: 20px;
 }

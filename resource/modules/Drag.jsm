@@ -1,4 +1,4 @@
-// VERSION 2.0.1
+// VERSION 2.0.2
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -126,7 +126,7 @@ this.GroupDrag.prototype = {
 	//   assumeConstantSize - (boolean) whether the bounds' dimensions are sacred or not.
 	snapBounds: function(bounds, stationaryCorner, assumeConstantSize) {
 		if(!stationaryCorner) {
-			stationaryCorner = UI.rtl ? 'topright' : 'topleft';
+			stationaryCorner = RTL ? 'topright' : 'topleft';
 		}
 		let update = false; // need to update
 		let updateX = false;

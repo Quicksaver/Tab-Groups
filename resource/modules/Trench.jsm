@@ -1,4 +1,4 @@
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 // Class: Trench - Class for drag-snapping regions; called "trenches" as they are long and narrow.
 // Parameters:
@@ -411,7 +411,7 @@ this.Trenches = {
 	//   preferTop - (boolean) prefer snapping to the top to the bottom
 	//   preferLeft - (boolean) prefer snapping to the left to the right
 	preferTop: true,
-	get preferLeft() { return !UI.rtl; },
+	get preferLeft() { return !RTL; },
 
 	trenches: new Map(),
 
