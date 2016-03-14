@@ -8,7 +8,7 @@ body {
 	font-size: 13px;
 }
 
-#bg:not(:-moz-system-metric(windows-compositor)) {
+body:not(:-moz-system-metric(windows-compositor)) {
 	background: url("chrome://tabgroups-os/skin/grain.png") repeat scroll center top, linear-gradient(#CCD9EA, #C7D5E7) repeat scroll 0 0;
 }
 

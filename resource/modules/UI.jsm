@@ -1,4 +1,4 @@
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 this.Keys = { meta: false };
 
@@ -129,7 +129,7 @@ this.UI = {
 						this.goToPreferences({ jumpto: 'sessionRestore' });
 						break;
 
-					// target == document
+					// target == GroupItems.workSpace
 					default: {
 						let focused = $$(":focus");
 						if(focused.length > 0) {
@@ -140,7 +140,7 @@ this.UI = {
 								}
 							}
 						}
-						if(e.originalTarget.id == "content" && e.button == 0 && e.detail == 1) {
+						if(e.originalTarget == GroupItems.workSpace && e.button == 0 && e.detail == 1) {
 							this._createGroupItemOnDrag(e);
 						}
 						break;
@@ -149,7 +149,7 @@ this.UI = {
 				break;
 
 			case 'dblclick': {
-				if(e.originalTarget.id != "content") { return; }
+				if(e.originalTarget != GroupItems.workSpace) { return; }
 
 				// Create a group with one tab on double click
 				let w = TabItems.tabWidth;
@@ -183,7 +183,7 @@ this.UI = {
 				break;
 
 			case 'dragover':
-				if(DraggingTab && e.target.id == 'content') {
+				if(DraggingTab && e.target == GroupItems.workSpace) {
 					DraggingTab.canDrop(e, e.target);
 				}
 				break;
@@ -422,17 +422,7 @@ this.UI = {
 
 		let padding = Trenches.defaultRadius;
 		let welcomeWidth = 300;
-		let pageBounds = this.getPageBounds();
-		pageBounds.inset(padding, padding);
-
-		let actions = $("actions");
-		if(actions) {
-			let $actions = iQ(actions);
-			pageBounds.width -= $actions.width();
-			if(RTL) {
-				pageBounds.left += $actions.width() - padding;
-			}
-		}
+		let pageBounds = GroupItems.getSafeWindowBounds();
 
 		// ___ make a fresh groupItem
 		let box = new Rect(pageBounds);
@@ -602,8 +592,8 @@ this.UI = {
 
 	// Returns a <Rect> defining the area of the page <Item>s should stay within.
 	getPageBounds: function() {
-		let width = Math.max(100, window.innerWidth);
-		let height = Math.max(100, window.innerHeight);
+		let width = Math.max(100, GroupItems.workSpace.scrollWidth);
+		let height = Math.max(100, GroupItems.workSpace.scrollHeight);
 		return new Rect(0, 0, width, height);
 	},
 
@@ -1244,7 +1234,7 @@ this.UI = {
 		phantom.classList.add("phantom");
 		phantom.classList.add("activeGroupItem");
 		phantom.classList.add("dragRegion");
-		document.body.appendChild(phantom);
+		GroupItems.workSpace.appendChild(phantom);
 
 		// a faux-Item
 		let item = {

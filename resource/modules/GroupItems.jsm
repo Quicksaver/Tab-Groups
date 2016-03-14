@@ -1,4 +1,4 @@
-// VERSION 1.2.4
+// VERSION 1.2.5
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -67,7 +67,7 @@ this.GroupItem = function(listOfEls, options) {
 
 	this.isDragging = false;
 	this.isResizing = false;
-	document.body.appendChild(this.container);
+	GroupItems.workSpace.appendChild(this.container);
 
 	// ___ Titlebar
 	this.titlebar = document.createElement('div');
@@ -942,7 +942,7 @@ this.GroupItem.prototype = {
 		this.undoContainer = document.createElement('div');
 		this.undoContainer.classList.add('undo');
 		this.undoContainer.setAttribute('type', 'button');
-		document.body.appendChild(this.undoContainer);
+		GroupItems.workSpace.appendChild(this.undoContainer);
 
 		let $undoContainer = iQ(this.undoContainer);
 
@@ -1188,7 +1188,8 @@ this.GroupItem.prototype = {
 			if(closed || (!this.children.length && !Tabs.numPinned && !item.isDragging)) {
 				this._makeLastActiveGroupItemActive();
 			} else if(!options.dontArrange) {
-				this._unfreezeItemSize();
+				this._unfreezeItemSize(true);
+				this.arrange();
 			}
 
 			this._sendToSubscribers("childRemoved", { item: item });
@@ -1553,7 +1554,8 @@ this.GroupItem.prototype = {
 		}
 
 		this.contents.insertBefore(this.tabContainer, this.contents.firstChild);
-		this._unfreezeItemSize();
+		this._unfreezeItemSize(true);
+		this.arrange();
 	},
 
 	// Creates a new tab within this groupItem.
@@ -1624,7 +1626,7 @@ this.GroupItems = {
 	_removingHiddenGroups: false,
 	_autoclosePaused: false,
 	_lastActiveList: null,
-	workSpace: document,
+	workSpace: $('groups'),
 
 	get size() { return this.groupItems.size; },
 	[Symbol.iterator]: function* () {
@@ -2073,9 +2075,7 @@ this.GroupItems = {
 			groupItem.add(tab._tabViewTabItem);
 			groupItem.reorderTabsBasedOnTabItemOrder()
 		} else {
-			let pageBounds = UI.getPageBounds();
-			pageBounds.inset(20, 20);
-
+			let pageBounds = this.getSafeWindowBounds();
 			let box = new Rect(pageBounds);
 			box.width = 250;
 			box.height = 200;
@@ -2114,7 +2114,7 @@ this.GroupItems = {
 		// the safe bounds that would keep it "in the window"
 		let gutter = this.defaultGutter;
 		let topGutter = this.topGutter;
-		return new Rect(gutter, topGutter, window.innerWidth - 2 * gutter, window.innerHeight - gutter - topGutter);
+		return new Rect(gutter, topGutter, this.workSpace.scrollWidth - 2 * gutter, this.workSpace.scrollHeight - gutter - topGutter);
 	},
 
 	// Checks to see which items can now be unsquished.

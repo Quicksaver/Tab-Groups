@@ -1,4 +1,4 @@
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 // Class: Trench - Class for drag-snapping regions; called "trenches" as they are long and narrow.
 // Parameters:
@@ -171,7 +171,7 @@ this.Trench.prototype = {
 				this.dom.guideTrench = guideTrench;
 			}
 			iQ(guideTrench).css(this.guideRect);
-			document.body.appendChild(guideTrench);
+			GroupItems.workSpace.appendChild(guideTrench);
 		} else {
 			if(this.dom.guideTrench) {
 				this.dom.guideTrench.remove();
@@ -210,8 +210,8 @@ this.Trench.prototype = {
 
 		iQ(visibleTrench).css(this.rect);
 		iQ(activeVisibleTrench).css(this.activeRect || this.rect);
-		document.body.appendChild(visibleTrench);
-		document.body.appendChild(activeVisibleTrench);
+		GroupItems.workSpace.appendChild(visibleTrench);
+		GroupItems.workSpace.appendChild(activeVisibleTrench);
 	},
 
 	// Hide the trench.
