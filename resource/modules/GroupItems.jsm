@@ -1,4 +1,4 @@
-// VERSION 1.2.5
+// VERSION 1.2.6
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1220,7 +1220,7 @@ this.GroupItem.prototype = {
 		let box = this.getContentBounds();
 		let arrObj = TabItems.arrange(this.children, box);
 
-		let shouldStack = arrObj.tabWidth < TabItems.minTabWidth;
+		let shouldStack = arrObj.tabWidth < TabItems.minTabWidth || arrObj.tabHeight < TabItems.minTabHeight;
 		this._columns = shouldStack ? null : arrObj.columns;
 
 		return shouldStack;

@@ -1,4 +1,4 @@
-// VERSION 1.1.4
+// VERSION 1.1.5
 
 this.Keys = { meta: false };
 
@@ -411,9 +411,6 @@ this.UI = {
 		// we can't very well see the preferences if we're still in tabview
 		this.hideTabView();
 	},
-
-	// Returns true if we are in RTL mode, false otherwise
-	rtl: false,
 
 	// Resets the Panorama view to have just one group with all tabs
 	reset: function() {

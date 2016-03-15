@@ -1,4 +1,4 @@
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -801,20 +801,20 @@ this.TabItems = {
 
 	// Private method that returns the fontsize to use given the tab's width
 	getFontSizeFromWidth: function(width) {
-		let widthRange = new Range(0, TabItems.tabWidth);
-		let proportion = widthRange.proportion(width - TabItems.tabItemPadding.x, true);
+		let widthRange = new Range(0, this.tabWidth);
+		let proportion = widthRange.proportion(width - this.tabItemPadding.x, true);
 		// proportion is in [0,1]
-		return Math.max(TabItems.fontSizeRange.scale(proportion), TabItems.fontSizeRange.min);
+		return Math.max(this.fontSizeRange.scale(proportion), this.fontSizeRange.min);
 	},
 
 	// Private method that returns the tabitem width given a height.
 	_getWidthForHeight: function(height) {
-		return height * TabItems.invTabAspect;
+		return height * this.invTabAspect;
 	},
 
 	// Private method that returns the tabitem height given a width.
 	_getHeightForWidth: function(width) {
-		return width * TabItems.tabAspect;
+		return width * this.tabAspect;
 	},
 
 	// Arranges the given items in a grid within the given bounds, maximizing item size but maintaining standard tab aspect ratio for each
@@ -833,9 +833,9 @@ this.TabItems = {
 		let tabHeight;
 		let totalHeight;
 
-		let figure = function() {
+		let figure = () => {
 			rows = Math.ceil(count / columns);
-			let validSize = TabItems.calcValidSize(new Point(bounds.width / columns, -1));
+			let validSize = this.calcValidSize(new Point(bounds.width / columns, -1));
 			tabWidth = validSize.x;
 			tabHeight = validSize.y;
 
@@ -849,21 +849,21 @@ this.TabItems = {
 		}
 
 		if(rows == 1) {
-			let validSize = TabItems.calcValidSize(new Point(tabWidth, bounds.height));
+			let validSize = this.calcValidSize(new Point(tabWidth, bounds.height));
 			tabWidth = validSize.x;
 			tabHeight = validSize.y;
 		}
 
-		tabWidth = Math.floor(tabWidth) -TabItems.tabItemPadding.x;
-		tabHeight = Math.floor(tabHeight) -TabItems.tabItemPadding.y;
+		tabWidth = Math.floor(tabWidth) -this.tabItemPadding.x;
+		tabHeight = Math.floor(tabHeight) -this.tabItemPadding.y;
 
 		return { tabWidth, tabHeight, columns, rows };
 	},
 
 	// Pass in a desired size, and receive a size based on proper title size and aspect ratio.
 	calcValidSize: function(size) {
-		let width = Math.max(TabItems.minTabWidth, size.x);
-		let height = Math.max(TabItems.minTabHeight, size.y);
+		let width = Math.max(this.minTabWidth, size.x);
+		let height = Math.max(this.minTabHeight, size.y);
 		let retSize = new Point(width, height);
 
 		if(size.x > -1) {
