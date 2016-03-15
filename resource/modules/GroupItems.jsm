@@ -1,4 +1,4 @@
-// VERSION 1.2.7
+// VERSION 1.2.8
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1316,8 +1316,8 @@ this.GroupItem.prototype = {
 		// x is the left margin that the stack will have, within the content area (bb)
 		// y is the vertical margin
 		let position = {
-			x: (bb.width - size.x) / 2,
-			y: (bb.height - size.y) / 2
+			x: (bb.width - size.x - TabItems.tabItemPadding.x) / 2,
+			y: (bb.height - size.y - TabItems.tabItemPadding.y) / 2
 		};
 
 		let sscode = '\
