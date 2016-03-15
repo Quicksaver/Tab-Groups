@@ -1,4 +1,4 @@
-// VERSION 1.2.6
+// VERSION 1.2.7
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -135,23 +135,6 @@ this.GroupItem = function(listOfEls, options) {
 	this.titleShield = document.createElement('div');
 	this.titleShield.classList.add('title-shield');
 	this.titleShield.setAttribute('title', Strings.get("TabView", "groupItemDefaultName"));
-	this.titleShield.handleEvent = (e) => {
-		switch(e.type) {
-			case 'mousedown':
-				this.lastMouseDownTarget = (e.button == 0 ? e.target : null);
-				break;
-
-			case 'mouseup':
-				let same = (e.target == this.lastMouseDownTarget);
-				this.lastMouseDownTarget = null;
-				if(same && !this.isDragging && !this.isResizing) {
-					this.focusTitle();
-				}
-				break;
-		}
-	};
-	this.titleShield.addEventListener('mousedown', this.titleShield);
-	this.titleShield.addEventListener('mouseup', this.titleShield);
 	tbContainer.appendChild(this.titleShield);
 
 	this.setTitle(options.title);
@@ -642,12 +625,16 @@ this.GroupItem.prototype = {
 				this.lastMouseDownTarget = null;
 
 				if(!this.childHandling && same && !this.isDragging && !this.isResizing) {
-					if(Tabs.selected.pinned
+					if(e.target == this.titleShield) {
+						this.focusTitle();
+					}
+					else if(Tabs.selected.pinned
 					&& UI.getActiveTab() != this.getActiveTab()
 					&& this.children.length) {
 						UI.setActive(this, { dontSetActiveTabInGroup: true });
 						UI.goToTab(Tabs.selected);
-					} else {
+					}
+					else {
 						let tabItem = this.getTopChild();
 						if(tabItem) {
 							tabItem.zoomIn();
@@ -672,11 +659,9 @@ this.GroupItem.prototype = {
 					}
 					else if(this.closeButton != e.target
 					&& this.expander != e.target) {
+						this.lastMouseDownTarget = e.target;
 						if(!this.childHandling) {
 							new GroupDrag(this, e);
-						}
-						if(!isAncestor(e.target, this.titlebar)) {
-							this.lastMouseDownTarget = e.target;
 						}
 					}
 				}
