@@ -1,15 +1,11 @@
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
 // Class: TabItem - An <Item> that represents a tab.
 // Parameters:
 //   tab - a xul:tab
-this.TabItem = function(tab, options) {
-	if(!options) {
-		options = {};
-	}
-
+this.TabItem = function(tab, options = {}) {
 	Subscribable(this);
 
 	this.tab = tab;
@@ -819,13 +815,12 @@ this.TabItems = {
 
 	// Arranges the given items in a grid within the given bounds, maximizing item size but maintaining standard tab aspect ratio for each
 	// Parameters:
-	//   items - an array of <TabItem>s. Can be null.
+	//   count - number of items to be arranged within bounds.
 	//   bounds - a <Rect> defining the space to arrange within
 	//   columns - pass an initial value for the number of columns to assume the items will be displayed in, if not set the loop will start at 1
 	// Returns:
-	//   an object with the width value of the child items (`tabWIdth` and `tabHeight`) and the number of columns (`columns`).
-	arrange: function(items, bounds, columns) {
-		let count = items.length;
+	//   an object with the width value of the child items (`tabWIdth` and `tabHeight`) and the number of columns (`columns`) and rows (`rows`).
+	arrange: function(count, bounds, columns) {
 		columns = columns || 1;
 		// We'll assume that all the items have the same styling and that the margin is the same width around.
 		let rows;

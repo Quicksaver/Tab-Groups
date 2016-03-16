@@ -1,4 +1,4 @@
-// VERSION 2.0.2
+// VERSION 2.0.3
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -57,6 +57,9 @@ this.GroupDrag.prototype = {
 			}
 
 			this.started = true;
+		}
+		else {
+			this.el.classList.add('resizing');
 		}
 
 		this.item.isDragging = true;
@@ -124,10 +127,7 @@ this.GroupDrag.prototype = {
 	//   stationaryCorner   - which corner is stationary? by default, the top left in LTR mode, and top right in RTL mode.
 	//                        "topleft", "bottomleft", "topright", "bottomright"
 	//   assumeConstantSize - (boolean) whether the bounds' dimensions are sacred or not.
-	snapBounds: function(bounds, stationaryCorner, assumeConstantSize) {
-		if(!stationaryCorner) {
-			stationaryCorner = RTL ? 'topright' : 'topleft';
-		}
+	snapBounds: function(bounds, stationaryCorner = RTL ? 'topright' : 'topleft', assumeConstantSize) {
 		let update = false; // need to update
 		let updateX = false;
 		let updateY = false;
@@ -345,6 +345,7 @@ this.GroupDrag.prototype = {
 		this.item.isDragging = false;
 		this.item.isResizing = false;
 		this.el.classList.remove('dragging');
+		this.el.classList.remove('resizing');
 
 		this.item.pushAway(immediately);
 

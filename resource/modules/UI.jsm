@@ -1,4 +1,4 @@
-// VERSION 1.1.5
+// VERSION 1.1.6
 
 this.Keys = { meta: false };
 
@@ -511,17 +511,17 @@ this.UI = {
 	// Parameters:
 	// options
 	//  dontSetActiveTabInGroup bool for not setting active tab in group
-	setActive: function(item, options) {
+	setActive: function(item, options = {}) {
 		if(item.isATabItem) {
 			if(item.parent) {
 				GroupItems.setActiveGroupItem(item.parent);
 			}
-			if(!options || !options.dontSetActiveTabInGroup) {
+			if(!options.dontSetActiveTabInGroup) {
 				this._setActiveTab(item);
 			}
 		} else {
 			GroupItems.setActiveGroupItem(item);
-			if(!options || !options.dontSetActiveTabInGroup) {
+			if(!options.dontSetActiveTabInGroup) {
 				let activeTab = item.getActiveTab();
 				if(activeTab) {
 					this._setActiveTab(activeTab);
@@ -891,22 +891,6 @@ this.UI = {
 
 		setAttribute(this.exitBtn, "groups", numberOfGroups);
 		gTabView.updateGroupNumberBroadcaster(numberOfGroups);
-	},
-
-	// Convenience function to get the next tab closest to the entered position
-	getClosestTab: function(tabCenter) {
-		let cl = null;
-		let clDist;
-		for(let item of TabItems) {
-			if(!item.parent || item.parent.hidden) { continue; }
-
-			let testDist = tabCenter.distance(item.getBounds().center());
-			if(cl == null || testDist < clDist) {
-				cl = item;
-				clDist = testDist;
-			}
-		}
-		return cl;
 	},
 
 	// Sets up the allowed browser keys using key elements.
@@ -1532,11 +1516,7 @@ this.UI = {
 		}
 	},
 
-	tempShowBanner: function(banner, duration) {
-		if(!duration) {
-			duration = 5000;
-		}
-
+	tempShowBanner: function(banner, duration = 5000) {
 		banner.handleEvent = function(e) {
 			if(trueAttribute(this, 'show')) {
 				this._tempShowBanner = aSync(() => {

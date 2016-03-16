@@ -319,12 +319,13 @@ body:not(.searching) .groupItem:not(.phantom) {
 
 /* Other */
 
-.dragging {
+.groupItem.dragging,
+.groupItem.resizing {
 	z-index: 100;
 }
 
-.dragging,
-.dragging * {
+.groupItem.dragging,
+.groupItem.dragging * {
 	cursor: grabbing !important;
 }
 

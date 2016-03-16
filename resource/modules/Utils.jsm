@@ -1,4 +1,4 @@
-// VERSION 1.2.0
+// VERSION 1.2.1
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -333,39 +333,6 @@ this.Utils = {
 	merge: function(first, second) {
 		Array.forEach(second, el => Array.push(first, el));
 		return first;
-	},
-
-	// Pass several objects in and it will combine them all into the first object and return it.
-	extend: function() {
-		// copy reference to target object
-		let target = arguments[0] || {};
-
-		// Handle case when target is a string or something
-		if(typeof(target) != "object" && typeof(target) != "function") {
-			target = {};
-		}
-
-		let length = arguments.length;
-		for(let i = 1; i < length; i++) {
-			// Only deal with non-null/undefined values
-			let options = arguments[i];
-			if(options) {
-				// Extend the base object
-				for(let name in options) {
-					let copy = options[name];
-
-					// Prevent never-ending loop
-					if(target === copy) { continue; }
-
-					if(copy !== undefined) {
-						target[name] = copy;
-					}
-				}
-			}
-		}
-
-		// Return the modified object
-		return target;
 	}
 };
 

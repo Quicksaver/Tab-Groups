@@ -1,4 +1,4 @@
-// VERSION 1.2.0
+// VERSION 1.2.1
 
 // Returns an iQClass object which represents an individual element. selector can only be a DOM node.
 // I'm keeping this only because I don't feel like rewritting all the bounds/animation/fadein/out code.
@@ -77,16 +77,17 @@ this.iQClass.prototype = {
 		for(let key in properties) {
 			let value = properties[key];
 
-			if(pixels[key] && typeof value != 'string') {
-				value += 'px';
-			}
-
 			if(value == null) {
 				this.context.style.removeProperty(key);
-			} else if(key.indexOf('-') != -1) {
-				this.context.style.setProperty(key, value, '');
 			} else {
-				this.context.style[key] = value;
+				if(pixels[key] && typeof value != 'string') {
+					value += 'px';
+				}
+				if(key.indexOf('-') != -1) {
+					this.context.style.setProperty(key, value, '');
+				} else {
+					this.context.style[key] = value;
+				}
 			}
 		}
 
@@ -103,11 +104,7 @@ this.iQClass.prototype = {
 	//     "tabviewBounce", "easeInQuad". Default is "ease".
 	//   complete - function to call once the animation is done, takes nothing
 	//     in, but "this" is set to the element that was animated.
-	animate: function(css, options) {
-		if(!options) {
-			options = {};
-		}
-
+	animate: function(css, options = {}) {
 		let easings = {
 			tabviewBounce: "cubic-bezier(0.0, 0.63, .6, 1.29)",
 			easeInQuad: 'ease-in', // TODO: make it a real easeInQuad, or decide we don't care

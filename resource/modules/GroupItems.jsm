@@ -1,4 +1,4 @@
-// VERSION 1.2.8
+// VERSION 1.2.9
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -12,11 +12,7 @@
 //   title - the title for the groupItem; otherwise blank
 //   focusTitle - focus the title's input field after creation
 //   immediately - true if we want all placement immediately, not with animation
-this.GroupItem = function(listOfEls, options) {
-	if(!options) {
-		options = {};
-	}
-
+this.GroupItem = function(listOfEls, options = {}) {
 	Subscribable(this);
 
 	this._inited = false;
@@ -34,6 +30,7 @@ this.GroupItem = function(listOfEls, options) {
 
 	this._itemSizeFrozen = false;
 	this._delaySetCurrentSize = null;
+	this._lastArrange = null;
 
 	// A <Point> that describes the last size specifically chosen by the user.
 	this.userSize = null;
@@ -179,7 +176,7 @@ this.GroupItem = function(listOfEls, options) {
 
 	// ___ Children
 	// We explicitly set dontArrange=true to prevent the groupItem from re-arranging its children after a tabItem has been added.
-	// This saves us a group.arrange() call per child and therefore some tab.setBounds() calls.
+	// This saves us a group.arrange() call per child.
 	options.dontArrange = true;
 	for(let el of listOfEls) {
 		this.add(el, options);
@@ -303,14 +300,10 @@ this.GroupItem.prototype = {
 	//   options - an object with additional parameters, see below
 	// Possible options:
 	//   force - true to always update the DOM even if the bounds haven't changed; default false
-	setBounds: function(inRect, immediately, options) {
+	setBounds: function(inRect, immediately, options = {}) {
 		// Validate and conform passed in size
 		let validSize = GroupItems.calcValidSize(new Point(inRect.width, inRect.height));
 		let rect = new Rect(inRect.left, inRect.top, validSize.x, validSize.y);
-
-		if(!options) {
-			options = {};
-		}
 
 		// ___ Determine what has changed
 		let css = {};
@@ -332,8 +325,6 @@ this.GroupItem.prototype = {
 		}
 
 		if(Utils.isEmptyObject(css)) { return; }
-
-		let offset = new Point(rect.left - this.bounds.left, rect.top - this.bounds.top);
 		this.bounds = new Rect(rect);
 
 		// ___ Update our representation
@@ -361,14 +352,10 @@ this.GroupItem.prototype = {
 		this.save();
 	},
 
-	setSize: function(bounds, options) {
+	setSize: function(bounds, options = {}) {
 		if(this._delaySetCurrentSize) {
 			this._delaySetCurrentSize.cancel();
 			this._delaySetCurrentSize = null;
-		}
-
-		if(!options) {
-			options = {};
 		}
 
 		// Trigger handlers only if needed.
@@ -754,24 +741,11 @@ this.GroupItem.prototype = {
 		this._makeLastActiveGroupItemActive();
 	},
 
-	// Make the closest tab external to this group active. Used when closing the group.
-	_makeClosestTabActive: function() {
-		let closeCenter = this.getBounds().center();
-
-		// Find closest tab to make active
-		let closestTabItem = UI.getClosestTab(closeCenter);
-		if(closestTabItem) {
-			UI.setActive(closestTabItem);
-		}
-	},
-
 	// Makes the last active group item active.
 	_makeLastActiveGroupItemActive: function() {
 		let groupItem = GroupItems.getLastActiveGroupItem();
 		if(groupItem) {
 			UI.setActive(groupItem);
-		} else {
-			this._makeClosestTabActive();
 		}
 	},
 
@@ -792,7 +766,7 @@ this.GroupItem.prototype = {
 	//   options - various options (see below)
 	// Possible options:
 	//   immediately - true when no animations should be used
-	_unhide: function(options) {
+	_unhide: function(options = {}) {
 		this._cancelFadeAwayUndoButtonTimer();
 		this.hidden = false;
 		this.removeUndoButton();
@@ -804,7 +778,7 @@ this.GroupItem.prototype = {
 		};
 
 		this.$container.show();
-		if(!options || !options.immediately) {
+		if(!options.immediately) {
 			this.$container.animate({
 				"transform": "scale(1)",
 				"opacity": 1
@@ -1056,15 +1030,11 @@ this.GroupItem.prototype = {
 	// Options:
 	//   index - (int) if set, add this tab at this index
 	//   dontArrange - (bool) if true, will not trigger an arrange on the group
-	add: function(item, options) {
+	add: function(item, options = {}) {
 		try {
 			// safeguard to remove the item from its previous group
 			if(item.parent && item.parent !== this) {
 				item.parent.remove(item);
-			}
-
-			if(!options) {
-				options = {};
 			}
 
 			let wasAlreadyInThisGroupItem = false;
@@ -1082,8 +1052,6 @@ this.GroupItem.prototype = {
 			this.children.splice(index, 0, item);
 
 			if(!wasAlreadyInThisGroupItem) {
-				item.groupItemData = {};
-
 				item.addSubscriber("close", this._onChildClose);
 				item.setParent(this);
 
@@ -1135,12 +1103,8 @@ this.GroupItem.prototype = {
 	// Possible options:
 	//   dontArrange - don't rearrange the remaining items
 	//   dontClose - don't close the group even if it normally would
-	remove: function(item, options) {
+	remove: function(item, options = {}) {
 		try {
-			if(!options) {
-				options = {};
-			}
-
 			let index = this.children.indexOf(item);
 			let prevIndex = 0;
 			if(index != -1) {
@@ -1185,25 +1149,19 @@ this.GroupItem.prototype = {
 	},
 
 	// Removes all of the groupItem's children. The optional "options" param is passed to each remove call.
-	removeAll: function(options) {
-		let newOptions = { dontArrange: true };
-		if(options) {
-			Utils.extend(newOptions, options);
-		}
+	removeAll: function(options = {}) {
+		options.dontArrange = true;
 
 		for(let child of this.children.concat()) {
-			this.remove(child, newOptions);
+			this.remove(child, options);
 		}
 	},
 
 	// Returns true if the groupItem should stack (instead of grid).
 	shouldStack: function() {
-		let options = {
-			getDimensions: true,
-			count: this.children.length
-		};
+		let count = this.children.length;
 		let box = this.getContentBounds();
-		let arrObj = TabItems.arrange(this.children, box);
+		let arrObj = TabItems.arrange(count, box);
 
 		let shouldStack = arrObj.tabWidth < TabItems.minTabWidth || arrObj.tabHeight < TabItems.minTabHeight;
 		this._columns = shouldStack ? null : arrObj.columns;
@@ -1295,29 +1253,62 @@ this.GroupItem.prototype = {
 		let count = childrenToArrange.length;
 		if(!count) { return; }
 
-		let itemAspect = TabItems.tabAspect;
-		let scale = 0.7;
-		let bb = this.getContentBounds(true);
-		let bbAspect = bb.height / bb.width;
-		let numInPile = 6;
-		let zIndex = numInPile;
-		let angleDelta = 3.5; // degrees
-
-		// compute size of the entire stack, modulo rotation.
-		let size;
-		if(bbAspect > itemAspect) {
-			// Tall, thin groupItem
-			size = TabItems.calcValidSize(new Point(bb.width * scale, -1));
-		} else {
-			// Short, wide groupItem
-			size = TabItems.calcValidSize(new Point(-1, bb.height * scale));
+		// ensure topChild is the first item in childrenToArrange
+		let topChild = this.getTopChild();
+		let topChildPos = childrenToArrange.indexOf(topChild);
+		if(topChildPos > 0) {
+			childrenToArrange = childrenToArrange.concat(childrenToArrange.splice(0, topChildPos));
 		}
 
-		// x is the left margin that the stack will have, within the content area (bb)
+		let numInPile = 6;
+		let zIndex = numInPile;
+		let children = [];
+		for(let child of childrenToArrange) {
+			child.isStacked = true;
+			if(numInPile-- > 0) {
+				children.push(child);
+			} else {
+				child.hidden = true;
+			}
+		}
+		let bounds = this.getContentBounds(true);
+
+		// Check against our cached values if we need to re-calc anything.
+		let lastArrange = this._lastArrange;
+		let arrange = !lastArrange || !lastArrange.isStacked || !lastArrange.bounds.equals(bounds) || !lastArrange.children;
+		if(!arrange) {
+			for(let i = 0; i < children.length; i++) {
+				if(lastArrange.children[i] != children[i]) {
+					arrange = true;
+					break;
+				}
+			}
+		}
+		if(!arrange) { return; }
+		this._lastArrange = { isStacked: true, bounds, children };
+
+		this.isStacked = true;
+		removeAttribute(this.tabContainer, 'columns');
+
+		// compute size of the entire stack, modulo rotation.
+		let itemAspect = TabItems.tabAspect;
+		let scale = 0.7;
+		let boundsAspect = bounds.height / bounds.width;
+
+		let size;
+		if(boundsAspect > itemAspect) {
+			// Tall, thin groupItem
+			size = TabItems.calcValidSize(new Point(bounds.width * scale, -1));
+		} else {
+			// Short, wide groupItem
+			size = TabItems.calcValidSize(new Point(-1, bounds.height * scale));
+		}
+
+		// x is the left margin that the stack will have, within the content area (bounds)
 		// y is the vertical margin
 		let position = {
-			x: (bb.width - size.x - TabItems.tabItemPadding.x) / 2,
-			y: (bb.height - size.y - TabItems.tabItemPadding.y) / 2
+			x: (bounds.width - size.x - TabItems.tabItemPadding.x) / 2,
+			y: (bounds.height - size.y - TabItems.tabItemPadding.y) / 2
 		};
 
 		let sscode = '\
@@ -1330,32 +1321,11 @@ this.GroupItem.prototype = {
 
 		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);
 
-		let children = [];
-
-		// ensure topChild is the first item in childrenToArrange
-		let topChild = this.getTopChild();
-		let topChildPos = childrenToArrange.indexOf(topChild);
-		if(topChildPos > 0) {
-			childrenToArrange = childrenToArrange.concat(childrenToArrange.splice(0, topChildPos));
-		}
-
-		for(let child of childrenToArrange) {
-			// Children are still considered stacked even if they're hidden later.
-			child.addClass("stacked");
-			child.isStacked = true;
-			setAttribute(child.container, 'draggable', 'false');
-			if(numInPile-- > 0) {
-				children.push(child);
-			} else {
-				child.hidden = true;
-			}
-		}
-
-		this.isStacked = true;
-		removeAttribute(this.tabContainer, 'columns');
-
+		let angleDelta = 3.5; // degrees
 		let angleAccum = 0;
 		for(let child of children) {
+			child.addClass("stacked");
+			setAttribute(child.container, 'draggable', 'false');
 			if(angleAccum != 0) {
 				child.addClass('behind');
 			} else {
@@ -1377,7 +1347,16 @@ this.GroupItem.prototype = {
 			cols = this._columns;
 		}
 
-		if(!this.children.length) { return; }
+		let count = this.children.length;
+		if(!count) { return; }
+
+		let bounds = this.getContentBounds(true);
+
+		// Check against our cached values if we need to re-calc anything.
+		let lastArrange = this._lastArrange;
+		let arrange = !lastArrange || lastArrange.isStacked || !lastArrange.bounds.equals(bounds) || lastArrange.count != count;
+		if(!arrange) { return; }
+		this._lastArrange = { isStacked: false, bounds, count };
 
 		for(let child of this.children) {
 			child.removeClass("stacked");
@@ -1387,8 +1366,7 @@ this.GroupItem.prototype = {
 			setAttribute(child.container, 'draggable', 'true');
 		}
 
-		let box = this.getContentBounds(true);
-		this._lastTabSize = TabItems.arrange(this.children, box, cols);
+		this._lastTabSize = TabItems.arrange(count, bounds, cols);
 		let { tabWidth, tabHeight, columns } = this._lastTabSize;
 		let fontSize = TabItems.getFontSizeFromWidth(tabWidth);
 		let spaceWidth = tabWidth + TabItems.tabItemPadding.x;
@@ -1746,12 +1724,10 @@ this.GroupItems = {
 
 							toClose.delete(groupItem);
 						} else {
-							let options = {
-								// we always push when first appending the group, in case new groups (from other add-ons, or imported in prefs)
-								// overlap existing groups
-								immediately: true
-							};
-							new GroupItem([], Utils.extend({}, data, options));
+							// we always push when first appending the group, in case new groups (from other add-ons, or imported in prefs)
+							// overlap existing groups
+							data.immediately = true;
+							new GroupItem([], data);
 						}
 					}
 				}
@@ -1904,7 +1880,6 @@ this.GroupItems = {
 		// create new group for the new tabItem
 		let newGroupItemBounds = new Rect(20, 20, 250, 200);;
 		let newGroupItem = new GroupItem([tabItem], { bounds: newGroupItemBounds });
-		newGroupItem.snap();
 		UI.setActive(newGroupItem);
 	},
 
@@ -2111,7 +2086,7 @@ this.GroupItems = {
 		let pairsProvided = (pairs ? true : false);
 		if(!pairsProvided) {
 			pairs = [];
-			for(let item of GroupItems) {
+			for(let item of this) {
 				pairs.push({
 					item: item,
 					bounds: item.getBounds()
@@ -2131,7 +2106,7 @@ this.GroupItems = {
 			if(Utils.isPoint(item.userSize)) {
 				newSize = new Point(item.userSize);
 			} else {
-				newSize = GroupItems.calcValidSize(new Point(GroupItems.minGroupWidth, -1));
+				newSize = this.calcValidSize(new Point(this.minGroupWidth, -1));
 			}
 
 			newBounds.width = Math.max(newBounds.width, newSize.x);
