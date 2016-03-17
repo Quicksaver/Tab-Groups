@@ -682,7 +682,7 @@ this.GroupItem.prototype = {
 	//   options - An object with optional settings for this call.
 	// Options:
 	//   immediately - (bool) if true, no animation will be used
-	close: function(options) {
+	close: function(options = {}) {
 		this.removeAll({ dontClose: true });
 		GroupItems.unregister(this);
 
@@ -701,7 +701,7 @@ this.GroupItem.prototype = {
 			this._sendToSubscribers("close");
 		};
 
-		if(this.hidden || (options && options.immediately)) {
+		if(this.hidden || options.immediately) {
 			destroyGroup();
 		} else {
 			this.$container.animate({
@@ -1527,15 +1527,14 @@ this.GroupItem.prototype = {
 	//  options - the options object
 	//    dontZoomIn - set to true to not zoom into the newly created tab
 	//    closedLastTab - boolean indicates the last tab has just been closed
-	newTab: function(url, options) {
-		if(options && options.closedLastTab) {
+	newTab: function(url, options = {}) {
+		if(options.closedLastTab) {
 			UI.closedLastTabInTabView = true;
 		}
 
 		UI.setActive(this, { dontSetActiveTabInGroup: true });
 
-		let dontZoomIn = !!(options && options.dontZoomIn);
-		return gBrowser.loadOneTab(url || gWindow.BROWSER_NEW_TAB_URL, { inBackground: dontZoomIn });
+		return gBrowser.loadOneTab(url || gWindow.BROWSER_NEW_TAB_URL, { inBackground: !!options.dontZoomIn });
 	},
 
 	// Reorders the tabs in a groupItem based on the arrangement of the tabs shown in the tab bar.

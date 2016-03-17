@@ -1,4 +1,4 @@
-// VERSION 1.1.4
+// VERSION 1.1.5
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -202,7 +202,7 @@ this.TabItem.prototype = {
 	//   options - an object with additional parameters, see below
 	// Possible options:
 	//   groupItemId - if the tab doesn't have any data associated with it and groupItemId is available, add the tab to that group.
-	_reconnect: function(options) {
+	_reconnect: function(options = {}) {
 		let tabData = Storage.getTabData(this.tab);
 		let groupItem;
 
@@ -236,7 +236,7 @@ this.TabItem.prototype = {
 			}
 		}
 		else {
-			if(options && options.groupItemId) {
+			if(options.groupItemId) {
 				groupItem = GroupItems.groupItem(options.groupItemId);
 			}
 
@@ -601,7 +601,7 @@ this.TabItems = {
 	//   options - an object with additional parameters, see below
 	// Possible options:
 	//   force - true to always update the tab item even if it's incomplete
-	_update: function(tab, options) {
+	_update: function(tab, options = {}) {
 		try {
 			// ___ get the TabItem
 			let tabItem = tab._tabViewTabItem;
@@ -635,7 +635,7 @@ this.TabItems = {
 			setAttribute(tabItem.container, "title", tooltip);
 
 			// ___ Make sure the tab is complete and ready for updating.
-			if(options && options.force) {
+			if(options.force) {
 				tabItem.updateCanvas();
 			} else {
 				this._isComplete(tab).then((isComplete) => {
