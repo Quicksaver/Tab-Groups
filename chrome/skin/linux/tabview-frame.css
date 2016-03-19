@@ -70,10 +70,13 @@ body {
 	border: 1px solid rgba(230,230,230,1);
 	background-color: window;
 	background-image: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+}
+
+body.classic .groupItem {
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) 1px 1px 3px;
 }
 
-.groupItem:-moz-locale-dir(rtl) {
+body.classic .groupItem:-moz-locale-dir(rtl) {
 	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) -1px 1px 3px;
 }
 
@@ -142,9 +145,7 @@ input.name:focus {
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 64, 16, 48);
 }
 
-/* Pinned Tabs group */
-
-#pinnedTabs {
+#actions .grouped {
 	border-top: 1px solid rgba(230,230,230,1);
 }
 

@@ -1,4 +1,4 @@
-// VERSION 1.1.6
+// VERSION 1.2.0
 
 this.Keys = { meta: false };
 
@@ -56,6 +56,9 @@ this.UI = {
 	// has the user clicked the close button in the notice in this window already
 	_noticeDismissed: false,
 
+	get classic() { return Prefs.displayMode == 'classic'; },
+	get grid() { return Prefs.displayMode == 'grid'; },
+
 	get sessionRestoreNotice() { return $('sessionRestoreNotice'); },
 	get sessionRestoreAutoChanged() { return $('sessionRestoreAutoChanged'); },
 	get sessionRestorePrivate() { return $('sessionRestorePrivate'); },
@@ -63,6 +66,9 @@ this.UI = {
 	get exitBtn() { return $("exit-button"); },
 	get optionsBtn() { return $("optionsbutton"); },
 	get helpBtn() { return $("helpbutton"); },
+	get gridBtn() { return $("gridbutton"); },
+	get classicBtn() { return $("classicbutton"); },
+	get gridNewGroupBtn() { return $("gridNewGroup"); },
 
 	_els: Cc["@mozilla.org/eventlistenerservice;1"].getService(Ci.nsIEventListenerService),
 
@@ -140,7 +146,7 @@ this.UI = {
 								}
 							}
 						}
-						if(e.originalTarget == GroupItems.workSpace && e.button == 0 && e.detail == 1) {
+						if(this.classic && e.originalTarget == GroupItems.workSpace && e.button == 0 && e.detail == 1) {
 							this._createGroupItemOnDrag(e);
 						}
 						break;
@@ -179,11 +185,23 @@ this.UI = {
 					case this.helpBtn:
 						this.goToPreferences({ pane: 'paneHowTo' });
 						break;
+
+					case this.classicBtn:
+						Prefs.displayMode = 'classic';
+						break;
+
+					case this.gridBtn:
+						Prefs.displayMode = 'grid';
+						break;
+
+					case this.gridNewGroupBtn:
+						GroupItems.newGroup();
+						break;
 				}
 				break;
 
 			case 'dragover':
-				if(DraggingTab && e.target == GroupItems.workSpace) {
+				if(DraggingTab && (e.target == GroupItems.workSpace || e.target == this.gridNewGroupBtn)) {
 					DraggingTab.canDrop(e, e.target);
 				}
 				break;
@@ -263,10 +281,14 @@ this.UI = {
 	},
 
 	observe: function(aSubject, aTopic, aData) {
-		switch(aTopic) {
-			case 'nsPref:changed':
+		switch(aSubject) {
+			case 'showTabOnUpdates':
 				this._noticeDismissed = false;
 				this.checkSessionRestore();
+				break;
+
+			case 'displayMode':
+				this.toggleMode();
 				break;
 		}
 	},
@@ -291,6 +313,9 @@ this.UI = {
 			Listeners.add(this.exitBtn, 'click', this);
 			Listeners.add(this.optionsBtn, 'click', this);
 			Listeners.add(this.helpBtn, 'click', this);
+			Listeners.add(this.gridBtn, 'click', this);
+			Listeners.add(this.classicBtn, 'click', this);
+			Listeners.add(this.gridNewGroupBtn, 'click', this);
 			Listeners.add(GroupItems.workSpace, 'dragover', this);
 
 			// When you click on the background/empty part of TabView, we create a new groupItem.
@@ -298,6 +323,10 @@ this.UI = {
 			Listeners.add(GroupItems.workSpace, 'dblclick', this);
 
 			Messenger.listenWindow(gWindow, "DOMWillOpenModalDialog", this);
+
+			// Initialize the UI with the correct mode from the start, the groups will take care of themselves as they're added.
+			Prefs.listen('displayMode', this);
+			document.body.classList.add(Prefs.displayMode);
 
 			// ___ setup key handlers
 			this._setupBrowserKeys();
@@ -359,6 +388,9 @@ this.UI = {
 		}
 		finally {
 			GroupItems.resumeArrange();
+
+			// There's no point in having ridiculously large slots. We only need to maintain the relative slot differences between the groups.
+			GroupItems.normalizeSlots();
 		}
 	},
 
@@ -378,6 +410,9 @@ this.UI = {
 		Listeners.remove(this.exitBtn, 'click', this);
 		Listeners.remove(this.optionsBtn, 'click', this);
 		Listeners.remove(this.helpBtn, 'click', this);
+		Listeners.remove(this.gridBtn, 'click', this);
+		Listeners.remove(this.classicBtn, 'click', this);
+		Listeners.remove(this.gridNewGroupBtn, 'click', this);
 		Listeners.remove(GroupItems.workSpace, 'dragover', this);
 
 		pageWatch.unregister(this);
@@ -397,6 +432,8 @@ this.UI = {
 		Tabs.unlisten("TabSelect", this);
 		Tabs.unlisten("TabPinned", this);
 		Tabs.unlisten("TabUnpinned", this);
+
+		Prefs.unlisten('displayMode', this);
 
 		this._currentTab = null;
 		this._pageBounds = null;
@@ -455,6 +492,35 @@ this.UI = {
 	blurAll: function() {
 		for(let element of $$(":focus")) {
 			element.blur();
+		}
+	},
+
+	// toggle between the various workspace modes available
+	toggleMode: function() {
+		if(document.body.classList.contains(Prefs.displayMode)) { return; }
+
+		document.body.classList.remove('classic');
+		document.body.classList.remove('grid');
+
+		document.body.classList.add(Prefs.displayMode);
+
+		try {
+			GroupItems.pauseArrange();
+
+			// Any hidden (closed) groups are removed from view when toggling between modes.
+			GroupItems.removeHiddenGroups();
+
+			// Re-build necessary groups info (sizes, positions and stuff)
+			GroupItems.load();
+		}
+		catch(ex) {
+			Cu.reportError(ex);
+		}
+		finally {
+			GroupItems.resumeArrange();
+			if(this.classic) {
+				GroupItems.unsquish();
+			}
 		}
 	},
 
@@ -589,8 +655,9 @@ this.UI = {
 
 	// Returns a <Rect> defining the area of the page <Item>s should stay within.
 	getPageBounds: function() {
-		let width = Math.max(100, GroupItems.workSpace.scrollWidth);
-		let height = Math.max(100, GroupItems.workSpace.scrollHeight);
+		let box = GroupItems.workSpace.getBoundingClientRect();
+		let width = Math.max(100, Math.floor(box.width));
+		let height = Math.max(100, Math.floor(box.height));
 		return new Rect(0, 0, width, height);
 	},
 
@@ -1275,6 +1342,16 @@ this.UI = {
 		let oldPageBounds = new Rect(this._pageBounds);
 		let newPageBounds = this.getPageBounds();
 		if(newPageBounds.equals(oldPageBounds)) { return; }
+
+		if(UI.grid) {
+			// I can't do this on a delay (so it won't resize on every mousemove),
+			// it becomes very jaggy, and... weird. Sometimes it won't even resize at all after stopping the mouse
+			// for a while until moving it again.
+			GroupItems.arrange(true);
+			return;
+		}
+
+		// Classic mode...
 
 		if(!this.shouldResizeItems()) { return; }
 

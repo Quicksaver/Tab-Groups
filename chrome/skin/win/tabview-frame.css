@@ -73,6 +73,9 @@ body:not(:-moz-system-metric(windows-compositor)) {
 
 .groupItem {
 	background-color: #E0EAF5;
+}
+
+body.classic .groupItem {
 	box-shadow:
 		0 1px 0 #FFFFFF inset,
 		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
@@ -81,7 +84,7 @@ body:not(:-moz-system-metric(windows-compositor)) {
 		0 1px 3px rgba(4, 38, 60, 0.6);
 }
 
-.groupItem:-moz-locale-dir(rtl) {
+body.classic .groupItem:-moz-locale-dir(rtl) {
 	box-shadow:
 		0 1px 0 #FFFFFF inset,
 		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
@@ -161,9 +164,7 @@ input.name:focus {
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 72, 18, 54);
 }
 
-/* Pinned Tabs group */
-
-#pinnedTabs {
+#actions .grouped {
 	border-top: 1px solid rgba(4, 38, 60, 0.3);
 }
 

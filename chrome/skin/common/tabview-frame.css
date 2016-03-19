@@ -27,6 +27,13 @@ body {
 	position: relative;
 }
 
+body.grid #groups {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	overflow: hidden;
+}
+
 /* Tabs */
 
 .tab {
@@ -182,29 +189,53 @@ body.DraggingTab .tab * {
 /* Tab GroupItem */
 
 .groupItem {
-	position: absolute;
-	cursor: pointer;
-	border-radius: 0.4em;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
 }
 
-body:not(.searching) .groupItem:not(.phantom) {
+.groupItem:not(.closed) {
+	cursor: pointer;
+}
+
+body.classic .groupItem {
+	position: absolute;
+	border-radius: 5px;
+}
+
+body.classic:not(.searching) .groupItem:not(.phantom) {
 	resize: both;
 }
 
-.groupItem:not(.phantom) {
+body.grid .groupItem {
+	position: relative;
+	flex: 1 1 auto;
+	box-shadow:
+		inset -1px 0 0 ThreeDShadow,
+		inset 0 -1px 0 ThreeDShadow,
+		inset 1px 0 0 ThreeDHighlight,
+		inset 0 1px 0 ThreeDHighlight;
+}
+
+body.grid .groupItem.closed > *:not(.undo) {
+	display: none;
+}
+
+body.DraggingGroup .groupItem * {
+	pointer-events: none;
+}
+
+body.classic .groupItem:not(.phantom) {
 	/* Keep in sync with GroupsItems.minGroupHeight/Width */
 	min-height: 145px;
 	min-width: 120px;
 }
 
-.groupItem.activeGroupItem {
+body.classic .groupItem.activeGroupItem {
 	box-shadow: rgba(0,0,0,0.8) 2px 2px 8px;
 }
 
-.groupItem.activeGroupItem:-moz-locale-dir(rtl) {
+body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl) {
 	box-shadow: rgba(0,0,0,0.8) -2px 2px 8px;
 }
 
@@ -233,7 +264,7 @@ body:not(.searching) .groupItem:not(.phantom) {
 .overlay {
 	background-color: rgba(0,0,0,.7) !important;
 	box-shadow: 3px 3px 5.5px rgba(0,0,0,.5);
-	border-radius: 0.4em;
+	border-radius: 5px;
 }
 
 .overlay:-moz-locale-dir(rtl) {
@@ -245,9 +276,15 @@ body:not(.searching) .groupItem:not(.phantom) {
 	display: flex;
 	align-items: stretch;
 	align-content: stretch;
-	border-radius: 0.4em;
+	border-radius: 5px;
 	border: none;
 	cursor: pointer;
+}
+
+body.grid .undo {
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
 
 .undo > span {
@@ -270,6 +307,32 @@ body:not(.searching) .groupItem:not(.phantom) {
 .phantom {
 	position: absolute;
 	cursor: default;
+}
+
+body:not(.grid) #gridNewGroup {
+	display: none;
+}
+
+#gridNewGroup {
+	position: relative;
+	order: 9999999;
+	-moz-user-focus: normal;
+}
+
+#gridNewGroup > div {
+	pointer-events: none;
+	width: 100%;
+	height: 100%;
+	max-width: 100px;
+	max-height: 100px;
+	margin: auto;
+	background-image: url("chrome://tabgroups/skin/new-group.png");
+	background-size: contain;
+	opacity: 0.75;
+}
+
+#gridNewGroup:-moz-any(:hover,.dragOver) > div {
+	opacity: 1;
 }
 
 /* Trenches */
@@ -339,11 +402,11 @@ body:not(.searching) .groupItem:not(.phantom) {
 
 /* Can't use :-moz-drag-over because hovering its children nodes while dragging
  * would set the pseudo-class on those and not on the group node. */
-.groupItem.dragOver {
+body.classic .groupItem.dragOver {
 	box-shadow: 2px 2px 7px -1px rgba(0,0,0,.6);
 }
 
-.groupItem.dragOver:-moz-locale-dir(rtl) {
+body.classic .groupItem.dragOver:-moz-locale-dir(rtl) {
 	box-shadow: -2px 2px 7px -1px rgba(0,0,0,.6);
 }
 
@@ -517,7 +580,9 @@ input.name:focus::-moz-placeholder {
 	height: 24px;
 }
 
-#actions input:hover {
+#actions input:hover,
+body.classic #classicbutton,
+body.grid #gridbutton {
 	cursor: pointer;
 	background-color: rgba(128,128,128,.15);
 }
@@ -534,12 +599,20 @@ input.name:focus::-moz-placeholder {
 	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 60, 20, 40);
 }
 
-/* Pinned Tabs group */
+#actions #classicbutton {
+	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 80, 20, 60);
+}
 
-#pinnedTabs {
+#actions #gridbutton {
+	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 100, 20, 80);
+}
+
+#actions .grouped {
 	margin-top: 3px;
 	padding-top: 3px;
 }
+
+/* Pinned Tabs group */
 
 .appTabIcon {
 	background-size: 18px 18px;
@@ -589,7 +662,7 @@ body:not(.searching) #search {
 	color: white;
 	border: none;
 	background-color: #272727;
-	border-radius: 0.4em;
+	border-radius: 5px;
 	-moz-padding-start: 5px;
 	-moz-padding-end: 5px;
 	font-size: 14px;
@@ -640,7 +713,7 @@ body:not(.searching) #search {
 	display: flex;
 	pointer-events: auto;
 	background-color: #EBEBEB;
-	border-radius: 0.4em;
+	border-radius: 5px;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 	border: 1px solid rgba(255, 255, 255, 0.5);
 	padding: 2px 3px;

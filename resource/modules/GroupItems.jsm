@@ -1,4 +1,4 @@
-// VERSION 1.2.9
+// VERSION 1.3.0
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -31,9 +31,13 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this._itemSizeFrozen = false;
 	this._delaySetCurrentSize = null;
 	this._lastArrange = null;
+	this._userBounds = false;
+	this._slot = 0;
+	this._row = '';
 
 	// A <Point> that describes the last size specifically chosen by the user.
 	this.userSize = null;
+	this.bounds = null;
 
 	// The <TabItem> for the groupItem's active tab.
 	this._activeTab = null;
@@ -44,23 +48,12 @@ this.GroupItem = function(listOfEls, options = {}) {
 		this.userSize = new Point(options.userSize);
 	}
 
-	let rectToBe;
-	if(options.bounds) {
-		rectToBe = new Rect(options.bounds);
-	}
-
-	if(!rectToBe) {
-		rectToBe = GroupItems.getBoundingBox(listOfEls);
-		rectToBe.inset(-42, -42);
-	}
-
 	this.container = document.createElement('div');
 	this.container.id = 'group'+this.id;
 	this.container.classList.add('groupItem');
+	toggleAttribute(this.container, 'draggable', UI.grid);
 	this.container._item = this;
-
-	this.$container = iQ(this.container).css(rectToBe);
-	this.bounds = this.$container.bounds();
+	this.$container = iQ(this.container);
 
 	this.isDragging = false;
 	this.isResizing = false;
@@ -187,14 +180,31 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.container.addEventListener('mouseup', this);
 	this.container.addEventListener('dragover', this);
 	this.container.addEventListener('dragenter', this);
+	this.container.addEventListener('dragstart', this);
+
+	this.slot = options.slot || GroupItems.nextSlot();
 
 	GroupItems.register(this);
 
-	// ___ Position
-	this.setBounds(rectToBe, options.immediately);
+	if(options.bounds) {
+		this.bounds = new Rect(options.bounds);
+	}
 
-	// Calling snap will also trigger pushAway
-	this.snap(options.immediately);
+	if(UI.classic) {
+		if(!this.bounds) {
+			this.bounds = GroupItems.getBoundingBox(listOfEls);
+			this.bounds.inset(-42, -42);
+		}
+
+		this.$container.css(this.bounds);
+		this._userBounds = true;
+
+		// ___ Position
+		this.setBounds(this.bounds, options.immediately);
+
+		// Calling snap will also trigger pushAway
+		this.snap(options.immediately);
+	}
 
 	if(!options.immediately && listOfEls.length) {
 		this.$container.hide().fadeIn();
@@ -225,7 +235,8 @@ this.GroupItem.prototype = {
 	// Returns all of the info worth storing about this groupItem.
 	getStorageData: function() {
 		let data = {
-			bounds: this.getBounds(),
+			bounds: this.getBounds(true),
+			slot: this.slot,
 			userSize: null,
 			title: this.getTitle(),
 			id: this.id
@@ -247,6 +258,28 @@ this.GroupItem.prototype = {
 	// or if it doesn't have one, its first child.
 	isTopOfStack: function(item) {
 		return this.isStacked && item == this.getTopChild();
+	},
+
+	get slot() {
+		return this._slot;
+	},
+	set slot(v) {
+		if(this._slot != v) {
+			this._slot = v;
+			this.container.style.order = v;
+		}
+		return this._slot;
+	},
+
+	get row() {
+		return this._row;
+	},
+	set row(v) {
+		if(this._row != v) {
+			this._row = v;
+			this.container.setAttribute('row', v);
+		}
+		return this._row;
 	},
 
 	// Saves this groupItem to persistent storage.
@@ -289,7 +322,11 @@ this.GroupItem.prototype = {
 	},
 
 	// Returns a copy of the Item's bounds as a <Rect>.
-	getBounds: function() {
+	getBounds: function(classic) {
+		// Pre-saved bounds are only valid for classic free-arrange mode.
+		if(!classic && !UI.classic) {
+			return this.$container.bounds();
+		}
 		return new Rect(this.bounds);
 	},
 
@@ -301,6 +338,20 @@ this.GroupItem.prototype = {
 	// Possible options:
 	//   force - true to always update the DOM even if the bounds haven't changed; default false
 	setBounds: function(inRect, immediately, options = {}) {
+		// In grid mode, we don't control the group's bounds here. Reset everything so that it's all set up again if necessary later.
+		if(UI.grid) {
+			if(this._userBounds) {
+				this.$container.css({
+					top: null,
+					left: null,
+					width: null,
+					height: null
+				});
+				this._userBounds = false;
+			}
+			return;
+		}
+
 		// Validate and conform passed in size
 		let validSize = GroupItems.calcValidSize(new Point(inRect.width, inRect.height));
 		let rect = new Rect(inRect.left, inRect.top, validSize.x, validSize.y);
@@ -308,24 +359,25 @@ this.GroupItem.prototype = {
 		// ___ Determine what has changed
 		let css = {};
 
-		if(rect.left != this.bounds.left || options.force) {
+		if(!this._userBounds || rect.left != this.bounds.left || options.force) {
 			css.left = rect.left;
 		}
 
-		if(rect.top != this.bounds.top || options.force) {
+		if(!this._userBounds || rect.top != this.bounds.top || options.force) {
 			css.top = rect.top;
 		}
 
-		if(rect.width != this.bounds.width || options.force) {
+		if(!this._userBounds || rect.width != this.bounds.width || options.force) {
 			css.width = rect.width;
 		}
 
-		if(rect.height != this.bounds.height || options.force) {
+		if(!this._userBounds || rect.height != this.bounds.height || options.force) {
 			css.height = rect.height;
 		}
 
 		if(Utils.isEmptyObject(css)) { return; }
 		this.bounds = new Rect(rect);
+		this._userBounds = true;
 
 		// ___ Update our representation
 		if(immediately) {
@@ -379,6 +431,7 @@ this.GroupItem.prototype = {
 	},
 
 	// Pushes all other items away so none overlap this Item.
+	// Called by the drag handler in classic mdoe.
 	// Parameters:
 	//  immediately - boolean for doing the pushAway without animation
 	pushAway: function(immediately) {
@@ -639,7 +692,7 @@ this.GroupItem.prototype = {
 				// only set the last mouse down target if it is a left click, not on the close button,
 				// not on the expand button, not on the title bar and its elements
 				this.lastMouseDownTarget = null;
-				if(e.button == 0) {
+				if(!this.hidden && e.button == 0) {
 					// Make sure it knows to snap to another group's edges when being resized.
 					if(e.originalTarget.localName == 'resizer' && e.originalTarget.parentNode == this.container) {
 						new GroupDrag(this, e, true);
@@ -647,7 +700,7 @@ this.GroupItem.prototype = {
 					else if(this.closeButton != e.target
 					&& this.expander != e.target) {
 						this.lastMouseDownTarget = e.target;
-						if(!this.childHandling) {
+						if(!this.childHandling && UI.classic) {
 							new GroupDrag(this, e);
 						}
 					}
@@ -656,10 +709,20 @@ this.GroupItem.prototype = {
 				this.childHandling = false;
 				break;
 
+			case 'dragstart':
+				this.lastMouseDownTarget = null;
+				if(!DraggingTab) {
+					new GroupDrag(this, e);
+				}
+				break;
+
 			case 'dragover':
 			case 'dragenter':
 				if(DraggingTab) {
 					DraggingTab.canDrop(e, this);
+				}
+				else if(DraggingGroup) {
+					DraggingGroup.canDrop(e, this);
 				}
 				break;
 
@@ -701,7 +764,7 @@ this.GroupItem.prototype = {
 			this._sendToSubscribers("close");
 		};
 
-		if(this.hidden || options.immediately) {
+		if(this.hidden || !UI.classic || options.immediately) {
 			destroyGroup();
 		} else {
 			this.$container.animate({
@@ -721,15 +784,19 @@ this.GroupItem.prototype = {
 		if(this.children.length) {
 			this._unfreezeItemSize();
 
-			this.$container.animate({
-				opacity: 0,
-				"transform": "scale(.3)",
-			}, {
-				duration: 170,
-				complete: () => {
-					this.$container.hide();
-				}
-			});
+			if(UI.classic) {
+				this.$container.animate({
+					opacity: 0,
+					"transform": "scale(.3)",
+				}, {
+					duration: 170,
+					complete: () => {
+						this.$container.hide();
+					}
+				});
+			} else {
+				this.container.classList.add('closed');
+			}
 
 			this.removeTrenches();
 			this._createUndoButton();
@@ -778,7 +845,7 @@ this.GroupItem.prototype = {
 		};
 
 		this.$container.show();
-		if(!options.immediately) {
+		if(!options.immediately && UI.classic) {
 			this.$container.animate({
 				"transform": "scale(1)",
 				"opacity": 1
@@ -787,7 +854,11 @@ this.GroupItem.prototype = {
 				complete: finalize
 			});
 		} else {
-			this.$container.css({ "transform": "none", opacity: 1 });
+			if(UI.classic) {
+				this.$container.css({ "transform": "none", opacity: 1 });
+			} else {
+				this.container.classList.remove('closed');
+			}
 			finalize();
 		}
 	},
@@ -885,13 +956,17 @@ this.GroupItem.prototype = {
 			}
 
 			if(shouldFadeAway) {
-				iQ(this.undoContainer).animate({
-					color: "transparent",
-					opacity: 0
-				}, {
-					duration: this._fadeAwayUndoButtonDuration,
-					complete: () => { this.closeHidden(); }
-				});
+				if(UI.classic) {
+					iQ(this.undoContainer).animate({
+						color: "transparent",
+						opacity: 0
+					}, {
+						duration: this._fadeAwayUndoButtonDuration,
+						complete: () => { this.closeHidden(); }
+					});
+				} else {
+					this.closeHidden();
+				}
 			}
 		}
 	},
@@ -901,8 +976,6 @@ this.GroupItem.prototype = {
 		this.undoContainer = document.createElement('div');
 		this.undoContainer.classList.add('undo');
 		this.undoContainer.setAttribute('type', 'button');
-		GroupItems.workSpace.appendChild(this.undoContainer);
-
 		let $undoContainer = iQ(this.undoContainer);
 
 		let span = document.createElement('span');
@@ -917,30 +990,44 @@ this.GroupItem.prototype = {
 			e.preventDefault();
 			e.stopPropagation();
 			this._cancelFadeAwayUndoButtonTimer();
-			$undoContainer.fadeOut(() => { this.closeHidden(); });
+			if(UI.classic) {
+				$undoContainer.fadeOut(() => { this.closeHidden(); });
+			} else {
+				this.closeHidden();
+			}
 		};
 		undoClose.addEventListener('click', undoClose, true);
 		this.undoContainer.appendChild(undoClose);
 
-		$undoContainer.css({
-			left: this.bounds.left + this.bounds.width /2 - $undoContainer.width() /2,
-			top:  this.bounds.top + this.bounds.height /2 - $undoContainer.height() /2,
-			"transform": "scale(.1)",
-			opacity: 0
-		});
-		this.hidden = true;
+		if(UI.classic) {
+			GroupItems.workSpace.appendChild(this.undoContainer);
 
-		// hide group item and show undo container.
-		aSync(() => {
-			$undoContainer.animate({
-				"transform": "scale(1)",
-				"opacity": 1
-			}, {
-				easing: "tabviewBounce",
-				duration: 170,
-				complete: () => { this._sendToSubscribers("groupHidden"); }
+			let bounds = this.getBounds();
+			$undoContainer.css({
+				left: bounds.left + bounds.width /2 - $undoContainer.width() /2,
+				top:  bounds.top + bounds.height /2 - $undoContainer.height() /2,
+				"transform": "scale(.1)",
+				opacity: 0
 			});
-		}, 50);
+
+			// hide group item and show undo container.
+			aSync(() => {
+				$undoContainer.animate({
+					"transform": "scale(1)"+transform,
+					"opacity": 1
+				}, {
+					easing: "tabviewBounce",
+					duration: 170,
+					complete: () => { this._sendToSubscribers("groupHidden"); }
+				});
+			}, 50);
+		}
+		else {
+			this.container.appendChild(this.undoContainer);
+			this._sendToSubscribers("groupHidden");
+		}
+
+		this.hidden = true;
 
 		// add click handlers
 		this.undoContainer.handleEvent = (e) => {
@@ -1005,20 +1092,26 @@ this.GroupItem.prototype = {
 		let undoContainer = this.undoContainer;
 		this.undoContainer = null;
 
-		iQ(undoContainer).animate({
-			opacity: 0,
-			"transform": "scale(.1)",
-		}, {
-			duration: 170,
-			complete: () => {
-				undoContainer.remove();
-			}
-		});
+		if(UI.classic) {
+			iQ(undoContainer).animate({
+				opacity: 0,
+				"transform": "scale(.1)",
+			}, {
+				duration: 170,
+				complete: () => {
+					undoContainer.remove();
+				}
+			});
 
-		// Begin showing the group even before the undo button is fully removed.
-		aSync(() => {
+			// Begin showing the group even before the undo button is fully removed.
+			aSync(() => {
+				this._unhide();
+			}, 50);
+		}
+		else {
+			undoContainer.remove();
 			this._unhide();
-		}, 50);
+		}
 
 		return true;
 	},
@@ -1585,6 +1678,7 @@ this.GroupItems = {
 	_activeGroupItem: null,
 	_arrangePaused: false,
 	_arrangesPending: new Set(),
+	_lastArrange: null,
 	_removingHiddenGroups: false,
 	_autoclosePaused: false,
 	_lastActiveList: null,
@@ -1616,6 +1710,7 @@ this.GroupItems = {
 		for(let group of this) {
 			Styles.unload('group_'+group.id+'_'+_UUID);
 		}
+		Styles.unload("GroupItems.arrange_"+_UUID);
 
 		// additional clean up
 		this.groupItems = new Map();
@@ -1640,6 +1735,7 @@ this.GroupItems = {
 	// Resolve bypassed and collected arrange() calls
 	resumeArrange: function() {
 		this._arrangePaused = false;
+		this.arrange();
 		for(let groupItem of this._arrangesPending) {
 			groupItem.arrange();
 		}
@@ -1717,9 +1813,11 @@ this.GroupItems = {
 								}
 							}
 
+							groupItem.slot = data.slot;
 							groupItem.userSize = data.userSize;
 							groupItem.setTitle(data.title);
 							groupItem.setBounds(data.bounds, true);
+							toggleAttribute(groupItem.container, 'draggable', UI.grid);
 
 							toClose.delete(groupItem);
 						} else {
@@ -1793,6 +1891,8 @@ this.GroupItems = {
 		}
 
 		// For compatibility with other add-ons that might modify (read: create) groups, instead of discarting invalid groups we "fix" them.
+		let corrupt = false;
+
 		if(!groupItemData.bounds || !Utils.isRect(groupItemData.bounds)) {
 			let pageBounds = UI.getPageBounds();
 			pageBounds.inset(20, 20);
@@ -1802,6 +1902,15 @@ this.GroupItems = {
 			box.height = 200;
 
 			groupItemData.bounds = box;
+			corrupt = true;
+		}
+
+		if(!groupItemData.slot || typeof(groupItemData.slot) != 'number') {
+			groupItemData.slot = this.nextSlot();
+			corrupt = true;
+		}
+
+		if(corrupt) {
 			Storage.saveGroupItem(gWindow, groupItemData);
 		}
 
@@ -1811,6 +1920,8 @@ this.GroupItems = {
 	// Adds the given <GroupItem> to the list of groupItems we're tracking.
 	register: function(groupItem) {
 		this.groupItems.set(groupItem.id, groupItem);
+
+		this.arrange(true);
 		UI.updateTabButton();
 	},
 
@@ -1822,9 +1933,10 @@ this.GroupItems = {
 			this._activeGroupItem = null;
 		}
 
-		this._arrangesPending.delete(groupItem);
-
 		this._lastActiveList.remove(groupItem);
+		this._arrangesPending.delete(groupItem);
+		this.arrange(true);
+
 		UI.updateTabButton();
 	},
 
@@ -2073,7 +2185,9 @@ this.GroupItems = {
 		// the safe bounds that would keep it "in the window"
 		let gutter = this.defaultGutter;
 		let topGutter = this.topGutter;
-		return new Rect(gutter, topGutter, this.workSpace.scrollWidth - 2 * gutter, this.workSpace.scrollHeight - gutter - topGutter);
+
+		let bounds = UI.getPageBounds();
+		return new Rect(gutter, topGutter, bounds.width - 2 * gutter, bounds.height - gutter - topGutter);
 	},
 
 	// Checks to see which items can now be unsquished.
@@ -2082,6 +2196,9 @@ this.GroupItems = {
 	//     If pairs is null, the operation is performed directly on all of the top level items.
 	//   ignore - an <Item> to not include in calculations (because it's about to be closed, for instance)
 	unsquish: function(pairs, ignore) {
+		// Only meant for classic mode.
+		if(!UI.classic) { return; }
+
 		let pairsProvided = (pairs ? true : false);
 		if(!pairsProvided) {
 			pairs = [];
@@ -2149,6 +2266,265 @@ this.GroupItems = {
 		if(!pairsProvided) {
 			for(let pair of pairs) {
 				pair.item.setBounds(pair.bounds);
+			}
+		}
+	},
+
+	// Returns the next free slot, it will always be the highest value of all groups' slots.
+	nextSlot: function() {
+		let next = 1;
+		for(let groupItem of this) {
+			if(next <= groupItem.slot) {
+				next = groupItem.slot +1;
+			}
+		}
+		return next;
+	},
+
+	// Returns an array of all group items sorted by their slot property (as shown in grid layout).
+	sortBySlot: function() {
+		let groups = [];
+		for(let groupItem of this) {
+			groups.push(groupItem);
+		}
+		groups.sort(function(a,b) { return a.slot - b.slot; });
+		return groups;
+	},
+
+	// Normalizes all existing groups' slots to the lowest possible values, maintaining the same relation amongst themselves.
+	normalizeSlots: function() {
+		let groups = this.sortBySlot();
+		let slot = 1;
+		for(let groupItem of groups) {
+			if(groupItem.slot != slot) {
+				groupItem.slot = slot;
+				groupItem.save();
+			}
+			slot++;
+		}
+	},
+
+	// Arranges the groups in grid mode, based on the available workspace dimensions.
+	arrange: function(delayChildren) {
+		// Only meant for grid mode.
+		if(!UI.grid) { return; }
+
+		// This will be called as soon as arrange is unpaused.
+		if(this._arrangePaused) { return; }
+
+		let bounds = UI.getPageBounds();
+		// +1 is for the create new group item.
+		let count = this.size +1;
+
+		// Do we need to re-arrange anything?
+		let lastArrange = this._lastArrange;
+		let arrange = !lastArrange || !lastArrange.count != count || !lastArrange.bounds.equals(bounds);
+		if(!arrange) { return; }
+		this._lastArrange = { count, bounds };
+		// If we have no groups, it's easy, flex-stretch the create new group item.
+		if(count == 1) {
+			Styles.unload("GroupItems.arrange_"+_UUID);
+			return;
+		}
+
+		// If we don't have enough space for a single group, there's not much to do.
+		if(bounds.width < this.minGroupWidth) {
+			Styles.unload("GroupItems.arrange_"+_UUID);
+			return;
+		}
+
+		let groups = this.sortBySlot();
+		let i = 0;
+
+		let rows;
+		let columns;
+		let height;
+		let totalHeight;
+
+		let calc = (factor) => {
+			let width;
+			let totalWidth;
+			let initCount = count;
+			let initRows = rows;
+			let initColumns = columns;
+			let initHeight = height;
+			let specWidth;
+			let specHeight;
+			let specColumns;
+			let specRows;
+
+			if(!factor) {
+				// We always have at least two rows in the grid if there's enough space.
+				if(this.minGroupHeight *2 <= bounds.height) {
+					rows = 2;
+				} else {
+					rows = 1;
+				}
+			}
+			else if(factor == 1) {
+				let high = null;
+				let low = null;
+
+				// We're looking to shift items from the upper rows to the last one, so that it's more compressed and thus has the smallest items.
+				// We can't do that if we don't have enough rows.
+				if(rows == 1) {
+					return { high, low };
+				}
+
+				// And we don't need to do it if all the rows already have the same number of items.
+				let lastRowItems = count % columns;
+				if(!lastRowItems) {
+					return { high, low };
+				}
+
+				specColumns = columns;
+				specRows = rows -1;
+
+				// How many items must be shifted to fill the last row.
+				let shift = columns - lastRowItems;
+
+				// Do we need to shift down any items from all the upper rows?
+				let shiftColumns = Math.floor(shift / specRows);
+				if(shiftColumns) {
+					specColumns -= shiftColumns;
+					low = { rows: specRows, columns: specColumns };
+					shift = shift % specRows;
+				}
+
+				// Do we need to shift an item still from only a few of the upper rows?
+				if(shift) {
+					specColumns -= 1;
+					high = { rows: shift, columns: specColumns };
+					if(low) {
+						low.rows -= shift;
+					}
+				}
+
+				if(high) {
+					let validSize = this.calcValidSize(new Point(bounds.width / high.columns, height));
+					high.width = Math.floor(validSize.x);
+					high.height = Math.floor(validSize.y);
+					small.rows -= high.rows;
+				}
+
+				if(low) {
+					let validSize = this.calcValidSize(new Point(bounds.width / low.columns, height));
+					low.width = Math.floor(validSize.x);
+					low.height = Math.floor(validSize.y);
+					small.rows -= low.rows;
+				}
+
+				// We don't need to recalc the small items dimensions as they should be kept the same.
+				return { high, low };
+			}
+			else {
+				// If there's only one row left, we can't increase it anymore.
+				if(rows == 1) {
+					return null;
+				}
+
+				// If the groups are already overflowing, it's safe to assume we can't increase the size of any of them.
+				if(totalHeight > bounds.height) {
+					return null;
+				}
+
+				// Have we already increased all the groups we can (can we not shift any more groups to the next row)?
+				specColumns = Math.max(1, Math.floor(columns / factor));
+				if(count - specColumns <= 0) {
+					return null;
+				}
+
+				let validSize = this.calcValidSize(new Point(bounds.width / specColumns, height * factor));
+				specWidth = Math.floor(validSize.x);
+				specHeight = Math.floor(validSize.y);
+
+				rows--;
+				count -= specColumns;
+				bounds.height -= specHeight;
+			}
+
+			let figure = () => {
+				columns = Math.ceil(count / rows);
+				let validSize = this.calcValidSize(new Point(bounds.width / columns, bounds.height / rows));
+				width = Math.floor(validSize.x);
+				height = Math.floor(validSize.y);
+
+				totalWidth = width * columns;
+			}
+
+			figure();
+			while(columns > 1 && totalWidth > bounds.width) {
+				rows++;
+				figure();
+			}
+
+			if(!factor) {
+				return { rows, columns, width, height };
+			}
+
+			totalHeight = height * rows;
+			if(totalHeight <= bounds.height) {
+				small = { rows, columns, width, height };
+				return { rows: 1, columns: specColumns, width: specWidth, height: specHeight };
+			}
+			// In case an increased row can't fit, we need to revert the groups dimensions to their previous values.
+			else {
+				bounds.height += specHeight;
+				rows = initRows;
+				count = initCount;
+				columns = initColumns;
+				height = initHeight;
+				totalHeight = height * rows;
+				return null;
+			}
+		};
+		// First we figure out the safest grid display, where all items are equally distributed and have the same dimensions.
+		let small = calc();
+
+		// Try to enlarge some groups in the first row, to bring more attention to them.
+		let big = calc(1.75);
+
+		// Do we have any potential free space for a medium row? This can be in addition or instead of the big row.
+		let medium = calc(1.25);
+
+		// Equalize (stretch) the top small rows, so that the items in the last row only are the smallest.
+		let shift = calc(1);
+		let sscode = '';
+		let style = (type, items) => {
+			if(!items) { return; }
+
+			sscode += '\
+				html['+objName+'_UUID="'+_UUID+'"] body.grid .groupItem[row="'+type+'"] {\n\
+					width: '+items.width+'px;\n\
+					height: '+items.height+'px;\n\
+				}';
+
+			for(let r = 0; r < items.rows; r++) {
+				for(let c = 0; c < items.columns; c++) {
+					// The last item (create new group item) isn't really a group item; it's always row="small".
+					if(groups[i]) {
+						groups[i].row = type;
+						i++;
+					}
+				}
+			}
+		};
+
+		style('big', big);
+		style('medium', medium);
+		style('shiftHight', shift.high);
+		style('shiftLow', shift.low);
+		style('small', small);
+
+		Styles.load('GroupItems.arrange_'+_UUID, sscode, true);
+		// When the groups change dimensions, we should ensure their tabs are also re-arranged properly.
+		if(!delayChildren) {
+			for(let group of this) {
+				group.arrange();
+			}
+		} else {
+			for(let group of this) {
+				group.delayArrange(200);
 			}
 		}
 	},

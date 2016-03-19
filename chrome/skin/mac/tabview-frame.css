@@ -71,8 +71,11 @@ body {
 
 .groupItem {
 	background-color: rgb(240,240,240);
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 	border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+body.classic .groupItem {
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .phantom {
@@ -136,9 +139,7 @@ input.name:focus {
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 80, 20, 60);
 }
 
-/* Pinned Tabs group */
-
-#pinnedTabs {
+#actions .grouped {
 	border-top: 1px solid rgba(255, 255, 255, 0.5);
 }
 

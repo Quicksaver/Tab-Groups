@@ -1,4 +1,4 @@
-// VERSION 2.0.4
+// VERSION 2.1.0
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -12,9 +12,18 @@ this.DraggingGroup = null;
 this.GroupDrag = function(item, e, resizing, callback) {
 	DraggingGroup = this;
 	this.item = item;
-	this.el = item.container;
+	this.container = item.container;
 	this.callback = callback;
 	this.started = false;
+
+	// If we're in grid mode, this is an HTML5 drag.
+	if(UI.grid) {
+		e.dataTransfer.setData("text/plain", "tabview-group");
+
+		this.item.isDragging = true;
+		this.start();
+		return;
+	}
 
 	Listeners.add(gWindow, 'mousemove', this);
 	Listeners.add(gWindow, 'mouseup', this);
@@ -47,9 +56,20 @@ this.GroupDrag.prototype = {
 	start: function() {
 		if(!this.check()) { return; }
 
+		// If we're in grid mode, this is an HTML5 drag.
+		if(UI.grid) {
+			this.dropTarget = this.item;
+
+			Listeners.add(this.container, 'drop', this);
+			Listeners.add(this.container, 'dragend', this);
+
+			document.body.classList.add('DraggingGroup');
+			return;
+		}
+
 		if(!this.item.isResizing) {
 			// show a dragging cursor while the item is being dragged
-			this.el.classList.add('dragging');
+			this.container.classList.add('dragging');
 
 			if(!this.item.isAFauxItem) {
 				UI.setActive(this.item);
@@ -59,14 +79,14 @@ this.GroupDrag.prototype = {
 			this.started = true;
 		}
 		else {
-			this.el.classList.add('resizing');
+			this.container.classList.add('resizing');
 		}
 
 		this.item.isDragging = true;
 
 		this.safeWindowBounds = GroupItems.getSafeWindowBounds();
 
-		Trenches.activateOthersTrenches(this.el);
+		Trenches.activateOthersTrenches(this.container);
 	},
 
 	handleEvent: function(e) {
@@ -117,6 +137,15 @@ this.GroupDrag.prototype = {
 
 			case 'mouseup':
 				this.stop();
+				break;
+
+			case 'drop':
+				this.drop(e);
+				// no break; end the drag now
+
+			// If this fires, it means no valid drop occurred, so just end the drag as if nothing happened in the first place.
+			case 'dragend':
+				this.end();
 				break;
 		}
 	},
@@ -294,9 +323,9 @@ this.GroupDrag.prototype = {
 			this.item.setBounds(box);
 
 			if(box.width > GroupItems.minGroupWidth && box.height > GroupItems.minGroupHeight) {
-				this.item.container.style.opacity = '1';
+				this.container.style.opacity = '1';
 			} else {
-				this.item.container.style.opacity = '0.7';
+				this.container.style.opacity = '0.7';
 			}
 		}
 		else {
@@ -347,8 +376,8 @@ this.GroupDrag.prototype = {
 		Trenches.hideGuides();
 		this.item.isDragging = false;
 		this.item.isResizing = false;
-		this.el.classList.remove('dragging');
-		this.el.classList.remove('resizing');
+		this.container.classList.remove('dragging');
+		this.container.classList.remove('resizing');
 
 		this.item.pushAway(immediately);
 
@@ -357,7 +386,60 @@ this.GroupDrag.prototype = {
 		this.end();
 	},
 
+	canDrop: function(e, dropTarget) {
+		e.preventDefault();
+
+		// global drag tracking
+		UI.lastMoveTime = Date.now();
+
+		if(this.dropTarget != dropTarget) {
+			this.dropTarget.container.classList.remove('dragOver');
+			Listeners.remove(this.dropTarget.container, 'drop', this);
+
+			this.dropTarget = dropTarget;
+			this.dropTarget.container.classList.add('dragOver');
+			Listeners.add(this.dropTarget.container, 'drop', this);
+		}
+	},
+
+	drop: function(e) {
+		if(!this.check()) { return; }
+
+		// No-op, shouldn't happen though.
+		if(!this.dropTarget) { return; }
+
+		// Don't need to do anything.
+		if(this.dropTarget == this.item) {
+			this.end();
+			return;
+		}
+
+		// If we have a valid drop target (group), switch slots with it
+		// There's no need to recalc the grid dimensions, they should stay the same, only the groups should switch with one-another.
+		let targetSlot = this.dropTarget.slot;
+		let targetRow = this.dropTarget.row;
+
+		this.dropTarget.slot = this.item.slot;
+		this.dropTarget.row = this.item.row;
+		this.item.slot = targetSlot;
+		this.item.row = targetRow;
+		this.dropTarget.save();
+		this.dropTarget.arrange();
+		this.item.save();
+		this.item.arrange();
+
+		this.end();
+	},
+
 	end: function() {
+		// Is this an HTML5 drag? We have some extra things to end in this case.
+		if(UI.grid) {
+			this.dropTarget.container.classList.remove('dragOver');
+			Listeners.remove(this.dropTarget.container, 'drop', this);
+			Listeners.remove(this.container, 'dragend', this);
+			document.body.classList.remove('DraggingGroup');
+		}
+
 		DraggingGroup = null;
 		if(this.callback) {
 			this.callback();
@@ -371,6 +453,7 @@ this.DraggingTab = null;
 this.TabDrag = function(e, tabItem) {
 	DraggingTab = this;
 	this.item = tabItem;
+	this.container = tabItem.container;
 	this.dropTarget = tabItem.parent;
 	e.dataTransfer.setData("text/plain", "tabview-tab");
 
@@ -382,7 +465,7 @@ this.TabDrag = function(e, tabItem) {
 		target = this.getDropTargetNode();
 	}
 	Listeners.add(target, 'drop', this);
-	Listeners.add(this.item.container, 'dragend', this);
+	Listeners.add(this.container, 'dragend', this);
 
 	// Hide async so that the translucent image that follows the cursor actually shows something.
 	this.delayedStart = aSync(() => { this.finishDragStart(); });
@@ -595,7 +678,10 @@ this.TabDrag.prototype = {
 			tabWidth += TabItems.tabItemPadding.x +10;
 			tabHeight += TabItems.tabItemPadding.y +50;
 
-			let bounds = new Rect(e.offsetX - (tabWidth /2), e.offsetY - (tabHeight /2), tabWidth, tabHeight);
+			let bounds;
+			if(UI.classic) {
+				bounds = new Rect(e.offsetX - (tabWidth /2), e.offsetY - (tabHeight /2), tabWidth, tabHeight);
+			}
 			new GroupItem([ this.item ], { bounds, focusTitle: true });
 		}
 	},
@@ -616,7 +702,7 @@ this.TabDrag.prototype = {
 			this.sibling.container.classList.remove('space-after');
 		}
 
-		Listeners.remove(this.item.container, 'dragend', this);
+		Listeners.remove(this.container, 'dragend', this);
 		this.item.hidden = false;
 		document.body.classList.remove('DraggingTab');
 

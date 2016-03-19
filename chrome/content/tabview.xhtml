@@ -17,13 +17,19 @@
 
 	<body transparent="true">
 		<div id="content">
-			<div id="groups"/>
+			<div id="groups">
+				<div id="gridNewGroup" class="groupItem" title="&buttonNewGroup.label;" row="small"><div/></div>
+			</div>
 			<div id="actions">
 				<input id="exit-button" type="button" title="&buttonExitTabGroups.label;" groups="0"/>
 				<input id="optionsbutton" type="button" title="&buttonOptionsTabGroups.label;"/>
 				<input id="helpbutton" type="button" title="&buttonHelpTabGroups.label;"/>
-				<input id="searchbutton" type="button" title="&buttonSearchTabs.label;"/>
-				<div id="pinnedTabs" hidden="true" />
+				<div class="grouped">
+					<input id="gridbutton" type="button" title="&buttonGrid.label;"/>
+					<input id="classicbutton" type="button" title="&buttonClassic.label;"/>
+					<input id="searchbutton" type="button" title="&buttonSearchTabs.label;"/>
+				</div>
+				<div id="pinnedTabs" class="grouped" hidden="true" />
 			</div>
 		</div>
 
