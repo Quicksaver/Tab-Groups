@@ -125,14 +125,9 @@ input.name:focus {
 /* Side buttons */
 
 #actions {
-	border: none;
 	background-color: #E0EAF5;
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
-		1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		-1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		0 1px 3px rgba(4, 38, 60, 0.6);
+	box-shadow: 0 1px 3px rgba(4, 38, 60, 0.6);
+	border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 #actions:-moz-locale-dir(rtl) {

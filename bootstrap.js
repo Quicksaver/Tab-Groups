@@ -1,4 +1,4 @@
-// VERSION 1.8.8
+// VERSION 1.8.9
 
 // This looks for file defaults.js in resource folder, expects:
 //	objName - (string) main object name for the add-on, to be added to window element
@@ -85,6 +85,28 @@ function LOG(str) {
 	if(!str) { str = typeof(str)+': '+str; }
 	console.log(objName+' :: CHROME :: '+str);
 }
+function STEPLOGGER(name) {
+	this.name = name;
+	this.steps = [];
+	this.initTime = new Date().getTime();
+	this.lastTime = this.initTime;
+}
+STEPLOGGER.prototype = {
+	step: function(name) {
+		let time = new Date().getTime();
+		this.steps.push({ name, time: time - this.lastTime});
+		this.lastTime = time;
+	},
+	end: function() {
+		this.step('end');
+		let endTime = new Date().getTime();
+		let report = { name: this.name, total: endTime - this.initTime };
+		for(let x of this.steps) {
+			report[x.name] = x.time;
+		}
+		console.log(report);
+	}
+};
 
 XPCOMUtils.defineLazyServiceGetter(Services, "xulStore", "@mozilla.org/xul/xulstore;1", "nsIXULStore");
 XPCOMUtils.defineLazyServiceGetter(Services, "navigator", "@mozilla.org/network/protocol;1?name=http", "nsIHttpProtocolHandler");

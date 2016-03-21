@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 // This script should be loaded by defaultsContent.js, which is in turn loaded directly by the Messenger module.
 // defaultsContent.js call its .init(objPathString, frame) method, where frame is the enviroment of the frame script.
@@ -80,6 +80,28 @@ function LOG(str) {
 	if(!str) { str = typeof(str)+': '+str; }
 	console.log(objName+' :: CONTENT :: '+str);
 }
+function STEPLOGGER(name) {
+	this.name = name;
+	this.steps = [];
+	this.initTime = new Date().getTime();
+	this.lastTime = this.initTime;
+}
+STEPLOGGER.prototype = {
+	step: function(name) {
+		let time = new Date().getTime();
+		this.steps.push({ name, time: time - this.lastTime});
+		this.lastTime = time;
+	},
+	end: function() {
+		this.step('end');
+		let endTime = new Date().getTime();
+		let report = { name: this.name, total: endTime - this.initTime };
+		for(let x of this.steps) {
+			report[x.name] = x.time;
+		}
+		console.log(report);
+	}
+};
 
 function handleDeadObject(ex) {
 	if(ex.message == "can't access dead object") {

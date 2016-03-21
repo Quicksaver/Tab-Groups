@@ -1,4 +1,4 @@
-// VERSION 1.3.0
+// VERSION 1.3.1
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -29,11 +29,11 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.lastMouseDownTarget = null;
 
 	this._itemSizeFrozen = false;
-	this._delaySetCurrentSize = null;
 	this._lastArrange = null;
 	this._userBounds = false;
 	this._slot = 0;
 	this._row = '';
+	this._gridBounds = null;
 
 	// A <Point> that describes the last size specifically chosen by the user.
 	this.userSize = null;
@@ -146,13 +146,11 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.contents = document.createElement('div');
 	this.contents.classList.add('contents');
 	this.container.appendChild(this.contents);
-	this.$contents = iQ(this.contents);
 
 	// tabs container
 	this.tabContainer = document.createElement('div');
 	this.tabContainer.classList.add('tab-container');
 	this.contents.appendChild(this.tabContainer);
-	this.$tabContainer = iQ(this.tabContainer);
 
 	// ___ Stack Expander
 	this.expander = document.createElement("div");
@@ -318,7 +316,18 @@ this.GroupItem.prototype = {
 
 	// Returns a <Rect> for the groupItem's content area (which doesn't include the title, etc).
 	getContentBounds: function(justTabs) {
-		return (justTabs) ? this.$tabContainer.bounds() : this.$contents.bounds();
+		if(this.expanded) {
+			return new Rect(this.expanded.bounds);
+		}
+
+		let bounds = new Rect((UI.classic) ? this.bounds : this._gridBounds);
+		bounds.width -= UICache.groupContentsMargin.x;
+		bounds.height -= UICache.groupContentsMargin.y;
+		bounds.height -= UICache.groupTitlebarHeight;
+		if(justTabs && this.isStacked) {
+			bounds.height -= UICache.stackExpanderHeight;
+		}
+		return bounds;
 	},
 
 	// Returns a copy of the Item's bounds as a <Rect>.
@@ -404,29 +413,16 @@ this.GroupItem.prototype = {
 		this.save();
 	},
 
-	setSize: function(bounds, options = {}) {
-		if(this._delaySetCurrentSize) {
-			this._delaySetCurrentSize.cancel();
-			this._delaySetCurrentSize = null;
-		}
-
-		// Trigger handlers only if needed.
-		if(!bounds) {
-			let box = this.$container.bounds();
-			let valid = GroupItems.calcValidSize(new Point(box.width, box.height));
-			bounds = new Rect(box.left, box.top, valid.x, valid.y);
-		}
-		if(!bounds.equals(this.bounds) || options.force) {
+	setSize: function(bounds, arrange) {
+		if(bounds && !bounds.equals(this.bounds)) {
 			this.bounds = bounds;
 			UI.clearShouldResizeItems();
 			this.setTrenches(bounds);
 			this.save();
+		}
 
-			if(options.immediate) {
-				this.arrange();
-			} else {
-				this.delayArrange(350);
-			}
+		if(arrange) {
+			this.arrange();
 		}
 	},
 
@@ -697,7 +693,7 @@ this.GroupItem.prototype = {
 					if(e.originalTarget.localName == 'resizer' && e.originalTarget.parentNode == this.container) {
 						new GroupDrag(this, e, true);
 					}
-					else if(this.closeButton != e.target
+					else if(!e.target.classList.contains('close') // can also be tabs close button
 					&& this.expander != e.target) {
 						this.lastMouseDownTarget = e.target;
 						if(!this.childHandling && UI.classic) {
@@ -1328,14 +1324,11 @@ this.GroupItem.prototype = {
 		// if we should stack and we're not expanded
 		if(shouldStack) {
 			this.container.classList.add('stackedGroup');
-			// When first opening groups mode, the expanders icons are only 1px high, for clown reasons of course.
-			let expanderHeight;
-			while(expanderHeight != this.expander.clientHeight) {
-				expanderHeight = this.expander.clientHeight;
-				this._stackArrange();
-			}
+			this.isStacked = true;
+			this._stackArrange();
 		} else {
 			this.container.classList.remove('stackedGroup');
+			this.isStacked = false;
 			this._gridArrange();
 		}
 	},
@@ -1357,13 +1350,14 @@ this.GroupItem.prototype = {
 		let zIndex = numInPile;
 		let children = [];
 		for(let child of childrenToArrange) {
-			child.isStacked = true;
-			if(numInPile-- > 0) {
+			if(numInPile > 0) {
 				children.push(child);
+				numInPile--;
 			} else {
-				child.hidden = true;
+				child.inVisibleStack(false);
 			}
 		}
+
 		let bounds = this.getContentBounds(true);
 
 		// Check against our cached values if we need to re-calc anything.
@@ -1380,7 +1374,6 @@ this.GroupItem.prototype = {
 		if(!arrange) { return; }
 		this._lastArrange = { isStacked: true, bounds, children };
 
-		this.isStacked = true;
 		removeAttribute(this.tabContainer, 'columns');
 
 		// compute size of the entire stack, modulo rotation.
@@ -1400,8 +1393,8 @@ this.GroupItem.prototype = {
 		// x is the left margin that the stack will have, within the content area (bounds)
 		// y is the vertical margin
 		let position = {
-			x: (bounds.width - size.x - TabItems.tabItemPadding.x) / 2,
-			y: (bounds.height - size.y - TabItems.tabItemPadding.y) / 2
+			x: (bounds.width - size.x - UICache.tabItemPadding.x) / 2,
+			y: (bounds.height - size.y - UICache.tabItemPadding.y) / 2
 		};
 
 		let sscode = '\
@@ -1416,18 +1409,10 @@ this.GroupItem.prototype = {
 
 		let angleDelta = 3.5; // degrees
 		let angleAccum = 0;
+		let angleMultiplier = RTL ? -1 : 1;
 		for(let child of children) {
-			child.addClass("stacked");
-			setAttribute(child.container, 'draggable', 'false');
-			if(angleAccum != 0) {
-				child.addClass('behind');
-			} else {
-				child.removeClass('behind');
-			}
-
-			child.setZ(zIndex--);
-			child.setRotation((RTL ? -1 : 1) * angleAccum);
-			child.hidden = false;
+			child.inVisibleStack(true, angleMultiplier * angleAccum, zIndex);
+			zIndex--;
 			angleAccum += angleDelta;
 		}
 	},
@@ -1436,7 +1421,6 @@ this.GroupItem.prototype = {
 	_gridArrange: function() {
 		let cols;
 		if(!this.expanded) {
-			this.isStacked = false;
 			cols = this._columns;
 		}
 
@@ -1451,19 +1435,25 @@ this.GroupItem.prototype = {
 		if(!arrange) { return; }
 		this._lastArrange = { isStacked: false, bounds, count };
 
+		// Reset stacked info, as this groups isn't stacked anymore (even when in the expanded tray, the tabs are still not considered stacked).
 		for(let child of this.children) {
-			child.removeClass("stacked");
-			child.isStacked = false;
-			child.setRotation(0);
-			child.hidden = false;
-			setAttribute(child.container, 'draggable', 'true');
+			child.inVisibleStack();
 		}
 
 		this._lastTabSize = TabItems.arrange(count, bounds, cols);
 		let { tabWidth, tabHeight, columns } = this._lastTabSize;
 		let fontSize = TabItems.getFontSizeFromWidth(tabWidth);
-		let spaceWidth = tabWidth + TabItems.tabItemPadding.x;
-		let spaceHeight = tabHeight + TabItems.tabItemPadding.y;
+		let spaceWidth = tabWidth + UICache.tabItemPadding.x;
+		let spaceHeight = tabHeight + UICache.tabItemPadding.y;
+
+		// Tab title heights vary according to fonts... I wish I could use flexbox here, but the more flexboxes the more it lags.
+		let lineHeight = TabItems.fontSizeRange.max;
+		if(fontSize > 10) {
+			lineHeight++;
+			if(fontSize > 13) {
+				lineHeight++;
+			}
+		}
 
 		setAttribute(this.tabContainer, 'columns', columns);
 
@@ -1473,6 +1463,10 @@ this.GroupItem.prototype = {
 				width: '+tabWidth+'px;\n\
 				height: '+tabHeight+'px;\n\
 				font-size: '+fontSize+'px;\n\
+			}\n\
+			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab:not(.stacked) .thumb,\n\
+			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .thumb {\n\
+				height: calc(100% - '+lineHeight+'px);\n\
 			}\n\
 			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container:not([columns="1"]) .tab.space-before,\n\
 			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container:not([columns="1"]) .tab.space-before {\n\
@@ -1688,6 +1682,11 @@ this.GroupItems = {
 	[Symbol.iterator]: function* () {
 		for(let groupItem of this.groupItems.values()) {
 			yield groupItem;
+		}
+	},
+	get [0]() {
+		for(let groupItem of this.groupItems.values()) {
+			return groupItem;
 		}
 	},
 
@@ -2313,6 +2312,7 @@ this.GroupItems = {
 		if(this._arrangePaused) { return; }
 
 		let bounds = UI.getPageBounds();
+
 		// +1 is for the create new group item.
 		let count = this.size +1;
 
@@ -2321,6 +2321,7 @@ this.GroupItems = {
 		let arrange = !lastArrange || !lastArrange.count != count || !lastArrange.bounds.equals(bounds);
 		if(!arrange) { return; }
 		this._lastArrange = { count, bounds };
+
 		// If we have no groups, it's easy, flex-stretch the create new group item.
 		if(count == 1) {
 			Styles.unload("GroupItems.arrange_"+_UUID);
@@ -2478,6 +2479,7 @@ this.GroupItems = {
 				return null;
 			}
 		};
+
 		// First we figure out the safest grid display, where all items are equally distributed and have the same dimensions.
 		let small = calc();
 
@@ -2489,6 +2491,7 @@ this.GroupItems = {
 
 		// Equalize (stretch) the top small rows, so that the items in the last row only are the smallest.
 		let shift = calc(1);
+
 		let sscode = '';
 		let style = (type, items) => {
 			if(!items) { return; }
@@ -2504,6 +2507,7 @@ this.GroupItems = {
 					// The last item (create new group item) isn't really a group item; it's always row="small".
 					if(groups[i]) {
 						groups[i].row = type;
+						groups[i]._gridBounds = new Rect(0, 0, items.width, items.height);
 						i++;
 					}
 				}
@@ -2517,6 +2521,7 @@ this.GroupItems = {
 		style('small', small);
 
 		Styles.load('GroupItems.arrange_'+_UUID, sscode, true);
+
 		// When the groups change dimensions, we should ensure their tabs are also re-arranged properly.
 		if(!delayChildren) {
 			for(let group of this) {

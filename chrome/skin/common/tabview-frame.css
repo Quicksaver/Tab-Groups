@@ -8,23 +8,24 @@ html {
 }
 
 body {
-	padding: 0px;
-	margin: 0 auto;
+	padding: 0;
+	margin: 0;
 }
 
 #content {
 	overflow: -moz-hidden-unscrollable;
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
+}
+
+html, body, #content {
 	height: 100%;
-	display: flex;
+	width: 100%;
 }
 
 #groups {
-	flex: 1 1 auto;
 	position: relative;
+	height: 100%;
+	/* #actions 29px width + 1px borders x2 */
+	width: calc(100% - 31px);
 }
 
 body.grid #groups {
@@ -37,9 +38,6 @@ body.grid #groups {
 /* Tabs */
 
 .tab {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
 	overflow: hidden;
 	padding: 10px;
 	margin: 0;
@@ -60,13 +58,15 @@ body.DraggingTab .tab * {
 
 .thumb {
 	position: relative;
-	flex: 1 1 auto;
-	display: flex;
 	overflow: hidden;
+	width: 100%;
+}
+
+.tab.stacked .thumb {
+	height: 100%;
 }
 
 .thumb > *:-moz-any(canvas,.cached-thumb) {
-	flex: 1 1 auto;
 	background-color: white;
 	background-clip: content-box;
 }
@@ -74,14 +74,14 @@ body.DraggingTab .tab * {
 .tab.cached-data .cached-thumb,
 .tab:not(.cached-data) canvas {
 	/* minus the borders, canvas are insane because they need width/height attributes to work properly,
-	   which completely messes up their layout in flex. */
+	   which completely messes up their layout unless overriden here. */
 	width: calc(100% - 2px) !important;
 	height: calc(100% - 2px) !important;
 }
 
 .tab.cached-data canvas,
 .tab:not(.cached-data) .cached-thumb {
-	visibility: collapse;
+	display: none;
 }
 
 .favicon {
@@ -148,7 +148,6 @@ body.DraggingTab .tab * {
 	white-space: nowrap;
 	text-align: center;
 	margin: 3px 0;
-	flex: 0 0 auto;
 }
 
 .stacked {
@@ -189,8 +188,6 @@ body.DraggingTab .tab * {
 /* Tab GroupItem */
 
 .groupItem {
-	display: flex;
-	flex-direction: column;
 	overflow: hidden;
 }
 
@@ -239,26 +236,26 @@ body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl) {
 	box-shadow: rgba(0,0,0,0.8) -2px 2px 8px;
 }
 
-.groupItem .close {
-	width: 26px;
-	background-position: center center;
-}
-
 .groupItem .contents {
-	flex: 1 1 auto;
 	margin: 6px;
-	display: flex;
-	flex-direction: column;
 	overflow: hidden;
+	/* leave space for titlebar and for its own margin */
+	height: calc(100% - 24px - 12px);
 }
 
 .tab-container {
 	position: relative;
-	flex: 1 1 auto;
+	width: 100%;
+	height: 100%;
 	display: flex;
 	flex-wrap: wrap;
 	align-content: flex-start;
 	overflow: hidden;
+}
+
+.groupItem.stackedGroup .tab-container {
+	/* leave space for the stack expander */
+	height: calc(100% - 32px);
 }
 
 .overlay {
@@ -414,11 +411,17 @@ body.classic .groupItem.dragOver:-moz-locale-dir(rtl) {
 	display: flex;
 	cursor: move;
 	font-size: 12px;
+	height: 24px;
 }
 
 .title-container {
 	position: relative;
 	flex: 1 1 auto;
+}
+
+.titlebar .close {
+	width: 26px;
+	background-position: center center;
 }
 
 input.name {
@@ -469,7 +472,6 @@ input.name:focus::-moz-placeholder {
 
 .transparentBorder {
 	border: 1px solid transparent !important;
-	border: 1px solid transparent !important;
 }
 
 .groupItem:not(.stackedGroup) .stackExpander {
@@ -478,11 +480,10 @@ input.name:focus::-moz-placeholder {
 
 .stackExpander {
 	cursor: pointer;
-	bottom: 8px;
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/stack-expander.png), 0, 48, 24, 24);
 	width: 24px;
 	height: 24px;
-	margin: 0 auto;
+	margin: 0 auto 8px;
 }
 
 .stackExpander:hover {
@@ -551,22 +552,24 @@ input.name:focus::-moz-placeholder {
 /* Side buttons */
 
 #actions {
-	position: relative;
+	position: absolute;
+	top: 0;
 	align-self: start;
 	padding: 3px 0;
-	-moz-padding-end: 3px;
 	z-index: 30;
 	width: 29px;
 	text-align: center;
-	border-radius: 5px;
+	-moz-border-end: 1px solid transparent;
 }
 
 #actions:-moz-locale-dir(ltr) {
-	right: -3px;
+	right: 0;
+	border-radius: 5px 0 0 5px;
 }
 
 #actions:-moz-locale-dir(rtl) {
-	left: -3px;
+	left: 0;
+	border-radius: 0 5px 5px 0;
 }
 
 #actions input {
@@ -575,7 +578,7 @@ input.name:focus::-moz-placeholder {
 	background-position: 50% 50%;
 	background-attachment: scroll;
 	border: none;
-	padding: 2px;
+	padding: 0;
 	width: 24px;
 	height: 24px;
 }

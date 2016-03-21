@@ -1,4 +1,4 @@
-// VERSION 1.1.5
+// VERSION 1.1.6
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -29,31 +29,17 @@ this.TabItem = function(tab, options = {}) {
 	this.tabCanvas = new TabCanvas(this.tab, this.canvas);
 
 	this.isATabItem = true;
+	this._hidden = false;
 	this._reconnected = false;
 	this.isStacked = false;
+	this._inVisibleStack = null;
 	this.lastMouseDownTarget = null;
 
 	this._lastTabUpdateTime = Date.now();
 
-	// Read off the total vertical and horizontal padding on the tab container and cache this value, as it must be the same for every TabItem.
-	if(!TabItems.tabItemPadding) {
-		let divStyle = getComputedStyle(this.container);
-		TabItems.tabItemPadding = {
-			x: parseInt(divStyle.getPropertyValue('padding-left')) + parseInt(divStyle.getPropertyValue('padding-right')),
-			y: parseInt(divStyle.getPropertyValue('padding-top')) + parseInt(divStyle.getPropertyValue('padding-bottom'))
-		};
-	}
-	if(!TabItems.canvasOffset) {
-		let canvasStyle = getComputedStyle(this.canvas);
-		TabItems.canvasOffset = {
-			x: parseInt(canvasStyle.getPropertyValue('border-left-width')) + parseInt(canvasStyle.getPropertyValue('border-right-width')),
-			y: parseInt(canvasStyle.getPropertyValue('border-top-width')) + parseInt(canvasStyle.getPropertyValue('border-bottom-width'))
-		};
-	}
-
 	Listeners.add(this.container, 'mousedown', this);
 	Listeners.add(this.container, 'mouseup', this);
-	Listeners.add(this.container, 'dragstart', this);
+	Listeners.add(this.container, 'dragstart', this, true);
 	Listeners.add(this.container, 'dragover', this);
 	Listeners.add(this.container, 'dragenter', this);
 
@@ -179,8 +165,13 @@ this.TabItem.prototype = {
 				break;
 
 			case 'dragstart':
-				this.lastMouseDownTarget = null;
-				new TabDrag(e, this);
+				if(this.lastMouseDownTarget == this.closeBtn) {
+					e.preventDefault();
+					e.stopPropagation();
+				} else {
+					this.lastMouseDownTarget = null;
+					new TabDrag(e, this);
+				}
 				break;
 
 			case 'dragenter':
@@ -256,7 +247,7 @@ this.TabItem.prototype = {
 	destroy: function() {
 		Listeners.remove(this.container, 'mousedown', this);
 		Listeners.remove(this.container, 'mouseup', this);
-		Listeners.remove(this.container, 'dragstart', this);
+		Listeners.remove(this.container, 'dragstart', this, true);
 		Listeners.remove(this.container, 'dragover', this);
 		Listeners.remove(this.container, 'dragenter', this);
 		this.container.remove();
@@ -278,16 +269,47 @@ this.TabItem.prototype = {
 	},
 
 	get hidden() {
-		try { return this.container.classList.contains('tabHidden'); } catch(ex) { LOG(arguments.callee.caller); throw ex; }
+		return this._hidden;
 	},
 
 	set hidden(v) {
-		this.container.classList[v ? 'add' : 'remove']('tabHidden');
+		if(this._hidden != v) {
+			this.container.classList[v ? 'add' : 'remove']('tabHidden');
+			this._hidden = v;
+		}
+		return this._hidden;
 	},
 
-	// Sets the z-index for this item.
-	setZ: function(value) {
-		this.container.style.zIndex = value;
+	inVisibleStack: function(visible, rotation, zIndex) {
+		let stacked = visible != undefined;
+		this.isStacked = stacked;
+
+		if(!visible) {
+			this.hidden = stacked;
+			if(!this._inVisibleStack) { return; }
+			this._inVisibleStack = null;
+
+			setAttribute(this.container, 'draggable', 'true');
+			this.removeClass("stacked");
+			this.removeClass("behind");
+			this.setRotation(0);
+			return;
+		}
+
+		if(this._inVisibleStack && this._inVisibleStack.rotation == rotation && this._inVisibleStack.zIndex == zIndex) { return; }
+		this._inVisibleStack = { rotation, zIndex };
+
+		this.addClass("stacked");
+		setAttribute(this.container, 'draggable', 'false');
+		if(rotation != 0) {
+			this.addClass('behind');
+		} else {
+			this.removeClass('behind');
+		}
+
+		this.container.style.zIndex = zIndex;
+		this.setRotation(rotation);
+		this.hidden = false;
 	},
 
 	// Rotates the object to the given number of degrees.
@@ -381,8 +403,8 @@ this.TabItem.prototype = {
 	// Updates the tabitem's canvas.
 	updateCanvas: function() {
 		// ___ thumbnail
-		let w = this.$canvas.width() - TabItems.canvasOffset.x;
-		let h = this.$canvas.height() - TabItems.canvasOffset.y;
+		let w = this.$canvas.width() - UICache.tabCanvasOffset.x;
+		let h = this.$canvas.height() - UICache.tabCanvasOffset.y;
 		let dimsChanged = w != this.canvas.width || h != this.canvas.height;
 
 		TabItems._lastUpdateTime = Date.now();
@@ -422,13 +444,16 @@ this.TabItems = {
 	_maxTimeForUpdating: 200, // milliseconds that consecutive updates can take
 	_lastUpdateTime: Date.now(),
 	reconnectingPaused: false,
-	tabItemPadding: null,
-	canvasOffset: null,
 
 	get size() { return this.items.size; },
 	[Symbol.iterator]: function* () {
 		for(let item of this.items) {
 			yield item;
+		}
+	},
+	get [0]() {
+		for(let item of this) {
+			return item;
 		}
 	},
 
@@ -798,7 +823,7 @@ this.TabItems = {
 	// Private method that returns the fontsize to use given the tab's width
 	getFontSizeFromWidth: function(width) {
 		let widthRange = new Range(0, this.tabWidth);
-		let proportion = widthRange.proportion(width - this.tabItemPadding.x, true);
+		let proportion = widthRange.proportion(width - UICache.tabItemPadding.x, true);
 		// proportion is in [0,1]
 		return Math.max(this.fontSizeRange.scale(proportion), this.fontSizeRange.min);
 	},
@@ -849,8 +874,8 @@ this.TabItems = {
 			tabHeight = validSize.y;
 		}
 
-		tabWidth = Math.floor(tabWidth) -this.tabItemPadding.x;
-		tabHeight = Math.floor(tabHeight) -this.tabItemPadding.y;
+		tabWidth = Math.floor(tabWidth) -UICache.tabItemPadding.x;
+		tabHeight = Math.floor(tabHeight) -UICache.tabItemPadding.y;
 
 		return { tabWidth, tabHeight, columns, rows };
 	},

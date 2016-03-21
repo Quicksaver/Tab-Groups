@@ -1,4 +1,4 @@
-// VERSION 2.1.0
+// VERSION 2.1.1
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -117,8 +117,8 @@ this.GroupDrag.prototype = {
 						this._stoppedMoving.cancel();
 					}
 					this._stoppedMoving = aSync(() => {
-						this.item.setSize(null, { force: true, immediate: true });
-					}, 50);
+						this.item.setSize(bounds, true);
+					}, 100);
 					break;
 				}
 
@@ -363,7 +363,11 @@ this.GroupDrag.prototype = {
 				this.snap(null, true);
 			}
 		} else {
-			this.item.setSize(null, { immediate: true });
+			if(this._stoppedMoving) {
+				this._stoppedMoving.cancel();
+				this._stoppedMoving = null;
+			}
+			this.item.setSize(null, true);
 			this.snap();
 
 			// Remembers the current size as one the user has chosen.
@@ -675,8 +679,8 @@ this.TabDrag.prototype = {
 			}
 
 			let { tabWidth, tabHeight } = tabSize;
-			tabWidth += TabItems.tabItemPadding.x +10;
-			tabHeight += TabItems.tabItemPadding.y +50;
+			tabWidth += UICache.tabItemPadding.x +10;
+			tabHeight += UICache.tabItemPadding.y +50;
 
 			let bounds;
 			if(UI.classic) {

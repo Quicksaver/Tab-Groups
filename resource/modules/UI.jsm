@@ -1,4 +1,4 @@
-// VERSION 1.2.0
+// VERSION 1.2.1
 
 this.Keys = { meta: false };
 
@@ -1348,6 +1348,9 @@ this.UI = {
 			// it becomes very jaggy, and... weird. Sometimes it won't even resize at all after stopping the mouse
 			// for a while until moving it again.
 			GroupItems.arrange(true);
+
+			this._pageBounds = newPageBounds;
+			this._save();
 			return;
 		}
 
@@ -1407,7 +1410,7 @@ this.UI = {
 			pair.item.snap();
 		}
 
-		this._pageBounds = this.getPageBounds();
+		this._pageBounds = newPageBounds;
 		this._save();
 	},
 
@@ -1613,6 +1616,61 @@ this.UI = {
 		banner.clientTop;
 
 		setAttribute(banner, 'show', 'true');
+	}
+};
+
+// Keep a few values cached, to avoid constant reflows.
+this.UICache = {
+	get tabItemPadding() {
+		delete this.tabItemPadding;
+		let item = TabItems[0];
+		let style = getComputedStyle(item.container);
+		this.tabItemPadding = {
+			x: parseInt(style.getPropertyValue('padding-left')) + parseInt(style.getPropertyValue('padding-right')),
+			y: parseInt(style.getPropertyValue('padding-top')) + parseInt(style.getPropertyValue('padding-bottom'))
+		};
+		return this.tabItemPadding;
+	},
+
+	get tabCanvasOffset() {
+		delete this.tabCanvasOffset;
+		let item = TabItems[0];
+		let style = getComputedStyle(item.canvas);
+		this.tabCanvasOffset = {
+			x: parseInt(style.getPropertyValue('border-left-width')) + parseInt(style.getPropertyValue('border-right-width')),
+			y: parseInt(style.getPropertyValue('border-top-width')) + parseInt(style.getPropertyValue('border-bottom-width'))
+		};
+		return this.tabCanvasOffset;
+	},
+
+	get groupTitlebarHeight() {
+		delete this.groupTitlebarHeight;
+		let item = GroupItems[0];
+		let style = getComputedStyle(item.titlebar);
+		this.groupTitlebarHeight = parseInt(style.getPropertyValue('height'));
+		return this.groupTitlebarHeight;
+	},
+
+	get stackExpanderHeight() {
+		delete this.stackExpanderHeight;
+		let item = GroupItems[0];
+		let style = getComputedStyle(item.expander);
+		this.stackExpanderHeight =
+			parseInt(style.getPropertyValue('height'))
+			+ parseInt(style.getPropertyValue('margin-bottom'))
+			+ parseInt(style.getPropertyValue('margin-top'));
+		return this.stackExpanderHeight;
+	},
+
+	get groupContentsMargin() {
+		delete this.groupContentsMargin;
+		let item = GroupItems[0];
+		let style = getComputedStyle(item.contents);
+		this.groupContentsMargin = {
+			x: parseInt(style.getPropertyValue('margin-left')) + parseInt(style.getPropertyValue('margin-right')),
+			y: parseInt(style.getPropertyValue('margin-top')) + parseInt(style.getPropertyValue('margin-bottom'))
+		};
+		return this.groupContentsMargin;
 	}
 };
 
