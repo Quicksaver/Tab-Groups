@@ -1,4 +1,4 @@
-// VERSION 1.3.2
+// VERSION 1.3.3
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -104,11 +104,13 @@ this.GroupItem = function(listOfEls, options = {}) {
 				this.title.setSelectionRange(0, 0);
 				this.titleShield.hidden = false;
 				this.save();
+				toggleAttribute(this.container, 'draggable', UI.grid);
 				break;
 
 			case 'focus':
 				this._unfreezeItemSize();
 				if(!this._titleFocused) {
+					removeAttribute(this.container, 'draggable');
 					this.title.select();
 					this._titleFocused = true;
 				}
