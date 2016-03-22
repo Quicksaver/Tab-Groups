@@ -1,4 +1,4 @@
-// VERSION 1.1.6
+// VERSION 1.1.7
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -563,9 +563,13 @@ this.TabItems = {
 		canvas.setAttribute('moz-opaque', '');
 		thumb.appendChild(canvas);
 
+		let faviconContainer = document.createElement('div');
+		faviconContainer.classList.add('favicon-container');
+		thumb.appendChild(faviconContainer);
+
 		let favicon = document.createElement('div');
 		favicon.classList.add('favicon');
-		thumb.appendChild(favicon);
+		faviconContainer.appendChild(favicon);
 
 		let span = document.createElement('span');
 		span.classList.add('tab-title');
@@ -636,11 +640,11 @@ this.TabItems = {
 				if(iconUrl) {
 					tabItem.fav._iconUrl = iconUrl;
 					tabItem.fav.style.backgroundImage = 'url("'+iconUrl+'")';
-					tabItem.fav.hidden = false;
+					tabItem.fav.parentNode.hidden = false;
 				} else {
 					tabItem.fav._iconUrl = '';
 					tabItem.fav.style.backgroundImage = '';
-					tabItem.fav.hidden = true;
+					tabItem.fav.parentNode.hidden = true;
 				}
 				tabItem._sendToSubscribers("iconUpdated");
 			});

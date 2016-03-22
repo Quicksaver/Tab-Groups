@@ -2,10 +2,15 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+:root {
+	--item-background: #D0D0D0;
+	--item-border: 1px solid rgba(0, 0, 0, 0.3);
+	--item-border-radius: 7px;
+}
+
 body {
 	background-color: transparent;
 	font: message-box;
-	color: rgba(0, 0, 0, 0.6);
 	font-size: 12px;
 }
 
@@ -23,23 +28,23 @@ body {
 /* Tabs */
 
 .thumb {
-	background-color: rgb(240,240,240);
+	background-color: var(--item-background);
 }
 
 .thumb > *:-moz-any(canvas,.cached-thumb) {
-	border: 1px solid rgba(0, 0, 0, 0.3);
+	border: var(--item-border);
 }
 
-.favicon {
-	background-color: rgb(240,240,240);
+.favicon-container {
+	background-color: var(--item-background);
 	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, -1px 0 0 rgba(225, 225, 225, 0.8) inset;
 	border-top: 1px solid transparent;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+	border-bottom: var(--item-border);
 	-moz-border-start: 1px solid transparent;
-	-moz-border-end: 1px solid rgba(0, 0, 0, 0.3);
+	-moz-border-end: var(--item-border);
 }
 
-.favicon:-moz-locale-dir(rtl) {
+.favicon-container:-moz-locale-dir(rtl) {
 	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, 1px 0 0 rgba(225, 225, 225, 0.8) inset;
 }
 
@@ -53,70 +58,31 @@ body {
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/close.png), 0, 48, 16, 32);
 }
 
-.tab-title {
-	text-shadow: 0 1px rgba(255, 255, 255, 0.6);
-}
-
-.tab.focus .thumb {
-	box-shadow: 0 0 5.5px -moz-mac-menuselect/*#0060D6*/;
-	border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-.tab.focus:not(.stacked) .favicon {
-	border-top: 1px solid rgba(0, 0, 0, 0.3);
-	-moz-border-start: 1px solid rgba(0, 0, 0, 0.3);
-}
-
 /* Tab GroupItem */
 
 .groupItem {
-	background-color: rgb(240,240,240);
-	border: 1px solid rgba(255, 255, 255, 0.5);
+	background-color: var(--item-background);
 }
 
 body.classic .groupItem {
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+	border-radius: var(--item-border-radius);
 }
 
-.phantom {
-	border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.dragRegion {
-	background: rgba(235, 235, 235, 0.4);
-}
-
+.expandedTray,
 .undo {
-	background-color: #A0A0A0;
-	box-shadow: 0px 1px 0px rgba(255,255,255,.5), 0px -1px 0px rgba(0,0,0,.24);
-	text-shadow: 0px -1px 0px rgba(255,255,255,.2);
-	color: rgba(0,0,0,.8);
-}
-
-.undo:hover {
-	background-color: #949494;
-}
-
-/* Other */
-
-input.name {
-	color: #999;
-}
-
-input.name:focus {
-	color: #555;
-}
-
-.title-container:hover input.name::-moz-placeholder {
-	color: #CCC;
+	background-color: var(--item-background);
+	border-radius: var(--item-border-radius);
 }
 
 /* Side buttons */
 
-#actions {
-	background-color: #EBEBEB;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-	border: 1px solid rgba(255, 255, 255, 0.5);
+body.classic #actions {
+	background-color: var(--item-background);
+	border-radius: var(--item-border-radius) 0 0 var(--item-border-radius);
+}
+
+body.classic #actions:-moz-locale-dir(rtl) {
+	border-radius: 0 var(--item-border-radius) var(--item-border-radius) 0;
 }
 
 #exit-button {
@@ -145,7 +111,7 @@ input.name:focus {
 
 /* Search */
 
-#searchshade:-moz-window-inactive {
+.shade:-moz-window-inactive {
 	background: linear-gradient(rgba(237,237,237,0.42), rgba(216,216,216,0.42));
 }
 

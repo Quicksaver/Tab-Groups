@@ -2,9 +2,15 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+:root {
+	--item-background: -moz-dialog;
+	--item-background-aero: hsl(210,75%,92%);
+	--item-border: 1px solid rgba(73, 99, 119, 0.3);
+	--item-border-radius: 5px;
+}
+
 body {
 	font: message-box;
-	color: rgba(0, 0, 0, 0.6);
 	font-size: 13px;
 }
 
@@ -12,22 +18,47 @@ body:not(:-moz-system-metric(windows-compositor)) {
 	background: url("chrome://tabgroups-os/skin/grain.png") repeat scroll center top, linear-gradient(#CCD9EA, #C7D5E7) repeat scroll 0 0;
 }
 
+body.grid {
+	background-color: var(--item-background);
+}
+
+@media (-moz-windows-default-theme) {
+	@media	(-moz-os-version: windows-vista),
+		(-moz-os-version: windows-win7) {
+
+		body.grid {
+			background-color: var(--item-background-aero);
+		}
+	}
+}
+
 /* Tabs */
 
 .thumb {
-	background-color: #E0EAF5;
+	background-color: var(--item-background);
 }
 
 .thumb > *:-moz-any(canvas,.cached-thumb) {
-	border: 1px solid rgba(73, 99, 119, 0.3);
+	border: var(--item-border);
 }
 
-.favicon {
-	background-color: #E0EAF5;
+.favicon-container {
+	background-color: var(--item-background);
 	border-top: 1px solid transparent;
-	border-bottom: 1px solid rgba(73, 99, 119, 0.3);
+	border-bottom: var(--item-border);
 	-moz-border-start: 1px solid transparent;
-	-moz-border-end: 1px solid rgba(73, 99, 119, 0.3);
+	-moz-border-end: var(--item-border);
+}
+
+@media (-moz-windows-default-theme) {
+	@media	(-moz-os-version: windows-vista),
+		(-moz-os-version: windows-win7) {
+
+		.thumb,
+		.favicon-container {
+			background-color: var(--item-background-aero);
+		}
+	}
 }
 
 .close {
@@ -42,101 +73,53 @@ body:not(:-moz-system-metric(windows-compositor)) {
 	background-image: -moz-image-rect(url("chrome://tabgroups-os/skin/close.png"), 0, 48, 16, 32);
 }
 
-.tab-title {
-	text-shadow: 0 1px rgba(255, 255, 255, 0.6);
-}
-
-.tab.focus .thumb {
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px #FFFFFF inset,
-		1px 0 1px #FFFFFF inset,
-		-1px 0 1px #FFFFFF inset,
-		0 0 5.5px #007ECE;
-}
-
-.tab.focus .thumb:-moz-locale-dir(rtl) {
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px #FFFFFF inset,
-		-1px 0 1px #FFFFFF inset,
-		1px 0 1px #FFFFFF inset,
-		0 0 5.5px #007ECE;
-}
-
-.tab.focus:not(.stacked) .favicon {
-	border-top: 1px solid rgba(73, 99, 119, 0.3);
-	-moz-border-start: 1px solid rgba(73, 99, 119, 0.3);
-}
-
 /* Tab GroupItem */
 
-.groupItem {
-	background-color: #E0EAF5;
-}
-
-body.classic .groupItem {
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
-		1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		-1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		0 1px 3px rgba(4, 38, 60, 0.6);
-}
-
-body.classic .groupItem:-moz-locale-dir(rtl) {
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
-		-1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		0 1px 3px rgba(4, 38, 60, 0.6);
-}
-
-.dragRegion {
-	background: rgba(224, 234, 245, 0.4);
-}
-
+.groupItem,
+.expandedTray,
 .undo {
-	background-color: #A0A0A0;
-	box-shadow: 0px 1px 0px rgba(255,255,255,.5), 0px -1px 0px rgba(0,0,0,.24);
-	text-shadow: 0px -1px 0px rgba(255,255,255,.2);
-	color: rgba(0,0,0,.8);
+	background-color: var(--item-background);
 }
 
-.undo:hover {
-	background-color: #949494;
-}
+@media (-moz-windows-default-theme) {
+	@media	(-moz-os-version: windows-vista),
+		(-moz-os-version: windows-win7) {
 
-/* Other */
+		.groupItem {
+			background-color: var(--item-background-aero);
+		}
 
-input.name {
-	color: #999;
-}
+		body.classic .groupItem {
+			border-radius: var(--item-border-radius);
+		}
 
-input.name:focus {
-	color: #555;
-}
-
-.title-container:hover input.name::-moz-placeholder {
-	color: #CCC;
+		.expandedTray,
+		.undo {
+			background-color: var(--item-background-aero);
+			border-radius: var(--item-border-radius);
+		}
+	}
 }
 
 /* Side buttons */
 
-#actions {
-	background-color: #E0EAF5;
-	box-shadow: 0 1px 3px rgba(4, 38, 60, 0.6);
-	border: 1px solid rgba(255, 255, 255, 0.8);
+body.classic #actions {
+	background-color: var(--item-background);
 }
 
-#actions:-moz-locale-dir(rtl) {
-	box-shadow:
-		0 1px 0 #FFFFFF inset,
-		0 -1px 1px rgba(255, 255, 255, 0.8) inset,
-		-1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		1px 0 1px rgba(255, 255, 255, 0.8) inset,
-		0 1px 3px rgba(4, 38, 60, 0.6);
+@media (-moz-windows-default-theme) {
+	@media	(-moz-os-version: windows-vista),
+		(-moz-os-version: windows-win7) {
+
+		body.classic #actions {
+			background-color: var(--item-background-aero);
+			border-radius: var(--item-border-radius) 0 0 var(--item-border-radius);
+		}
+
+		body.classic #actions:-moz-locale-dir(rtl) {
+			border-radius: 0 var(--item-border-radius) var(--item-border-radius) 0;
+		}
+	}
 }
 
 #exit-button {

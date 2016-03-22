@@ -1,4 +1,4 @@
-// VERSION 1.3.1
+// VERSION 1.3.2
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1002,15 +1002,13 @@ this.GroupItem.prototype = {
 			$undoContainer.css({
 				left: bounds.left + bounds.width /2 - $undoContainer.width() /2,
 				top:  bounds.top + bounds.height /2 - $undoContainer.height() /2,
-				"transform": "scale(.1)",
-				opacity: 0
+				"transform": "scale(.1)"
 			});
 
 			// hide group item and show undo container.
 			aSync(() => {
 				$undoContainer.animate({
-					"transform": "scale(1)"+transform,
-					"opacity": 1
+					"transform": "scale(1)"
 				}, {
 					easing: "tabviewBounce",
 					duration: 170,
@@ -1090,7 +1088,6 @@ this.GroupItem.prototype = {
 
 		if(UI.classic) {
 			iQ(undoContainer).animate({
-				opacity: 0,
 				"transform": "scale(.1)",
 			}, {
 				duration: 170,
@@ -1211,7 +1208,6 @@ this.GroupItem.prototype = {
 
 			item.setParent(null);
 			item.removeClass("stacked");
-			item.removeClass("stack-trayed");
 			item.isStacked = false;
 			item.hidden = false;
 			item.setRotation(0);
@@ -1491,6 +1487,15 @@ this.GroupItem.prototype = {
 	expand: function() {
 		UI.setActive(this.getTopChild());
 
+		// There are no top and left properties in grid mode, because it uses a flexbox to place the groups there.
+		// There's also no need to go through the trouble of getting them unless we actually need to; i.e. now.
+		if(UI.grid && !this._gridBounds.positioned) {
+			let bounds = this.$container.bounds();
+			this._gridBounds.top = bounds.top;
+			this._gridBounds.left = bounds.left;
+			this._gridBounds.positioned = true;
+		}
+
 		let startBounds = this.getBounds();
 		let tray = document.createElement('div');
 		let $tray = iQ(tray).css({
@@ -1533,6 +1538,7 @@ this.GroupItem.prototype = {
 
 		let shield = document.createElement('div');
 		shield.classList.add('shield');
+		shield.classList.add('shade');
 		shield.handleEvent = (e) => {
 			this.collapse();
 		};
@@ -1563,12 +1569,7 @@ this.GroupItem.prototype = {
 
 					this._sendToSubscribers("expanded");
 				}
-			})
-		tray.classList.add("overlay");
-
-		for(let child of this.children) {
-			child.addClass("stack-trayed");
-		}
+			});
 	},
 
 	// Collapses the groupItem from the expanded "tray" mode.
@@ -1598,10 +1599,6 @@ this.GroupItem.prototype = {
 
 		this.expanded.shield.remove();
 		this.expanded = null;
-
-		for(let child of this.children) {
-			child.removeClass("stack-trayed");
-		}
 
 		this.contents.insertBefore(this.tabContainer, this.contents.firstChild);
 		this._unfreezeItemSize(true);

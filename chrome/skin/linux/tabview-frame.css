@@ -2,9 +2,13 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+:root {
+	--item-background: -moz-dialog;
+	--item-border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
 body {
 	font: -moz-window;
-	color: WindowText;
 	font-size: 12px;
 	background-color: window;
 	background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.2));
@@ -13,23 +17,23 @@ body {
 /* Tabs */
 
 .thumb {
-	background-color: #D7D7D7;
+	background-color: var(--item-background);
 }
 
 .thumb > *:-moz-any(canvas,.cached-thumb) {
 	border: 1px solid rgba(0,0,0,0.2);
 }
 
-.favicon {
-	background-color: #D7D7D7;
+.favicon-container {
+	background-color: var(--item-background);
 	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, -1px 0 0 rgba(225, 225, 225, 0.8) inset;
 	border-top: 1px solid transparent;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+	border-bottom: var(--item-border);
 	-moz-border-start: 1px solid transparent;
-	-moz-border-end: 1px solid rgba(0, 0, 0, 0.3);
+	-moz-border-end: var(--item-border);
 }
 
-.favicon:-moz-locale-dir(rtl) {
+.favicon-container:-moz-locale-dir(rtl) {
 	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, 1px 0 0 rgba(225, 225, 225, 0.8) inset;
 }
 
@@ -54,75 +58,22 @@ body {
 	transition-timing-function: ease-out;
 }
 
-.tab.focus .thumb {
-	box-shadow: Highlight 0px 0px 5px 1px !important;
-	border-color: Highlight;
-}
-
-.tab.focus:not(.stacked) .favicon {
-	border-top: 1px solid rgba(0, 0, 0, 0.3);
-	-moz-border-start: 1px solid rgba(0, 0, 0, 0.3);
-}
-
 /* Tab GroupItem */
 
-.groupItem {
-	border: 1px solid rgba(230,230,230,1);
-	background-color: window;
-	background-image: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-}
-
-body.classic .groupItem {
-	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) 1px 1px 3px;
-}
-
-body.classic .groupItem:-moz-locale-dir(rtl) {
-	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) -1px 1px 3px;
+.groupItem,
+.expandedTray,
+.undo {
+	background-color: var(--item-background);
 }
 
 .phantom {
 	border: 1px solid rgba(190,190,190,1);
 }
 
-.dragRegion {
-	background: rgba(248,248,248,0.4);
-}
-
-.undo {
-	background-color: rgba(0,0,0,.2);
-	box-shadow: 0 1px 0 rgba(255,255,255,.4), 0 1px 0 rgba(0,0,0,.3) inset;
-	text-shadow: 0 1px 0 rgba(255,255,255,.2);
-	color: WindowText;
-}
-
-.undo:hover {
-	background-color: rgba(0,0,0,.3);
-}
-
-/* Other */
-
-input.name {
-	color: GrayText;
-}
-
-input.name:focus {
-	color: WindowText;
-}
-
-.title-container:hover input.name::-moz-placeholder {
-	color: GrayText;
-}
-
 /* Side buttons */
 
-#actions {
-	background-color: rgba(248,248,248,1);
-	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) 1px 1px 3px;
-	border: 1px solid rgba(230,230,230,1);
-}
-
-#actions:-moz-locale-dir(rtl) {
-	box-shadow: inset rgba(255, 255, 255, 0.6) 0 0 0 2px, rgba(0,0,0,0.2) -1px 1px 3px;
+body.classic #actions {
+	background-color: var(--item-background);
 }
 
 #exit-button {

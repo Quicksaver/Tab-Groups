@@ -2,6 +2,11 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+:root {
+	--hover-color: rgba(128,128,128,0.3);
+	--item-normal-shadow: 0 1px 5px rgba(60, 60, 60, 0.6);
+}
+
 html {
 	overflow: hidden;
 	-moz-user-select: none;
@@ -10,6 +15,7 @@ html {
 body {
 	padding: 0;
 	margin: 0;
+	color: -moz-DialogText;
 }
 
 #content {
@@ -84,7 +90,7 @@ body.DraggingTab .tab * {
 	display: none;
 }
 
-.favicon {
+.favicon-container {
 	position: absolute;
 	min-width: 17px;
 	min-height: 17px;
@@ -92,26 +98,31 @@ body.DraggingTab .tab * {
 	max-height: 27px;
 	width: calc(100% - 10px - 4px);
 	height: calc(100% - 10px - 4px);
+}
+
+.favicon-container:-moz-locale-dir(ltr) {
+	border-bottom-right-radius: 0.4em;
+}
+
+.favicon-container:-moz-locale-dir(rtl) {
+	border-bottom-left-radius: 0.4em;
+}
+
+.tab:not(.stacked) .favicon-container { top: 0; }
+.tab:not(.stacked) .favicon-container:-moz-locale-dir(ltr) { left: 0; }
+.tab:not(.stacked) .favicon-container:-moz-locale-dir(rtl) { right: 0; }
+
+.tab.stacked .favicon-container { top: 1px; }
+.tab.stacked .favicon-container:-moz-locale-dir(ltr) { left: 1px; }
+.tab.stacked .favicon-container:-moz-locale-dir(rtl) { right: 1px; }
+
+.favicon {
+	width: 100%;
+	height: 100%;
 	background-repeat: no-repeat;
 	background-size: 16px 16px;
 	background-position: center center;
 }
-
-.favicon:-moz-locale-dir(ltr) {
-	border-bottom-right-radius: 0.4em;
-}
-
-.favicon:-moz-locale-dir(rtl) {
-	border-bottom-left-radius: 0.4em;
-}
-
-.tab:not(.stacked) .favicon { top: 0; }
-.tab:not(.stacked) .favicon:-moz-locale-dir(ltr) { left: 0; }
-.tab:not(.stacked) .favicon:-moz-locale-dir(rtl) { right: 0; }
-
-.tab.stacked .favicon { top: 1px; }
-.tab.stacked .favicon:-moz-locale-dir(ltr) { left: 1px; }
-.tab.stacked .favicon:-moz-locale-dir(rtl) { right: 1px; }
 
 /* Apply crisp rendering for favicons at exactly 2dppx resolution */
 @media (resolution: 2dppx) {
@@ -175,20 +186,46 @@ body.DraggingTab .tab * {
 	box-shadow: rgba(0,0,0,.2) -1px 1px 4px;
 }
 
-.stack-trayed .tab-title {
-	text-shadow: rgba(0,0,0,1) 1px 1px 1.5px;
-	color: #EEE;
-	font-size: 11px;
-}
-
-.stack-trayed .tab-title:-moz-locale-dir(rtl) {
-	text-shadow: rgba(0,0,0,1) -1px 1px 1.5px;
-}
-
 /* Tab GroupItem */
 
-.groupItem {
+.groupItem,
+.expandedTray {
 	overflow: hidden;
+}
+
+body.classic .groupItem,
+.expandedTray {
+	border-top: 1px solid ThreeDHighlight;
+	border-bottom: 1px solid ThreeDLightShadow;
+	-moz-border-start: 1px solid ThreeDHighlight;
+	-moz-border-end: 1px solid ThreeDLightShadow;
+	box-shadow: var(--item-normal-shadow);
+}
+
+body.classic .groupItem.activeGroupItem,
+.expandedTray {
+	box-shadow: rgba(0,0,0,0.8) 2px 2px 8px;
+}
+
+body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl),
+.expandedTray:-moz-locale-dir(rtl) {
+	box-shadow: rgba(0,0,0,0.8) 2px 2px 8px;
+}
+
+body.grid .groupItem {
+	box-shadow:
+		inset -1px 0 0 ThreeDShadow,
+		inset 0 -1px 0 ThreeDShadow,
+		inset 1px 0 0 ThreeDHighlight,
+		inset 0 1px 0 ThreeDHighlight;
+}
+
+body.grid .groupItem:-moz-locale-dir(rtl) {
+	box-shadow:
+		inset -1px 0 0 ThreeDHighlight,
+		inset 0 -1px 0 ThreeDShadow,
+		inset 1px 0 0 ThreeDShadow,
+		inset 0 1px 0 ThreeDHighlight;
 }
 
 .groupItem:not(.closed) {
@@ -197,7 +234,6 @@ body.DraggingTab .tab * {
 
 body.classic .groupItem {
 	position: absolute;
-	border-radius: 5px;
 }
 
 body.classic:not(.searching) .groupItem:not(.phantom) {
@@ -207,11 +243,6 @@ body.classic:not(.searching) .groupItem:not(.phantom) {
 body.grid .groupItem {
 	position: relative;
 	flex: 1 1 auto;
-	box-shadow:
-		inset -1px 0 0 ThreeDShadow,
-		inset 0 -1px 0 ThreeDShadow,
-		inset 1px 0 0 ThreeDHighlight,
-		inset 0 1px 0 ThreeDHighlight;
 }
 
 body.grid .groupItem.closed > *:not(.undo) {
@@ -226,14 +257,6 @@ body.classic .groupItem:not(.phantom) {
 	/* Keep in sync with GroupsItems.minGroupHeight/Width */
 	min-height: 145px;
 	min-width: 120px;
-}
-
-body.classic .groupItem.activeGroupItem {
-	box-shadow: rgba(0,0,0,0.8) 2px 2px 8px;
-}
-
-body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl) {
-	box-shadow: rgba(0,0,0,0.8) -2px 2px 8px;
 }
 
 .groupItem .contents {
@@ -258,24 +281,22 @@ body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl) {
 	height: calc(100% - 32px);
 }
 
-.overlay {
-	background-color: rgba(0,0,0,.7) !important;
-	box-shadow: 3px 3px 5.5px rgba(0,0,0,.5);
-	border-radius: 5px;
-}
-
-.overlay:-moz-locale-dir(rtl) {
-	box-shadow: -3px 3px 5.5px rgba(0,0,0,.5);
-}
-
 .undo {
 	position: absolute;
 	display: flex;
 	align-items: stretch;
 	align-content: stretch;
-	border-radius: 5px;
-	border: none;
 	cursor: pointer;
+	border-top: 1px solid ThreeDHighlight;
+	border-bottom: 1px solid ThreeDLightShadow;
+	-moz-border-start: 1px solid ThreeDHighlight;
+	-moz-border-end: 1px solid ThreeDLightShadow;
+	box-shadow: var(--item-normal-shadow);
+	opacity: 0.75;
+}
+
+.undo:hover {
+	opacity: 1;
 }
 
 body.grid .undo {
@@ -293,12 +314,7 @@ body.grid .undo {
 .undo .close {
 	width: 16px;
 	-moz-padding-end: 0.75em;
-	opacity: 0.5;
 	background-position: 0 50%;
-}
-
-.undo .close:hover {
-	opacity: 1.0;
 }
 
 .phantom {
@@ -318,18 +334,23 @@ body:not(.grid) #gridNewGroup {
 
 #gridNewGroup > div {
 	pointer-events: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	width: 100%;
 	height: 100%;
 	max-width: 100px;
 	max-height: 100px;
-	margin: auto;
-	background-image: url("chrome://tabgroups/skin/new-group.png");
+	background-image: url("chrome://tabgroups/skin/newItem.png");
 	background-size: contain;
-	opacity: 0.75;
+	background-repeat: no-repeat;
+	border: 5px dashed #333;
+	opacity: 0.4;
 }
 
 #gridNewGroup:-moz-any(:hover,.dragOver) > div {
-	opacity: 1;
+	opacity: 0.75;
 }
 
 /* Trenches */
@@ -379,32 +400,14 @@ body:not(.grid) #gridNewGroup {
 
 /* Other */
 
-.groupItem.dragging,
+body.classic .groupItem.dragging,
 .groupItem.resizing {
 	z-index: 100;
 }
 
-.groupItem.dragging,
-.groupItem.dragging * {
+body.classic .groupItem.dragging,
+body.classic .groupItem.dragging * {
 	cursor: grabbing !important;
-}
-
-.active {
-	box-shadow: 5px 5px 3px rgba(0,0,0,.5);
-}
-
-.active:-moz-locale-dir(rtl) {
-	box-shadow: -5px 5px 3px rgba(0,0,0,.5);
-}
-
-/* Can't use :-moz-drag-over because hovering its children nodes while dragging
- * would set the pseudo-class on those and not on the group node. */
-body.classic .groupItem.dragOver {
-	box-shadow: 2px 2px 7px -1px rgba(0,0,0,.6);
-}
-
-body.classic .groupItem.dragOver:-moz-locale-dir(rtl) {
-	box-shadow: -2px 2px 7px -1px rgba(0,0,0,.6);
 }
 
 .titlebar {
@@ -492,18 +495,26 @@ input.name:focus::-moz-placeholder {
 
 .expandedTray {
 	position: absolute;
-	display: flex;
 	z-index: 50;
 	padding: 6px;
 }
 
-.shield {
-	left: 0;
-	top: 0;
+.expandedTray .tab-container {
 	width: 100%;
 	height: 100%;
-	position: absolute;
+}
+
+.shield {
 	z-index: 10;
+}
+
+.shade {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,.42);
 }
 
 .banner {
@@ -559,17 +570,27 @@ input.name:focus::-moz-placeholder {
 	z-index: 30;
 	width: 29px;
 	text-align: center;
-	-moz-border-end: 1px solid transparent;
+	border: 1px solid transparent;
+	border-top-color: ThreeDHighlight;
 }
 
 #actions:-moz-locale-dir(ltr) {
 	right: 0;
-	border-radius: 5px 0 0 5px;
 }
 
 #actions:-moz-locale-dir(rtl) {
 	left: 0;
-	border-radius: 0 5px 5px 0;
+}
+
+body.classic #actions {
+	-moz-border-start-color: ThreeDHighlight;
+	border-bottom-color: ThreeDHighlight;
+}
+
+body.grid #actions {
+	border-bottom-color: ThreeDShadow;
+	/* account for its own padding and borders */
+	height: calc(100% - 8px);
 }
 
 #actions input {
@@ -578,16 +599,10 @@ input.name:focus::-moz-placeholder {
 	background-position: 50% 50%;
 	background-attachment: scroll;
 	border: none;
+	cursor: pointer;
 	padding: 0;
 	width: 24px;
 	height: 24px;
-}
-
-#actions input:hover,
-body.classic #classicbutton,
-body.grid #gridbutton {
-	cursor: pointer;
-	background-color: rgba(128,128,128,.15);
 }
 
 #actions #searchbutton {
@@ -621,6 +636,33 @@ body.grid #gridbutton {
 	background-size: 18px 18px;
 }
 
+/* Various interaction effects */
+
+.tab:not(.stacked).focus,
+.tab:not(.stacked):hover,
+#actions input:hover,
+body.classic #classicbutton,
+body.grid #gridbutton {
+	background-color: var(--hover-color);
+}
+
+.tab:not(.stacked).focus .favicon-container,
+.tab:not(.stacked):hover .favicon-container,
+.groupItem.stackedGroup.activeGroupItem,
+.groupItem.stackedGroup:hover,
+body.DraggingGroup .groupItem.dragging,
+body.DraggingGroup .groupItem.dragging .tab:not(.stacked) .favicon-container,
+body.DraggingGroup .groupItem.dragOver,
+body.DraggingGroup .groupItem.dragOver .tab:not(.stacked) .favicon-container,
+#gridNewGroup:hover,
+#gridNewGroup.dragOver {
+	background-image: linear-gradient(to bottom, var(--hover-color), var(--hover-color));
+}
+
+body.DraggingGroup .groupItem > * {
+	opacity: 0.7;
+}
+
 /* Search */
 
 body:not(.searching) #searchshade,
@@ -629,13 +671,7 @@ body:not(.searching) #search {
 }
 
 #searchshade {
-	position: absolute;
-	top: 0px;
-	left: 0px;
 	z-index: 100;
-	background-color: rgba(0,0,0,.42);
-	width: 100%;
-	height: 100%;
 }
 
 #search {

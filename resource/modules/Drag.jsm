@@ -1,4 +1,4 @@
-// VERSION 2.1.1
+// VERSION 2.1.2
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -59,6 +59,7 @@ this.GroupDrag.prototype = {
 		// If we're in grid mode, this is an HTML5 drag.
 		if(UI.grid) {
 			this.dropTarget = this.item;
+			this.container.classList.add('dragging');
 
 			Listeners.add(this.container, 'drop', this);
 			Listeners.add(this.container, 'dragend', this);
@@ -422,11 +423,14 @@ this.GroupDrag.prototype = {
 		// There's no need to recalc the grid dimensions, they should stay the same, only the groups should switch with one-another.
 		let targetSlot = this.dropTarget.slot;
 		let targetRow = this.dropTarget.row;
+		let targetBounds = this.dropTarget._gridBounds;
 
 		this.dropTarget.slot = this.item.slot;
 		this.dropTarget.row = this.item.row;
+		this.dropTarget._gridBounds = this.item._gridBounds;
 		this.item.slot = targetSlot;
 		this.item.row = targetRow;
+		this.item._gridBounds = targetBounds;
 		this.dropTarget.save();
 		this.dropTarget.arrange();
 		this.item.save();
@@ -439,9 +443,11 @@ this.GroupDrag.prototype = {
 		// Is this an HTML5 drag? We have some extra things to end in this case.
 		if(UI.grid) {
 			this.dropTarget.container.classList.remove('dragOver');
+			this.container.classList.remove('dragging');
 			Listeners.remove(this.dropTarget.container, 'drop', this);
 			Listeners.remove(this.container, 'dragend', this);
 			document.body.classList.remove('DraggingGroup');
+			this.item.isDragging = false;
 		}
 
 		DraggingGroup = null;

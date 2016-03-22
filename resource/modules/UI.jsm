@@ -1,4 +1,4 @@
-// VERSION 1.2.1
+// VERSION 1.2.2
 
 this.Keys = { meta: false };
 
@@ -1281,7 +1281,6 @@ this.UI = {
 		phantom.classList.add("groupItem");
 		phantom.classList.add("phantom");
 		phantom.classList.add("activeGroupItem");
-		phantom.classList.add("dragRegion");
 		GroupItems.workSpace.appendChild(phantom);
 
 		// a faux-Item
