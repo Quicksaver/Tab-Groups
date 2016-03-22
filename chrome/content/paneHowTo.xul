@@ -39,11 +39,11 @@
 			<html:ul>
 				<html:li>
 					<html:p>&howto.grid.description;</html:p>
-					<html:p><html:img src="chrome://objPathString/skin/howto/grid.png"/></html:p>
+					<html:p><html:img src="chrome://objPathString/skin/howto/grid.jpg"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.classic.description;</html:p>
-					<html:p><html:img src="chrome://objPathString/skin/howto/freearrange.png"/></html:p>
+					<html:p><html:img src="chrome://objPathString/skin/howto/freearrange.jpg"/></html:p>
 				</html:li>
 			</html:ul>
 		</groupbox>
@@ -60,7 +60,7 @@
 				<html:li><html:p>&howto.create.step2b;</html:p></html:li>
 				<html:li><html:p>&howto.create.step3;</html:p></html:li>
 			</html:ol>
-			<html:img src="chrome://objPathString/skin/howto/create.png"/>
+			<html:img src="chrome://objPathString/skin/howto/create.jpg"/>
 		</groupbox>
 
 		<groupbox align="start" id="paneHowTo-switch" collapsed="true" data-category="paneHowTo">
@@ -105,7 +105,7 @@
 			<caption label="&howto.pinned.caption;"/>
 			<html:p>&nbsp;</html:p>
 			<html:p>&howto.pinned.description2;</html:p>
-			<html:img src="chrome://objPathString/skin/howto/pinned.png"/>
+			<html:img src="chrome://objPathString/skin/howto/pinned.jpg"/>
 		</groupbox>
 
 		<groupbox align="start" id="paneHowTo-search" collapsed="true" data-category="paneHowTo">
@@ -117,7 +117,7 @@
 				</html:li>
 				<html:li>
 					<html:p>&howto.search.step3;</html:p>
-					<html:img src="chrome://objPathString/skin/howto/search.png"/>
+					<html:img src="chrome://objPathString/skin/howto/search.jpg"/>
 					<html:p>&howto.search.final;</html:p>
 				</html:li>
 			</html:ol>
