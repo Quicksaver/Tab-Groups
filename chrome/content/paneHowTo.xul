@@ -32,14 +32,32 @@
 			<html:p>&howto.overview.a;</html:p>
 		</groupbox>
 
+		<groupbox align="start" id="paneHowTo-mode" collapsed="true" data-category="paneHowTo">
+			<caption label="&howto.mode.caption;"/>
+			<html:p>&nbsp;</html:p>
+			<html:p>&howto.mode.description;</html:p>
+			<html:ul>
+				<html:li>
+					<html:p>&howto.grid.description;</html:p>
+					<html:p><html:img src="chrome://objPathString/skin/howto/grid.png"/></html:p>
+				</html:li>
+				<html:li>
+					<html:p>&howto.classic.description;</html:p>
+					<html:p><html:img src="chrome://objPathString/skin/howto/freearrange.png"/></html:p>
+				</html:li>
+			</html:ul>
+		</groupbox>
+
 		<groupbox align="start" id="paneHowTo-create" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.create.caption;"/>
+			<html:p>&nbsp;</html:p>
+			<html:p>&howto.create.step0;</html:p>
 			<html:ol>
-				<html:li><html:p>&howto.create.step1;</html:p></html:li>
 				<html:li>
-					<html:p>&howto.create.step2a;</html:p>
-					<html:p>&howto.create.step2b;</html:p>
+					<html:p>&howto.create.step1a;</html:p>
+					<html:p>&howto.create.step1b;</html:p>
 				</html:li>
+				<html:li><html:p>&howto.create.step2b;</html:p></html:li>
 				<html:li><html:p>&howto.create.step3;</html:p></html:li>
 			</html:ol>
 			<html:img src="chrome://objPathString/skin/howto/create.png"/>
@@ -51,60 +69,62 @@
 			<html:p>&howto.switch.description;</html:p>
 		</groupbox>
 
-		<groupbox align="start" id="paneHowTo-search" collapsed="true" data-category="paneHowTo">
-			<caption label="&howto.search.caption;"/>
-			<html:ol>
-				<html:li><html:p>&howto.search.step1;</html:p></html:li>
-				<html:li>
-					<html:p>&howto.search.step2a;</html:p>
-					<html:p>&howto.search.step2b;</html:p>
-				</html:li>
-				<html:li><html:p>&howto.search.step3;</html:p></html:li>
-			</html:ol>
-			<html:img src="chrome://objPathString/skin/howto/search.png"/>
-			<html:p>&howto.search.final;</html:p>
-		</groupbox>
-
 		<groupbox align="start" id="paneHowTo-organize" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.organize.caption;"/>
 			<html:p>&nbsp;</html:p>
 			<html:p>&howto.organize.description1;</html:p>
-			<html:p>&howto.organize.description2;</html:p>
 			<html:ul>
-				<groupbox align="start">
+				<html:li>
 					<caption label="&howto.resize.caption;"/>
 					<html:p>&nbsp;</html:p>
-					<html:p>&howto.resize.description1;</html:p>
-					<html:p>&howto.resize.description2;</html:p>
-				</groupbox>
-				<groupbox align="start">
+					<html:p>&howto.resize.description3;</html:p>
+					<html:p>&howto.resize.description4;</html:p>
+					<html:p>&howto.resize.description5;</html:p>
+				</html:li>
+				<html:li>
 					<caption label="&howto.rearrange.caption;"/>
 					<html:p>&nbsp;</html:p>
 					<html:p>&howto.rearrange.description;</html:p>
-				</groupbox>
-				<groupbox align="start">
+					<html:p>&howto.rearrange.description2;</html:p>
+				</html:li>
+				<html:li>
 					<caption label="&howto.name.caption;"/>
 					<html:p>&nbsp;</html:p>
 					<html:p>&howto.name.description;</html:p>
-				</groupbox>
-				<groupbox align="start">
+				</html:li>
+				<html:li>
 					<caption label="&howto.close.caption;"/>
 					<html:p>&nbsp;</html:p>
 					<html:p>&howto.close.description1;</html:p>
 					<html:p>&howto.close.description2;</html:p>
-				</groupbox>
+				</html:li>
 			</html:ul>
 		</groupbox>
 
 		<groupbox align="start" id="paneHowTo-pinned" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.pinned.caption;"/>
 			<html:p>&nbsp;</html:p>
-			<html:p>&howto.pinned.description;</html:p>
+			<html:p>&howto.pinned.description2;</html:p>
 			<html:img src="chrome://objPathString/skin/howto/pinned.png"/>
 		</groupbox>
 
+		<groupbox align="start" id="paneHowTo-search" collapsed="true" data-category="paneHowTo">
+			<caption label="&howto.search.caption;"/>
+			<html:ol>
+				<html:li>
+					<html:p>&howto.search.step2a;</html:p>
+					<html:p>&howto.search.step2b;</html:p>
+				</html:li>
+				<html:li>
+					<html:p>&howto.search.step3;</html:p>
+					<html:img src="chrome://objPathString/skin/howto/search.png"/>
+					<html:p>&howto.search.final;</html:p>
+				</html:li>
+			</html:ol>
+		</groupbox>
+
 		<groupbox align="start" id="paneHowTo-credits" collapsed="true" data-category="paneHowTo">
-			<html:p><html:span id="paneHowTo-credits-body">&howto.credits;</html:span>&nbsp;<html:a target="_blank" href="https://support.mozilla.org/user/marsf">marsf</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/djst">djst</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/JasnaPaka">JasnaPaka</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/KadirTopal">KadirTopal</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/Verdi">Verdi</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/scoobidiver">scoobidiver</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/Swarnava">Swarnava</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/linesarefuzzy">linesarefuzzy</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/greasemonkey">greasemonkey</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/ideato">ideato</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/deb.bhattacharya6">deb.bhattacharya6</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/KamranMackey">KamranMackey</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/grubert">grubert</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/jsavage">jsavage</html:a>.
+			<html:p><html:span id="paneHowTo-credits-body">&howto.credits;&nbsp;</html:span><html:a target="_blank" href="https://support.mozilla.org/user/marsf">marsf</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/djst">djst</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/JasnaPaka">JasnaPaka</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/KadirTopal">KadirTopal</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/Verdi">Verdi</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/scoobidiver">scoobidiver</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/Swarnava">Swarnava</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/linesarefuzzy">linesarefuzzy</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/greasemonkey">greasemonkey</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/ideato">ideato</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/deb.bhattacharya6">deb.bhattacharya6</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/KamranMackey">KamranMackey</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/grubert">grubert</html:a>, <html:a target="_blank" href="https://support.mozilla.org/user/jsavage">jsavage</html:a>.
 			</html:p>
 		</groupbox>
 	</prefpane>
