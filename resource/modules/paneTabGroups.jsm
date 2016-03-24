@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 this.sessionRestore = {
 	get button() { return $('paneTabGroups-sessionRestore-button'); },
@@ -22,7 +22,8 @@ this.sessionRestore = {
 	uninit: function() {
 		Listeners.remove(this.button, 'command', this);
 
-		pageWatch.unregister(this);
+		try { pageWatch.unregister(this); }
+		catch(ex) { /* doesn't matter */ }
 	},
 
 	updateButton: function() {

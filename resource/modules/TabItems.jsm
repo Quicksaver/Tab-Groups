@@ -1,4 +1,4 @@
-// VERSION 1.1.7
+// VERSION 1.1.8
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -608,6 +608,10 @@ this.TabItems = {
 	// Takes in a xul:tab.
 	update: function(tab) {
 		try {
+			// It could have been closed in the meantime, in which case there's no point
+			// (not that we could "update" it even if we wanted to anyway).
+			if(!tab._tabViewTabItem) { return; }
+
 			let shouldDefer =	this.isPaintingPaused()
 						|| this._tabsWaitingForUpdate.hasItems()
 						|| Date.now() - this._lastUpdateTime < this._heartbeatTiming;
@@ -632,6 +636,9 @@ this.TabItems = {
 	//   force - true to always update the tab item even if it's incomplete
 	_update: function(tab, options = {}) {
 		try {
+			// ___ remove from waiting list now that we have no other early returns
+			this._tabsWaitingForUpdate.remove(tab);
+
 			// ___ get the TabItem
 			let tabItem = tab._tabViewTabItem;
 
@@ -654,9 +661,6 @@ this.TabItems = {
 			if(tabItem.tabTitle.textContent != label) {
 				tabItem.tabTitle.textContent = label;
 			}
-
-			// ___ remove from waiting list now that we have no other early returns
-			this._tabsWaitingForUpdate.remove(tab);
 
 			// ___ URL
 			let tabUrl = tab.linkedBrowser.currentURI.spec;
@@ -1028,7 +1032,7 @@ this.TabCanvas.prototype = {
 				// so this shouldn't cause excessive IO when a thumbnail is updated frequently
 				gPageThumbnails.captureAndStoreIfStale(browser, () => {})
 			}
-		})
+		});
 	},
 
 	// Changing the dims of a canvas will clear it, so we don't want to do do this to a canvas we're currently displaying.
