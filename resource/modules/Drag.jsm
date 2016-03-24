@@ -1,4 +1,4 @@
-// VERSION 2.1.2
+// VERSION 2.1.3
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -524,7 +524,7 @@ this.TabDrag.prototype = {
 		this.delayedStart = null;
 		this.item.hidden = true;
 
-		let sibling = this.item.parent.children[this.item.parent.children.indexOf(this.item) +1];
+		let sibling = !this.item.isStacked && this.item.parent.children[this.item.parent.children.indexOf(this.item) +1];
 		if(sibling) {
 			this.dropHere(sibling);
 
@@ -671,9 +671,18 @@ this.TabDrag.prototype = {
 					options.index--;
 				}
 			}
-			// If dropping onto the same stacked group it came form, keep the same index.
-			else if(this.dropTarget.isStacked && ii > -1) {
-				options.index = ii;
+			else if(this.dropTarget.isStacked) {
+				// If dropping onto the same stacked group it came from, keep the same index.
+				if(ii > -1) {
+					options.index = ii;
+				}
+				// otherwise make it the active (top) tab on the stack, even though it'll be the last tab in the group.
+				else {
+					// nulling the group's active tab, will make the dragged tab the active one in .add(),
+					// which also rearranges the group when that happens, so there's no need to call that twice.
+					this.dropTarget._activeTab = null;
+					options.dontArrange = true;
+				}
 			}
 			this.dropTarget.add(this.item, options);
 		}

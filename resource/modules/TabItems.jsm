@@ -1,4 +1,4 @@
-// VERSION 1.1.8
+// VERSION 1.1.9
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -33,6 +33,7 @@ this.TabItem = function(tab, options = {}) {
 	this._reconnected = false;
 	this.isStacked = false;
 	this._inVisibleStack = null;
+	this._draggable = true;
 	this.lastMouseDownTarget = null;
 
 	this._lastTabUpdateTime = Date.now();
@@ -142,7 +143,7 @@ this.TabItem.prototype = {
 			case 'mousedown':
 				if(e.button != 2) {
 					this.lastMouseDownTarget = e.target;
-					if(!this.isStacked || e.button == 1) {
+					if(!this.isStacked || this.draggable || e.button == 1) {
 						this.parent.childHandling = true;
 					}
 				}
@@ -280,16 +281,28 @@ this.TabItem.prototype = {
 		return this._hidden;
 	},
 
+	get draggable() {
+		return this._draggable;
+	},
+
+	set draggable(v) {
+		if(this._draggable != v) {
+			toggleAttribute(this.container, 'draggable', v);
+			this._draggable = v;
+		}
+		return this._draggable;
+	},
+
 	inVisibleStack: function(visible, rotation, zIndex) {
-		let stacked = visible != undefined;
+		let stacked = visible !== undefined;
 		this.isStacked = stacked;
 
 		if(!visible) {
 			this.hidden = stacked;
+			this.draggable = true;
 			if(!this._inVisibleStack) { return; }
 			this._inVisibleStack = null;
 
-			setAttribute(this.container, 'draggable', 'true');
 			this.removeClass("stacked");
 			this.removeClass("behind");
 			this.setRotation(0);
@@ -300,10 +313,11 @@ this.TabItem.prototype = {
 		this._inVisibleStack = { rotation, zIndex };
 
 		this.addClass("stacked");
-		setAttribute(this.container, 'draggable', 'false');
 		if(rotation != 0) {
+			this.draggable = false;
 			this.addClass('behind');
 		} else {
+			this.draggable = true;
 			this.removeClass('behind');
 		}
 

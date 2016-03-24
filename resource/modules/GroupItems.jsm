@@ -1,4 +1,4 @@
-// VERSION 1.3.4
+// VERSION 1.3.5
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1221,10 +1221,7 @@ this.GroupItem.prototype = {
 			}
 
 			item.setParent(null);
-			item.removeClass("stacked");
-			item.isStacked = false;
-			item.hidden = false;
-			item.setRotation(0);
+			item.inVisibleStack();
 			item.removeSubscriber("close", this._onChildClose);
 
 			// if a blank tab is selected while restoring a tab the blank tab gets removed. we need to keep the group alive for the restored tab.
