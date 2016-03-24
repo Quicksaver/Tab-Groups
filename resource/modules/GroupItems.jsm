@@ -1,4 +1,4 @@
-// VERSION 1.3.3
+// VERSION 1.3.4
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -462,6 +462,14 @@ this.GroupItem.prototype = {
 			// bbc = center of the base's bounds
 			let bbc = bb.center();
 
+			pushOthers(baseItem, bb, bbc, baseData.generation);
+
+			// Push again those groups that have already been pushed but belong to the same generation,
+			// so that when several groups overlap, they are sure not to remain overlapping.
+			pushOthers(baseItem, bb, bbc, baseData.generation, true);
+		};
+
+		let pushOthers = function(baseItem, bb, bbc, generation, currentGen) {
 			for(let item of GroupItems) {
 				if(item == baseItem) { continue; }
 
@@ -469,7 +477,7 @@ this.GroupItem.prototype = {
 
 				// if the item under consideration has already been pushed, or has a lower
 				// "generation" (and thus an implictly greater placement priority) then don't move it.
-				if(data.generation <= baseData.generation) { continue; }
+				if(data.generation < generation || (!currentGen && data.generation == generation)) { continue; }
 
 				// box = this item's current bounds, with a +buffer margin.
 				let bounds = data.bounds;
@@ -506,7 +514,7 @@ this.GroupItem.prototype = {
 					bounds.offset(offset);
 
 					// This item now becomes an (n+1)-generation pushed item.
-					data.generation = baseData.generation +1;
+					data.generation = generation +1;
 
 					// keep track of who pushed this item.
 					data.pusher = baseItem;
@@ -530,6 +538,8 @@ this.GroupItem.prototype = {
 			let data = item.pushAwayData;
 			if(data.generation == 0) { continue; }
 
+			let pusherChain = new Set();
+
 			let apply = function(item, posStep, posStep2, sizeStep) {
 				let data = item.pushAwayData;
 				if(data.generation == 0) { return; }
@@ -545,8 +555,10 @@ this.GroupItem.prototype = {
 				bounds.height = validSize.y;
 
 				let pusher = data.pusher;
-				if(pusher) {
-					var newPosStep = new Point(posStep.x + posStep2.x, posStep.y + posStep2.y);
+				if(pusher && !pusherChain.has(pusher)) {
+					// Avoid too much recurssion.
+					pusherChain.add(pusher);
+					let newPosStep = new Point(posStep.x + posStep2.x, posStep.y + posStep2.y);
 					apply(pusher, newPosStep, posStep2, sizeStep);
 				}
 			};
@@ -2266,6 +2278,49 @@ this.GroupItems = {
 				pair.item.setBounds(pair.bounds);
 			}
 		}
+	},
+
+	// Reposition all groups, to make sure there are no overlaping groups.
+	resnap: function() {
+		// Stop at an early iteration, just in case there are too many groups, which would cause the browser to seem like it hanged
+		// (even though it'd still actually work, it's just not good UX).
+		let i;
+		if(this.size >= 30) {
+			i = 1;
+		} else if(this.size >= 20) {
+			i = 2;
+		} else {
+			i = 3;
+		}
+
+		let resnap;
+		let buffer = Math.floor(this.defaultGutter / 2);
+
+		do {
+			resnap = false;
+			i--;
+
+			for(let group of this) {
+				group.snap(this);
+			}
+
+			// Keep resnapping while there are still overlapping groups.
+			let boxes = new Set();
+			groupsLoop:
+			for(let group of this) {
+				let bb = new Rect(group.getBounds());
+				// apply the same margin as .pushAway will
+				bb.inset(-buffer, -buffer);
+				for(let box of boxes) {
+					if(box.intersects(bb)) {
+						resnap = true;
+						break groupsLoop;
+					}
+				}
+				boxes.add(bb);
+			}
+		}
+		while(resnap && i > 0);
 	},
 
 	// Returns the next free slot, it will always be the highest value of all groups' slots.

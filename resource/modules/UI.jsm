@@ -1,4 +1,4 @@
-// VERSION 1.2.3
+// VERSION 1.2.4
 
 this.Keys = { meta: false };
 
@@ -505,15 +505,17 @@ this.UI = {
 
 			// Re-build necessary groups info (sizes, positions and stuff)
 			GroupItems.load();
+
+			// Make sure groups that were never positioned (created in grid mode) don't overlap others.
+			if(UI.classic) {
+				GroupItems.resnap();
+			}
 		}
 		catch(ex) {
 			Cu.reportError(ex);
 		}
 		finally {
 			GroupItems.resumeArrange();
-			if(this.classic) {
-				GroupItems.unsquish();
-			}
 		}
 	},
 
