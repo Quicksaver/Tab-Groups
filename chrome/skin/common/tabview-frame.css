@@ -560,6 +560,10 @@ input.name:focus::-moz-placeholder {
 	height: 16px;
 }
 
+#sessionRestoreNotice span {
+	pointer-events: none;
+}
+
 /* Side buttons */
 
 #actions {

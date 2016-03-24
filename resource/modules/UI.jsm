@@ -1,4 +1,4 @@
-// VERSION 1.2.2
+// VERSION 1.2.3
 
 this.Keys = { meta: false };
 
@@ -60,6 +60,7 @@ this.UI = {
 	get grid() { return Prefs.displayMode == 'grid'; },
 
 	get sessionRestoreNotice() { return $('sessionRestoreNotice'); },
+	get sessionRestoreNoticeClose() { return $('sessionRestoreNoticeClose'); },
 	get sessionRestoreAutoChanged() { return $('sessionRestoreAutoChanged'); },
 	get sessionRestorePrivate() { return $('sessionRestorePrivate'); },
 
@@ -120,39 +121,22 @@ this.UI = {
 				this._onKeypress(e);
 				break;
 
-			case 'mousedown':
-				switch(e.target) {
-					case this.sessionRestoreNotice:
-						// see if we just want to dismiss the warning
-						if(e.originalTarget.classList.contains('close')) {
-							e.preventDefault();
-							e.stopPropagation();
-							this.sessionRestoreNotice.hidden = true;
-							this._noticeDismissed = true;
-							break;
+			case 'mousedown': {
+				// target == GroupItems.workSpace
+				let focused = $$(":focus");
+				if(focused.length > 0) {
+					for(let element of focused) {
+						// don't fire blur event if the same input element is clicked.
+						if(e.target != element && element.nodeName == "input") {
+							element.blur();
 						}
-
-						this.goToPreferences({ jumpto: 'sessionRestore' });
-						break;
-
-					// target == GroupItems.workSpace
-					default: {
-						let focused = $$(":focus");
-						if(focused.length > 0) {
-							for(let element of focused) {
-								// don't fire blur event if the same input element is clicked.
-								if(e.target != element && element.nodeName == "input") {
-									element.blur();
-								}
-							}
-						}
-						if(this.classic && e.originalTarget == GroupItems.workSpace && e.button == 0 && e.detail == 1) {
-							this._createGroupItemOnDrag(e);
-						}
-						break;
 					}
 				}
+				if(this.classic && e.originalTarget == GroupItems.workSpace && e.button == 0 && e.detail == 1) {
+					this._createGroupItemOnDrag(e);
+				}
 				break;
+			}
 
 			case 'dblclick': {
 				if(e.originalTarget != GroupItems.workSpace) { return; }
@@ -173,6 +157,15 @@ this.UI = {
 
 			case 'click':
 				switch(e.target) {
+					case this.sessionRestoreNoticeClose:
+						this.sessionRestoreNotice.hidden = true;
+						this._noticeDismissed = true;
+						break;
+
+					case this.sessionRestoreNotice:
+						this.goToPreferences({ jumpto: 'sessionRestore' });
+						break;
+
 					case this.exitBtn:
 						this.exit();
 						this.blurAll();
@@ -374,7 +367,7 @@ this.UI = {
 			Messenger.loadInWindow(gWindow, 'TabView');
 
 			pageWatch.register(this);
-			Listeners.add(this.sessionRestoreNotice, 'mousedown', this, true);
+			Listeners.add(this.sessionRestoreNotice, 'click', this);
 
 			// ___ Done
 			this._frameInitialized = true;
@@ -402,7 +395,7 @@ this.UI = {
 		Listeners.remove(gWindow, "SSWindowClosing", this);
 		Listeners.remove(gWindow, "SSWindowStateBusy", this);
 		Listeners.remove(gWindow, "SSWindowStateReady", this);
-		Listeners.remove(this.sessionRestoreNotice, 'mousedown', this, true);
+		Listeners.remove(this.sessionRestoreNotice, 'click', this);
 
 		Listeners.remove(GroupItems.workSpace, 'mousedown', this);
 		Listeners.remove(GroupItems.workSpace, 'dblclick', this);
