@@ -1,4 +1,4 @@
-// VERSION 1.3.5
+// VERSION 1.3.6
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2366,12 +2366,21 @@ this.GroupItems = {
 
 		// +1 is for the create new group item.
 		let count = this.size +1;
+		let groups = this.sortBySlot();
 
 		// Do we need to re-arrange anything?
 		let lastArrange = this._lastArrange;
 		let arrange = !lastArrange || !lastArrange.count != count || !lastArrange.bounds.equals(bounds);
+		if(!arrange) {
+			for(let i = 0; i < groups.length; i++) {
+				if(groups[i] != lastArrange.groups[i]) {
+					arrange = true;
+					break;
+				}
+			}
+		}
 		if(!arrange) { return; }
-		this._lastArrange = { count, bounds };
+		this._lastArrange = { count, bounds, groups };
 
 		// If we have no groups, it's easy, flex-stretch the create new group item.
 		if(count == 1) {
@@ -2385,7 +2394,6 @@ this.GroupItems = {
 			return;
 		}
 
-		let groups = this.sortBySlot();
 		let i = 0;
 
 		let rows;
