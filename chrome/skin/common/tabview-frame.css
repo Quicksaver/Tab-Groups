@@ -260,10 +260,10 @@ body.classic .groupItem:not(.phantom) {
 }
 
 .groupItem .contents {
-	margin: 6px;
+	margin-top: 2px;
 	overflow: hidden;
 	/* leave space for titlebar and for its own margin */
-	height: calc(100% - 24px - 12px);
+	height: calc(100% - 24px - 2px);
 }
 
 .tab-container {
