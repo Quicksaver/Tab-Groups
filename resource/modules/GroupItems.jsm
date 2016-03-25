@@ -1,4 +1,4 @@
-// VERSION 1.3.6
+// VERSION 1.3.7
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1702,6 +1702,11 @@ this.GroupItems = {
 	minGroupHeight: 145,
 	minGroupWidth: 120,
 
+	// Will be calc'ed in init() from the values above.
+	minGroupRatio: 0,
+	maxGroupRatio: 2,
+	minGroupHeightRange: null,
+
 	// How far apart Items should be from each other and from bounds
 	defaultGutter: 15,
 	// set the top gutter separately, as the top of the window has its own extra chrome which makes a large top gutter unnecessary.
@@ -1710,6 +1715,9 @@ this.GroupItems = {
 	// Function: init
 	init: function() {
 		this._lastActiveList = new MRUList();
+
+		this.minGroupRatio = this.minGroupWidth / this.minGroupHeight;
+		this.minGroupHeightRange = new Range(this.minGroupHeight, this.minGroupHeight * this.maxGroupRatio);
 	},
 
 	// Function: uninit
@@ -2183,8 +2191,18 @@ this.GroupItems = {
 	},
 
 	// Basic measure rules. Assures that item is a minimum size.
-	calcValidSize: function(size) {
-		return new Point(Math.max(size.x, this.minGroupWidth), Math.max(size.y, this.minGroupHeight));
+	calcValidSize: function(size, keepRatio) {
+		let w = Math.max(size.x, this.minGroupWidth);
+		let h = Math.max(size.y, this.minGroupHeight);
+
+		// Used when arranging the grid layout, for groups to keep a minimal ratio so that they don't appear too squished.
+		if(keepRatio) {
+			let heightFactor = this.minGroupHeightRange.proportion(h);
+			let minRatio = this.minGroupRatio * heightFactor;
+			w = Math.max(w, h * minRatio);
+		}
+
+		return new Point(w, h);
 	},
 
 	// Returns the bounds within which it is safe to place all non-stationary <Item>s.
@@ -2505,7 +2523,7 @@ this.GroupItems = {
 
 			let figure = () => {
 				columns = Math.ceil(count / rows);
-				let validSize = this.calcValidSize(new Point(bounds.width / columns, bounds.height / rows));
+				let validSize = this.calcValidSize(new Point(bounds.width / columns, bounds.height / rows), true);
 				width = Math.floor(validSize.x);
 				height = Math.floor(validSize.y);
 
