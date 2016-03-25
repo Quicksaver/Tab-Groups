@@ -1,4 +1,4 @@
-// VERSION 1.3.7
+// VERSION 1.3.8
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -215,6 +215,9 @@ this.GroupItem = function(listOfEls, options = {}) {
 };
 
 this.GroupItem.prototype = {
+	// For backwards compatibility with other add-ons possibly interacting with the group.
+	get _children() { return this.children; },
+
 	// The prompt text for the title field.
 	defaultName: Strings.get("TabView", "groupItemDefaultName"),
 
