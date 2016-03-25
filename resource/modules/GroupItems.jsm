@@ -1,4 +1,4 @@
-// VERSION 1.3.9
+// VERSION 1.3.10
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2631,6 +2631,7 @@ this.PinnedItems = {
 
 	icons: new Map(),
 	_delayedUpdates: new Set(),
+	_activeItem: null,
 
 	handleEvent: function(e) {
 		let tab = e.target;
@@ -2673,6 +2674,10 @@ this.PinnedItems = {
 					this._updateIcons(tab);
 				}
 				break;
+
+			case 'TabSelect':
+				this.makeActive(tab);
+				break;
 		}
 	},
 
@@ -2683,6 +2688,7 @@ this.PinnedItems = {
 		Tabs.listen("TabPinned", this);
 		Tabs.listen("TabUnpinned", this);
 		Tabs.listen("TabAttrModified", this);
+		Tabs.listen("TabSelect", this);
 
 		for(let tab of Tabs.pinned) {
 			this.add(tab);
@@ -2696,6 +2702,7 @@ this.PinnedItems = {
 		Tabs.unlisten("TabPinned", this);
 		Tabs.unlisten("TabUnpinned", this);
 		Tabs.unlisten("TabAttrModified", this);
+		Tabs.unlisten("TabSelect", this);
 
 		for(let icon of this.icons.values()) {
 			icon.remove();
@@ -2763,6 +2770,10 @@ this.PinnedItems = {
 			this.icons.set(tab, icon);
 			this.tray.appendChild(icon);
 			this.updateTray();
+
+			if(tab == Tabs.selected) {
+				this.makeActive(tab);
+			}
 		});
 	},
 
@@ -2785,6 +2796,21 @@ this.PinnedItems = {
 
 			let sibling = this.tray.childNodes[tab._tPos] || null;
 			this.tray.insertBefore(icon, sibling);
+		}
+	},
+
+	makeActive: function(tab) {
+		if(this._activeItem) {
+			this._activeItem.classList.remove('activeAppTab');
+			this._activeItem = null;
+		}
+
+		if(!tab.pinned) { return; }
+
+		let icon = this.icons.get(tab);
+		if(icon) {
+			this._activeItem = icon;
+			this._activeItem.classList.add('activeAppTab');
 		}
 	}
 };

@@ -645,6 +645,7 @@ body.grid #actions {
 .tab:not(.stacked).focus,
 .tab:not(.stacked):hover,
 #actions input:hover,
+#actions input.appTabIcon.activeAppTab,
 body.classic #classicbutton,
 body.grid #gridbutton {
 	background-color: var(--hover-color);
