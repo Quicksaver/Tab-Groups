@@ -3,7 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 :root {
-	--hover-color: rgba(128,128,128,0.3);
+	--hover-color: rgba(128,128,128,0.4);
 	--item-normal-shadow: 0 1px 5px rgba(60, 60, 60, 0.6);
 }
 
@@ -496,7 +496,6 @@ input.name:focus::-moz-placeholder {
 .expandedTray {
 	position: absolute;
 	z-index: 50;
-	padding: 6px;
 }
 
 .expandedTray .tab-container {

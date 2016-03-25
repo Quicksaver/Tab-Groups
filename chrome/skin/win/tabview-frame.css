@@ -9,6 +9,16 @@
 	--item-border-radius: 5px;
 }
 
+@media (-moz-windows-default-theme) {
+	@media	(-moz-os-version: windows-vista),
+		(-moz-os-version: windows-win7) {
+
+		:root {
+			--hover-color: rgba(98,127,134,0.4);
+		}
+	}
+}
+
 body {
 	font: message-box;
 	font-size: 13px;
