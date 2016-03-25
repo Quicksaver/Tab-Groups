@@ -1,4 +1,4 @@
-// VERSION 1.3.8
+// VERSION 1.3.9
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2723,6 +2723,7 @@ this.PinnedItems = {
 
 		this.getFavIconUrl(tab, (iconUrl) => {
 			let icon = this.icons.get(tab);
+			icon.setAttribute('title', tab.getAttribute('label'));
 			if(icon && icon.getAttribute("src") != iconUrl) {
 				icon.setAttribute("src", iconUrl);
 			}
@@ -2748,6 +2749,7 @@ this.PinnedItems = {
 			let icon = document.createElement("input");
 			icon.classList.add("appTabIcon");
 			icon.setAttribute('type', 'button');
+			icon.setAttribute('title', tab.getAttribute('label'));
 			icon.style.backgroundImage = "url('"+iconUrl+"')";
 			icon.handleEvent = function(e) {
 				// "click" event only
