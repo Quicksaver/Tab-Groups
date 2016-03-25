@@ -1,4 +1,4 @@
-// VERSION 1.2.4
+// VERSION 1.2.5
 
 this.Keys = { meta: false };
 
@@ -1615,14 +1615,20 @@ this.UI = {
 
 // Keep a few values cached, to avoid constant reflows.
 this.UICache = {
+	defaultItemPadding: 20,
+
 	get tabItemPadding() {
-		delete this.tabItemPadding;
 		let item = TabItems[0];
 		let style = getComputedStyle(item.container);
-		this.tabItemPadding = {
-			x: parseInt(style.getPropertyValue('padding-left')) + parseInt(style.getPropertyValue('padding-right')),
-			y: parseInt(style.getPropertyValue('padding-top')) + parseInt(style.getPropertyValue('padding-bottom'))
-		};
+		let x = parseInt(style.getPropertyValue('padding-left')) + parseInt(style.getPropertyValue('padding-right'));
+		let y = parseInt(style.getPropertyValue('padding-top')) + parseInt(style.getPropertyValue('padding-bottom'));
+		// Sometimes it fails to get the correct values for this on startup,
+		// so assume there is at least some padding and check again next time this is called.
+		if(x + y == 0) {
+			return { x: this.defaultItemPadding, y: this.defaultItemPadding };
+		}
+		delete this.tabItemPadding;
+		this.tabItemPadding = { x, y };
 		return this.tabItemPadding;
 	},
 
