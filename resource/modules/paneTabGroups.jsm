@@ -1,14 +1,15 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 this.sessionRestore = {
 	get button() { return $('paneTabGroups-sessionRestore-button'); },
+	get groupbox() { return $('paneTabGroups-sessionRestore'); },
 
 	handleEvent: function() {
 		this.enable();
 	},
 
 	observe: function() {
-		this.updateButton();
+		this.updateGroupbox();
 	},
 
 	init: function() {
@@ -16,7 +17,7 @@ this.sessionRestore = {
 
 		Listeners.add(this.button, 'command', this);
 
-		this.updateButton();
+		this.updateGroupbox();
 	},
 
 	uninit: function() {
@@ -26,8 +27,8 @@ this.sessionRestore = {
 		catch(ex) { /* doesn't matter */ }
 	},
 
-	updateButton: function() {
-		toggleAttribute(this.button, 'disabled', pageWatch.sessionRestoreEnabled);
+	updateGroupbox: function() {
+		this.groupbox.hidden = pageWatch.sessionRestoreEnabled;
 	},
 
 	enable: function() {
