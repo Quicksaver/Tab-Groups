@@ -1,9 +1,13 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 this.pageWatch = {
 	TMP: false,
 	listeners: new Set(),
 	captureChanges: false,
+	initialized: false,
+
+	kKeepSession: 3,
+	kKeepingSession: new Set([ 3 ]),
 
 	observe: function(aSubject, aTopic, aData) {
 		this.shouldReset(aSubject, aTopic);
@@ -73,6 +77,7 @@ this.pageWatch = {
 	},
 
 	enableSessionRestore: function() {
+		// In case any of our dependencies failed to initialize before we need this, make sure it still "works".
 		if(this.sessionRestoreEnabled) { return; }
 
 		if(this.TMP && Prefs["sessions.manager"]) {
@@ -86,16 +91,18 @@ this.pageWatch = {
 			}
 		} else {
 			Prefs.pageBackup = Prefs.page;
-			Prefs.page = 3;
+			Prefs.page = this.kKeepSession;
 		}
 		this.start();
 	},
 
-	get sessionRestoreEnabled() {
+	get sessionRestoreEnabled() { if(!this.initialized) { LOG('damn'); console.trace(); }
+		this.finishInit();
+
 		if(this.TMP && Prefs["sessions.manager"]) {
 			return Prefs["sessions.onClose"] != 2 && Prefs["sessions.onStart"] != 2;
 		}
-		return Prefs.page == 3;
+		return this.kKeepingSession.has(Prefs.page);
 	},
 
 	get hasBackup() {
@@ -109,26 +116,43 @@ this.pageWatch = {
 		Prefs.setDefaults({ pageBackup: -1 });
 		Prefs.setDefaults({ page: 1 }, 'startup', 'browser');
 
+		let promises = [];
+
 		// Keep track of Tab Mix Plus session preferences as well
-		AddonManager.getAddonByID('{dc572301-7619-498c-a57d-39143191b318}', (addon) => {
-			if(addon && addon.isActive) {
-				Prefs.setDefaults({
-					onCloseBackup: -1,
-					onStartBackup: -1
-				});
-				Prefs.setDefaults({
-					["sessions.manager"]: true,
-					["sessions.onClose"]: 0,
-					["sessions.onStart"]: 2
-				}, 'tabmix');
-				Prefs.listen('sessions.manager', this);
-				this.TMP = true;
-			}
+		promises.push(new Promise((resolve, reject) => {
+			AddonManager.getAddonByID('{dc572301-7619-498c-a57d-39143191b318}', (addon) => {
+				if(addon && addon.isActive) {
+					Prefs.setDefaults({
+						onCloseBackup: -1,
+						onStartBackup: -1
+					});
+					Prefs.setDefaults({
+						["sessions.manager"]: true,
+						["sessions.onClose"]: 0,
+						["sessions.onStart"]: 2
+					}, 'tabmix');
+					Prefs.listen('sessions.manager', this);
+					this.TMP = true;
+				}
+				resolve();
+			});
+		}));
+
+		// Session Manager has a few extra settings that keep the session across restarts,
+		// we need to recognize those, so wait for our Session Manager watcher to be initialized.
+		promises.push(new Promise((resolve, reject) => {
+			this.waitForSessionManagerModule = resolve;
+		}));
+
+		Promise.all(promises).then(() => {
 			this.finishInit();
 		});
 	},
 
 	finishInit: function() {
+		if(this.initialized) { return; }
+		this.initialized = true;
+
 		Prefs.listen('page', this);
 		if(this.TMP) {
 			Prefs.listen('sessions.onClose', this);
@@ -151,7 +175,7 @@ this.pageWatch = {
 				Prefs["sessions.onStart"] = 0;
 			}
 		} else {
-			Prefs.page = 3;
+			Prefs.page = this.kKeepSession;
 		}
 	},
 
