@@ -1,4 +1,4 @@
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 this.pageWatch = {
 	TMP: false,
@@ -96,8 +96,13 @@ this.pageWatch = {
 		this.start();
 	},
 
-	get sessionRestoreEnabled() { if(!this.initialized) { LOG('damn'); console.trace(); }
+	get sessionRestoreEnabled() {
 		this.finishInit();
+
+		// Warning on exiting Firefox makes all of our warnings/handlers superfluous.
+		if(Prefs.showQuitWarning) {
+			return true;
+		}
 
 		if(this.TMP && Prefs["sessions.manager"]) {
 			return Prefs["sessions.onClose"] != 2 && Prefs["sessions.onStart"] != 2;
@@ -115,6 +120,7 @@ this.pageWatch = {
 	init: function() {
 		Prefs.setDefaults({ pageBackup: -1 });
 		Prefs.setDefaults({ page: 1 }, 'startup', 'browser');
+		Prefs.setDefaults({ showQuitWarning: false }, 'browser', '');
 
 		let promises = [];
 
@@ -154,6 +160,7 @@ this.pageWatch = {
 		this.initialized = true;
 
 		Prefs.listen('page', this);
+		Prefs.listen('showQuitWarning', this);
 		if(this.TMP) {
 			Prefs.listen('sessions.onClose', this);
 			Prefs.listen('sessions.onStart', this);
@@ -182,6 +189,7 @@ this.pageWatch = {
 	uninit: function() {
 		this.stop();
 		Prefs.unlisten('page', this);
+		Prefs.unlisten('showQuitWarning', this);
 		if(this.TMP) {
 			Prefs.unlisten('sessions.onClose', this);
 			Prefs.unlisten('sessions.onStart', this);
