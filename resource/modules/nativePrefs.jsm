@@ -1,4 +1,4 @@
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 this.pageWatch = {
 	TMP: false,
@@ -18,7 +18,7 @@ this.pageWatch = {
 		switch(aSubject) {
 			case "page":
 				// the user changed this preference specifically, our backup is no longer valid
-				if(!this.sessionRestoreEnabled) {
+				if(this.captureChanges && !this.sessionRestoreEnabled) {
 					Prefs.pageBackup = -1;
 					this.stop();
 					if(this.TMP && Prefs["sessions.manager"]) {
@@ -30,7 +30,7 @@ this.pageWatch = {
 			case "sessions.onClose":
 			case "sessions.onStart":
 				// try to mimic from above as closely as possible
-				if(!this.sessionRestoreEnabled) {
+				if(this.captureChanges && !this.sessionRestoreEnabled) {
 					Prefs.onCloseBackup = -1;
 					Prefs.onStartBackup = -1;
 					this.stop();
