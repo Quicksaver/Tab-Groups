@@ -635,8 +635,28 @@ body.grid #actions {
 
 /* Pinned Tabs group */
 
+#actions:not(.dragOver) #pinnedTabs:not([visible]) {
+	display: none;
+}
+
+#actions.dragOver #pinnedTabs {
+	padding-bottom: 24px;
+}
+
+body.DraggingTab .appTabIcon {
+	transition: margin 150ms linear;
+}
+
 .appTabIcon {
 	background-size: 18px 18px;
+}
+
+.appTabIcon.space-before {
+	margin-top: 24px;
+}
+
+.appTabIcon.space-after {
+	margin-bottom: 24px;
 }
 
 /* Various interaction effects */

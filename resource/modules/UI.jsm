@@ -1,4 +1,4 @@
-// VERSION 1.2.5
+// VERSION 1.2.6
 
 this.Keys = { meta: false };
 
@@ -663,66 +663,67 @@ this.UI = {
 		if(this.isTabViewVisible() || this._isChangingVisibility) { return; }
 		this._isChangingVisibility = true;
 
-		dispatch(window, { type: "willshowtabview", cancelable: false });
+		try {
+			dispatch(window, { type: "willshowtabview", cancelable: false });
 
-		// store tab strip smooth scroll value and disable it.
-		let tabStrip = gBrowser.tabContainer.mTabstrip;
-		this._originalSmoothScroll = tabStrip.smoothScroll;
-		tabStrip.smoothScroll = false;
+			// store tab strip smooth scroll value and disable it.
+			let tabStrip = gBrowser.tabContainer.mTabstrip;
+			this._originalSmoothScroll = tabStrip.smoothScroll;
+			tabStrip.smoothScroll = false;
 
-		let currentTab = this._currentTab;
+			let currentTab = this._currentTab;
 
-		for(let groupItem of this._reorderTabItemsOnShow) {
-			groupItem.reorderTabItemsBasedOnTabOrder();
-		}
-		this._reorderTabItemsOnShow = [];
+			for(let groupItem of this._reorderTabItemsOnShow) {
+				groupItem.reorderTabItemsBasedOnTabOrder();
+			}
+			this._reorderTabItemsOnShow = [];
 
-		gTabViewDeck.selectedPanel = gTabViewFrame;
-		gWindow.TabsInTitlebar.allowedBy("tabview-open", false);
-		gTabViewFrame.contentWindow.focus();
+			gTabViewDeck.selectedPanel = gTabViewFrame;
+			gWindow.TabsInTitlebar.allowedBy("tabview-open", false);
+			gTabViewFrame.contentWindow.focus();
 
-		gBrowser.updateTitlebar();
-		if(DARWIN) {
-			this.setTitlebarColors(true);
-		}
-
-		// Trick to make Ctrl+F4 and Ctrl+Shift+PageUp/PageDown shortcuts behave as expected in TabView,
-		// we need to remove the gBrowser as a listener for these, otherwise it would consume these events and they would never reach our handler.
-		this._els.removeSystemEventListener(gWindow.document, "keydown", gBrowser, false);
-
-		if(zoomOut && currentTab && currentTab._tabViewTabItem) {
-			let item = currentTab._tabViewTabItem;
-
-			// Zoom out!
-			item.zoomOut();
-
-			// if the tab's been destroyed
-			if(!currentTab._tabViewTabItem) {
-				item = null;
+			gBrowser.updateTitlebar();
+			if(DARWIN) {
+				this.setTitlebarColors(true);
 			}
 
-			this.setActive(item);
+			// Trick to make Ctrl+F4 and Ctrl+Shift+PageUp/PageDown shortcuts behave as expected in TabView,
+			// we need to remove the gBrowser as a listener for these, otherwise it would consume these events and they would never reach our handler.
+			this._els.removeSystemEventListener(gWindow.document, "keydown", gBrowser, false);
 
-			this._resize(true);
-			this._isChangingVisibility = false;
-			dispatch(window, { type: "tabviewshown", cancelable: false });
+			if(zoomOut && currentTab && currentTab._tabViewTabItem) {
+				let item = currentTab._tabViewTabItem;
 
-			// Flush pending updates
-			PinnedItems.flushUpdates();
+				// Zoom out!
+				item.zoomOut();
 
-			TabItems.resumePainting();
-		} else {
-			if(!currentTab || !currentTab._tabViewTabItem) {
+				// if the tab's been destroyed
+				if(!currentTab._tabViewTabItem) {
+					item = null;
+				}
+
+				this.setActive(item);
+
+				this._resize(true);
+			}
+			else if(!currentTab || !currentTab._tabViewTabItem) {
 				this.clearActiveTab();
 			}
-			this._isChangingVisibility = false;
-			dispatch(window, { type: "tabviewshown", cancelable: false });
-
-			// Flush pending updates
-			PinnedItems.flushUpdates();
-
-			TabItems.resumePainting();
 		}
+		catch(ex) {
+			Cu.reportError(ex);
+		}
+		finally {
+			this._isChangingVisibility = false;
+			if(!this.isTabViewVisible()) { return; }
+		}
+
+		dispatch(window, { type: "tabviewshown", cancelable: false });
+
+		// Flush pending updates
+		PinnedItems.flushUpdates();
+
+		TabItems.resumePainting();
 
 		this.checkSessionRestore();
 	},
@@ -744,32 +745,39 @@ this.UI = {
 		// and we'd get stuck if we prevent re-entrancy before doing that.
 		this._isChangingVisibility = true;
 
-		TabItems.pausePainting();
+		try {
+			TabItems.pausePainting();
 
-		for(let groupItem of this._reorderTabsOnHide) {
-			if(!groupItem.hidden && groupItem.container.parentNode) {
-				groupItem.reorderTabsBasedOnTabItemOrder();
+			for(let groupItem of this._reorderTabsOnHide) {
+				if(!groupItem.hidden && groupItem.container.parentNode) {
+					groupItem.reorderTabsBasedOnTabItemOrder();
+				}
 			}
+			this._reorderTabsOnHide = new Set();
+
+			if(fulfill) {
+				fulfill();
+			}
+
+			gTabViewDeck.selectedPanel = gBrowserPanel;
+			gWindow.TabsInTitlebar.allowedBy("tabview-open", true);
+			gBrowser.selectedBrowser.focus();
+
+			gBrowser.updateTitlebar();
+			gBrowser.tabContainer.mTabstrip.smoothScroll = this._originalSmoothScroll;
+			if(DARWIN) {
+				this.setTitlebarColors(false);
+			}
+
+			this._els.addSystemEventListener(gWindow.document, "keydown", gBrowser, false);
 		}
-		this._reorderTabsOnHide = new Set();
-
-		if(fulfill) {
-			fulfill();
+		catch(ex) {
+			Cu.reportError(ex);
 		}
-
-		gTabViewDeck.selectedPanel = gBrowserPanel;
-		gWindow.TabsInTitlebar.allowedBy("tabview-open", true);
-		gBrowser.selectedBrowser.focus();
-
-		gBrowser.updateTitlebar();
-		gBrowser.tabContainer.mTabstrip.smoothScroll = this._originalSmoothScroll;
-		if(DARWIN) {
-			this.setTitlebarColors(false);
+		finally {
+			this._isChangingVisibility = false;
+			if(this.isTabViewVisible()) { return; }
 		}
-
-		this._els.addSystemEventListener(gWindow.document, "keydown", gBrowser, false);
-
-		this._isChangingVisibility = false;
 
 		dispatch(window, { type: "tabviewhidden", cancelable: false });
 	},

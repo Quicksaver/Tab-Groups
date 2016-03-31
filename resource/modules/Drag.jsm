@@ -1,4 +1,4 @@
-// VERSION 2.1.3
+// VERSION 2.2.0
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -464,17 +464,12 @@ this.TabDrag = function(e, tabItem) {
 	DraggingTab = this;
 	this.item = tabItem;
 	this.container = tabItem.container;
-	this.dropTarget = tabItem.parent;
 	e.dataTransfer.setData("text/plain", "tabview-tab");
 
-	let target;
+	this.updateTarget(tabItem.parent);
 	if(this.dropTarget.expanded) {
-		target = this.dropTarget.expanded.tray;
 		Listeners.add(this.dropTarget.expanded.shield, 'dragenter', this);
-	} else {
-		target = this.getDropTargetNode();
 	}
-	Listeners.add(target, 'drop', this);
 	Listeners.add(this.container, 'dragend', this);
 
 	// Hide async so that the translucent image that follows the cursor actually shows something.
@@ -524,7 +519,12 @@ this.TabDrag.prototype = {
 		this.delayedStart = null;
 		this.item.hidden = true;
 
-		let sibling = !this.item.isStacked && this.item.parent.children[this.item.parent.children.indexOf(this.item) +1];
+		let sibling;
+		if(this.item.isATabItem) {
+			sibling = !this.item.isStacked && this.item.parent.children[this.item.parent.children.indexOf(this.item) +1];
+		} else if(this.item.isAnAppItem) {
+			sibling = this.item.nextSibling;
+		}
 		if(sibling) {
 			this.dropHere(sibling);
 
@@ -537,7 +537,13 @@ this.TabDrag.prototype = {
 
 	getDropTargetNode: function() {
 		if(this.dropTarget.isAGroupItem) {
+			if(this.dropTarget.expanded) {
+				return this.dropTarget.expanded.tray;
+			}
 			return this.dropTarget.container;
+		}
+		if(this.dropTarget._appTabsContainer) {
+			return this.dropTarget.parentNode;
 		}
 		return this.dropTarget;
 	},
@@ -553,6 +559,10 @@ this.TabDrag.prototype = {
 		// global drag tracking
 		UI.lastMoveTime = Date.now();
 
+		this.updateTarget(dropTarget);
+	},
+
+	updateTarget: function(dropTarget) {
 		if(this.dropTarget != dropTarget) {
 			// If the drop target changed, we absolutely need to reset the sibling as well.
 			if(this.sibling && this.sibling.parent != dropTarget) {
@@ -592,23 +602,35 @@ this.TabDrag.prototype = {
 				return;
 			}
 
-			i = sibling.parent.children.indexOf(sibling);
-			ii = sibling.parent.children.indexOf(this.item);
-			if(this.sibling) {
-				si = sibling.parent.children.indexOf(this.sibling);
-			}
-		}
+			if(!sibling.isAnAppItem) {
+				i = sibling.parent.children.indexOf(sibling);
+				ii = sibling.parent.children.indexOf(this.item);
+				if(this.sibling) {
+					si = sibling.parent.children.indexOf(this.sibling);
 
-		// If the currently spaced item is set in the same group before the just hovered item,
-		// the space should be set on the item immediately after.
-		if(si > -1 && si < i) {
-			i++;
-			siblingToBe = sibling.parent.children[i];
+					// If the currently spaced item is set in the same group before the just hovered item,
+					// the space should be set on the item immediately after.
+					if(si > -1 && si < i) {
+						i++;
+						siblingToBe = sibling.parent.children[i];
+					}
+				}
+			}
+			else if(this.sibling && this.sibling.isAnAppItem) {
+				let next = this.sibling.nextSibling;
+				while(next) {
+					if(next == siblingToBe) {
+						siblingToBe = siblingToBe.nextSibling;
+						break;
+					}
+					next = next.nextSibling;
+				}
+			}
 		}
 
 		// Hovering the last item of a row should set the space an item next to it instead,
 		// as margins of items in flexboxes are still rendered next to the items as usual.
-		let columns = siblingToBe ? sibling.parent._lastTabSize.columns : 0;
+		let columns = siblingToBe && !siblingToBe.isAnAppItem ? sibling.parent._lastTabSize.columns : 0;
 		if(columns > 1) {
 			// Don't forget arrays are 0-based
 			let c = i +1;
@@ -658,6 +680,16 @@ this.TabDrag.prototype = {
 
 		// If we have a valid drop target (group), add the item to it.
 		if(this.dropTarget.isAGroupItem) {
+			// When dragging a pinned tab into a group, we need to unpin it first, so that we have a tab item that we can drag.
+			let tab = this.item.tab;
+			if(tab.pinned) {
+				Listeners.remove(this.container, 'dragend', this);
+				gBrowser.unpinTab(tab);
+				this.item = tab._tabViewTabItem;
+				this.container = this.item.container;
+				Listeners.add(this.container, 'dragend', this);
+			}
+
 			let options = {};
 			let ii = this.dropTarget.children.indexOf(this.item);
 			if(this.sibling) {
@@ -686,6 +718,29 @@ this.TabDrag.prototype = {
 			}
 			this.dropTarget.add(this.item, options);
 		}
+		// If the drop target is the pinned tabs area, we should make sure the tab is pinned. Things are a little easier than as above though.
+		else if(this.dropTarget == PinnedItems.tray) {
+			// Pin the tab first, so that our handlers can first remove the original tab item, and then register it as an app tab.
+			let tab = this.item.tab;
+			if(!tab.pinned) {
+				Listeners.remove(this.container, 'dragend', this);
+				gBrowser.pinTab(tab);
+				this.item = PinnedItems.icons.get(tab);
+				this.container = this.item.container;
+				Listeners.add(this.container, 'dragend', this);
+			}
+
+			let sibling = this.sibling;
+			if(sibling && sibling.classList.contains('space-after')) {
+				sibling = sibling.nextSibling;
+				if(sibling && sibling == this.item) {
+					sibling = sibling.nextSibling;
+				}
+			}
+
+			PinnedItems.add(tab, sibling);
+			PinnedItems.reorderTabsBasedOnAppItemOrder();
+		}
 		// Otherwise create a new group in the place where the tab was dropped.
 		else {
 			let tabSize = TabItems;
@@ -697,11 +752,14 @@ this.TabDrag.prototype = {
 			tabWidth += UICache.tabItemPadding.x +10;
 			tabHeight += UICache.tabItemPadding.y +50;
 
-			let bounds;
+			let options = {
+				focusTitle: true
+			};
 			if(UI.classic) {
-				bounds = new Rect(e.offsetX - (tabWidth /2), e.offsetY - (tabHeight /2), tabWidth, tabHeight);
+				options.bounds = new Rect(e.offsetX - (tabWidth /2), e.offsetY - (tabHeight /2), tabWidth, tabHeight);
 			}
-			new GroupItem([ this.item ], { bounds, focusTitle: true });
+
+			new GroupItem([ this.item ], options);
 		}
 	},
 
