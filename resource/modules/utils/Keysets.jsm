@@ -1,4 +1,4 @@
-// VERSION 1.7.1
+// VERSION 1.7.2
 Modules.UTILS = true;
 
 // Keysets - handles editable keysets for the add-on
@@ -236,6 +236,7 @@ this.Keysets = {
 			let exists = this.exists(key);
 			if(!exists) {
 				this.registered.push(key);
+				this.flushOthers();
 			} else {
 				for(let other of this.delayedOtherKeys) {
 					if(other(exists)) {
@@ -261,6 +262,7 @@ this.Keysets = {
 		for(var r=0; r<this.registered.length; r++) {
 			if(this.registered[r].id == key.id) {
 				this.registered.splice(r, 1);
+				this.flushOthers();
 
 				if(!noSchedule) {
 					this.setAllWindows();
@@ -294,6 +296,33 @@ this.Keysets = {
 		// Tile Tabs Function keys
 		function(aKey) { return aKey.id.startsWith('tiletabs-fkey-') && !aKey.hasModifiers; }
 	],
+
+	_flushing: new Set(),
+	flushOthers: function(deinitializing) {
+		// This should be self-dependent as it is called on shutdown as well.
+		let obs = Services.obs;
+
+		// If AdBlock Plus is enabled, we will need to clear its keys cache when our keys are changed, to ensure there are no conflicts between both add-ons.
+		// This should be inconsequential for ABP itself, as it will just rebuild it form the available keysets the next time it needs it.
+		if(deinitializing || !this._flushing.has('adblockplus')) {
+			if(!deinitializing) {
+				this._flushing.add('adblockplus');
+			}
+			AddonManager.getAddonByID('{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}', (addon) => {
+				if(addon && addon.isActive) {
+					let result = {};
+					result.wrappedJSObject = result;
+					obs.notifyObservers(result, "adblockplus-require", "ui");
+					if(result.exports.UI) {
+						result.exports.UI.hotkeys = null;
+					}
+				}
+				if(!deinitializing) {
+					this._flushing.delete('adblockplus');
+				}
+			});
+		}
+	},
 
 	prepareKey: function(key) {
 		let newKey = {
@@ -479,6 +508,7 @@ this.Keysets = {
 	},
 
 	unsetAllWindows: function() {
+		this.flushOthers(true);
 		Windows.callOnAll((aWindow) => { this.unsetWindow(aWindow); }, 'navigator:browser');
 	},
 
