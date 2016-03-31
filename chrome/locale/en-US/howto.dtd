@@ -45,5 +45,6 @@
 
 <!ENTITY howto.pinned.caption "Pinned Tabs in Tab Groups">
 <!ENTITY howto.pinned.description2 "Pinned Tabs don't belong to any group. They are represented by their site's icon on the right side in groups mode, and will be visible regardless of what group you have active.">
+<!ENTITY howto.pinned.description3 "You can pin a tab while in groups view, by dragging it into this area. Likewise, drag a tab out of this area into any group to unpin it.">
 
 <!ENTITY howto.credits "This pane is based on an article originally on support.mozilla.org, written by these fine people:">

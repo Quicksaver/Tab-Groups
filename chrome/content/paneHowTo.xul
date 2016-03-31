@@ -105,6 +105,7 @@
 			<caption label="&howto.pinned.caption;"/>
 			<html:p>&nbsp;</html:p>
 			<html:p>&howto.pinned.description2;</html:p>
+			<html:p>&howto.pinned.description3;</html:p>
 			<html:img src="chrome://objPathString/skin/howto/pinned.jpg"/>
 		</groupbox>
 
