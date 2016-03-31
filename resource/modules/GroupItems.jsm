@@ -1,4 +1,4 @@
-// VERSION 1.4.0
+// VERSION 1.4.1
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1187,7 +1187,7 @@ this.GroupItem.prototype = {
 	//   tabItem - The tabItem that is closed.
 	_onChildClose: function(tabItem) {
 		let dontArrange = tabItem.closedManually && (this.expanded || !this.shouldStack());
-		let dontClose = !tabItem.closedManually && Tabs.numPinned;
+		let dontClose = !tabItem.closedManually && Tabs.numPinned && !UI.isTabViewVisible();
 		this.remove(tabItem, { dontArrange: dontArrange, dontClose: dontClose });
 
 		if(dontArrange) {

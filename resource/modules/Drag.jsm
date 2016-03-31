@@ -1,4 +1,4 @@
-// VERSION 2.2.0
+// VERSION 2.2.1
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -674,6 +674,28 @@ this.TabDrag.prototype = {
 		}
 	},
 
+	pinItem: function() {
+		let tab = this.item.tab;
+		if(!tab.pinned) {
+			Listeners.remove(this.container, 'dragend', this);
+			gBrowser.pinTab(tab);
+			this.item = PinnedItems.icons.get(tab);
+			this.container = this.item.container;
+			Listeners.add(this.container, 'dragend', this);
+		}
+	},
+
+	unpinItem: function() {
+		let tab = this.item.tab;
+		if(tab.pinned) {
+			Listeners.remove(this.container, 'dragend', this);
+			gBrowser.unpinTab(tab);
+			this.item = tab._tabViewTabItem;
+			this.container = this.item.container;
+			Listeners.add(this.container, 'dragend', this);
+		}
+	},
+
 	drop: function(e) {
 		// No-op, shouldn't happen though.
 		if(!this.dropTarget) { return; }
@@ -681,14 +703,7 @@ this.TabDrag.prototype = {
 		// If we have a valid drop target (group), add the item to it.
 		if(this.dropTarget.isAGroupItem) {
 			// When dragging a pinned tab into a group, we need to unpin it first, so that we have a tab item that we can drag.
-			let tab = this.item.tab;
-			if(tab.pinned) {
-				Listeners.remove(this.container, 'dragend', this);
-				gBrowser.unpinTab(tab);
-				this.item = tab._tabViewTabItem;
-				this.container = this.item.container;
-				Listeners.add(this.container, 'dragend', this);
-			}
+			this.unpinItem();
 
 			let options = {};
 			let ii = this.dropTarget.children.indexOf(this.item);
@@ -721,14 +736,7 @@ this.TabDrag.prototype = {
 		// If the drop target is the pinned tabs area, we should make sure the tab is pinned. Things are a little easier than as above though.
 		else if(this.dropTarget == PinnedItems.tray) {
 			// Pin the tab first, so that our handlers can first remove the original tab item, and then register it as an app tab.
-			let tab = this.item.tab;
-			if(!tab.pinned) {
-				Listeners.remove(this.container, 'dragend', this);
-				gBrowser.pinTab(tab);
-				this.item = PinnedItems.icons.get(tab);
-				this.container = this.item.container;
-				Listeners.add(this.container, 'dragend', this);
-			}
+			this.pinItem();
 
 			let sibling = this.sibling;
 			if(sibling && sibling.classList.contains('space-after')) {
@@ -738,11 +746,14 @@ this.TabDrag.prototype = {
 				}
 			}
 
-			PinnedItems.add(tab, sibling);
+			PinnedItems.add(this.item.tab, sibling);
 			PinnedItems.reorderTabsBasedOnAppItemOrder();
 		}
 		// Otherwise create a new group in the place where the tab was dropped.
 		else {
+			// We wouldn't be creating a new group for pinned tabs of course.
+			this.unpinItem();
+
 			let tabSize = TabItems;
 			if(this.item.parent && this.item.parent._lastTabSize) {
 				tabSize = this.item.parent._lastTabSize;
