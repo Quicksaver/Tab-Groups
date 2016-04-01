@@ -41,6 +41,10 @@ body.grid #groups {
 	overflow: hidden;
 }
 
+body.grid #groups.overflowing {
+	overflow-y: scroll;
+}
+
 /* Tabs */
 
 .tab {

@@ -1,4 +1,4 @@
-// VERSION 1.4.4
+// VERSION 1.4.5
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2553,19 +2553,31 @@ this.GroupItems = {
 				height = Math.floor(validSize.y);
 
 				totalWidth = width * columns;
-			}
+			};
 
-			figure();
-			while(columns > 1 && totalWidth > bounds.width) {
-				rows++;
+			let findOptimal = () => {
 				figure();
-			}
+				while(columns > 1 && totalWidth > bounds.width) {
+					rows++;
+					figure();
+				}
+				totalHeight = height * rows;
+			};
+
+			findOptimal();
 
 			if(!factor) {
+				// If we're overflowing, we need to re-do the final widths leaving space for the scrollbar.
+				if(totalHeight > bounds.height) {
+					this.workSpace.classList.add('overflowing');
+					bounds.width -= UICache.scrollbarWidth;
+					findOptimal();
+				} else {
+					this.workSpace.classList.remove('overflowing');
+				}
 				return { rows, columns, width, height };
 			}
 
-			totalHeight = height * rows;
 			if(totalHeight <= bounds.height) {
 				small = { rows, columns, width, height };
 				return { rows: 1, columns: specColumns, width: specWidth, height: specHeight };

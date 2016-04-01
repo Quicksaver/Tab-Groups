@@ -1,4 +1,4 @@
-// VERSION 1.2.6
+// VERSION 1.2.7
 
 this.Keys = { meta: false };
 
@@ -1679,6 +1679,16 @@ this.UICache = {
 			y: parseInt(style.getPropertyValue('margin-top')) + parseInt(style.getPropertyValue('margin-bottom'))
 		};
 		return this.groupContentsMargin;
+	},
+
+	get scrollbarWidth() {
+		delete this.scrollbarWidth;
+		let div = document.createElement("div");
+		div.setAttribute('style', 'width: 100px; height: 100px; overflow: scroll; position: fixed; top: -9999px;');
+		document.body.appendChild(div);
+		this.scrollbarWidth = 100 -div.clientWidth;
+		div.remove();
+		return this.scrollbarWidth;
 	}
 };
 
