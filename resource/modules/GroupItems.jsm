@@ -1,4 +1,4 @@
-// VERSION 1.4.1
+// VERSION 1.4.2
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2509,6 +2509,12 @@ this.GroupItems = {
 					return null;
 				}
 
+				// We don't want to have the larger groups contrast too much with the smaller groups.
+				// This is just a way to control this contrast in cases where there are too few rows.
+				if(rows == 2 && factor > 1.3) {
+					return null;
+				}
+
 				// If the groups are already overflowing, it's safe to assume we can't increase the size of any of them.
 				if(totalHeight > bounds.height) {
 					return null;
@@ -2569,7 +2575,7 @@ this.GroupItems = {
 		let small = calc();
 
 		// Try to enlarge some groups in the first row, to bring more attention to them.
-		let big = calc(1.75);
+		let big = calc(1.4);
 
 		// Do we have any potential free space for a medium row? This can be in addition or instead of the big row.
 		let medium = calc(1.25);
