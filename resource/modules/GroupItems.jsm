@@ -1,4 +1,4 @@
-// VERSION 1.4.3
+// VERSION 1.4.4
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1701,8 +1701,9 @@ this.GroupItems = {
 
 	// Will be calc'ed in init() from the values above.
 	minGroupRatio: 0,
-	maxGroupRatio: 2,
+	maxGroupRatio: 1,
 	minGroupHeightRange: null,
+	minGroupRatioRange: null,
 
 	// How far apart Items should be from each other and from bounds
 	defaultGutter: 15,
@@ -1715,6 +1716,7 @@ this.GroupItems = {
 
 		this.minGroupRatio = this.minGroupWidth / this.minGroupHeight;
 		this.minGroupHeightRange = new Range(this.minGroupHeight, this.minGroupHeight * this.maxGroupRatio);
+		this.minGroupRatioRange = new Range(this.minGroupRatio, this.minGroupRatio * this.maxGroupRatio);
 	},
 
 	// Function: uninit
@@ -2214,8 +2216,8 @@ this.GroupItems = {
 
 		// Used when arranging the grid layout, for groups to keep a minimal ratio so that they don't appear too squished.
 		if(keepRatio) {
-			let heightFactor = this.minGroupHeightRange.proportion(h);
-			let minRatio = this.minGroupRatio * heightFactor;
+			let proportion = this.minGroupHeightRange.proportion(h);
+			let minRatio = this.minGroupRatioRange.scale(proportion);
 			w = Math.max(w, h * minRatio);
 		}
 
