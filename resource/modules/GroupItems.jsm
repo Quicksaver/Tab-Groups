@@ -1,4 +1,4 @@
-// VERSION 1.4.2
+// VERSION 1.4.3
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -153,6 +153,14 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.tabContainer = document.createElement('div');
 	this.tabContainer.classList.add('tab-container');
 	this.contents.appendChild(this.tabContainer);
+
+	// The new tab item is a clone of the new group button placeholder, so that we can use the same style with it.
+	this.newTabItem = UI.gridNewGroupBtn.cloneNode(true);
+	this.newTabItem.id = '';
+	this.newTabItem.classList.remove('groupItem');
+	this.newTabItem.classList.add('tab');
+	setAttribute(this.newTabItem, "title", Strings.get("TabView", "openNewTab"));
+	this.tabContainer.appendChild(this.newTabItem);
 
 	// ___ Stack Expander
 	this.expander = document.createElement("div");
@@ -680,6 +688,9 @@ this.GroupItem.prototype = {
 				if(!this.childHandling && same && !this.isDragging && !this.isResizing) {
 					if(e.target == this.titleShield) {
 						this.focusTitle();
+					}
+					else if(e.target == this.newTabItem) {
+						this.newTab();
 					}
 					else if(Tabs.selected.pinned
 					&& UI.getActiveTab() != this.getActiveTab()
@@ -1258,7 +1269,7 @@ this.GroupItem.prototype = {
 
 	// Returns true if the groupItem should stack (instead of grid).
 	shouldStack: function() {
-		let count = this.children.length;
+		let count = this.children.length +1; // +1 for new tab item
 		let box = this.getContentBounds();
 		let arrObj = TabItems.arrange(count, box);
 
@@ -1434,9 +1445,7 @@ this.GroupItem.prototype = {
 			cols = this._columns;
 		}
 
-		let count = this.children.length;
-		if(!count) { return; }
-
+		let count = this.children.length +1; // +1 for new tab item
 		let bounds = this.getContentBounds(true);
 
 		// Check against our cached values if we need to re-calc anything.

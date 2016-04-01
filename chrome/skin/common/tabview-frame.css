@@ -322,35 +322,53 @@ body.grid .undo {
 	cursor: default;
 }
 
+/* new group/tab items */
+
+.stackedGroup .tab.create-new,
 body:not(.grid) #gridNewGroup {
 	display: none;
 }
 
-#gridNewGroup {
+body:-moz-any(.DraggingTab,.DraggingGroup) .tab.create-new,
+.groupItem:not(:hover) .tab.create-new {
+	opacity: 0;
+}
+
+.create-new {
 	position: relative;
 	order: 9999999;
 	-moz-user-focus: normal;
 }
 
-#gridNewGroup > div {
+.create-new .create-new-border {
 	pointer-events: none;
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	width: 100%;
-	height: 100%;
+	width: 65%;
+	height: 65%;
+	border: 5px dashed #333;
+	opacity: 0.3;
+}
+
+.create-new:-moz-any(:hover,.dragOver) > .create-new-border {
+	opacity: 0.75;
+}
+
+.create-new .create-new-plus {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 75%;
+	height: 75%;
 	max-width: 100px;
 	max-height: 100px;
 	background-image: url("chrome://tabgroups/skin/newItem.png");
 	background-size: contain;
 	background-repeat: no-repeat;
-	border: 5px dashed #333;
-	opacity: 0.4;
-}
-
-#gridNewGroup:-moz-any(:hover,.dragOver) > div {
-	opacity: 0.75;
+	background-position: center;
 }
 
 /* Trenches */
