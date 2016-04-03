@@ -1,6 +1,13 @@
 <!ENTITY pane.tabGroups.label "Tab Groups">
 <!ENTITY pane.session.label "Backup / Restore">
 
+<!ENTITY cat.stackTabs.label "When a group has too many tabs...">
+<!ENTITY cat.stackTabs.tooltip "If the group can't show all of its tabs because it has too many, you can...">
+<!ENTITY opt.stackTabs.label "Stack the group">
+<!ENTITY opt.stackTabs.tooltip "Only the active tab will be shown, stacked on top of the others. You can still access all the tabs by clicking the group's expand button.">
+<!ENTITY opt.listTabs.label "Scroll the group">
+<!ENTITY opt.listTabs.tooltip "Some of the tabs will be hidden and you will have to scroll the group to access them.">
+
 <!ENTITY cat.keyboardshortcuts.label "Keyboard Shortcuts">
 <!ENTITY cat.backup.label "Backup your Tab Groups">
 <!ENTITY cat.restore.label "Restore Tab Groups">

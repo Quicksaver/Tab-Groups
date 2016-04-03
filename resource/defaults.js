@@ -1,4 +1,4 @@
-// VERSION 1.4.4
+// VERSION 1.4.5
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -16,6 +16,7 @@ addonUris = {
 
 prefList = {
 	displayMode: 'grid',
+	stackTabs: true,
 
 	tabViewKeycode: 'E',
 	tabViewAccel: true,
@@ -134,6 +135,9 @@ function onStartup() {
 	Modules.load('compatibilityFix/sandboxFixes');
 	Modules.load('keysets');
 
+	// Scrollbar CSS code needs to be loaded as an AGENT sheet, otherwise it won't apply to scrollbars in non-xul documents.
+	Styles.load('scrollbars', 'scrollbars', false, 'agent');
+
 	// Apply the add-on to every window opened and to be opened
 	Windows.callOnAll(startAddon, 'navigator:browser');
 	Windows.register(startAddon, 'domwindowopened', 'navigator:browser');
@@ -142,6 +146,8 @@ function onStartup() {
 function onShutdown() {
 	// remove the add-on from all windows
 	Windows.callOnAll(stopAddon, null, null, true);
+
+	Styles.unload('scrollbars');
 
 	Modules.unload('keysets');
 	Modules.unload('compatibilityFix/sandboxFixes');

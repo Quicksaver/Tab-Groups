@@ -1,4 +1,4 @@
-// VERSION 1.1.9
+// VERSION 1.1.10
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -874,10 +874,23 @@ this.TabItems = {
 		let tabWidth;
 		let tabHeight;
 		let totalHeight;
+		let totalWidth;
+		let overflowing;
+		let firstCycle = false;
 
 		let figure = () => {
-			rows = Math.ceil(count / columns);
+			let specRows = Math.ceil(count / columns);
 			let validSize = this.calcValidSize(new Point(bounds.width / columns, -1));
+			totalWidth = validSize.x * columns;
+			overflowing = totalWidth > bounds.width;
+
+			if(firstCycle && overflowing) {
+				columns--;
+				return;
+			}
+			firstCycle = true;
+
+			rows = specRows;
 			tabWidth = validSize.x;
 			tabHeight = validSize.y;
 
@@ -885,7 +898,7 @@ this.TabItems = {
 		}
 
 		figure();
-		while(rows > 1 && totalHeight > bounds.height) {
+		while(!overflowing && rows > 1 && totalHeight > bounds.height) {
 			columns++;
 			figure();
 		}
@@ -894,12 +907,13 @@ this.TabItems = {
 			let validSize = this.calcValidSize(new Point(tabWidth, bounds.height));
 			tabWidth = validSize.x;
 			tabHeight = validSize.y;
+			totalHeight = tabHeight;
 		}
 
 		tabWidth = Math.floor(tabWidth) -UICache.tabItemPadding.x;
 		tabHeight = Math.floor(tabHeight) -UICache.tabItemPadding.y;
 
-		return { tabWidth, tabHeight, columns, rows };
+		return { tabWidth, tabHeight, columns, rows, overflowing };
 	},
 
 	// Pass in a desired size, and receive a size based on proper title size and aspect ratio.

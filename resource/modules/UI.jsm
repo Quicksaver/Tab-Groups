@@ -1,4 +1,4 @@
-// VERSION 1.2.7
+// VERSION 1.2.8
 
 this.Keys = { meta: false };
 
@@ -283,6 +283,14 @@ this.UI = {
 			case 'displayMode':
 				this.toggleMode();
 				break;
+
+			case 'stackTabs':
+				for(let groupItem of GroupItems) {
+					if(groupItem.isStacked || groupItem.overflowing) {
+						groupItem.arrange();
+					}
+				}
+				break;
 		}
 	},
 
@@ -318,6 +326,7 @@ this.UI = {
 			Messenger.listenWindow(gWindow, "DOMWillOpenModalDialog", this);
 
 			// Initialize the UI with the correct mode from the start, the groups will take care of themselves as they're added.
+			Prefs.listen('stackTabs', this);
 			Prefs.listen('displayMode', this);
 			document.body.classList.add(Prefs.displayMode);
 
@@ -426,6 +435,7 @@ this.UI = {
 		Tabs.unlisten("TabPinned", this);
 		Tabs.unlisten("TabUnpinned", this);
 
+		Prefs.unlisten('stackTabs', this);
 		Prefs.unlisten('displayMode', this);
 
 		this._currentTab = null;
@@ -653,6 +663,9 @@ this.UI = {
 		let box = GroupItems.workSpace.getBoundingClientRect();
 		let width = Math.max(100, Math.floor(box.width));
 		let height = Math.max(100, Math.floor(box.height));
+		if(this.grid && GroupItems.workSpace.classList.contains('overflowing')) {
+			width += UICache.scrollbarWidth;
+		}
 		return new Rect(0, 0, width, height);
 	},
 
@@ -1683,11 +1696,9 @@ this.UICache = {
 
 	get scrollbarWidth() {
 		delete this.scrollbarWidth;
-		let div = document.createElement("div");
-		div.setAttribute('style', 'width: 100px; height: 100px; overflow: scroll; position: fixed; top: -9999px;');
-		document.body.appendChild(div);
-		this.scrollbarWidth = 100 -div.clientWidth;
-		div.remove();
+		let style = getComputedStyle(document.documentElement);
+		let width = style.getPropertyValue('--scrollbar-width');
+		this.scrollbarWidth = parseInt(width);
 		return this.scrollbarWidth;
 	}
 };

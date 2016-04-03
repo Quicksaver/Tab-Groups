@@ -1,4 +1,4 @@
-// VERSION 1.4.5
+// VERSION 1.4.6
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -21,6 +21,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.isAGroupItem = true;
 	this.id = options.id || GroupItems.getNextID();
 	this.isStacked = false;
+	this.overflowing = false;
 	this.expanded = null;
 	this.hidden = false;
 	this.childHandling = false;
@@ -723,9 +724,14 @@ this.GroupItem.prototype = {
 					}
 					else if(!e.target.classList.contains('close') // can also be tabs close button
 					&& this.expander != e.target) {
-						this.lastMouseDownTarget = e.target;
-						if(!this.childHandling && UI.classic) {
-							new GroupDrag(this, e);
+						// Don't handle when clicking on the scrollbar of overflowing groups.
+						if(!this.overflowing
+						|| e.target != this.tabContainer
+						|| e.target.namespaceURI == e.originalTarget.namespaceURI) {
+							this.lastMouseDownTarget = e.target;
+							if(!this.childHandling && UI.classic) {
+								new GroupDrag(this, e);
+							}
 						}
 					}
 				}
@@ -1197,7 +1203,7 @@ this.GroupItem.prototype = {
 	// Parameters:
 	//   tabItem - The tabItem that is closed.
 	_onChildClose: function(tabItem) {
-		let dontArrange = tabItem.closedManually && (this.expanded || !this.shouldStack());
+		let dontArrange = tabItem.closedManually && (this.expanded || !this.isOverflowing());
 		let dontClose = !tabItem.closedManually && Tabs.numPinned && !UI.isTabViewVisible();
 		this.remove(tabItem, { dontArrange: dontArrange, dontClose: dontClose });
 
@@ -1268,15 +1274,14 @@ this.GroupItem.prototype = {
 	},
 
 	// Returns true if the groupItem should stack (instead of grid).
-	shouldStack: function() {
+	isOverflowing: function() {
 		let count = this.children.length +1; // +1 for new tab item
 		let box = this.getContentBounds();
 		let arrObj = TabItems.arrange(count, box);
 
-		let shouldStack = arrObj.tabWidth < TabItems.minTabWidth || arrObj.tabHeight < TabItems.minTabHeight;
-		this._columns = shouldStack ? null : arrObj.columns;
+		this._columns = arrObj.overflowing ? null : arrObj.columns;
 
-		return shouldStack;
+		return arrObj.overflowing;
 	},
 
 	// Freezes current item size (when removing a child).
@@ -1340,25 +1345,24 @@ this.GroupItem.prototype = {
 			tab.style.order = i;
 		}
 
-		let shouldStack = this.shouldStack() && !this.expanded;
+		let isOverflowing = this.isOverflowing() && !this.expanded;
 
 		// if we should stack and we're not expanded
-		if(shouldStack) {
-			this.container.classList.add('stackedGroup');
-			this.isStacked = true;
+		if(isOverflowing && Prefs.stackTabs) {
 			this._stackArrange();
 		} else {
-			this.container.classList.remove('stackedGroup');
-			this.isStacked = false;
 			this._gridArrange();
 		}
 	},
 
 	// Arranges the children in a stack.
 	_stackArrange: function() {
+		this.container.classList.add('stackedGroup');
+		this.isStacked = true;
+		removeAttribute(this.tabContainer, 'columns');
+
 		let childrenToArrange = this.children.concat();
 		let count = childrenToArrange.length;
-		if(!count) { return; }
 
 		// ensure topChild is the first item in childrenToArrange
 		let topChild = this.getTopChild();
@@ -1394,8 +1398,6 @@ this.GroupItem.prototype = {
 		}
 		if(!arrange) { return; }
 		this._lastArrange = { isStacked: true, bounds, children };
-
-		removeAttribute(this.tabContainer, 'columns');
 
 		// compute size of the entire stack, modulo rotation.
 		let itemAspect = TabItems.tabAspect;
@@ -1440,6 +1442,9 @@ this.GroupItem.prototype = {
 
 	// Arranges the children into a grid.
 	_gridArrange: function() {
+		this.container.classList.remove('stackedGroup');
+		this.isStacked = false;
+
 		let cols;
 		if(!this.expanded) {
 			cols = this._columns;
@@ -1460,7 +1465,7 @@ this.GroupItem.prototype = {
 		}
 
 		this._lastTabSize = TabItems.arrange(count, bounds, cols);
-		let { tabWidth, tabHeight, columns } = this._lastTabSize;
+		let { tabWidth, tabHeight, columns, overflowing } = this._lastTabSize;
 		let fontSize = TabItems.getFontSizeFromWidth(tabWidth);
 		let spaceWidth = tabWidth + UICache.tabItemPadding.x;
 		let spaceHeight = tabHeight + UICache.tabItemPadding.y;
@@ -1474,6 +1479,7 @@ this.GroupItem.prototype = {
 			}
 		}
 
+		this.overflowing = overflowing;
 		setAttribute(this.tabContainer, 'columns', columns);
 
 		let sscode = '\

@@ -1,0 +1,41 @@
+@-moz-document url("chrome://tabgroups/content/tabview.xhtml") {
+
+	scrollbar {
+		-moz-appearance: none !important;
+		position: relative;
+		background-color: transparent;
+		background-image: none;
+		z-index: 2147483647;
+		padding: 2px;
+		border: none;
+	}
+
+	scrollbar[orient="vertical"] {
+		-moz-margin-start: calc(0px - var(--scrollbar-width));
+		min-width: var(--scrollbar-width);
+		max-width: var(--scrollbar-width);
+	}
+
+	scrollbar[orient="horizontal"] {
+		margin-top: calc(0px - var(--scrollbar-width));
+		min-height: var(--scrollbar-width);
+		max-height: var(--scrollbar-width);
+	}
+
+	slider {
+		-moz-appearance: none;
+	}
+
+	thumb {
+		-moz-appearance: none;
+		background-color: var(--hover-color);
+		border-width: 0px;
+		border-radius: 3px;
+	}
+
+	scrollbar scrollbarbutton,
+	scrollbar gripper {
+		display: none;
+	}
+
+}

@@ -18,6 +18,7 @@
 
 	<prefpane id="mainPrefPane">
 		<preferences>
+			<preference id="pref-stackTabs" name="extensions.tabgroups.stackTabs" type="bool"/>
 			<preference id="pref-tabViewKeycode" name="extensions.tabgroups.tabViewKeycode" type="string"/>
 			<preference id="pref-tabViewAccel" name="extensions.tabgroups.tabViewAccel" type="bool"/>
 			<preference id="pref-tabViewShift" name="extensions.tabgroups.tabViewShift" type="bool"/>
@@ -38,6 +39,30 @@
 		<hbox id="header-tabGroups" class="header" collapsed="true" data-category="paneTabGroups">
 			<label class="header-name">&pane.tabGroups.label;</label>
 		</hbox>
+
+		<groupbox align="start" id="paneTabGroups-stackTabs" collapsed="true" data-category="paneTabGroups">
+			<caption label="&cat.stackTabs.label;"/>
+			<radiogroup delayPreference="pref-stackTabs"
+				jump="stackTabs"
+				onsyncfrompreference="return document.getElementById(this.getAttribute('delayPreference')).value ? 'stack' : 'list';"
+				onsynctopreference="return this.value == 'stack';">
+				<hbox helpbox="paneTabGroups-stackTabs-helptext">
+					<radio label="&opt.stackTabs.label;"
+						class="smallindent"
+						value="stack"/>
+					<radio label="&opt.listTabs.label;"
+						class="smallindent"
+						value="list"/>
+				</hbox>
+			</radiogroup>
+			<vbox id="paneTabGroups-stackTabs-helptext" collapsed="true">
+				<description>&cat.stackTabs.tooltip;</description>
+				<description style="font-weight:bold; margin-top:1em;">&opt.stackTabs.label;</description>
+				<description>&opt.stackTabs.tooltip;</description>
+				<description style="font-weight:bold; margin-top:1em;">&opt.listTabs.label;</description>
+				<description>&opt.listTabs.tooltip;</description>
+			</vbox>
+		</groupbox>
 
 		<groupbox align="start" id="paneTabGroups-shortcut" collapsed="true" data-category="paneTabGroups">
 			<caption label="&cat.keyboardshortcuts.label;"/>

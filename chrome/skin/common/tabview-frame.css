@@ -5,6 +5,7 @@
 :root {
 	--hover-color: rgba(128,128,128,0.4);
 	--item-normal-shadow: 0 1px 5px rgba(60, 60, 60, 0.6);
+	--scrollbar-width: 10px;
 }
 
 html {
@@ -38,11 +39,14 @@ body.grid #groups {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: stretch;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 body.grid #groups.overflowing {
-	overflow-y: scroll;
+	-moz-padding-end: var(--scrollbar-width);
+	/* same as above, plus its own padding to add space to the scrollbar */
+	width: calc(100% - 31px - var(--scrollbar-width));
 }
 
 /* Tabs */
@@ -277,7 +281,8 @@ body.classic .groupItem:not(.phantom) {
 	display: flex;
 	flex-wrap: wrap;
 	align-content: flex-start;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .groupItem.stackedGroup .tab-container {
