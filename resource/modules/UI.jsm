@@ -1,4 +1,23 @@
-// VERSION 1.2.9
+// VERSION 1.2.10
+
+// Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
+this.Synthesizer = {
+	_utils: null,
+	get utils() {
+		if(!this._utils) {
+			this._utils = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
+		}
+		return this._utils;
+	},
+
+	scroll: function(mouse, delta) {
+		try {
+			this.utils.sendWheelEvent(mouse.x, mouse.y, 0, delta, 0, window.WheelEvent.DOM_DELTA_LINE, 0, 0, delta, 0);
+		}
+		// We really only care about not blocking anything else that is supposed to run.
+		catch(ex) { Cu.reportError(ex); }
+	}
+};
 
 this.Keys = { meta: false };
 
@@ -52,6 +71,9 @@ this.UI = {
 
 	// Used to keep track of the tab strip smooth scroll value.
 	_originalSmoothScroll: null,
+
+	// Sensitivity in pixels of the area reactive to dragging a tab that will cause the group to scroll.
+	scrollAreaSize: 15,
 
 	// has the user clicked the close button in the notice in this window already
 	_noticeDismissed: false,
@@ -196,6 +218,9 @@ this.UI = {
 			case 'dragover':
 				if(DraggingTab && (e.target == GroupItems.workSpace || e.target == this.gridNewGroupBtn)) {
 					DraggingTab.canDrop(e, e.target);
+				}
+				else if(DraggingGroup && this.grid && GroupItems.workSpace.classList.contains('overflowing')) {
+					UI.scrollAreaWhileDragging(e, GroupItems.workSpace);
 				}
 				break;
 
@@ -667,6 +692,25 @@ this.UI = {
 			width += UICache.scrollbarWidth;
 		}
 		return new Rect(0, 0, width, height);
+	},
+
+	// See if the provided element should be scrolled while dragging the mouse over to its top or bottom edge.
+	scrollAreaWhileDragging: function(e, element) {
+		let mouse = new Point(e.clientX, e.clientY);
+		let rect = element.getBoundingClientRect();
+		let topArea = new Rect(rect.left, rect.top, rect.width, this.scrollAreaSize);
+		let bottomArea = new Rect(rect.left, rect.top + rect.height - this.scrollAreaSize, rect.width, this.scrollAreaSize);
+
+		let delta;
+		if(topArea.contains(mouse)) {
+			delta = -1;
+		} else if(bottomArea.contains(mouse)) {
+			delta = 1;
+		}
+
+		if(delta) {
+			Synthesizer.scroll(mouse, delta);
+		}
 	},
 
 	// Shows TabView and hides the main browser UI.

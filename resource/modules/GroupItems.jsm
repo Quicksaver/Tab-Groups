@@ -1,4 +1,4 @@
-// VERSION 1.4.7
+// VERSION 1.4.8
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -747,6 +747,12 @@ this.GroupItem.prototype = {
 				break;
 
 			case 'dragover':
+				// Obviously only need scroll when dragging and if there's something to actually scroll.
+				if(DraggingTab && this.overflowing) {
+					UI.scrollAreaWhileDragging(e, this.tabContainer);
+				}
+				// no break; continue to dragenter
+
 			case 'dragenter':
 				if(DraggingTab) {
 					DraggingTab.canDrop(e, this);
