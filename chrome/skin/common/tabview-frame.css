@@ -6,6 +6,17 @@
 	--hover-color: rgba(128,128,128,0.4);
 	--item-normal-shadow: 0 1px 5px rgba(60, 60, 60, 0.6);
 	--scrollbar-width: 10px;
+	--thumbs-tab-padding: 10px;
+	--list-tab-height: 37px;
+	--list-tab-padding: 6px;
+	--favicon-size: 16px;
+	--canvas-border-width: 1px;
+	--group-titlebar-height: 24px;
+	--group-contents-margin: 0;
+	--group-contents-top-margin: 2px;
+	--stack-expander-size: 24px;
+	--stack-expander-top-margin: 0;
+	--stack-expander-bottom-margin: 8px;
 }
 
 html {
@@ -53,7 +64,7 @@ body.grid #groups.overflowing {
 
 .tab {
 	overflow: hidden;
-	padding: 10px;
+	padding: var(--thumbs-tab-padding);
 	margin: 0;
 	cursor: pointer;
 }
@@ -70,7 +81,7 @@ body.DraggingTab .tab * {
 	pointer-events: none;
 }
 
-.thumb {
+.tab-container:not(.noThumbs) .thumb {
 	position: relative;
 	overflow: hidden;
 	width: 100%;
@@ -94,12 +105,16 @@ body.DraggingTab .tab * {
 }
 
 .tab.cached-data canvas,
-.tab:not(.cached-data) .cached-thumb {
+.tab:not(.cached-data) .cached-thumb,
+.tab.noFavicon .favicon-container {
 	display: none;
 }
 
 .favicon-container {
 	position: absolute;
+}
+
+.tab-container:not(.noThumbs) .favicon-container {
 	min-width: 17px;
 	min-height: 17px;
 	max-width: 27px;
@@ -108,17 +123,17 @@ body.DraggingTab .tab * {
 	height: calc(100% - 10px - 4px);
 }
 
-.favicon-container:-moz-locale-dir(ltr) {
+.tab-container:not(.noThumbs) .favicon-container:-moz-locale-dir(ltr) {
 	border-bottom-right-radius: 0.4em;
 }
 
-.favicon-container:-moz-locale-dir(rtl) {
+.tab-container:not(.noThumbs) .favicon-container:-moz-locale-dir(rtl) {
 	border-bottom-left-radius: 0.4em;
 }
 
-.tab:not(.stacked) .favicon-container { top: 0; }
-.tab:not(.stacked) .favicon-container:-moz-locale-dir(ltr) { left: 0; }
-.tab:not(.stacked) .favicon-container:-moz-locale-dir(rtl) { right: 0; }
+.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container { top: 0; }
+.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container:-moz-locale-dir(ltr) { left: 0; }
+.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container:-moz-locale-dir(rtl) { right: 0; }
 
 .tab.stacked .favicon-container { top: 1px; }
 .tab.stacked .favicon-container:-moz-locale-dir(ltr) { left: 1px; }
@@ -128,7 +143,7 @@ body.DraggingTab .tab * {
 	width: 100%;
 	height: 100%;
 	background-repeat: no-repeat;
-	background-size: 16px 16px;
+	background-size: var(--favicon-size) var(--favicon-size);
 	background-position: center center;
 }
 
@@ -268,10 +283,10 @@ body.classic .groupItem:not(.phantom) {
 }
 
 .groupItem .contents {
-	margin-top: 2px;
+	margin-top: var(--group-contents-top-margin);
 	overflow: hidden;
 	/* leave space for titlebar and for its own margin */
-	height: calc(100% - 24px - 2px);
+	height: calc(100% - var(--group-titlebar-height) - var(--group-contents-top-margin));
 }
 
 .tab-container {
@@ -380,6 +395,66 @@ body:-moz-any(.DraggingTab,.DraggingGroup) .tab.create-new,
 	background-position: center;
 }
 
+/* tab items shown without thumbnails (listed only) */
+
+.tab-container.noThumbs .tab {
+	position: relative;
+	flex: 1 1 auto;
+	width: 100%;
+	height: calc(var(--list-tab-height) - var(--list-tab-padding) - var(--list-tab-padding));
+	padding: var(--list-tab-padding);
+}
+
+.tab-container.noThumbs .tab.space-before {
+	margin-top: var(--list-tab-height);
+}
+
+.tab-container.noThumbs .tab.space-after {
+	margin-bottom: var(--list-tab-height);
+}
+
+.tab-container.noThumbs .tab .thumb {
+	/* this is just to prevent any sort of display glitch */
+	width: 0;
+	height: 0;
+}
+
+.tab-container.noThumbs .tab .cached-thumb,
+.tab-container.noThumbs .tab canvas {
+	display: none;
+}
+
+.tab-container.noThumbs .tab .favicon-container {
+	top: 50%;
+	transform: translateY(-50%);
+	width: var(--favicon-size);
+	height: var(--favicon-size);
+	background: none;
+	border: none;
+	-moz-margin-start: 2px;
+}
+
+.tab-container.noThumbs .tab .close {
+	top: 50%;
+	transform: translateY(-50%);
+	-moz-margin-end: 5px;
+}
+
+.tab-container.noThumbs .tab .tab-title {
+	text-align: start;
+	-moz-margin-end: 18px;
+}
+
+.tab-container.noThumbs .tab:not(.noFavicon) .tab-title {
+	-moz-margin-start: 24px;
+}
+
+.tab-container.noThumbs .create-new-border {
+	height: 100%;
+	width: 100%;
+	border: none;
+}
+
 /* Trenches */
 
 .guideTrench,
@@ -441,7 +516,7 @@ body.classic .groupItem.dragging * {
 	display: flex;
 	cursor: move;
 	font-size: 12px;
-	height: 24px;
+	height: var(--group-titlebar-height);
 }
 
 .title-container {
@@ -511,9 +586,9 @@ input.name:focus::-moz-placeholder {
 .stackExpander {
 	cursor: pointer;
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/stack-expander.png), 0, 48, 24, 24);
-	width: 24px;
-	height: 24px;
-	margin: 0 auto 8px;
+	width: var(--stack-expander-size);
+	height: var(--stack-expander-size);
+	margin: var(--stack-expander-top-margin) auto var(--stack-expander-bottom-margin);
 }
 
 .stackExpander:hover {
@@ -821,8 +896,8 @@ body:not(.searching) #search {
 	-moz-margin-end: 5px;
 	position: relative;
 	top: calc(50% - 8px);
-	width: 16px;
-	height: 16px;
+	width: var(--favicon-size);
+	height: var(--favicon-size);
 }
 
 .inlineMatch > span {

@@ -1,4 +1,4 @@
-// VERSION 2.2.1
+// VERSION 2.2.2
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -760,8 +760,8 @@ this.TabDrag.prototype = {
 			}
 
 			let { tabWidth, tabHeight } = tabSize;
-			tabWidth += UICache.tabItemPadding.x +10;
-			tabHeight += UICache.tabItemPadding.y +50;
+			tabWidth += UICache.tabItemPadding +10;
+			tabHeight += UICache.tabItemPadding +50;
 
 			let options = {
 				focusTitle: true

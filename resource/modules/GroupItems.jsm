@@ -1,4 +1,4 @@
-// VERSION 1.4.6
+// VERSION 1.4.7
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1358,6 +1358,7 @@ this.GroupItem.prototype = {
 	// Arranges the children in a stack.
 	_stackArrange: function() {
 		this.container.classList.add('stackedGroup');
+		this.tabContainer.classList.remove('noThumbs');
 		this.isStacked = true;
 		removeAttribute(this.tabContainer, 'columns');
 
@@ -1416,8 +1417,8 @@ this.GroupItem.prototype = {
 		// x is the left margin that the stack will have, within the content area (bounds)
 		// y is the vertical margin
 		let position = {
-			x: (bounds.width - size.x - UICache.tabItemPadding.x) / 2,
-			y: (bounds.height - size.y - UICache.tabItemPadding.y) / 2
+			x: (bounds.width - size.x - UICache.tabItemPadding) / 2,
+			y: (bounds.height - size.y - UICache.tabItemPadding) / 2
 		};
 
 		let sscode = '\
@@ -1467,8 +1468,8 @@ this.GroupItem.prototype = {
 		this._lastTabSize = TabItems.arrange(count, bounds, cols);
 		let { tabWidth, tabHeight, columns, overflowing } = this._lastTabSize;
 		let fontSize = TabItems.getFontSizeFromWidth(tabWidth);
-		let spaceWidth = tabWidth + UICache.tabItemPadding.x;
-		let spaceHeight = tabHeight + UICache.tabItemPadding.y;
+		let spaceWidth = tabWidth + UICache.tabItemPadding;
+		let spaceHeight = tabHeight + UICache.tabItemPadding;
 
 		// Tab title heights vary according to fonts... I wish I could use flexbox here, but the more flexboxes the more it lags.
 		let lineHeight = TabItems.fontSizeRange.max;
@@ -1481,6 +1482,13 @@ this.GroupItem.prototype = {
 
 		this.overflowing = overflowing;
 		setAttribute(this.tabContainer, 'columns', columns);
+
+		if(overflowing && columns < GroupItems.minTabColumns) {
+			this.tabContainer.classList.add('noThumbs');
+			Styles.unload('group_'+this.id+'_'+_UUID);
+			return;
+		}
+		this.tabContainer.classList.remove('noThumbs');
 
 		let sscode = '\
 			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab,\n\
@@ -1710,6 +1718,11 @@ this.GroupItems = {
 	maxGroupRatio: 1,
 	minGroupHeightRange: null,
 	minGroupRatioRange: null,
+
+	// The minimum number of columns necessary to show thumbnails for tab item when the group overflows (when it's not stacked).
+	// This value gives a rough equivalent of information in the form of shown tabs;
+	// i.e. one row of 3 tabs with thumbnails should have roughly the same height as 3 tabs listed without thumbnails.
+	minTabColumns: 3,
 
 	// How far apart Items should be from each other and from bounds
 	defaultGutter: 15,

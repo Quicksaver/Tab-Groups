@@ -4,7 +4,7 @@
 
 :root {
 	--item-background: #D0D0D0;
-	--item-border: 1px solid rgba(0, 0, 0, 0.3);
+	--item-border: var(--canvas-border-width) solid rgba(0, 0, 0, 0.3);
 	--item-border-radius: 7px;
 }
 

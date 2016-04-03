@@ -5,7 +5,7 @@
 :root {
 	--item-background: -moz-dialog;
 	--item-background-aero: hsl(210,75%,92%);
-	--item-border: 1px solid rgba(73, 99, 119, 0.3);
+	--item-border: var(--canvas-border-width) solid rgba(73, 99, 119, 0.3);
 	--item-border-radius: 5px;
 }
 

@@ -4,7 +4,7 @@
 
 :root {
 	--item-background: -moz-dialog;
-	--item-border: 1px solid rgba(0, 0, 0, 0.3);
+	--item-border: var(--canvas-border-width) solid rgba(0, 0, 0, 0.3);
 }
 
 body {
@@ -21,7 +21,7 @@ body {
 }
 
 .thumb > *:-moz-any(canvas,.cached-thumb) {
-	border: 1px solid rgba(0,0,0,0.2);
+	border: var(--item-border);
 }
 
 .favicon-container {

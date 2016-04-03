@@ -1,4 +1,4 @@
-// VERSION 1.2.8
+// VERSION 1.2.9
 
 this.Keys = { meta: false };
 
@@ -1636,74 +1636,46 @@ this.UI = {
 
 // Keep a few values cached, to avoid constant reflows.
 this.UICache = {
-	defaultItemPadding: 20,
-
-	get tabItemPadding() {
-		let item = TabItems[0];
-		let style = getComputedStyle(item.container);
-		let x = parseInt(style.getPropertyValue('padding-left')) + parseInt(style.getPropertyValue('padding-right'));
-		let y = parseInt(style.getPropertyValue('padding-top')) + parseInt(style.getPropertyValue('padding-bottom'));
-		// Sometimes it fails to get the correct values for this on startup,
-		// so assume there is at least some padding and check again next time this is called.
-		if(x + y == 0) {
-			return { x: this.defaultItemPadding, y: this.defaultItemPadding };
-		}
-		delete this.tabItemPadding;
-		this.tabItemPadding = { x, y };
-		return this.tabItemPadding;
+	ghost: function(aName, aLambda) {
+		XPCOMUtils.defineLazyGetter(this, aName, aLambda);
 	},
 
-	get tabCanvasOffset() {
-		delete this.tabCanvasOffset;
-		let item = TabItems[0];
-		let style = getComputedStyle(item.canvas);
-		this.tabCanvasOffset = {
-			x: parseInt(style.getPropertyValue('border-left-width')) + parseInt(style.getPropertyValue('border-right-width')),
-			y: parseInt(style.getPropertyValue('border-top-width')) + parseInt(style.getPropertyValue('border-bottom-width'))
-		};
-		return this.tabCanvasOffset;
-	},
-
-	get groupTitlebarHeight() {
-		delete this.groupTitlebarHeight;
-		let item = GroupItems[0];
-		let style = getComputedStyle(item.titlebar);
-		this.groupTitlebarHeight = parseInt(style.getPropertyValue('height'));
-		return this.groupTitlebarHeight;
-	},
-
-	get stackExpanderHeight() {
-		delete this.stackExpanderHeight;
-		let item = GroupItems[0];
-		let style = getComputedStyle(item.expander);
-		this.stackExpanderHeight =
-			parseInt(style.getPropertyValue('height'))
-			+ parseInt(style.getPropertyValue('margin-bottom'))
-			+ parseInt(style.getPropertyValue('margin-top'));
-		return this.stackExpanderHeight;
-	},
-
-	get groupContentsMargin() {
-		delete this.groupContentsMargin;
-		let item = GroupItems[0];
-		let style = getComputedStyle(item.contents);
-		this.groupContentsMargin = {
-			x: parseInt(style.getPropertyValue('margin-left')) + parseInt(style.getPropertyValue('margin-right')),
-			y: parseInt(style.getPropertyValue('margin-top')) + parseInt(style.getPropertyValue('margin-bottom'))
-		};
-		return this.groupContentsMargin;
-	},
-
-	get scrollbarWidth() {
-		delete this.scrollbarWidth;
+	init: function() {
 		let style = getComputedStyle(document.documentElement);
-		let width = style.getPropertyValue('--scrollbar-width');
-		this.scrollbarWidth = parseInt(width);
-		return this.scrollbarWidth;
+
+		this.ghost('tabItemPadding', function() {
+			return parseInt(style.getPropertyValue('--thumbs-tab-padding')) *2;
+		});
+
+		this.ghost('tabCanvasOffset', function() {
+			return parseInt(style.getPropertyValue('--canvas-border-width')) *2;
+		});
+
+		this.ghost('groupTitlebarHeight', function() {
+			return parseInt(style.getPropertyValue('--group-titlebar-height'));
+		});
+
+		this.ghost('stackExpanderHeight', function() {
+			return	parseInt(style.getPropertyValue('--stack-expander-size'))
+				+ parseInt(style.getPropertyValue('--stack-expander-top-margin'))
+				+ parseInt(style.getPropertyValue('--stack-expander-bottom-margin'));
+		});
+
+		this.ghost('groupContentsMargin', function() {
+			return {
+				x: parseInt(style.getPropertyValue('--group-contents-top-margin')) *2,
+				y: parseInt(style.getPropertyValue('--group-contents-margin')) + parseInt(style.getPropertyValue('--group-contents-top-margin'))
+			};
+		});
+
+		this.ghost('scrollbarWidth', function() {
+			return parseInt(style.getPropertyValue('--scrollbar-width'));
+		});
 	}
 };
 
 Modules.LOADMODULE = function() {
+	UICache.init();
 	UI.init();
 };
 

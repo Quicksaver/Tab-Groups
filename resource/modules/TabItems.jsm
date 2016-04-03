@@ -1,4 +1,4 @@
-// VERSION 1.1.10
+// VERSION 1.1.11
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -417,8 +417,8 @@ this.TabItem.prototype = {
 	// Updates the tabitem's canvas.
 	updateCanvas: function() {
 		// ___ thumbnail
-		let w = this.$canvas.width() - UICache.tabCanvasOffset.x;
-		let h = this.$canvas.height() - UICache.tabCanvasOffset.y;
+		let w = this.$canvas.width() - UICache.tabCanvasOffset;
+		let h = this.$canvas.height() - UICache.tabCanvasOffset;
 		let dimsChanged = w != this.canvas.width || h != this.canvas.height;
 
 		TabItems._lastUpdateTime = Date.now();
@@ -444,7 +444,7 @@ this.TabItem.prototype = {
 
 // Singleton for managing <TabItem>s
 this.TabItems = {
-	minTabWidth: 60,
+	minTabWidth: 90,
 	tabWidth: 160,
 	tabHeight: 160,
 	tabAspect: 0, // set in init
@@ -661,11 +661,11 @@ this.TabItems = {
 				if(iconUrl) {
 					tabItem.fav._iconUrl = iconUrl;
 					tabItem.fav.style.backgroundImage = 'url("'+iconUrl+'")';
-					tabItem.fav.parentNode.hidden = false;
+					tabItem.removeClass('noFavicon');
 				} else {
 					tabItem.fav._iconUrl = '';
 					tabItem.fav.style.backgroundImage = '';
-					tabItem.fav.parentNode.hidden = true;
+					tabItem.addClass('noFavicon');
 				}
 				tabItem._sendToSubscribers("iconUpdated");
 			});
@@ -845,7 +845,7 @@ this.TabItems = {
 	// Private method that returns the fontsize to use given the tab's width
 	getFontSizeFromWidth: function(width) {
 		let widthRange = new Range(0, this.tabWidth);
-		let proportion = widthRange.proportion(width - UICache.tabItemPadding.x, true);
+		let proportion = widthRange.proportion(width - UICache.tabItemPadding, true);
 		// proportion is in [0,1]
 		return Math.max(this.fontSizeRange.scale(proportion), this.fontSizeRange.min);
 	},
@@ -910,8 +910,8 @@ this.TabItems = {
 			totalHeight = tabHeight;
 		}
 
-		tabWidth = Math.floor(tabWidth) -UICache.tabItemPadding.x;
-		tabHeight = Math.floor(tabHeight) -UICache.tabItemPadding.y;
+		tabWidth = Math.floor(tabWidth) -UICache.tabItemPadding;
+		tabHeight = Math.floor(tabHeight) -UICache.tabItemPadding;
 
 		return { tabWidth, tabHeight, columns, rows, overflowing };
 	},
