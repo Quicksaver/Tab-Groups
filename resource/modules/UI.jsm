@@ -1,4 +1,4 @@
-// VERSION 1.2.10
+// VERSION 1.2.11
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1718,9 +1718,29 @@ this.UICache = {
 	}
 };
 
-Modules.LOADMODULE = function() {
+this.UIStarter = function() {
+	try {
+		let links = $$('link[rel="stylesheet"]');
+		for(let link of links) {
+			// Wait for the stylesheet to fully load in the window, otherwise UICache wouldn't have correct values and the layout would go nuts.
+			if(!link.sheet || !link.sheet.cssRules || !link.sheet.cssRules.length) {
+				Timers.init('UIStarter', () => { UIStarter(); }, 100);
+				return;
+			}
+		}
+	}
+	catch(ex) {
+		// Called too early?
+		Timers.init('UIStarter', () => { UIStarter(); }, 100);
+		return;
+	}
+
 	UICache.init();
 	UI.init();
+};
+
+Modules.LOADMODULE = function() {
+	UIStarter();
 };
 
 Modules.UNLOADMODULE = function() {
