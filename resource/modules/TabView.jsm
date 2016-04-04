@@ -1,4 +1,4 @@
-// VERSION 1.0.27
+// VERSION 1.0.28
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -274,6 +274,8 @@ this.TabView = {
 	_deinitFrame: function() {
 		// nothing to do
 		if(!this._window && !this._iframe && !this._deck) { return; }
+
+		this.hide();
 
 		Listeners.remove(this._window, "tabviewframeinitialized", this);
 		Listeners.remove(this._iframe, "DOMContentLoaded", this);
