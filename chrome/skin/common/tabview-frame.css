@@ -580,7 +580,7 @@ input.name:focus::-moz-placeholder {
 }
 
 .groupItem:not(.stackedGroup) .stackExpander {
-	visibility: collapse;
+	display: none;
 }
 
 .stackExpander {

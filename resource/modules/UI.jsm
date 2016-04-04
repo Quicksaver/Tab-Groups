@@ -1,4 +1,4 @@
-// VERSION 1.2.11
+// VERSION 1.2.12
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -414,8 +414,6 @@ this.UI = {
 			Cu.reportError(ex);
 		}
 		finally {
-			GroupItems.resumeArrange();
-
 			// There's no point in having ridiculously large slots. We only need to maintain the relative slot differences between the groups.
 			GroupItems.normalizeSlots();
 		}
@@ -683,6 +681,17 @@ this.UI = {
 		this._activeTab.parent.reorderTabItemsBasedOnTabOrder();
 	},
 
+	// If the active tab's group is overflowing, scroll it until the tab is visible.
+	showActiveTab: function() {
+		let tabItem = this.getActiveTab();
+		if(!tabItem) { return; }
+
+		// There's no need to do anything, the active tab item is already visible for sure.
+		if(!tabItem.parent.overflowing) { return; }
+
+		tabItem.container.scrollIntoView();
+	},
+
 	// Returns a <Rect> defining the area of the page <Item>s should stay within.
 	getPageBounds: function() {
 		let box = GroupItems.workSpace.getBoundingClientRect();
@@ -779,9 +788,10 @@ this.UI = {
 
 		// Flush pending updates
 		PinnedItems.flushUpdates();
-
+		GroupItems.resumeArrange();
 		TabItems.resumePainting();
 
+		this.showActiveTab();
 		this.checkSessionRestore();
 	},
 
@@ -803,6 +813,7 @@ this.UI = {
 		this._isChangingVisibility = true;
 
 		try {
+			GroupItems.pauseArrange();
 			TabItems.pausePainting();
 
 			for(let groupItem of this._reorderTabsOnHide) {

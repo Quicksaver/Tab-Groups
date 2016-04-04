@@ -1,4 +1,4 @@
-// VERSION 1.4.8
+// VERSION 1.4.9
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1344,13 +1344,6 @@ this.GroupItem.prototype = {
 			return;
 		}
 
-		// Ensure the tab nodes are shown in the right order.
-		let tabs = this.tabContainer.childNodes;
-		for(let i = 0; i < this.children.length; i++) {
-			let tab = this.children[i].container;
-			tab.style.order = i;
-		}
-
 		let isOverflowing = this.isOverflowing() && !this.expanded;
 
 		// if we should stack and we're not expanded
@@ -1366,6 +1359,7 @@ this.GroupItem.prototype = {
 		this.container.classList.add('stackedGroup');
 		this.tabContainer.classList.remove('noThumbs');
 		this.isStacked = true;
+		this.overflowing = false;
 		removeAttribute(this.tabContainer, 'columns');
 
 		let childrenToArrange = this.children.concat();
@@ -1456,6 +1450,9 @@ this.GroupItem.prototype = {
 		if(!this.expanded) {
 			cols = this._columns;
 		}
+
+		// Ensure the tab items are shown in the right order.
+		this.reorderTabItemsBasedOnTabOrder(true);
 
 		let count = this.children.length +1; // +1 for new tab item
 		let bounds = this.getContentBounds(true);
@@ -1666,11 +1663,17 @@ this.GroupItem.prototype = {
 
 	// Reorders the tabs in a groupItem based on the arrangement of the tabs shown in the tab bar.
 	// It does it by sorting the children of the groupItem by the positions of their respective tabs in the tab bar.
-	reorderTabItemsBasedOnTabOrder: function() {
-		this.children.sort((a,b) => a.tab._tPos - b.tab._tPos);
+	reorderTabItemsBasedOnTabOrder: function(justItems) {
+		if(!justItems) {
+			this.children.sort((a,b) => a.tab._tPos - b.tab._tPos);
+		}
 
-		this.arrange();
-		// this.arrange calls this.save for us
+		// There's no point in doing this when the group is stacked. The tabs will be re-ordered when it's expanded.
+		if(!this.isStacked) {
+			for(let tabItem of this.children) {
+				tabItem.container.style.order = tabItem.tab._tPos;
+			}
+		}
 	},
 
 	// Reorders the tabs in the tab bar based on the arrangment of the tabs shown in the groupItem.
