@@ -1,4 +1,4 @@
-// VERSION 1.0.28
+// VERSION 1.0.29
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -203,6 +203,15 @@ this.TabView = {
 		}
 
 		this._initialized = true;
+
+		// When updating from a 1.0.* version while tab view is visible, it wouldn't successfully hide it before deinitializing it.
+		// So we need to make sure that happens now, otherwise the user can't do a thing.
+		if(!gTabViewDeck.selectedPanel) {
+			this._initFrame(() => {
+				gTabViewDeck.selectedPanel = this._iframe;
+				this.hide();
+			});
+		}
 	},
 
 	uninit: function() {
