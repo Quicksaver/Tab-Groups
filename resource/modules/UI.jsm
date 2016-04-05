@@ -1,4 +1,4 @@
-// VERSION 1.2.12
+// VERSION 1.2.13
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -697,9 +697,6 @@ this.UI = {
 		let box = GroupItems.workSpace.getBoundingClientRect();
 		let width = Math.max(100, Math.floor(box.width));
 		let height = Math.max(100, Math.floor(box.height));
-		if(this.grid && GroupItems.workSpace.classList.contains('overflowing')) {
-			width += UICache.scrollbarWidth;
-		}
 		return new Rect(0, 0, width, height);
 	},
 
