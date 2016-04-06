@@ -1,4 +1,4 @@
-// VERSION 1.4.9
+// VERSION 1.4.10
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1718,10 +1718,6 @@ this.GroupItems = {
 		}
 	},
 
-	// Keep in sync with the CSS values
-	minGroupHeight: 145,
-	minGroupWidth: 120,
-
 	// Will be calc'ed in init() from the values above.
 	minGroupRatio: 0,
 	maxGroupRatio: 1,
@@ -1741,6 +1737,9 @@ this.GroupItems = {
 	// Function: init
 	init: function() {
 		this._lastActiveList = new MRUList();
+
+		this.minGroupHeight = UICache.minGroupHeight;
+		this.minGroupWidth = UICache.minGroupWidth;
 
 		this.minGroupRatio = this.minGroupWidth / this.minGroupHeight;
 		this.minGroupHeightRange = new Range(this.minGroupHeight, this.minGroupHeight * this.maxGroupRatio);
@@ -2638,10 +2637,13 @@ this.GroupItems = {
 		let style = (type, items) => {
 			if(!items) { return; }
 
+			let width = items.width - UICache.groupBorderWidth;
+			let height = items.height - UICache.groupBorderWidth;
+
 			sscode += '\
 				html['+objName+'_UUID="'+_UUID+'"] body.grid .groupItem[row="'+type+'"] {\n\
-					width: '+items.width+'px;\n\
-					height: '+items.height+'px;\n\
+					width: '+width+'px;\n\
+					height: '+height+'px;\n\
 				}';
 
 			for(let r = 0; r < items.rows; r++) {
@@ -2649,7 +2651,7 @@ this.GroupItems = {
 					// The last item (create new group item) isn't really a group item; it's always row="small".
 					if(groups[i]) {
 						groups[i].row = type;
-						groups[i]._gridBounds = new Rect(0, 0, items.width, items.height);
+						groups[i]._gridBounds = new Rect(0, 0, width, height);
 						i++;
 					}
 				}

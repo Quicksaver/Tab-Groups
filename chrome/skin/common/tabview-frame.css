@@ -11,12 +11,18 @@
 	--list-tab-padding: 6px;
 	--favicon-size: 16px;
 	--canvas-border-width: 1px;
+	--group-min-width: 120px;
+	--group-min-height: 145px;
+	--group-border-width: 1px;
 	--group-titlebar-height: 24px;
 	--group-contents-margin: 0;
 	--group-contents-top-margin: 2px;
 	--stack-expander-size: 24px;
 	--stack-expander-top-margin: 0;
 	--stack-expander-bottom-margin: 8px;
+	--actions-width: 29px;
+	/* active workspace excludes the width and borders of the action buttons */
+	--workspace-width: calc(100% - var(--actions-width) - var(--group-border-width) - var(--group-border-width));
 }
 
 html {
@@ -42,8 +48,7 @@ html, body, #content {
 #groups {
 	position: relative;
 	height: 100%;
-	/* #actions 29px width + 1px borders x2 */
-	width: calc(100% - 31px);
+	width: var(--workspace-width);
 }
 
 body.grid #groups {
@@ -216,12 +221,22 @@ body.DraggingTab .tab * {
 	overflow: hidden;
 }
 
+.groupItem,
+.expandedTray {
+	border-top: var(--group-border-width) solid ThreeDHighlight;
+	border-bottom: var(--group-border-width) solid ThreeDLightShadow;
+	-moz-border-start: var(--group-border-width) solid ThreeDHighlight;
+	-moz-border-end: var(--group-border-width) solid ThreeDLightShadow;
+}
+
+body:not(.classic) .groupItem {
+	border-bottom-color: ThreeDShadow;
+	-moz-border-end-color: ThreeDShadow;
+}
+
 body.classic .groupItem,
 .expandedTray {
-	border-top: 1px solid ThreeDHighlight;
-	border-bottom: 1px solid ThreeDLightShadow;
-	-moz-border-start: 1px solid ThreeDHighlight;
-	-moz-border-end: 1px solid ThreeDLightShadow;
+	position: absolute;
 	box-shadow: var(--item-normal-shadow);
 }
 
@@ -235,28 +250,8 @@ body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl),
 	box-shadow: rgba(0,0,0,0.8) 2px 2px 8px;
 }
 
-body.grid .groupItem {
-	box-shadow:
-		inset -1px 0 0 ThreeDShadow,
-		inset 0 -1px 0 ThreeDShadow,
-		inset 1px 0 0 ThreeDHighlight,
-		inset 0 1px 0 ThreeDHighlight;
-}
-
-body.grid .groupItem:-moz-locale-dir(rtl) {
-	box-shadow:
-		inset -1px 0 0 ThreeDHighlight,
-		inset 0 -1px 0 ThreeDShadow,
-		inset 1px 0 0 ThreeDShadow,
-		inset 0 1px 0 ThreeDHighlight;
-}
-
 .groupItem:not(.closed) {
 	cursor: pointer;
-}
-
-body.classic .groupItem {
-	position: absolute;
 }
 
 body.classic:not(.searching) .groupItem:not(.phantom) {
@@ -276,10 +271,9 @@ body.DraggingGroup .groupItem * {
 	pointer-events: none;
 }
 
-body.classic .groupItem:not(.phantom) {
-	/* Keep in sync with GroupsItems.minGroupHeight/Width */
-	min-height: 145px;
-	min-width: 120px;
+body:not(.grid) .groupItem:not(.phantom) {
+	min-height: var(--group-min-height);
+	min-width: var(--group-min-width);
 }
 
 .groupItem .contents {
@@ -596,7 +590,6 @@ input.name:focus::-moz-placeholder {
 }
 
 .expandedTray {
-	position: absolute;
 	z-index: 50;
 }
 
@@ -673,9 +666,9 @@ input.name:focus::-moz-placeholder {
 	align-self: start;
 	padding: 3px 0;
 	z-index: 30;
-	width: 29px;
+	width: var(--actions-width);
 	text-align: center;
-	border: 1px solid transparent;
+	border: var(--group-border-width) solid transparent;
 	border-top-color: ThreeDHighlight;
 }
 

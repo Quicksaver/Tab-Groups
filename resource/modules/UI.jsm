@@ -1689,7 +1689,10 @@ this.UI = {
 // Keep a few values cached, to avoid constant reflows.
 this.UICache = {
 	ghost: function(aName, aLambda) {
-		XPCOMUtils.defineLazyGetter(this, aName, aLambda);
+		this.__defineGetter__(aName, () => {
+			delete this[aName];
+			return this[aName] = aLambda();
+		});
 	},
 
 	init: function() {
@@ -1707,6 +1710,18 @@ this.UICache = {
 			return parseInt(style.getPropertyValue('--group-titlebar-height'));
 		});
 
+		this.ghost('minGroupHeight', function() {
+			return parseInt(style.getPropertyValue('--group-min-height'));
+		});
+
+		this.ghost('minGroupWidth', function() {
+			return parseInt(style.getPropertyValue('--group-min-width'));
+		});
+
+		this.ghost('groupBorderWidth', function() {
+			return parseInt(style.getPropertyValue('--group-border-width')) *2;
+		});
+
 		this.ghost('stackExpanderHeight', function() {
 			return	parseInt(style.getPropertyValue('--stack-expander-size'))
 				+ parseInt(style.getPropertyValue('--stack-expander-top-margin'))
@@ -1715,7 +1730,7 @@ this.UICache = {
 
 		this.ghost('groupContentsMargin', function() {
 			return {
-				x: parseInt(style.getPropertyValue('--group-contents-top-margin')) *2,
+				x: parseInt(style.getPropertyValue('--group-contents-margin')) *2,
 				y: parseInt(style.getPropertyValue('--group-contents-margin')) + parseInt(style.getPropertyValue('--group-contents-top-margin'))
 			};
 		});
