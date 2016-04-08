@@ -1,4 +1,4 @@
-// VERSION 1.4.10
+// VERSION 1.4.11
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1670,8 +1670,8 @@ this.GroupItem.prototype = {
 
 		// There's no point in doing this when the group is stacked. The tabs will be re-ordered when it's expanded.
 		if(!this.isStacked) {
-			for(let tabItem of this.children) {
-				tabItem.container.style.order = tabItem.tab._tPos;
+			for(let i = 0; i < this.children.length; i++) {
+				this.children[i].container.style.order = i;
 			}
 		}
 	},
