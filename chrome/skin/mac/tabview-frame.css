@@ -8,6 +8,10 @@
 	--item-border-radius: 7px;
 }
 
+:root:-moz-window-inactive {
+	--shade-background: linear-gradient(rgba(237,237,237,0.42), rgba(216,216,216,0.42));
+}
+
 body {
 	background-color: transparent;
 	font: message-box;
@@ -27,21 +31,8 @@ body {
 
 /* Tabs */
 
-.thumb {
-	background-color: var(--item-background);
-}
-
-.thumb > *:-moz-any(canvas,.cached-thumb) {
-	border: var(--item-border);
-}
-
 .favicon-container {
-	background-color: var(--item-background);
 	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, -1px 0 0 rgba(225, 225, 225, 0.8) inset;
-	border-top: 1px solid transparent;
-	border-bottom: var(--item-border);
-	-moz-border-start: 1px solid transparent;
-	-moz-border-end: var(--item-border);
 }
 
 .favicon-container:-moz-locale-dir(rtl) {
@@ -60,24 +51,15 @@ body {
 
 /* Tab GroupItem */
 
-.groupItem {
-	background-color: var(--item-background);
-}
-
-body.classic .groupItem {
-	border-radius: var(--item-border-radius);
-}
-
+body.classic .groupItem,
 .expandedTray,
-.undo {
-	background-color: var(--item-background);
+.undo:not(.inGroupSelector) {
 	border-radius: var(--item-border-radius);
 }
 
 /* Side buttons */
 
 body.classic #actions {
-	background-color: var(--item-background);
 	border-radius: var(--item-border-radius) 0 0 var(--item-border-radius);
 }
 
@@ -110,10 +92,6 @@ body.classic #actions:-moz-locale-dir(rtl) {
 }
 
 /* Search */
-
-.shade:-moz-window-inactive {
-	background: linear-gradient(rgba(237,237,237,0.42), rgba(216,216,216,0.42));
-}
 
 #searchbox {
 	box-shadow: 0px 1px 0px rgba(255,255,255,.5), 0px -1px 0px rgba(0,0,0,1), 0px 0px 13px rgba(0,0,0,.8);

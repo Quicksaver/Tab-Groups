@@ -1,4 +1,4 @@
-// VERSION 2.2.2
+// VERSION 2.3.0
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -106,7 +106,7 @@ this.GroupDrag.prototype = {
 					let x = this.startBounds.width + (mouse.x - this.startMouse.x);
 					let y = this.startBounds.height + (mouse.y - this.startMouse.y);
 					let validSize = GroupItems.calcValidSize({ x, y });
-					let bounds = this.item.getBounds();
+					let bounds = this.item.getBounds({ real: true });
 					bounds.width = validSize.x;
 					bounds.height = validSize.y;
 					this.item.setSize(bounds);
@@ -162,8 +162,6 @@ this.GroupDrag.prototype = {
 			stationaryCorner = RTL ? 'topright' : 'topleft';
 		}
 		let update = false; // need to update
-		let updateX = false;
-		let updateY = false;
 		let newRect;
 		let snappedTrenches = new Map();
 
@@ -175,7 +173,9 @@ this.GroupDrag.prototype = {
 			// might be false if no changes were made
 			if(newRect) {
 				update = true;
-				snappedTrenches = newRect.snappedTrenches || new Map();
+				if(newRect.snappedTrenches) {
+					snappedTrenches = newRect.snappedTrenches;
+				}
 				bounds = newRect;
 			}
 		}
@@ -457,6 +457,185 @@ this.GroupDrag.prototype = {
 	}
 };
 
+// This will be the GroupSelectorDrag object created when a group selector is dragged.
+this.DraggingGroupSelector = null;
+
+this.GroupSelectorDrag = function(e, item) {
+	DraggingGroupSelector = this;
+	this.item = item;
+	this.sorted = GroupItems.sortBySlot();
+	this.i = this.sorted.indexOf(this.item.groupItem);
+	this.started = false;
+
+	// In single mode we're just dragging the group selector item, not the actual group.
+	e.dataTransfer.setData("text/plain", "tabview-group-selector");
+
+	this.item.groupItem.isDragging = true;
+	Listeners.add(this.item, 'dragend', this);
+
+	// Hide async so that the translucent image that follows the cursor actually shows something.
+	this.delayedStart = aSync(() => { this.finishDragStart(); });
+};
+
+this.GroupSelectorDrag.prototype = {
+	delayedStart: null,
+
+	check: function() {
+		return DraggingGroupSelector == this;
+	},
+
+	handleEvent: function(e) {
+		if(!this.check()) { return; }
+
+		switch(e.type) {
+			case 'drop':
+				this.drop(e);
+				// no break; end the drag now
+
+			// If this fires, it means no valid drop occurred, so just end the drag as if nothing happened in the first place.
+			case 'dragend':
+				this.end();
+				break;
+		}
+	},
+
+	finishDragStart: function() {
+		if(!this.check()) { return; }
+
+		// In single mode we're just dragging the group selector item, not the actual group.
+		if(this.delayedStart) {
+			this.delayedStart.cancel();
+			this.delayedStart = null;
+		}
+		this.item.hidden = true;
+
+		Listeners.add(UI.groupSelector, 'drop', this);
+
+		let si = this.i +1;
+		if(si < this.sorted.length) {
+			this.dropHere(this.sorted[si].selector);
+		}
+
+		// force a flush before animating the transitions, so that it seems like this first space appears immediately
+		if(this.dropTarget) {
+			this.dropTarget.clientTop;
+		}
+
+		document.body.classList.add('DraggingGroupSelector');
+	},
+
+	canDrop: function(e) {
+		e.preventDefault();
+
+		if(this.delayedStart) {
+			this.delayedStart.cancel();
+			this.finishDragStart();
+		}
+
+		// global drag tracking
+		UI.lastMoveTime = Date.now();
+	},
+
+	dropHere: function(dropTarget) {
+		// This shouldn't happen, but still better make sure.
+		if(dropTarget == this.item) { return; }
+
+		// If we're hovering over a group that's already shifted, it can only shift to the other side.
+		if(dropTarget && this.dropTarget == dropTarget) {
+			if(dropTarget.classList.contains('space-before')) {
+				dropTarget.classList.remove('space-before');
+				dropTarget.classList.add('space-after');
+			} else {
+				dropTarget.classList.add('space-before');
+				dropTarget.classList.remove('space-after');
+			}
+			return;
+		}
+
+		if(this.dropTarget != dropTarget) {
+			let si = -1;
+			if(this.dropTarget) {
+				this.dropTarget.classList.remove('space-before');
+				this.dropTarget.classList.remove('space-after');
+				si = this.sorted.indexOf(this.dropTarget.groupItem);
+			}
+
+			// When dragging over another selector, we need to make sure the behavior is predictable
+			if(dropTarget) {
+				let ti = this.sorted.indexOf(dropTarget.groupItem);
+				if(si > -1 && si < ti) {
+					ti++;
+					if(ti == this.i) {
+						ti++;
+					}
+					if(ti < this.sorted.length) {
+						dropTarget = this.sorted[ti].selector;
+					} else {
+						dropTarget = null;
+					}
+				}
+			}
+
+			this.dropTarget = dropTarget;
+			if(dropTarget) {
+				dropTarget.classList.add('space-before');
+			}
+		}
+	},
+
+	drop: function() {
+		let slot;
+		let dropTarget = this.dropTarget;
+		if(dropTarget) {
+			if(dropTarget.classList.contains('space-after')) {
+				let ti = this.sorted.indexOf(dropTarget.groupItem) +1;
+				if(ti == this.i) {
+					ti++;
+				}
+				if(ti < this.sorted.length) {
+					dropTarget = this.sorted[ti].selector;
+				} else {
+					dropTarget = null;
+				}
+			}
+
+			// We could not have a dropTarget anymore if we're moving to the last slot.
+			if(dropTarget) {
+				slot = dropTarget.groupItem.slot;
+
+				// make sure the relative order of the groups remains unchanged, we don't want doubled slots
+				for(let group of GroupItems) {
+					if(group != this.item.groupItem && group.slot >= slot) {
+						group.slot++;
+						group.save();
+					}
+				}
+			}
+		}
+
+		// default moving to the last slot on every valid drop.
+		if(!slot) {
+			slot = GroupItems.nextSlot();
+		}
+
+		this.item.groupItem.slot = slot;
+		this.item.groupItem.save();
+	},
+
+	end: function() {
+		if(this.dropTarget) {
+			this.dropTarget.classList.remove('space-before');
+			this.dropTarget.classList.remove('space-after');
+		}
+
+		this.item.hidden = false;
+		this.item.groupItem.isDragging = false;
+		Listeners.remove(this.item, 'dragend', this);
+		Listeners.remove(UI.groupSelector, 'drop', this);
+		document.body.classList.remove('DraggingGroupSelector');
+	}
+};
+
 // This will be the TabDrag object created when a tab is dragged.
 this.DraggingTab = null;
 
@@ -516,7 +695,10 @@ this.TabDrag.prototype = {
 	finishDragStart: function() {
 		if(!this.check()) { return; }
 
-		this.delayedStart = null;
+		if(this.delayedStart) {
+			this.delayedStart.cancel();
+			this.delayedStart = null;
+		}
 		this.item.hidden = true;
 
 		let sibling;
@@ -536,6 +718,8 @@ this.TabDrag.prototype = {
 	},
 
 	getDropTargetNode: function() {
+		if(!this.dropTarget) { return null; }
+
 		if(this.dropTarget.isAGroupItem) {
 			if(this.dropTarget.expanded) {
 				return this.dropTarget.expanded.tray;
@@ -569,18 +753,18 @@ this.TabDrag.prototype = {
 				this.dropHere(null);
 			}
 
-			if(this.dropTarget) {
-				let target = this.getDropTargetNode();
-				target.classList.remove('dragOver');
-				Listeners.remove(target, 'drop', this);
-			}
-
+			this.updateDropTargetNode(false);
 			this.dropTarget = dropTarget;
-			if(this.dropTarget) {
-				let target = this.getDropTargetNode();
-				target.classList.add('dragOver');
-				Listeners.add(target, 'drop', this);
-			}
+			this.updateDropTargetNode(true);
+		}
+	},
+
+	updateDropTargetNode: function(dragOver) {
+		let node = this.getDropTargetNode();
+		if(node) {
+			let method = (dragOver) ? 'add' : 'remove';
+			node.classList[method]('dragOver');
+			Listeners[method](node, 'drop', this);
 		}
 	},
 
@@ -697,28 +881,47 @@ this.TabDrag.prototype = {
 	},
 
 	drop: function(e) {
-		// No-op, shouldn't happen though.
-		if(!this.dropTarget) { return; }
+		let dropTarget = this.dropTarget;
 
+		// No-op, shouldn't happen though.
+		if(!dropTarget) { return; }
+
+		// When dropping onto a group selector, the tab should be added to the corresponding group.
+		if(dropTarget.isASelectorItem) {
+			dropTarget = dropTarget.groupItem;
+
+			// If dropping in the same group as it comes from, no-op.
+			if(dropTarget == this.item.parent) { return; }
+
+			// When dragging a pinned tab into a group, we need to unpin it first, so that we have a tab item that we can drag.
+			this.unpinItem();
+
+			// See the note below on dropping onto a stacked group case.
+			dropTarget._activeTab = null;
+			dropTarget.add(this.item, { dontArrange: true });
+
+			// Make sure the thumbnail for that group is updated even when the group isn't active, to reflect this change.
+			dropTarget._updateThumb(true, true);
+		}
 		// If we have a valid drop target (group), add the item to it.
-		if(this.dropTarget.isAGroupItem) {
+		else if(dropTarget.isAGroupItem) {
 			// When dragging a pinned tab into a group, we need to unpin it first, so that we have a tab item that we can drag.
 			this.unpinItem();
 
 			let options = {};
-			let ii = this.dropTarget.children.indexOf(this.item);
+			let ii = dropTarget.children.indexOf(this.item);
 			if(this.sibling) {
-				options.index = this.dropTarget.children.indexOf(this.sibling);
+				options.index = dropTarget.children.indexOf(this.sibling);
 				if(this.sibling.container.classList.contains('space-after')) {
 					options.index++;
 				}
 				// Don't count the item currently being dragged, it will be removed from the array so this index won't match.
-				let ii = this.dropTarget.children.indexOf(this.item);
+				let ii = dropTarget.children.indexOf(this.item);
 				if(ii > -1 && ii < options.index) {
 					options.index--;
 				}
 			}
-			else if(this.dropTarget.isStacked) {
+			else if(dropTarget.isStacked) {
 				// If dropping onto the same stacked group it came from, keep the same index.
 				if(ii > -1) {
 					options.index = ii;
@@ -727,14 +930,14 @@ this.TabDrag.prototype = {
 				else {
 					// nulling the group's active tab, will make the dragged tab the active one in .add(),
 					// which also rearranges the group when that happens, so there's no need to call that twice.
-					this.dropTarget._activeTab = null;
+					dropTarget._activeTab = null;
 					options.dontArrange = true;
 				}
 			}
-			this.dropTarget.add(this.item, options);
+			dropTarget.add(this.item, options);
 		}
 		// If the drop target is the pinned tabs area, we should make sure the tab is pinned. Things are a little easier than as above though.
-		else if(this.dropTarget == PinnedItems.tray) {
+		else if(dropTarget == PinnedItems.tray) {
 			// Pin the tab first, so that our handlers can first remove the original tab item, and then register it as an app tab.
 			this.pinItem();
 
@@ -775,14 +978,10 @@ this.TabDrag.prototype = {
 	},
 
 	end: function() {
-		if(this.dropTarget) {
-			let target = this.getDropTargetNode();
-			target.classList.remove('dragOver');
-			Listeners.remove(target, 'drop', this);
-			if(this.dropTarget.expanded) {
-				Listeners.remove(this.dropTarget.expanded.shield, 'dragenter', this);
-				Listeners.remove(this.dropTarget.expanded.tray, 'drop', this);
-			}
+		this.updateDropTargetNode(false);
+		if(this.dropTarget && this.dropTarget.expanded) {
+			Listeners.remove(this.dropTarget.expanded.shield, 'dragenter', this);
+			Listeners.remove(this.dropTarget.expanded.tray, 'drop', this);
 		}
 
 		if(this.sibling) {

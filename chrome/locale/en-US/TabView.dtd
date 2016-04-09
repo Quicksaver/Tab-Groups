@@ -12,6 +12,7 @@
 <!ENTITY buttonHelpTabGroups.label "How to use tab groups">
 <!ENTITY buttonClassic.label "Free arrange">
 <!ENTITY buttonGrid.label "Grid display">
+<!ENTITY buttonSingle.label "Single view">
 <!ENTITY buttonNewGroup.label "Create new group">
 
 <!ENTITY searchOtherWindowTabs.label "Tabs from other windows">

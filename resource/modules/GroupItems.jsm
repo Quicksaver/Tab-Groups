@@ -1,4 +1,4 @@
-// VERSION 1.4.11
+// VERSION 1.5.0
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -31,6 +31,8 @@ this.GroupItem = function(listOfEls, options = {}) {
 
 	this._itemSizeFrozen = false;
 	this._lastArrange = null;
+	this._lastThumb = null;
+	this._thumbNeedsUpdate = false;
 	this._userBounds = false;
 	this._slot = 0;
 	this._row = '';
@@ -42,8 +44,6 @@ this.GroupItem = function(listOfEls, options = {}) {
 
 	// The <TabItem> for the groupItem's active tab.
 	this._activeTab = null;
-
-	this._onChildClose = this._onChildClose.bind(this);
 
 	if(Utils.isPoint(options.userSize)) {
 		this.userSize = new Point(options.userSize);
@@ -104,7 +104,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 				this._titleFocused = false;
 				this.title.setSelectionRange(0, 0);
 				this.titleShield.hidden = false;
-				this.save();
+				this.setTitle(); // calls this.save() for us
 				toggleAttribute(this.container, 'draggable', UI.grid);
 				break;
 
@@ -129,11 +129,6 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.titleShield.classList.add('title-shield');
 	this.titleShield.setAttribute('title', Strings.get("TabView", "groupItemDefaultName"));
 	tbContainer.appendChild(this.titleShield);
-
-	this.setTitle(options.title);
-	if(options.focusTitle) {
-		this.focusTitle();
-	}
 
 	this.closeButton = document.createElement('div');
 	this.closeButton.classList.add('close');
@@ -175,6 +170,33 @@ this.GroupItem = function(listOfEls, options = {}) {
 
 	// ___ Undo Close
 	this.undoContainer = null;
+
+	// Create a new selector item in single mode's top area for this group.
+	this.selector = document.createElement('div');
+	this.selector.isASelectorItem = true;
+	this.selector.groupItem = this;
+	this.selector.classList.add('groupSelector');
+	this.selector.setAttribute('draggable', 'true');
+	this.selector.addEventListener('mousedown', this);
+	this.selector.addEventListener('mouseup', this);
+	this.selector.addEventListener('dragstart', this);
+	this.selector.addEventListener('dragover', this);
+	this.selector.addEventListener('dragenter', this);
+	UI.groupSelector.appendChild(this.selector);
+
+	this.canvas = document.createElement('canvas');
+	this.canvas.classList.add('groupThumb');
+	this.canvas.setAttribute('moz-opaque', '');
+	this.selector.appendChild(this.canvas);
+
+	this.selectorTitle = document.createElement('span');
+	this.selectorTitle.classList.add('group-title');
+	this.selector.appendChild(this.selectorTitle);
+
+	this.setTitle(options.title);
+	if(options.focusTitle) {
+		this.focusTitle();
+	}
 
 	// ___ Children
 	// We explicitly set dontArrange=true to prevent the groupItem from re-arranging its children after a tabItem has been added.
@@ -227,6 +249,11 @@ this.GroupItem.prototype = {
 	// For backwards compatibility with other add-ons possibly interacting with the group.
 	get _children() { return this.children; },
 
+	count: function() {
+		// +1 for new tab item
+		return this.children.length +1;
+	},
+
 	// The prompt text for the title field.
 	defaultName: Strings.get("TabView", "groupItemDefaultName"),
 
@@ -247,7 +274,7 @@ this.GroupItem.prototype = {
 	// Returns all of the info worth storing about this groupItem.
 	getStorageData: function() {
 		let data = {
-			bounds: this.getBounds(true),
+			bounds: this.getBounds({ classic: true }),
 			slot: this.slot,
 			userSize: null,
 			title: this.getTitle(),
@@ -279,6 +306,7 @@ this.GroupItem.prototype = {
 		if(this._slot != v) {
 			this._slot = v;
 			this.container.style.order = v;
+			this.selector.style.order = v;
 		}
 		return this._slot;
 	},
@@ -318,7 +346,13 @@ this.GroupItem.prototype = {
 
 	// Sets the title of this groupItem with the given string
 	setTitle: function(value) {
-		this.title.value = value || "";
+		let title = this.title.value || "";
+		if(value !== undefined) {
+			title = value || "";
+			this.title.value = title;
+		}
+		this.selectorTitle.textContent = title;
+		this.selector.setAttribute('title', title);
 		this.save();
 	},
 
@@ -334,7 +368,14 @@ this.GroupItem.prototype = {
 			return new Rect(this.expanded.bounds);
 		}
 
-		let bounds = new Rect((UI.classic) ? this.bounds : this._gridBounds);
+		let bounds;
+		if(UI.single) {
+			bounds = UI.getPageBounds();
+			bounds.width -= UICache.groupBorderWidth;
+			bounds.height -= UICache.groupBorderWidth;
+		} else {
+			bounds = new Rect((UI.classic) ? this.bounds : this._gridBounds);
+		}
 		bounds.width -= UICache.groupContentsMargin.x;
 		bounds.height -= UICache.groupContentsMargin.y;
 		bounds.height -= UICache.groupTitlebarHeight;
@@ -345,10 +386,23 @@ this.GroupItem.prototype = {
 	},
 
 	// Returns a copy of the Item's bounds as a <Rect>.
-	getBounds: function(classic) {
-		// Pre-saved bounds are only valid for classic free-arrange mode.
-		if(!classic && !UI.classic) {
+	getBounds: function(options = {}) {
+		if(options.real) {
 			return this.$container.bounds();
+		}
+
+		// There are no top and left properties in grid mode, because it uses a flexbox to place the groups there.
+		// There's also no need to go through the trouble of getting them unless we actually need to; i.e. now.
+		if(options.position && !this._gridBounds.positioned) {
+			let bounds = this.$container.bounds();
+			this._gridBounds.top = bounds.top;
+			this._gridBounds.left = bounds.left;
+			this._gridBounds.positioned = true;
+		}
+
+		// Pre-saved bounds are only valid for classic free-arrange mode.
+		if(!options.classic && !UI.classic) {
+			return new Rect(this._gridBounds);
 		}
 		return new Rect(this.bounds);
 	},
@@ -362,7 +416,7 @@ this.GroupItem.prototype = {
 	//   force - true to always update the DOM even if the bounds haven't changed; default false
 	setBounds: function(inRect, immediately, options = {}) {
 		// In grid mode, we don't control the group's bounds here. Reset everything so that it's all set up again if necessary later.
-		if(UI.grid) {
+		if(!UI.classic) {
 			if(this._userBounds) {
 				this.$container.css({
 					top: null,
@@ -693,6 +747,9 @@ this.GroupItem.prototype = {
 					else if(e.target == this.newTabItem) {
 						this.newTab();
 					}
+					else if(e.target == this.selector) {
+						UI.setActive(this);
+					}
 					else if(Tabs.selected.pinned
 					&& UI.getActiveTab() != this.getActiveTab()
 					&& this.children.length) {
@@ -741,7 +798,12 @@ this.GroupItem.prototype = {
 
 			case 'dragstart':
 				this.lastMouseDownTarget = null;
-				if(!DraggingTab) {
+				if(e.target == this.selector) {
+					if(!this.hidden) {
+						new GroupSelectorDrag(e, e.target);
+					}
+				}
+				else if(!DraggingTab) {
 					new GroupDrag(this, e);
 				}
 				break;
@@ -751,6 +813,10 @@ this.GroupItem.prototype = {
 				if(DraggingTab && this.overflowing) {
 					UI.scrollAreaWhileDragging(e, this.tabContainer);
 				}
+				else if(DraggingGroupSelector && e.target == this.selector) {
+					DraggingGroupSelector.canDrop(e);
+					break;
+				}
 				// no break; continue to dragenter
 
 			case 'dragenter':
@@ -759,6 +825,9 @@ this.GroupItem.prototype = {
 				}
 				else if(DraggingGroup) {
 					DraggingGroup.canDrop(e, this);
+				}
+				else if(DraggingGroupSelector && e.target == this.selector) {
+					DraggingGroupSelector.dropHere(this.selector);
 				}
 				break;
 
@@ -776,6 +845,15 @@ this.GroupItem.prototype = {
 		}
 	},
 
+	handleSubscription: function(name, info) {
+		switch(name) {
+			case 'close':
+				// info == tabItem
+				this._onChildClose(info);
+				break;
+		}
+	},
+
 	// Closes the groupItem, removing (but not closing) all of its children.
 	// Parameters:
 	//   options - An object with optional settings for this call.
@@ -790,10 +868,8 @@ this.GroupItem.prototype = {
 
 		let destroyGroup = () => {
 			this.container.remove();
-			if(this.undoContainer) {
-				this.undoContainer.remove();
-				this.undoContainer = null;
-			}
+			this.selector.remove();
+			this.destroyUndoButton();
 			this.removeTrenches();
 			Styles.unload('group_'+this.id+'_'+_UUID);
 			GroupItems.unsquish();
@@ -872,7 +948,7 @@ this.GroupItem.prototype = {
 	_unhide: function(options = {}) {
 		this._cancelFadeAwayUndoButtonTimer();
 		this.hidden = false;
-		this.removeUndoButton();
+		this.destroyUndoButton();
 		this.setTrenches(this.bounds);
 
 		let finalize = () => {
@@ -953,14 +1029,14 @@ this.GroupItem.prototype = {
 		// In other words, the group "close" event is fired before all browser tabs in the group are closed.
 		// The below code would fire the group "close" event only after all browser tabs in that group are closed.
 		for(let child of this.children.concat()) {
-			child.removeSubscriber("close", this._onChildClose);
+			child.removeSubscriber("close", this);
 
 			if(child.close(true)) {
 				this.remove(child, { dontArrange: true });
 			} else {
 				// child.removeSubscriber() must be called before child.close(),
 				// therefore we call child.addSubscriber() if the tab is not removed.
-				child.addSubscriber("close", this._onChildClose);
+				child.addSubscriber("close", this);
 			}
 		}
 
@@ -984,7 +1060,7 @@ this.GroupItem.prototype = {
 
 			if(GroupItems.size > 1) {
 				for(let groupItem of GroupItems) {
-					if(groupItem != this && groupItem.children.length > 0) {
+					if(groupItem != this && groupItem.children.length) {
 						shouldFadeAway = true;
 						break;
 					}
@@ -1035,34 +1111,6 @@ this.GroupItem.prototype = {
 		undoClose.addEventListener('click', undoClose, true);
 		this.undoContainer.appendChild(undoClose);
 
-		if(UI.classic) {
-			GroupItems.workSpace.appendChild(this.undoContainer);
-
-			let bounds = this.getBounds();
-			$undoContainer.css({
-				left: bounds.left + bounds.width /2 - $undoContainer.width() /2,
-				top:  bounds.top + bounds.height /2 - $undoContainer.height() /2,
-				"transform": "scale(.1)"
-			});
-
-			// hide group item and show undo container.
-			aSync(() => {
-				$undoContainer.animate({
-					"transform": "scale(1)"
-				}, {
-					easing: "tabviewBounce",
-					duration: 170,
-					complete: () => { this._sendToSubscribers("groupHidden"); }
-				});
-			}, 50);
-		}
-		else {
-			this.container.appendChild(this.undoContainer);
-			this._sendToSubscribers("groupHidden");
-		}
-
-		this.hidden = true;
-
 		// add click handlers
 		this.undoContainer.handleEvent = (e) => {
 			switch(e.type) {
@@ -1083,10 +1131,51 @@ this.GroupItem.prototype = {
 					break;
 			}
 		};
-		this.undoContainer.addEventListener('click', this.undoContainer);
-		this.undoContainer.addEventListener('mouseover', this.undoContainer);
-		this.undoContainer.addEventListener('mouseout', this.undoContainer);
 
+		// In single view, we use the group selector as the undo button.
+		if(UI.single) {
+			this.selector.addEventListener('click', this.undoContainer);
+			this.selector.addEventListener('mouseover', this.undoContainer);
+			this.selector.addEventListener('mouseout', this.undoContainer);
+
+			this.undoContainer.classList.add('inGroupSelector');
+			this.selector.classList.add('closedGroup');
+			this.selector.appendChild(this.undoContainer);
+			this._sendToSubscribers("groupHidden");
+		}
+		else {
+			this.undoContainer.addEventListener('click', this.undoContainer);
+			this.undoContainer.addEventListener('mouseover', this.undoContainer);
+			this.undoContainer.addEventListener('mouseout', this.undoContainer);
+
+			if(UI.classic) {
+				GroupItems.workSpace.appendChild(this.undoContainer);
+
+				let bounds = this.getBounds();
+				$undoContainer.css({
+					left: bounds.left + bounds.width /2 - $undoContainer.width() /2,
+					top:  bounds.top + bounds.height /2 - $undoContainer.height() /2,
+					"transform": "scale(.1)"
+				});
+
+				// hide group item and show undo container.
+				aSync(() => {
+					$undoContainer.animate({
+						"transform": "scale(1)"
+					}, {
+						easing: "tabviewBounce",
+						duration: 170,
+						complete: () => { this._sendToSubscribers("groupHidden"); }
+					});
+				}, 50);
+			}
+			else {
+				this.container.appendChild(this.undoContainer);
+				this._sendToSubscribers("groupHidden");
+			}
+		}
+
+		this.hidden = true;
 		this.setupFadeAwayUndoButtonTimer();
 	},
 
@@ -1107,11 +1196,20 @@ this.GroupItem.prototype = {
 		}
 	},
 
-	removeUndoButton: function() {
+	destroyUndoButton: function(keepNode) {
 		this._cancelFadeAwayUndoButtonTimer();
 		// Only remove the container if it's not animating out, it will remove itself when it finishes.
 		if(this.undoContainer) {
-			this.undoContainer.remove();
+			if(UI.single) {
+				this.selector.removeEventListener('click', this.undoContainer);
+				this.selector.removeEventListener('mouseover', this.undoContainer);
+				this.selector.removeEventListener('mouseout', this.undoContainer);
+				this.selector.classList.remove('closedGroup');
+			}
+
+			if(!keepNode) {
+				this.undoContainer.remove();
+			}
 			this.undoContainer = null;
 		}
 	},
@@ -1121,12 +1219,12 @@ this.GroupItem.prototype = {
 
 		this._cancelFadeAwayUndoButtonTimer();
 
-		// This makes it so we can begin restoring the group without having to remove the undo button first == better animation.
-		// After this animation finished, the undo button will self remove.
-		let undoContainer = this.undoContainer;
-		this.undoContainer = null;
-
 		if(UI.classic) {
+			// This makes it so we can begin restoring the group without having to remove the undo button first == better animation.
+			// After this animation finished, the undo button will self remove.
+			let undoContainer = this.undoContainer;
+			this.destroyUndoButton(true);
+
 			iQ(undoContainer).animate({
 				"transform": "scale(.1)",
 			}, {
@@ -1142,7 +1240,7 @@ this.GroupItem.prototype = {
 			}, 50);
 		}
 		else {
-			undoContainer.remove();
+			this.destroyUndoButton();
 			this._unhide();
 		}
 
@@ -1178,7 +1276,7 @@ this.GroupItem.prototype = {
 			this.children.splice(index, 0, item);
 
 			if(!wasAlreadyInThisGroupItem) {
-				item.addSubscriber("close", this._onChildClose);
+				item.addSubscriber("close", this);
 				item.setParent(this);
 
 				if(item == UI.getActiveTab() || !this._activeTab) {
@@ -1248,7 +1346,7 @@ this.GroupItem.prototype = {
 
 			item.setParent(null);
 			item.inVisibleStack();
-			item.removeSubscriber("close", this._onChildClose);
+			item.removeSubscriber("close", this);
 
 			// if a blank tab is selected while restoring a tab the blank tab gets removed. we need to keep the group alive for the restored tab.
 			if(item.isRemovedAfterRestore) {
@@ -1281,7 +1379,7 @@ this.GroupItem.prototype = {
 
 	// Returns true if the groupItem should stack (instead of grid).
 	isOverflowing: function() {
-		let count = this.children.length +1; // +1 for new tab item
+		let count = this.count();
 		let box = this.getContentBounds();
 		let arrObj = TabItems.arrange(count, box);
 
@@ -1344,10 +1442,10 @@ this.GroupItem.prototype = {
 			return;
 		}
 
-		let isOverflowing = this.isOverflowing() && !this.expanded;
+		let shouldStack = this.isOverflowing() && !this.expanded && Prefs.stackTabs && !UI.single;
 
 		// if we should stack and we're not expanded
-		if(isOverflowing && Prefs.stackTabs) {
+		if(shouldStack) {
 			this._stackArrange();
 		} else {
 			this._gridArrange();
@@ -1454,7 +1552,7 @@ this.GroupItem.prototype = {
 		// Ensure the tab items are shown in the right order.
 		this.reorderTabItemsBasedOnTabOrder(true);
 
-		let count = this.children.length +1; // +1 for new tab item
+		let count = this.count();
 		let bounds = this.getContentBounds(true);
 
 		// Check against our cached values if we need to re-calc anything.
@@ -1522,21 +1620,17 @@ this.GroupItem.prototype = {
 			}';
 
 		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);
+
+		// Update the group's thumb if necessary in single view's top selectors.
+		// There's no need to update immediately if the group already has a thumb.
+		this._updateThumb(!!this._lastThumb);
 	},
 
 	expand: function() {
 		UI.setActive(this.getTopChild());
 
-		// There are no top and left properties in grid mode, because it uses a flexbox to place the groups there.
-		// There's also no need to go through the trouble of getting them unless we actually need to; i.e. now.
-		if(UI.grid && !this._gridBounds.positioned) {
-			let bounds = this.$container.bounds();
-			this._gridBounds.top = bounds.top;
-			this._gridBounds.left = bounds.left;
-			this._gridBounds.positioned = true;
-		}
-
-		let startBounds = this.getBounds();
+		// Make sure the bounds contain the position properties (top, left).
+		let startBounds = this.getBounds({ position: UI.grid });
 		let tray = document.createElement('div');
 		let $tray = iQ(tray).css({
 			top: startBounds.top,
@@ -1643,6 +1737,89 @@ this.GroupItem.prototype = {
 		this.contents.insertBefore(this.tabContainer, this.contents.firstChild);
 		this._unfreezeItemSize(true);
 		this.arrange();
+	},
+
+	_clearThumbNeedsUpdate: function() {
+		if(this._thumbNeedsUpdate) {
+			this._thumbNeedsUpdate.cancel();
+			this._thumbNeedsUpdate = null;
+			return true;
+		}
+		return false;
+	},
+
+	_updateThumb: function(delay, force) {
+		if(!UI.single) {
+			this._clearThumbNeedsUpdate();
+			return;
+		}
+
+		// Discard the previous thumb data so that we're sure to update it afterwards.
+		// (Doesn't actually delete the thumb, only "expires" it.)
+		if(force) {
+			this._lastThumb = null;
+		}
+
+		if(delay) {
+			if(!this._thumbNeedsUpdate) {
+				this._thumbNeedsUpdate = aSync(() => { this._updateThumb(); }, 1000);
+			}
+			return;
+		}
+
+		let isActive = GroupItems.getActiveGroupItem() == this && !this.hidden;
+		let bounds = UI.getPageBounds();
+		let count = this.count();
+		let needsUpdate = this._clearThumbNeedsUpdate();
+
+		// Don't update the thumb if nothing has changed in the group.
+		if(this._lastThumb) {
+			// Don't update the thumb of a background group until it is selected.
+			if(!isActive) { return; }
+
+			if(!needsUpdate && bounds.equals(this._lastThumb.bounds) && count == this._lastThumb.count) { return; }
+		}
+		this._lastThumb = { bounds, count };
+
+		// If this isn't the active group item, we need to make it "visible" outside of the window so that it can be pictured into the canvas.
+		if(GroupItems.getActiveGroupItem() != this) {
+			bounds.realTop += bounds.height;
+			bounds.top += bounds.height;
+		}
+
+		// Don't include the borders or the titlebar in the thumb, only the tabs area.
+		let inset = UICache.groupBorderWidth /2;
+		bounds.inset(inset, inset);
+		bounds.realTop += inset;
+		bounds.realLeft += inset;
+		bounds.realTop += UICache.groupTitlebarHeight;
+		bounds.top += UICache.groupTitlebarHeight;
+		bounds.height -= UICache.groupTitlebarHeight;
+
+		// Keep the same aspect ratio in the canvas from the group dimensions, to avoid distortion.
+		let w = UICache.groupSelectorCanvasSize;
+		let h = UICache.groupSelectorCanvasSize;
+		let ratio = bounds.width / bounds.height;
+		if(ratio > 1) {
+			h /= ratio;
+		} else {
+			w *= ratio;
+		}
+
+		let canvas = this.canvas;
+		canvas.width = w;
+		canvas.height = h;
+
+		document.documentElement.classList.add('thumbing');
+		this.container.classList.add('thumbing');
+
+		let ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, w, h);
+		ctx.scale(w / bounds.width, h / bounds.height);
+		ctx.drawWindow(window, bounds.realLeft, bounds.realTop, bounds.width, bounds.height, 'rgb(255,255,255)');
+
+		document.documentElement.classList.remove('thumbing');
+		this.container.classList.remove('thumbing');
 	},
 
 	// Creates a new tab within this groupItem.
@@ -1962,6 +2139,7 @@ this.GroupItems = {
 	register: function(groupItem) {
 		this.groupItems.set(groupItem.id, groupItem);
 
+		this._lastActiveList.append(groupItem);
 		this.arrange(true);
 		UI.updateTabButton();
 	},
@@ -2046,19 +2224,24 @@ this.GroupItems = {
 	setActiveGroupItem: function(groupItem) {
 		if(this._activeGroupItem) {
 			this._activeGroupItem.container.classList.remove('activeGroupItem');
+			this._activeGroupItem.selector.classList.remove('activeGroupItem');
 		}
 
 		groupItem.container.classList.add('activeGroupItem');
+		groupItem.selector.classList.add('activeGroupItem');
 
 		this._lastActiveList.update(groupItem);
 		this._activeGroupItem = groupItem;
 		this._save();
+
+		// When changing the current groupItem while in single view, make sure its thumb is up-to-date.
+		groupItem._updateThumb(true);
 	},
 
 	// Gets last active group item. Returns the <groupItem>. If nothing is found, return null.
 	getLastActiveGroupItem: function() {
 		return this._lastActiveList.peek(function(groupItem) {
-			return (groupItem && !groupItem.hidden && groupItem.children.length)
+			return (groupItem && !groupItem.hidden && groupItem.children.length);
 		});
 	},
 
@@ -2369,7 +2552,7 @@ this.GroupItems = {
 			let boxes = new Set();
 			groupsLoop:
 			for(let group of this) {
-				let bb = new Rect(group.getBounds());
+				let bb = group.getBounds();
 				// apply the same margin as .pushAway will
 				bb.inset(-buffer, -buffer);
 				for(let box of boxes) {
@@ -2420,7 +2603,13 @@ this.GroupItems = {
 
 	// Arranges the groups in grid mode, based on the available workspace dimensions.
 	arrange: function(delayChildren) {
-		// Only meant for grid mode.
+		// In single mode we can skip to arranging the tabs in each group, as all groups will have the same full-size dimensions.
+		if(UI.single) {
+			this.arrangeAllGroups(delayChildren);
+			return;
+		}
+
+		// The rest is only meant for grid mode.
 		if(!UI.grid) { return; }
 
 		// This will be called as soon as arrange is unpaused.
@@ -2667,6 +2856,10 @@ this.GroupItems = {
 		Styles.load('GroupItems.arrange_'+_UUID, sscode, true);
 
 		// When the groups change dimensions, we should ensure their tabs are also re-arranged properly.
+		this.arrangeAllGroups(delayChildren);
+	},
+
+	arrangeAllGroups: function(delayChildren) {
 		if(!delayChildren) {
 			for(let group of this) {
 				group.arrange();

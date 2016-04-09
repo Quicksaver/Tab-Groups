@@ -22,17 +22,19 @@
 		max-height: var(--scrollbar-width);
 	}
 
-	slider {
-		-moz-appearance: none;
+	scrollbar slider {
+		-moz-appearance: none !important;
 	}
 
-	thumb {
-		-moz-appearance: none;
+	scrollbar thumb {
+		-moz-appearance: none !important;
 		background-color: var(--hover-color);
 		border-width: 0px;
 		border-radius: 3px;
 	}
 
+	html > scrollbar,
+	.groupItem.thumbing scrollbar,
 	scrollbar scrollbarbutton,
 	scrollbar gripper {
 		display: none;

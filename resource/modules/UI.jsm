@@ -1,4 +1,4 @@
-// VERSION 1.2.13
+// VERSION 1.3.0
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -10,9 +10,19 @@ this.Synthesizer = {
 		return this._utils;
 	},
 
-	scroll: function(mouse, delta) {
+	flipWheel: function(e) {
 		try {
-			this.utils.sendWheelEvent(mouse.x, mouse.y, 0, delta, 0, window.WheelEvent.DOM_DELTA_LINE, 0, 0, delta, 0);
+			e.preventDefault();
+			e.stopPropagation();
+			this.utils.sendWheelEvent(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ, window.WheelEvent.DOM_DELTA_LINE, 0, e.deltaY, e.deltaX, 0);
+		}
+		// We really only care about not blocking anything else that is supposed to run.
+		catch(ex) { Cu.reportError(ex); }
+	},
+
+	scroll: function(mouse, deltaX, deltaY) {
+		try {
+			this.utils.sendWheelEvent(mouse.x, mouse.y, deltaX, deltaY, 0, window.WheelEvent.DOM_DELTA_LINE, 0, deltaX, deltaY, 0);
 		}
 		// We really only care about not blocking anything else that is supposed to run.
 		catch(ex) { Cu.reportError(ex); }
@@ -80,6 +90,9 @@ this.UI = {
 
 	get classic() { return Prefs.displayMode == 'classic'; },
 	get grid() { return Prefs.displayMode == 'grid'; },
+	get single() { return Prefs.displayMode == 'single'; },
+
+	get groupSelector() { return $('groupSelector'); },
 
 	get sessionRestoreNotice() { return $('sessionRestoreNotice'); },
 	get sessionRestoreNoticeClose() { return $('sessionRestoreNoticeClose'); },
@@ -89,9 +102,11 @@ this.UI = {
 	get exitBtn() { return $("exit-button"); },
 	get optionsBtn() { return $("optionsbutton"); },
 	get helpBtn() { return $("helpbutton"); },
+	get singleBtn() { return $("singlebutton"); },
 	get gridBtn() { return $("gridbutton"); },
 	get classicBtn() { return $("classicbutton"); },
 	get gridNewGroupBtn() { return $("gridNewGroup"); },
+	get singleNewGroupBtn() { return $("singleNewGroup"); },
 
 	_els: Cc["@mozilla.org/eventlistenerservice;1"].getService(Ci.nsIEventListenerService),
 
@@ -209,18 +224,43 @@ this.UI = {
 						Prefs.displayMode = 'grid';
 						break;
 
+					case this.singleBtn:
+						Prefs.displayMode = 'single';
+						break;
+
+					case this.singleNewGroupBtn:
 					case this.gridNewGroupBtn:
-						GroupItems.newGroup();
+						this.setActive(GroupItems.newGroup());
 						break;
 				}
 				break;
 
 			case 'dragover':
-				if(DraggingTab && (e.target == GroupItems.workSpace || e.target == this.gridNewGroupBtn)) {
-					DraggingTab.canDrop(e, e.target);
+				if(DraggingTab) {
+					if(e.target == GroupItems.workSpace || e.target == this.gridNewGroupBtn) {
+						DraggingTab.canDrop(e, e.target);
+					}
+					else if(e.target == this.groupSelector || e.target.parentNode == this.groupSelector) {
+						if(e.target.parentNode == this.groupSelector) {
+							DraggingTab.canDrop(e, e.target);
+						}
+						UI.scrollAreaWhileDragging(e, this.groupSelector);
+					}
 				}
 				else if(DraggingGroup && this.grid && GroupItems.workSpace.classList.contains('overflowing')) {
 					UI.scrollAreaWhileDragging(e, GroupItems.workSpace);
+				}
+				else if(DraggingGroupSelector && (e.target == this.groupSelector || e.target.parentNode == this.groupSelector)) {
+					DraggingGroupSelector.canDrop(e);
+					UI.scrollAreaWhileDragging(e, this.groupSelector);
+				}
+				break;
+
+			case 'wheel':
+				// When scrolling the group selector area, we want it to always go sideways.
+				if(!e.deltaX) {
+					// Sometimes this works, sometimes it doesn't... I don't know...
+					Synthesizer.flipWheel(e);
 				}
 				break;
 
@@ -319,6 +359,15 @@ this.UI = {
 		}
 	},
 
+	handleSubscription: function(name, info) {
+		switch(name) {
+			case 'close':
+				// info == tabItem
+				this._onActiveTabClosed(info);
+				break;
+		}
+	},
+
 	// Must be called after the object is created.
 	init: function() {
 		try {
@@ -339,14 +388,18 @@ this.UI = {
 			Listeners.add(this.exitBtn, 'click', this);
 			Listeners.add(this.optionsBtn, 'click', this);
 			Listeners.add(this.helpBtn, 'click', this);
+			Listeners.add(this.singleBtn, 'click', this);
 			Listeners.add(this.gridBtn, 'click', this);
 			Listeners.add(this.classicBtn, 'click', this);
 			Listeners.add(this.gridNewGroupBtn, 'click', this);
-			Listeners.add(GroupItems.workSpace, 'dragover', this);
+			Listeners.add(this.singleNewGroupBtn, 'click', this);
 
 			// When you click on the background/empty part of TabView, we create a new groupItem.
 			Listeners.add(GroupItems.workSpace, 'mousedown', this);
 			Listeners.add(GroupItems.workSpace, 'dblclick', this);
+			Listeners.add(GroupItems.workSpace, 'dragover', this);
+			Listeners.add(this.groupSelector, 'wheel', this, true);
+			Listeners.add(this.groupSelector, 'dragover', this);
 
 			Messenger.listenWindow(gWindow, "DOMWillOpenModalDialog", this);
 
@@ -393,7 +446,7 @@ this.UI = {
 			if(this._pageBounds) {
 				this._resize(true);
 			} else {
-				this._pageBounds = this.getPageBounds();
+				this._pageBounds = this.getPageBounds(true);
 			}
 			Listeners.add(window, 'resize', this);
 
@@ -431,14 +484,18 @@ this.UI = {
 
 		Listeners.remove(GroupItems.workSpace, 'mousedown', this);
 		Listeners.remove(GroupItems.workSpace, 'dblclick', this);
+		Listeners.remove(GroupItems.workSpace, 'dragover', this);
+		Listeners.remove(this.groupSelector, 'wheel', this, true);
+		Listeners.remove(this.groupSelector, 'dragover', this);
 
 		Listeners.remove(this.exitBtn, 'click', this);
 		Listeners.remove(this.optionsBtn, 'click', this);
 		Listeners.remove(this.helpBtn, 'click', this);
+		Listeners.remove(this.singleBtn, 'click', this);
 		Listeners.remove(this.gridBtn, 'click', this);
 		Listeners.remove(this.classicBtn, 'click', this);
 		Listeners.remove(this.gridNewGroupBtn, 'click', this);
-		Listeners.remove(GroupItems.workSpace, 'dragover', this);
+		Listeners.remove(this.singleNewGroupBtn, 'click', this);
 
 		pageWatch.unregister(this);
 
@@ -527,8 +584,10 @@ this.UI = {
 
 		document.body.classList.remove('classic');
 		document.body.classList.remove('grid');
+		document.body.classList.remove('single');
 
 		document.body.classList.add(Prefs.displayMode);
+		this._resize(true);
 
 		try {
 			GroupItems.pauseArrange();
@@ -573,13 +632,13 @@ this.UI = {
 
 		if(this._activeTab) {
 			this._activeTab.makeDeactive();
-			this._activeTab.removeSubscriber("close", this._onActiveTabClosed);
+			this._activeTab.removeSubscriber("close", this);
 		}
 
 		this._activeTab = tabItem;
 
 		if(this._activeTab) {
-			this._activeTab.addSubscriber("close", this._onActiveTabClosed);
+			this._activeTab.addSubscriber("close", this);
 			this._activeTab.makeActive();
 
 			// When setting a new active tab (i.e. when closing the previous active tab) TabView loses focus, probably because the physical tab gets it when it's "selected".
@@ -596,8 +655,8 @@ this.UI = {
 	// Parameters:
 	//  - the <TabItem> that is closed
 	_onActiveTabClosed: function(tabItem) {
-		if(UI._activeTab == tabItem) {
-			UI._setActiveTab(null);
+		if(this._activeTab == tabItem) {
+			this._setActiveTab(null);
 		}
 	},
 
@@ -693,29 +752,64 @@ this.UI = {
 	},
 
 	// Returns a <Rect> defining the area of the page <Item>s should stay within.
-	getPageBounds: function() {
-		let box = GroupItems.workSpace.getBoundingClientRect();
-		let width = Math.max(100, Math.floor(box.width));
-		let height = Math.max(100, Math.floor(box.height));
-		return new Rect(0, 0, width, height);
+	getPageBounds: function(real) {
+		if(!real) {
+			let rect = new Rect(this._pageBounds);
+			rect.realTop = this._pageBounds.realTop;
+			rect.realLeft = this._pageBounds.realLeft;
+			return rect;
+		}
+
+		let top = 0;
+		let left = 0;
+		let width = window.innerWidth;
+		let height = window.innerHeight;
+		width -= (UICache.actionsWidth + UICache.groupBorderWidth);
+		if(UI.single) {
+			let offset = UICache.groupSelectorSize + UICache.groupBorderWidth;
+			height -= offset;
+			top += offset;
+		}
+		width = Math.max(100, Math.floor(width));
+		height = Math.max(100, Math.floor(height));
+
+		let rect = new Rect(0, 0, width, height);
+		rect.realTop = top;
+		rect.realLeft = left;
+		return rect;
 	},
 
 	// See if the provided element should be scrolled while dragging the mouse over to its top or bottom edge.
 	scrollAreaWhileDragging: function(e, element) {
 		let mouse = new Point(e.clientX, e.clientY);
 		let rect = element.getBoundingClientRect();
-		let topArea = new Rect(rect.left, rect.top, rect.width, this.scrollAreaSize);
-		let bottomArea = new Rect(rect.left, rect.top + rect.height - this.scrollAreaSize, rect.width, this.scrollAreaSize);
+		let deltaX = 0;
+		let deltaY = 0;
 
-		let delta;
-		if(topArea.contains(mouse)) {
-			delta = -1;
-		} else if(bottomArea.contains(mouse)) {
-			delta = 1;
+		if(element.scrollTopMax > 0) {
+			let topArea = new Rect(rect.left, rect.top, rect.width, this.scrollAreaSize);
+			let bottomArea = new Rect(rect.left, rect.top + rect.height - this.scrollAreaSize, rect.width, this.scrollAreaSize);
+
+			if(topArea.contains(mouse)) {
+				deltaY = -1;
+			} else if(bottomArea.contains(mouse)) {
+				deltaY = 1;
+			}
 		}
 
-		if(delta) {
-			Synthesizer.scroll(mouse, delta);
+		if(element.scrollLeftMax > 0) {
+			let leftArea = new Rect(rect.left, rect.top, this.scrollAreaSize, rect.height);
+			let rightArea = new Rect(rect.left + rect.width - this.scrollAreaSize, rect.top, this.scrollAreaSize, rect.height);
+
+			if(leftArea.contains(mouse)) {
+				deltaX = -1;
+			} else if(rightArea.contains(mouse)) {
+				deltaX = 1;
+			}
+		}
+
+		if(deltaX || deltaY) {
+			Synthesizer.scroll(mouse, deltaX, deltaY);
 		}
 	},
 
@@ -1406,24 +1500,36 @@ this.UI = {
 		// 3. everything on the screen fits and nothing feels cramped
 		if(!force && !this.isTabViewVisible()) { return; }
 
-		let oldPageBounds = new Rect(this._pageBounds);
-		let newPageBounds = this.getPageBounds();
+		let oldPageBounds = this.getPageBounds();
+		let newPageBounds = this.getPageBounds(true);
 		if(newPageBounds.equals(oldPageBounds)) { return; }
 
-		if(UI.grid) {
-			// I can't do this on a delay (so it won't resize on every mousemove),
-			// it becomes very jaggy, and... weird. Sometimes it won't even resize at all after stopping the mouse
-			// for a while until moving it again.
-			GroupItems.arrange(true);
-
+		if(!UI.classic) {
 			this._pageBounds = newPageBounds;
 			this._save();
+
+			if(UI.grid) {
+				// I can't do this on a delay (so it won't resize on every mousemove),
+				// it becomes very jaggy, and... weird. Sometimes it won't even resize at all after stopping the mouse
+				// for a while until moving it again.
+				GroupItems.arrange(true);
+			}
+			// In single mode we only need to rearrange the tabs, the group will always be fully extended to occupy all the available space.
+			else if(UI.single) {
+				for(let groupItem of GroupItems) {
+					groupItem.delayArrange(200);
+				}
+			}
 			return;
 		}
 
 		// Classic mode...
 
-		if(!this.shouldResizeItems()) { return; }
+		if(!this.shouldResizeItems(newPageBounds)) {
+			this._pageBounds = newPageBounds;
+			this._save();
+			return;
+		}
 
 		// compute itemBounds: the union of all the top-level items' bounds.
 		let itemBounds = new Rect(this._pageBounds);
@@ -1483,9 +1589,7 @@ this.UI = {
 
 	// Returns whether we should resize the items on the screen, based on whether the top-level items fit in the screen or not and whether they feel "cramped" or not.
 	// These computations may be done using cached values. The cache can be cleared with UI.clearShouldResizeItems().
-	shouldResizeItems: function() {
-		let newPageBounds = this.getPageBounds();
-
+	shouldResizeItems: function(newPageBounds) {
 		// If we don't have cached cached values...
 		if(this._minimalRect === undefined || this._feelsCramped === undefined) {
 			// Loop through every top-level Item for two operations:
@@ -1598,7 +1702,7 @@ this.UI = {
 			return true;
 		}
 
-		if(!Utils.isRect(data.pageBounds)) {
+		if(!Utils.isRect(data.pageBounds) || !Utils.isNumber(data.pageBounds.realTop) || !Utils.isNumber(data.pageBounds.realLeft)) {
 			data.pageBounds = null;
 			return false;
 		}
@@ -1706,6 +1810,16 @@ this.UICache = {
 			return parseInt(style.getPropertyValue('--canvas-border-width')) *2;
 		});
 
+		this.ghost('groupSelectorSize', function() {
+			return parseInt(style.getPropertyValue('--group-selector-size'));
+		});
+
+		this.ghost('groupSelectorCanvasSize', () => {
+			return	this.groupSelectorSize
+				- (parseInt(style.getPropertyValue('--group-selector-padding')) *2)
+				- parseInt(style.getPropertyValue('--group-selector-title-height'));
+		});
+
 		this.ghost('groupTitlebarHeight', function() {
 			return parseInt(style.getPropertyValue('--group-titlebar-height'));
 		});
@@ -1737,6 +1851,10 @@ this.UICache = {
 
 		this.ghost('scrollbarWidth', function() {
 			return parseInt(style.getPropertyValue('--scrollbar-width'));
+		});
+
+		this.ghost('actionsWidth', function() {
+			return parseInt(style.getPropertyValue('--actions-width'));
 		});
 	}
 };

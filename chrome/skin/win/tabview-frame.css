@@ -4,7 +4,6 @@
 
 :root {
 	--item-background: -moz-dialog;
-	--item-background-aero: hsl(210,75%,92%);
 	--item-border: var(--canvas-border-width) solid rgba(73, 99, 119, 0.3);
 	--item-border-radius: 5px;
 }
@@ -14,6 +13,7 @@
 		(-moz-os-version: windows-win7) {
 
 		:root {
+			--item-background: hsl(210,75%,92%);
 			--hover-color: rgba(98,127,134,0.4);
 		}
 	}
@@ -28,48 +28,11 @@ body:not(:-moz-system-metric(windows-compositor)) {
 	background: url("chrome://tabgroups-os/skin/grain.png") repeat scroll center top, linear-gradient(#CCD9EA, #C7D5E7) repeat scroll 0 0;
 }
 
-body.grid {
+body:not(.classic) {
 	background-color: var(--item-background);
-}
-
-@media (-moz-windows-default-theme) {
-	@media	(-moz-os-version: windows-vista),
-		(-moz-os-version: windows-win7) {
-
-		body.grid {
-			background-color: var(--item-background-aero);
-		}
-	}
 }
 
 /* Tabs */
-
-.thumb {
-	background-color: var(--item-background);
-}
-
-.thumb > *:-moz-any(canvas,.cached-thumb) {
-	border: var(--item-border);
-}
-
-.favicon-container {
-	background-color: var(--item-background);
-	border-top: 1px solid transparent;
-	border-bottom: var(--item-border);
-	-moz-border-start: 1px solid transparent;
-	-moz-border-end: var(--item-border);
-}
-
-@media (-moz-windows-default-theme) {
-	@media	(-moz-os-version: windows-vista),
-		(-moz-os-version: windows-win7) {
-
-		.thumb,
-		.favicon-container {
-			background-color: var(--item-background-aero);
-		}
-	}
-}
 
 .close {
 	background-image: -moz-image-rect(url("chrome://tabgroups-os/skin/close.png"), 0, 16, 16, 0);
@@ -85,27 +48,13 @@ body.grid {
 
 /* Tab GroupItem */
 
-.groupItem,
-.expandedTray,
-.undo {
-	background-color: var(--item-background);
-}
-
 @media (-moz-windows-default-theme) {
 	@media	(-moz-os-version: windows-vista),
 		(-moz-os-version: windows-win7) {
 
-		.groupItem {
-			background-color: var(--item-background-aero);
-		}
-
-		body.classic .groupItem {
-			border-radius: var(--item-border-radius);
-		}
-
+		body.classic .groupItem,
 		.expandedTray,
-		.undo {
-			background-color: var(--item-background-aero);
+		.undo:not(.inGroupSelector) {
 			border-radius: var(--item-border-radius);
 		}
 	}
@@ -113,16 +62,11 @@ body.grid {
 
 /* Side buttons */
 
-body.classic #actions {
-	background-color: var(--item-background);
-}
-
 @media (-moz-windows-default-theme) {
 	@media	(-moz-os-version: windows-vista),
 		(-moz-os-version: windows-win7) {
 
 		body.classic #actions {
-			background-color: var(--item-background-aero);
 			border-radius: var(--item-border-radius) 0 0 var(--item-border-radius);
 		}
 

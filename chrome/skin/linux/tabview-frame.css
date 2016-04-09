@@ -16,21 +16,8 @@ body {
 
 /* Tabs */
 
-.thumb {
-	background-color: var(--item-background);
-}
-
-.thumb > *:-moz-any(canvas,.cached-thumb) {
-	border: var(--item-border);
-}
-
 .favicon-container {
-	background-color: var(--item-background);
 	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, -1px 0 0 rgba(225, 225, 225, 0.8) inset;
-	border-top: 1px solid transparent;
-	border-bottom: var(--item-border);
-	-moz-border-start: 1px solid transparent;
-	-moz-border-end: var(--item-border);
 }
 
 .favicon-container:-moz-locale-dir(rtl) {
@@ -60,21 +47,11 @@ body {
 
 /* Tab GroupItem */
 
-.groupItem,
-.expandedTray,
-.undo {
-	background-color: var(--item-background);
-}
-
 .phantom {
 	border: 1px solid rgba(190,190,190,1);
 }
 
 /* Side buttons */
-
-body.classic #actions {
-	background-color: var(--item-background);
-}
 
 #exit-button {
 	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 80, 16, 64);

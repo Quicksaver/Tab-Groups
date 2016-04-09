@@ -1,4 +1,4 @@
-// VERSION 1.1.11
+// VERSION 1.1.12
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -27,6 +27,7 @@ this.TabItem = function(tab, options = {}) {
 	this.closeBtn = $$('.close', this.container)[0];
 
 	this.tabCanvas = new TabCanvas(this.tab, this.canvas);
+	this.tabCanvas.addSubscriber("painted", this);
 
 	this.isATabItem = true;
 	this._hidden = false;
@@ -62,6 +63,11 @@ this.TabItem.prototype = {
 	showCachedData: function() {
 		let { title, url } = this.getTabState();
 		let thumbnailURL = gPageThumbnails.getThumbnailURL(url);
+
+		// This method is only called when the tab item is first created during initialization.
+		// We should update the group's thumb when the tab's cached thumb loads, otherwise we end up with a bunch of white squares in there.
+		// Further updates to the tab's thumb will surely come through its canvas, which will also update the group's thumb accordingly.
+		this.cachedThumb.addEventListener('load', this);
 
 		setAttribute(this.cachedThumb, "src", thumbnailURL);
 		this.container.classList.add("cached-data");
@@ -185,6 +191,20 @@ this.TabItem.prototype = {
 				if(DraggingTab) {
 					DraggingTab.canDrop(e, this.parent);
 				}
+				break;
+
+			case 'load':
+				// It's not necessary to keep the listener, this will surely only be called once per tab item.
+				this.cachedThumb.removeEventListener('load', this);
+				this.parent._updateThumb(true, true);
+				break;
+		}
+	},
+
+	handleSubscription: function(name, info) {
+		switch(name) {
+			case 'painted':
+				this.parent._updateThumb(true);
 				break;
 		}
 	},

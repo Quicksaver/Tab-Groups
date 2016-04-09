@@ -20,9 +20,27 @@
 	--stack-expander-size: 24px;
 	--stack-expander-top-margin: 0;
 	--stack-expander-bottom-margin: 8px;
+	--group-selector-size: 160px;
+	--group-selector-padding: 15px;
+	--group-selector-title-height: 14px;
 	--actions-width: 29px;
-	/* active workspace excludes the width and borders of the action buttons */
-	--workspace-width: calc(100% - var(--actions-width) - var(--group-border-width) - var(--group-border-width));
+	--shade-background: rgba(0,0,0,.42);
+	--drag-animation: margin 150ms linear;
+}
+
+body {
+	--workspace-height: 100%;
+	/* active workspace excludes the width and borders of the action buttons, excludes its own borders (or of its items) as well */
+	--workspace-width: calc(100% - var(--actions-width) - (var(--group-border-width) * 2));
+}
+
+body.single {
+	/* in single mode we need to exclude the borders from the groups/groupSelector themselves as well */
+	--workspace-width: calc(100% - var(--actions-width) - (var(--group-border-width) * 4));
+	/* for single view, we need to exclude the group selector at the top and its borders */
+	--workspace-height: calc(100% - var(--group-selector-size) - (var(--group-border-width) * 2));
+	/* it's kind of silly that I have to exclude borders here as well... am I missing something? */
+	--group-single-height: calc(100% - (var(--group-border-width) * 2));
 }
 
 html {
@@ -47,7 +65,7 @@ html, body, #content {
 
 #groups {
 	position: relative;
-	height: 100%;
+	height: var(--workspace-height);
 	width: var(--workspace-width);
 }
 
@@ -62,7 +80,13 @@ body.grid #groups {
 body.grid #groups.overflowing {
 	-moz-padding-end: var(--scrollbar-width);
 	/* same as above, plus its own padding to add space to the scrollbar */
-	width: calc(100% - 31px - var(--scrollbar-width));
+	width: calc(100% - var(--workspace-width) - var(--scrollbar-width));
+}
+
+html.thumbing,
+html.thumbing body.single #groups,
+html.thumbing body.single #content {
+	overflow: visible;
 }
 
 /* Tabs */
@@ -79,7 +103,7 @@ body.grid #groups.overflowing {
 }
 
 body.DraggingTab .tab {
-	transition: margin 150ms linear;
+	transition: var(--drag-animation);
 }
 
 body.DraggingTab .tab * {
@@ -90,6 +114,7 @@ body.DraggingTab .tab * {
 	position: relative;
 	overflow: hidden;
 	width: 100%;
+	background-color: var(--item-background);
 }
 
 .tab.stacked .thumb {
@@ -99,14 +124,15 @@ body.DraggingTab .tab * {
 .thumb > *:-moz-any(canvas,.cached-thumb) {
 	background-color: white;
 	background-clip: content-box;
+	border: var(--item-border);
 }
 
 .tab.cached-data .cached-thumb,
 .tab:not(.cached-data) canvas {
 	/* minus the borders, canvas are insane because they need width/height attributes to work properly,
 	   which completely messes up their layout unless overriden here. */
-	width: calc(100% - 2px) !important;
-	height: calc(100% - 2px) !important;
+	width: calc(100% - var(--canvas-border-width) - var(--canvas-border-width)) !important;
+	height: calc(100% - var(--canvas-border-width) - var(--canvas-border-width)) !important;
 }
 
 .tab.cached-data canvas,
@@ -117,6 +143,11 @@ body.DraggingTab .tab * {
 
 .favicon-container {
 	position: absolute;
+	background-color: var(--item-background);
+	border-top: 1px solid transparent;
+	border-bottom: var(--item-border);
+	-moz-border-start: 1px solid transparent;
+	-moz-border-end: var(--item-border);
 }
 
 .tab-container:not(.noThumbs) .favicon-container {
@@ -214,6 +245,12 @@ body.DraggingTab .tab * {
 	box-shadow: rgba(0,0,0,.2) -1px 1px 4px;
 }
 
+.groupItem.thumbing .tab-title,
+.groupItem.thumbing .favicon-container,
+.groupItem.thumbing .close {
+	opacity: 0;
+}
+
 /* Tab GroupItem */
 
 .groupItem,
@@ -221,14 +258,18 @@ body.DraggingTab .tab * {
 	overflow: hidden;
 }
 
+#groupSelector,
 .groupItem,
-.expandedTray {
+.expandedTray,
+.undo:not(.inGroupSelector) {
+	background-color: var(--item-background);
 	border-top: var(--group-border-width) solid ThreeDHighlight;
 	border-bottom: var(--group-border-width) solid ThreeDLightShadow;
 	-moz-border-start: var(--group-border-width) solid ThreeDHighlight;
 	-moz-border-end: var(--group-border-width) solid ThreeDLightShadow;
 }
 
+#groupSelector,
 body:not(.classic) .groupItem {
 	border-bottom-color: ThreeDShadow;
 	-moz-border-end-color: ThreeDShadow;
@@ -263,7 +304,23 @@ body.grid .groupItem {
 	flex: 1 1 auto;
 }
 
-body.grid .groupItem.closed > *:not(.undo) {
+body.single .groupItem {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: var(--group-single-height);
+}
+
+body.single .groupItem:not(.activeGroupItem):not(.thumbing) {
+	display: none;
+}
+
+body.single .groupItem:not(.activeGroupItem).thumbing {
+	top: 100%;
+}
+
+body:not(.classic) .groupItem.closed > *:not(.undo) {
 	display: none;
 }
 
@@ -305,19 +362,14 @@ body:not(.grid) .groupItem:not(.phantom) {
 	align-items: stretch;
 	align-content: stretch;
 	cursor: pointer;
-	border-top: 1px solid ThreeDHighlight;
-	border-bottom: 1px solid ThreeDLightShadow;
-	-moz-border-start: 1px solid ThreeDHighlight;
-	-moz-border-end: 1px solid ThreeDLightShadow;
-	box-shadow: var(--item-normal-shadow);
 	opacity: 0.75;
 }
 
-.undo:hover {
-	opacity: 1;
+.undo:not(.inGroupSelector) {
+	box-shadow: var(--item-normal-shadow);
 }
 
-body.grid .undo {
+body:not(.classic) .undo {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
@@ -348,7 +400,8 @@ body:not(.grid) #gridNewGroup {
 }
 
 body:-moz-any(.DraggingTab,.DraggingGroup) .tab.create-new,
-.groupItem:not(:hover) .tab.create-new {
+body:not(.single) .groupItem:not(:hover) .tab.create-new,
+.groupItem.thumbing .tab.create-new {
 	opacity: 0;
 }
 
@@ -447,6 +500,81 @@ body:-moz-any(.DraggingTab,.DraggingGroup) .tab.create-new,
 	height: 100%;
 	width: 100%;
 	border: none;
+}
+
+/* Group Selector items */
+
+#groupSelector {
+	position: relative;
+	width: var(--workspace-width);
+	height: var(--group-selector-size);
+	display: flex;
+	overflow-x: auto;
+	overflow-y: hidden;
+	background-color: rgba(255,255,255,0.6);
+}
+
+body:not(.single) #groupSelector {
+	display: none;
+}
+
+.groupSelector {
+	position: relative;
+	overflow: hidden;
+	margin: 0;
+	cursor: pointer;
+	flex: 0 0 auto;
+	width: var(--group-selector-size);
+	height: var(--group-selector-size);
+}
+
+body.DraggingGroupSelector .groupSelector {
+	transition: var(--drag-animation);
+}
+
+.groupSelector.space-before {
+	-moz-margin-start: var(--group-selector-size);
+}
+
+.groupSelector.space-after {
+	-moz-margin-end: var(--group-selector-size);
+}
+
+.groupSelector:not(.closedGroup) * {
+	pointer-events: none;
+}
+
+.groupThumb {
+	position: absolute;
+	left: 50%;
+	/* keeping this aligned correctly with the group title is a bit tricky,
+	   as I'm trying to avoid using flexboxes because its a canvas and those lag there */
+	top: calc(50% - (var(--group-selector-title-height) /2));
+	transform: translate(-50%, calc(0px - 50% - (var(--group-selector-title-height) /4)));
+	padding: 4px;
+	border: var(--canvas-border-width) solid var(--hover-color);
+	background-color: var(--item-background);
+}
+
+.groupSelector.closedGroup .groupThumb {
+	display: none;
+}
+
+.groupSelector .group-title {
+	display: block;
+	position: absolute;
+	bottom: calc(var(--group-selector-padding) / 2);
+	left: 50%;
+	transform: translateX(-50%);
+	max-width: calc(100% - var(--group-selector-padding));
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-align: center;
+}
+
+body.DraggingGroupSelector #singleNewGroup {
+	opacity: 0;
 }
 
 /* Trenches */
@@ -608,7 +736,7 @@ input.name:focus::-moz-placeholder {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(0,0,0,.42);
+	background: var(--shade-background);
 }
 
 .banner {
@@ -681,6 +809,7 @@ input.name:focus::-moz-placeholder {
 }
 
 body.classic #actions {
+	background-color: var(--item-background);
 	-moz-border-start-color: ThreeDHighlight;
 	border-bottom-color: ThreeDHighlight;
 }
@@ -723,6 +852,10 @@ body.grid #actions {
 	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 100, 20, 80);
 }
 
+#actions #singlebutton {
+	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 120, 20, 100);
+}
+
 #actions .grouped {
 	margin-top: 3px;
 	padding-top: 3px;
@@ -739,7 +872,7 @@ body.grid #actions {
 }
 
 body.DraggingTab .appTabIcon {
-	transition: margin 150ms linear;
+	transition: var(--drag-animation);
 }
 
 .appTabIcon {
@@ -756,17 +889,21 @@ body.DraggingTab .appTabIcon {
 
 /* Various interaction effects */
 
-.tab:not(.stacked).focus,
-.tab:not(.stacked):hover,
+.groupItem:not(.thumbing) .tab:not(.stacked).focus,
+.groupItem:not(.thumbing) .tab:not(.stacked):hover,
 #actions input:hover,
 #actions input.appTabIcon.activeAppTab,
+.groupSelector:hover,
+.groupSelector.dragOver,
+.groupSelector.activeGroupItem,
 body.classic #classicbutton,
-body.grid #gridbutton {
+body.grid #gridbutton,
+body.single #singlebutton {
 	background-color: var(--hover-color);
 }
 
-.tab:not(.stacked).focus .favicon-container,
-.tab:not(.stacked):hover .favicon-container,
+.groupItem:not(.thumbing) .tab:not(.stacked).focus .favicon-container,
+.groupItem:not(.thumbing) .tab:not(.stacked):hover .favicon-container,
 .groupItem.stackedGroup.activeGroupItem,
 .groupItem.stackedGroup:hover,
 body.DraggingGroup .groupItem.dragging,
@@ -782,8 +919,24 @@ body.DraggingGroup .groupItem > * {
 	opacity: 0.7;
 }
 
+.groupSelector:hover .groupThumb,
+.groupSelector.dragOver .groupThumb,
+.groupSelector.activeGroupItem .groupThumb {
+	border-top: var(--group-border-width) solid ThreeDShadow;
+	border-bottom: var(--group-border-width) solid ThreeDLightShadow;
+	-moz-border-start: var(--group-border-width) solid ThreeDShadow;
+	-moz-border-end: var(--group-border-width) solid ThreeDLightShadow;
+}
+
+.groupSelector:hover .undo,
+.undo:hover {
+	opacity: 1;
+}
+
 /* Search */
 
+html.thumbing #searchshade,
+html.thumbing #search,
 body:not(.searching) #searchshade,
 body:not(.searching) #search {
 	display: none;

@@ -1,4 +1,4 @@
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 // Class: Trench - Class for drag-snapping regions; called "trenches" as they are long and narrow.
 // Parameters:
@@ -20,8 +20,8 @@ this.Trench = function(element, xory, type, edge) {
 	this.type = type; // "border" or "guide"
 	this.edge = edge; // "top", "left", "bottom", or "right"
 
-	// (array) DOM elements for visible reflexes of the Trench
-	this.dom = [];
+	// DOM elements for visible reflexes of the Trench
+	this.dom = {};
 
 	// (boolean) Whether this trench will project a visible guide (dotted line) or not.
 	this.showGuide = false;
@@ -172,11 +172,10 @@ this.Trench.prototype = {
 			}
 			iQ(guideTrench).css(this.guideRect);
 			GroupItems.workSpace.appendChild(guideTrench);
-		} else {
-			if(this.dom.guideTrench) {
-				this.dom.guideTrench.remove();
-				delete this.dom.guideTrench;
-			}
+		}
+		else if(this.dom.guideTrench) {
+			this.dom.guideTrench.remove();
+			delete this.dom.guideTrench;
 		}
 
 		if(!Trenches.showDebug) {

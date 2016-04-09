@@ -1,4 +1,4 @@
-// VERSION 1.2.1
+// VERSION 1.2.2
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -287,7 +287,13 @@ this.Subscribable = function(obj) {
 
 		let subscribers = this.subscribers.get(eventName);
 		for(let callback of subscribers) {
-			try { callback(eventInfo); }
+			try {
+				if(typeof(callback) == 'object') {
+					callback.handleSubscription(eventName, eventInfo);
+				} else {
+					callback(eventInfo);
+				}
+			}
 			catch(ex) { Cu.reportError(ex); }
 		}
 	};
@@ -339,10 +345,9 @@ this.Utils = {
 // Class: MRUList - A most recently used list.
 // If a is an array of entries, creates a copy of it.
 this.MRUList = function(a) {
+	this._list = [];
 	if(Array.isArray(a)) {
-		this._list = a.concat();
-	} else {
-		this._list = [];
+		this._list.concat(a);
 	}
 };
 
@@ -351,6 +356,14 @@ this.MRUList.prototype = {
 	update: function(entry) {
 		this.remove(entry);
 		this._list.unshift(entry);
+	},
+
+	// Inserts a new item at the end of the list if its not in it already.
+	append: function(entry) {
+		let index = this._list.indexOf(entry);
+		if(index == -1) {
+			this._list.push(entry);
+		}
 	},
 
 	// Removes the given entry from the list.
@@ -369,6 +382,7 @@ this.MRUList.prototype = {
 					return entry;
 				}
 			}
+			return null;
 		}
 		return this._list.length > 0 ? this._list[0] : null;
 	},
