@@ -38,6 +38,10 @@
 			<html:p>&howto.mode.description;</html:p>
 			<html:ul>
 				<html:li>
+					<html:p>&howto.single.description;</html:p>
+					<html:p><html:img src="chrome://objPathString/skin/howto/singleview.jpg"/></html:p>
+				</html:li>
+				<html:li>
 					<html:p>&howto.grid.description;</html:p>
 					<html:p><html:img src="chrome://objPathString/skin/howto/grid.jpg"/></html:p>
 				</html:li>
@@ -66,7 +70,7 @@
 		<groupbox align="start" id="paneHowTo-switch" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.switch.caption;"/>
 			<html:p>&nbsp;</html:p>
-			<html:p>&howto.switch.description;</html:p>
+			<html:p>&howto.switch.description2;</html:p>
 		</groupbox>
 
 		<groupbox align="start" id="paneHowTo-organize" collapsed="true" data-category="paneHowTo">

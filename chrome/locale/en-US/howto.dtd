@@ -3,19 +3,20 @@
 <!ENTITY howto.overview.a "Tab Groups are great for grouping tabs by task. For example, you might have a group of tabs related to searching for a gift and another group for paying your bills online. Try creating groups for things you normally do online and use Tab Groups to switch between them. It's an easy way to stay organized.">
 
 <!ENTITY howto.mode.caption "How do I work in groups view?">
-<!ENTITY howto.mode.description "To enter the Tab Groups view, either click on the toolbar button, or use the keyboard shortcut. There, you have two possible modes, toggle between them at any time through the controllers on the right:">
+<!ENTITY howto.mode.description "To enter the Tab Groups view, either click on the toolbar button, or use the keyboard shortcut. There, you have three possible modes, toggle between them at any time through the controllers on the right:">
+<!ENTITY howto.single.description "Single view is the default mode. It is the simplest to use, and it is perfect for keeping separate groups stored away but always at hand.">
 <!ENTITY howto.grid.description "In grid layout, your groups are automatically sized according to how many you have and how much free space there is.">
 <!ENTITY howto.classic.description "In free arrange mode, you can position and resize your groups at will within the work space. You can use this visual organization to your advantage when working many different groups.">
 
 <!ENTITY howto.create.caption "How do I create a Tab Group?">
 <!ENTITY howto.create.step0 "When you enter the Tab Groups view for the first time, you'll see thumbnail previews of all of your tabs in one group.">
-<!ENTITY howto.create.step1a "In grid layout it couldn't be simpler, just click the Create New Group button at the bottom. You can't miss it.">
+<!ENTITY howto.create.step1a "In single view or grid layout, just click the Create New Group button at the bottom. You can't miss it.">
 <!ENTITY howto.create.step1b "In free arrange mode, to make a new group, simply drag one tab out of the group, a box will be drawn around it. Or you can click and drag directly in the free space to draw a new group yourself with the dimensions you want.">
 <!ENTITY howto.create.step2b "You can continue adding tabs to that new group and you can create more groups.">
 <!ENTITY howto.create.step3 "When you are done, just click on a tab to exit the view. You will return to Firefox, the tab you clicked on will be active and only the tabs in that group will be visible.">
 
 <!ENTITY howto.switch.caption "How do I switch between Tab Groups?">
-<!ENTITY howto.switch.description "Switching between tab groups is easy. Just enter the tab groups view, then click on the tab group you want to view. The tab you clicked on will be active and only the tabs in that group will be visible.">
+<!ENTITY howto.switch.description2 "It couldn't be simpler. Just enter the tab groups view, then click on the tab want to view. The tab you clicked on will be active and only the tabs in that group will be visible. You can also double-click on an empty area of any group, you will be taken to the last selected tab in that group.">
 
 <!ENTITY howto.search.caption "How do I search through my tabs?">
 <!ENTITY howto.search.step1 "Enter the Tab Groups view.">
