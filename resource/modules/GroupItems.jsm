@@ -1,4 +1,4 @@
-// VERSION 1.5.0
+// VERSION 1.5.1
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -177,11 +177,6 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.selector.groupItem = this;
 	this.selector.classList.add('groupSelector');
 	this.selector.setAttribute('draggable', 'true');
-	this.selector.addEventListener('mousedown', this);
-	this.selector.addEventListener('mouseup', this);
-	this.selector.addEventListener('dragstart', this);
-	this.selector.addEventListener('dragover', this);
-	this.selector.addEventListener('dragenter', this);
 	UI.groupSelector.appendChild(this.selector);
 
 	this.canvas = document.createElement('canvas');
@@ -207,11 +202,10 @@ this.GroupItem = function(listOfEls, options = {}) {
 	}
 
 	// ___ Finish Up
-	this.container.addEventListener('mousedown', this);
-	this.container.addEventListener('mouseup', this);
-	this.container.addEventListener('dragover', this);
-	this.container.addEventListener('dragenter', this);
-	this.container.addEventListener('dragstart', this);
+	for(let evtName of [ 'mousedown', 'mouseup', 'dblclick', 'dragover', 'dragenter', 'dragstart' ]) {
+		this.container.addEventListener(evtName, this);
+		this.selector.addEventListener(evtName, this);
+	}
 
 	this.slot = options.slot || GroupItems.nextSlot();
 
@@ -750,19 +744,11 @@ this.GroupItem.prototype = {
 					else if(e.target == this.selector) {
 						UI.setActive(this);
 					}
-					else if(Tabs.selected.pinned
-					&& UI.getActiveTab() != this.getActiveTab()
-					&& this.children.length) {
-						UI.setActive(this, { dontSetActiveTabInGroup: true });
-						UI.goToTab(Tabs.selected);
+					else if(this.isStacked) {
+						this.zoomIn();
 					}
 					else {
-						let tabItem = this.getTopChild();
-						if(tabItem) {
-							tabItem.zoomIn();
-						} else {
-							this.newTab();
-						}
+						UI.setActive(this);
 					}
 				}
 
@@ -794,6 +780,17 @@ this.GroupItem.prototype = {
 				}
 
 				this.childHandling = false;
+				break;
+
+			case 'dblclick':
+				if(this.hidden) { break; }
+
+				// We only want these to zoom into a tab when double-clicking on an empty area of the group.
+				if(e.target == this.selector
+				|| e.target.classList.contains('tab-container')
+				|| e.target.classList.contains('groupItem')) {
+					this.zoomIn();
+				}
 				break;
 
 			case 'dragstart':
@@ -851,6 +848,21 @@ this.GroupItem.prototype = {
 				// info == tabItem
 				this._onChildClose(info);
 				break;
+		}
+	},
+
+	zoomIn: function() {
+		if(Tabs.selected.pinned && UI.getActiveTab() != this.getActiveTab()) {
+			UI.setActive(this, { dontSetActiveTabInGroup: true });
+			UI.goToTab(Tabs.selected);
+		}
+		else {
+			let tabItem = this.getTopChild();
+			if(tabItem) {
+				tabItem.zoomIn();
+			} else {
+				this.newTab();
+			}
 		}
 	},
 
@@ -2222,6 +2234,9 @@ this.GroupItems = {
 	// Paramaters:
 	//  groupItem - the active <GroupItem>
 	setActiveGroupItem: function(groupItem) {
+		// No point.
+		if(this._activeGroupItem == groupItem) { return; }
+
 		if(this._activeGroupItem) {
 			this._activeGroupItem.container.classList.remove('activeGroupItem');
 			this._activeGroupItem.selector.classList.remove('activeGroupItem');

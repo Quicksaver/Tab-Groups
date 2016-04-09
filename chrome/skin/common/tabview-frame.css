@@ -291,8 +291,12 @@ body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl),
 	box-shadow: rgba(0,0,0,0.8) 2px 2px 8px;
 }
 
-.groupItem:not(.closed) {
+.groupItem:not(.closed).stackedGroup {
 	cursor: pointer;
+}
+
+body:not(.single) .groupItem:not(.closed):not(.stackedGroup) {
+	cursor: grab;
 }
 
 body.classic:not(.searching) .groupItem:not(.phantom) {
