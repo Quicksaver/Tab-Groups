@@ -1,4 +1,4 @@
-// VERSION 1.1.13
+// VERSION 1.1.14
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -412,6 +412,9 @@ this.TabItem.prototype = {
 
 		// Zoom in!
 		aSync(() => {
+			// Tab View has been deinitialized. We can't proceed.
+			if(typeof(UI) == 'undefined') { return; }
+
 			UI.goToTab(this.tab);
 
 			// tab might not be selected because hideTabView() is invoked after

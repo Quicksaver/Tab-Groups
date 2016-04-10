@@ -1,4 +1,4 @@
-// VERSION 1.0.29
+// VERSION 1.0.30
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -284,7 +284,10 @@ this.TabView = {
 		// nothing to do
 		if(!this._window && !this._iframe && !this._deck) { return; }
 
-		this.hide();
+		// hide() will actually fail to complete properly if this method is called while tab view is visible,
+		// because it implies a degree of asynchronicity in the process.
+		// So we force tab view to disappear in that case, to make sure the user isn't left with a blank empty window.
+		this.hide(true);
 
 		Listeners.remove(this._window, "tabviewframeinitialized", this);
 		Listeners.remove(this._iframe, "DOMContentLoaded", this);
@@ -319,9 +322,12 @@ this.TabView = {
 		});
 	},
 
-	hide: function() {
+	hide: function(force) {
 		if(this.isVisible() && this._window) {
 			this._window[objName].UI.exit();
+			if(force) {
+				this._window[objName].UI.hideTabView();
+			}
 			return true;
 		}
 		return false;
