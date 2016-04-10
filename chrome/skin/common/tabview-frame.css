@@ -892,6 +892,8 @@ body.DraggingTab .appTabIcon {
 
 .groupItem:not(.thumbing) .tab:not(.stacked).focus,
 .groupItem:not(.thumbing) .tab:not(.stacked):hover,
+.expandedTray .tab.focus,
+.expandedTray .tab:hover,
 #actions input:hover,
 #actions input.appTabIcon.activeAppTab,
 .groupSelector:hover,
@@ -905,6 +907,8 @@ body.single #singlebutton {
 
 .groupItem:not(.thumbing) .tab:not(.stacked).focus .favicon-container,
 .groupItem:not(.thumbing) .tab:not(.stacked):hover .favicon-container,
+.expandedTray .tab.focus .favicon-container,
+.expandedTray .tab:hover .favicon-container,
 .groupItem.stackedGroup.activeGroupItem,
 .groupItem.stackedGroup:hover,
 body.DraggingGroup .groupItem.dragging,
