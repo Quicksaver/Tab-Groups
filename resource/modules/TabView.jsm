@@ -1,4 +1,4 @@
-// VERSION 1.0.30
+// VERSION 1.0.31
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -405,28 +405,7 @@ this.TabView = {
 	},
 
 	getGroupTitle: function(groupItem) {
-		let title = groupItem.getTitle();
-		if(title.trim()) {
-			return title;
-		}
-
-		if(!groupItem.children.length) {
-			return Strings.get('TabView', 'groupItemUnnamed', [
-				[ "$num", groupItem.id ]
-			]);
-		}
-
-		let topChildLabel = groupItem.getTopChild().tab.label;
-		let childNum = groupItem.children.length;
-		if(childNum > 1) {
-			let num = childNum -1;
-			return Strings.get('TabView', 'moveToUnnamedGroup', [
-				[ "$title", topChildLabel ],
-				[ "$tabs", num ]
-			], num);
-		}
-
-		return topChildLabel;
+		return groupItem.getTitle(true).trim();
 	},
 
 	_createGroupMenuItem: function(groupItem) {

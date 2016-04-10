@@ -672,20 +672,26 @@ input.name:focus {
 
 .title-container:hover input.name,
 .title-container input.name:focus {
-	border-bottom: 1px solid #ddd;
+	border-bottom-color: rgba(128,128,128,0.25);
 }
 
-input.name::-moz-placeholder {
-	opacity: 1.0;
-	font-style: italic !important;
-	color: transparent;
+input.name:not(:focus)::-moz-placeholder {
 	background-image: url("chrome://tabgroups/skin/edit-light.png");
 	background-repeat: no-repeat;
 }
 
-.title-container:hover input.name::-moz-placeholder,
+input.name.unnamed-group:not(:focus) {
+	-moz-padding-start: 18px;
+	width: calc(100% - 18px);
+}
+
+.unnamed-group:not(:focus) {
+	font-style: italic;
+	color: rgba(128,128,128,0.9);
+}
+
 input.name:focus::-moz-placeholder {
-	background-image: none;
+	color: transparent;
 }
 
 .title-shield {

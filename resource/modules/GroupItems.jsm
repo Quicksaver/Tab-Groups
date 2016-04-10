@@ -1,4 +1,4 @@
-// VERSION 1.6.1
+// VERSION 1.6.2
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -44,6 +44,9 @@ this.GroupItem = function(listOfEls, options = {}) {
 
 	// The <TabItem> for the groupItem's active tab.
 	this._activeTab = null;
+
+	// The prompt text for the title field.
+	this.defaultName = Strings.get('TabView', 'groupItemUnnamed', [ [ "$num", this.id ] ]);
 
 	if(Utils.isPoint(options.userSize)) {
 		this.userSize = new Point(options.userSize);
@@ -248,9 +251,6 @@ this.GroupItem.prototype = {
 		return this.children.length +1;
 	},
 
-	// The prompt text for the title field.
-	defaultName: Strings.get("TabView", "groupItemDefaultName"),
-
 	// Sets the active <TabItem> for this groupItem; can be null, but only if there are no children.
 	setActiveTab: function(tab) {
 		this._activeTab = tab;
@@ -334,8 +334,8 @@ this.GroupItem.prototype = {
 	},
 
 	// Returns the title of this groupItem as a string.
-	getTitle: function() {
-		return this.title ? this.title.value : '';
+	getTitle: function(placeholder) {
+		return this.title.value || (placeholder ? this.defaultName : '');
 	},
 
 	// Sets the title of this groupItem with the given string
@@ -345,7 +345,16 @@ this.GroupItem.prototype = {
 			title = value || "";
 			this.title.value = title;
 		}
+
 		this.selectorTitle.textContent = title;
+		if(title) {
+			this.selectorTitle.classList.remove('unnamed-group');
+			this.title.classList.remove('unnamed-group');
+		} else {
+			this.selectorTitle.classList.add('unnamed-group');
+			this.title.classList.add('unnamed-group');
+			title = this.defaultName;
+		}
 		this.selector.setAttribute('title', title);
 		this.save();
 	},
