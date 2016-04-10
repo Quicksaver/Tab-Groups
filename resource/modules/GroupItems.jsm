@@ -1,4 +1,4 @@
-// VERSION 1.5.1
+// VERSION 1.5.2
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1518,10 +1518,10 @@ this.GroupItem.prototype = {
 		let size;
 		if(boundsAspect > itemAspect) {
 			// Tall, thin groupItem
-			size = TabItems.calcValidSize(new Point(bounds.width * scale, -1));
+			size = TabItems.calcValidSize(new Point(bounds.width * scale, -1), true);
 		} else {
 			// Short, wide groupItem
-			size = TabItems.calcValidSize(new Point(-1, bounds.height * scale));
+			size = TabItems.calcValidSize(new Point(-1, bounds.height * scale), true);
 		}
 
 		// x is the left margin that the stack will have, within the content area (bounds)

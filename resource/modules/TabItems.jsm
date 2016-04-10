@@ -1,4 +1,4 @@
-// VERSION 1.1.12
+// VERSION 1.1.13
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -937,9 +937,13 @@ this.TabItems = {
 	},
 
 	// Pass in a desired size, and receive a size based on proper title size and aspect ratio.
-	calcValidSize: function(size) {
-		let width = Math.max(this.minTabWidth, size.x);
-		let height = Math.max(this.minTabHeight, size.y);
+	calcValidSize: function(size, scaleDown) {
+		let width = size.x;
+		let height = size.y;
+		if(!scaleDown) {
+			width = Math.max(this.minTabWidth, width);
+			height = Math.max(this.minTabHeight, height);
+		}
 		let retSize = new Point(width, height);
 
 		if(size.x > -1) {
