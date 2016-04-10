@@ -1,4 +1,4 @@
-// VERSION 1.6.0
+// VERSION 1.6.1
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2331,21 +2331,7 @@ this.GroupItems = {
 	//  reverse - the boolean indicates the direction to look for the next groupItem.
 	// Returns the <tabItem>. If nothing is found, return null.
 	getNextGroupItemTab: function(reverse) {
-		let groupItems = [];
-		for(let groupItem of this) {
-			groupItems.push(groupItem);
-		}
-
-		// When cycling through groups, order them by their titles, otherwise it's far too arbitrary.
-		for(let groupItem of groupItems) {
-			groupItem.groupTitle = gWindow[objName].TabView.getGroupTitle(groupItem);
-		}
-		groupItems.sort(function(a, b) {
-			if(a.groupTitle < b.groupTitle) { return -1; }
-			if(a.groupTitle > b.groupTitle) { return 1; }
-			return 0;
-		});
-
+		let groupItems = this.sortBySlot();
 		if(reverse) {
 			groupItems.reverse();
 		}
