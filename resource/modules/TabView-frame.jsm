@@ -1,4 +1,4 @@
-// VERSION 1.0.10
+// VERSION 1.0.11
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -49,6 +49,7 @@ Modules.LOADMODULE = function() {
 	Modules.load('iQ');
 	Modules.load('FavIcons');
 	Modules.load('GroupItems');
+	Modules.load('PinnedItems');
 	Modules.load('TabItems');
 	Modules.load('Drag');
 	Modules.load('Trench');
@@ -62,6 +63,7 @@ Modules.UNLOADMODULE = function() {
 	Modules.unload('Trench');
 	Modules.unload('Drag');
 	Modules.unload('TabItems');
+	Modules.unload('PinnedItems');
 	Modules.unload('GroupItems');
 	Modules.unload('FavIcons');
 	Modules.unload('iQ');
