@@ -1,4 +1,4 @@
-// VERSION 1.3.1
+// VERSION 1.3.2
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -503,6 +503,7 @@ this.UI = {
 		Messenger.unloadFromWindow(gWindow, 'TabView');
 
 		// additional clean up
+		GroupOptionsUI.hide();
 		TabItems.uninit();
 		PinnedItems.uninit();
 		GroupItems.uninit();
@@ -1293,7 +1294,10 @@ this.UI = {
 		};
 
 		let focused = $$(":focus");
-		if((focused.length && focused[0].nodeName == "input") || Search.inSearch || this.ignoreKeypressForSearch) {
+		if((focused.length && focused[0].nodeName == "input")
+		|| Search.inSearch
+		|| GroupOptionsUI.activeOptions
+		|| this.ignoreKeypressForSearch) {
 			this.ignoreKeypressForSearch = false;
 			processBrowserKeys(e, true);
 			return;

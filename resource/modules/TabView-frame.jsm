@@ -1,4 +1,4 @@
-// VERSION 1.0.11
+// VERSION 1.0.12
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -54,11 +54,13 @@ Modules.LOADMODULE = function() {
 	Modules.load('Drag');
 	Modules.load('Trench');
 	Modules.load('Search');
+	Modules.load('GroupOptions');
 	Modules.load('UI');
 };
 
 Modules.UNLOADMODULE = function() {
 	Modules.unload('UI');
+	Modules.unload('GroupOptions');
 	Modules.unload('Search');
 	Modules.unload('Trench');
 	Modules.unload('Drag');

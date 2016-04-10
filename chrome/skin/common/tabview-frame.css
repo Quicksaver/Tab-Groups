@@ -642,6 +642,10 @@ body.classic .groupItem.dragging * {
 	height: var(--group-titlebar-height);
 }
 
+.titlebar > *:not(.title-container) {
+	flex: 0 0 auto;
+}
+
 .title-container {
 	position: relative;
 	flex: 1 1 auto;
@@ -654,12 +658,13 @@ body.classic .groupItem.dragging * {
 
 input.name {
 	text-overflow: ellipsis;
-	width: 100%;
 	background: transparent;
 	border: 1px solid transparent;
 	margin-top: 3px;
 	-moz-margin-start: 3px;
 	padding: 1px;
+	/* subtract own borders, margin and padding... */
+	width: calc(100% - 7px);
 }
 
 input.name:-moz-locale-dir(rtl) {
@@ -827,6 +832,7 @@ body.grid #actions {
 	height: calc(100% - 8px);
 }
 
+.group-options,
 #actions input {
 	background-color: transparent;
 	background-repeat: no-repeat;
@@ -843,6 +849,7 @@ body.grid #actions {
 	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 20, 20, 0);
 }
 
+.group-options,
 #actions #optionsbutton {
 	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 40, 20, 20);
 }
@@ -900,6 +907,7 @@ body.DraggingTab .appTabIcon {
 .groupItem:not(.thumbing) .tab:not(.stacked):hover,
 .expandedTray .tab.focus,
 .expandedTray .tab:hover,
+.group-options:hover,
 #actions input:hover,
 #actions input.appTabIcon.activeAppTab,
 .groupSelector:hover,
@@ -1062,4 +1070,67 @@ body:not(.searching) #search {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	max-width: 200px;
+}
+
+/* Per-group options sub-dialog */
+
+body:not(.groupOptions) #groupOptions-shade,
+body:not(.groupOptions) #groupOptions {
+	display: none;
+}
+
+#groupOptions-shade {
+	z-index: 100;
+}
+
+#groupOptions {
+	z-index: 175;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 80%;
+	height: 80%;
+	max-width: 800px;
+	max-height: 600px;
+	overflow: auto;
+	padding: 26px;
+	background: white;
+}
+
+#groupOptions-close {
+	position: absolute;
+	top: 0;
+	width: 26px;
+	height: 26px;
+}
+
+#groupOptions-close:-moz-locale-dir(ltr) {
+	right: 0;
+}
+#groupOptions-close:-moz-locale-dir(rtl) {
+	left: 0;
+}
+
+#groupOptions-title {
+	text-overflow: ellipsis;
+	background: none;
+	border: none;
+	border-bottom: 1px solid rgba(128,128,128,0.3);
+	/* subtract own border and padding */
+	width: 100%;
+	font-size: 24px;
+}
+
+#groupOptions-title:focus {
+	text-overflow: clip;
+}
+
+#groupOptions-title::-moz-placeholder {
+	font-style: italic;
+	color: rgba(128,128,128,1);
+}
+
+#groupOptions-title:focus::-moz-placeholder {
+	color: transparent;
 }

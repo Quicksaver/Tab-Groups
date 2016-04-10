@@ -1,4 +1,4 @@
-// VERSION 1.6.2
+// VERSION 1.6.3
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -132,6 +132,12 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.titleShield.classList.add('title-shield');
 	this.titleShield.setAttribute('title', Strings.get("TabView", "groupItemDefaultName"));
 	tbContainer.appendChild(this.titleShield);
+
+	this.optionsBtn = document.createElement('input');
+	this.optionsBtn.classList.add('group-options');
+	this.optionsBtn.setAttribute('type', 'button');
+	this.optionsBtn.setAttribute("title", Strings.get("TabView", "groupItemOptionsGroup"));
+	this.titlebar.appendChild(this.optionsBtn);
 
 	this.closeButton = document.createElement('div');
 	this.closeButton.classList.add('close');
@@ -753,6 +759,9 @@ this.GroupItem.prototype = {
 					else if(e.target == this.selector) {
 						UI.setActive(this);
 					}
+					else if(e.target == this.optionsBtn) {
+						new GroupOptions(this);
+					}
 					else if(this.isStacked) {
 						this.zoomIn();
 					}
@@ -781,7 +790,9 @@ this.GroupItem.prototype = {
 						|| e.target != this.tabContainer
 						|| e.target.namespaceURI == e.originalTarget.namespaceURI) {
 							this.lastMouseDownTarget = e.target;
-							if(!this.childHandling && UI.classic) {
+							if(!this.childHandling
+							&& UI.classic
+							&& e.target != this.optionsBtn) {
 								new GroupDrag(this, e);
 							}
 						}
