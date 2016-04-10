@@ -1,4 +1,4 @@
-// VERSION 1.3.0
+// VERSION 1.3.1
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -753,7 +753,7 @@ this.UI = {
 
 	// Returns a <Rect> defining the area of the page <Item>s should stay within.
 	getPageBounds: function(real) {
-		if(!real) {
+		if(!real && this._pageBounds) {
 			let rect = new Rect(this._pageBounds);
 			rect.realTop = this._pageBounds.realTop;
 			rect.realLeft = this._pageBounds.realLeft;
