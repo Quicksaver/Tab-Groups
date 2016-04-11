@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.GroupOptions = function(groupItem) {
 	this.groupItem = groupItem;
@@ -18,12 +18,21 @@ this.GroupOptions.prototype = {
 		return this.groupItem.defaultName;
 	},
 
+	get onOverflow() {
+		return this.groupItem.onOverflow;
+	},
+
+	set onOverflow(v) {
+		return this.groupItem.onOverflow = v;
+	},
+
 	showDialog: function() {
 		GroupOptionsUI.show(this);
 	},
 
-	hideDialog: function() {
-		GroupOptionsUI.hide();
+	finish: function() {
+		// We don't need to call save() on the group, that's done at least once already when setting the title.
+		this.groupItem.arrange();
 	}
 };
 
@@ -32,6 +41,8 @@ this.GroupOptionsUI = {
 	close: $('groupOptions-close'),
 	shade: $('groupOptions-shade'),
 	title: $('groupOptions-title'),
+	onOverflow: $$('[name="groupOptions-onOverflow"]'),
+	onOverflowBox: $('groupOptions-onOverflow'),
 
 	activeOptions: null,
 
@@ -62,6 +73,13 @@ this.GroupOptionsUI = {
 		this.title.value = this.activeOptions.title;
 		this.title.setAttribute('placeholder', this.activeOptions.placeholder);
 
+		toggleAttribute(this.onOverflowBox, 'disabled', UI.single);
+
+		for(let radio of this.onOverflow) {
+			radio.checked = radio.value == this.activeOptions.onOverflow;
+			toggleAttribute(radio, 'disabled', UI.single);
+		}
+
 		document.body.classList.add('groupOptions');
 
 		// make sure the cursor doesn't remain somewhere else
@@ -71,14 +89,24 @@ this.GroupOptionsUI = {
 	hide: function() {
 		if(!this.activeOptions) { return; }
 
-		this.activeOptions.title = this.title.value; // this will call group.save() because of the inner setTitle() call
-
-		document.body.classList.remove('groupOptions');
-
-		this.activeOptions = null;
-
+		// We do this first so that only the first click/action actually goes through, no point in doing the same thing several times in case clicks stack up.
 		Listeners.remove(this.shade, 'click', this);
 		Listeners.remove(this.close, 'click', this);
 		Listeners.remove(window, 'keypress', this);
+
+		for(let radio of this.onOverflow) {
+			if(radio.checked) {
+				this.activeOptions.onOverflow = radio.value;
+				break;
+			}
+		}
+
+		// The title should be the last thing to be set, as it calls save() for use.
+		this.activeOptions.title = this.title.value;
+
+		this.activeOptions.finish();
+
+		document.body.classList.remove('groupOptions');
+		this.activeOptions = null;
 	}
 };

@@ -6,7 +6,7 @@
 <!ENTITY opt.stackTabs.label "Stack the group">
 <!ENTITY opt.stackTabs.tooltip "Only the active tab will be shown, stacked on top of the others. You can still access all the tabs by clicking the group's expand button.">
 <!ENTITY opt.listTabs.label "Scroll the group">
-<!ENTITY opt.listTabs.tooltip "Some of the tabs will be hidden and you will have to scroll the group to access them.">
+<!ENTITY opt.listTabs.tooltip "Some of the tabs will be hidden and you will have to scroll the group to access them. Note that groups will always behave like this in single view, regardless of what you set here.">
 
 <!ENTITY cat.keyboardshortcuts.label "Keyboard Shortcuts">
 <!ENTITY cat.backup.label "Backup your Tab Groups">

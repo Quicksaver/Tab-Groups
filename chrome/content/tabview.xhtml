@@ -57,7 +57,27 @@
 		<div id="groupOptions-shade" class="shade"/>
 		<div id="groupOptions">
 			<div id="groupOptions-close" class="close" title="&options.close.tooltip;"/>
+
 			<input id="groupOptions-title" type="text" title="&options.title.tooltip;"/>
+
+			<p id="groupOptions-onOverflow">
+				<div class="caption">&options.onOverflow.caption;</div>
+				<div class="radio-group">
+					<label class="radio-option">
+						<input type="radio" name="groupOptions-onOverflow" value="default"/>
+						<span>&options.onOverflow.default.label;</span>
+					</label>
+					<label class="radio-option">
+						<input type="radio" name="groupOptions-onOverflow" value="stack"/>
+						<span>&options.onOverflow.stack.label;</span>
+					</label>
+					<label class="radio-option">
+						<input type="radio" name="groupOptions-onOverflow" value="list"/>
+						<span>&options.onOverflow.list.label;</span>
+					</label>
+				</div>
+				<div class="notapplicable-single">&options.notapplicable.single;</div>
+			</p>
 		</div>
 
 		<div id="sessionRestoreNotice" class="banner" hidden="true">

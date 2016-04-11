@@ -18,7 +18,12 @@
 <!ENTITY searchOtherWindowTabs.label "Tabs from other windows">
 
 <!ENTITY options.close.tooltip "Save and go back">
+<!ENTITY options.notapplicable.single "(not applicable in single view)">
 <!ENTITY options.title.tooltip "Name this tab group">
+<!ENTITY options.onOverflow.caption "When this group has too many tabs...">
+<!ENTITY options.onOverflow.default.label "Use default behavior">
+<!ENTITY options.onOverflow.stack.label "Stack the group">
+<!ENTITY options.onOverflow.list.label "Scroll the group">
 
 <!ENTITY sessionRestoreNotice.label "Your tabs and groups will not be restored the next time you start the browser! Click here to fix it.">
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Dismiss this warning until I restart the browser">

@@ -1,4 +1,4 @@
-// VERSION 1.6.3
+// VERSION 1.6.4
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -44,6 +44,9 @@ this.GroupItem = function(listOfEls, options = {}) {
 
 	// The <TabItem> for the groupItem's active tab.
 	this._activeTab = null;
+
+	// Per-group options
+	this.onOverflow = options.onOverflow || 'default';
 
 	// The prompt text for the title field.
 	this.defaultName = Strings.get('TabView', 'groupItemUnnamed', [ [ "$num", this.id ] ]);
@@ -277,6 +280,7 @@ this.GroupItem.prototype = {
 			bounds: this.getBounds({ classic: true }),
 			slot: this.slot,
 			userSize: null,
+			onOverflow: this.onOverflow,
 			title: this.getTitle(),
 			id: this.id
 		};
@@ -1474,7 +1478,10 @@ this.GroupItem.prototype = {
 			return;
 		}
 
-		let shouldStack = this.isOverflowing() && !this.expanded && Prefs.stackTabs && !UI.single;
+		let shouldStack =	this.isOverflowing()
+					&& !UI.single
+					&& !this.expanded
+					&& (this.onOverflow == 'stack' || (this.onOverflow == 'default' && Prefs.stackTabs));
 
 		// if we should stack and we're not expanded
 		if(shouldStack) {
@@ -2065,6 +2072,7 @@ this.GroupItems = {
 
 							groupItem.slot = data.slot;
 							groupItem.userSize = data.userSize;
+							groupItem.onOverflow = data.onOverflow;
 							groupItem.setTitle(data.title);
 							groupItem.setBounds(data.bounds, true);
 							toggleAttribute(groupItem.container, 'draggable', UI.grid);
@@ -2157,6 +2165,11 @@ this.GroupItems = {
 
 		if(!groupItemData.slot || typeof(groupItemData.slot) != 'number') {
 			groupItemData.slot = this.nextSlot();
+			corrupt = true;
+		}
+
+		if(!groupItemData.onOverflow || typeof(groupItemData.onOverflow) != 'string') {
+			groupItemData.onOverflow = 'default';
 			corrupt = true;
 		}
 

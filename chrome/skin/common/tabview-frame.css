@@ -1075,7 +1075,8 @@ body:not(.searching) #search {
 /* Per-group options sub-dialog */
 
 body:not(.groupOptions) #groupOptions-shade,
-body:not(.groupOptions) #groupOptions {
+body:not(.groupOptions) #groupOptions,
+body:not(.single) .notapplicable-single {
 	display: none;
 }
 
@@ -1096,6 +1097,7 @@ body:not(.groupOptions) #groupOptions {
 	overflow: auto;
 	padding: 26px;
 	background: white;
+	font-size: 20px;
 }
 
 #groupOptions-close {
@@ -1119,7 +1121,7 @@ body:not(.groupOptions) #groupOptions {
 	border-bottom: 1px solid rgba(128,128,128,0.3);
 	/* subtract own border and padding */
 	width: 100%;
-	font-size: 24px;
+	font-size: 26px;
 }
 
 #groupOptions-title:focus {
@@ -1133,4 +1135,22 @@ body:not(.groupOptions) #groupOptions {
 
 #groupOptions-title:focus::-moz-placeholder {
 	color: transparent;
+}
+
+#groupOptions .caption {
+	font-weight: bold;
+	margin: 5px 0;
+}
+
+#groupOptions .radio-option {
+	display: inline;
+	-moz-margin-end: 18px;
+}
+
+#groupOptions input[type="radio"] {
+	-moz-margin-end: 8px;
+}
+
+#groupOptions *:not(input)[disabled="true"] {
+	opacity: 0.5;
 }
