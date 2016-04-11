@@ -919,10 +919,10 @@ body.single #singlebutton {
 	background-color: var(--hover-color);
 }
 
-.groupItem:not(.thumbing) .tab:not(.stacked).focus .favicon-container,
-.groupItem:not(.thumbing) .tab:not(.stacked):hover .favicon-container,
-.expandedTray .tab.focus .favicon-container,
-.expandedTray .tab:hover .favicon-container,
+.groupItem:not(.thumbing) .tab-container:not(.noThumbs) .tab:not(.stacked).focus .favicon-container,
+.groupItem:not(.thumbing) .tab-container:not(.noThumbs) .tab:not(.stacked):hover .favicon-container,
+.expandedTray .tab-container:not(.noThumbs) .tab.focus .favicon-container,
+.expandedTray .tab-container:not(.noThumbs) .tab:hover .favicon-container,
 .groupItem.stackedGroup.activeGroupItem,
 .groupItem.stackedGroup:hover,
 body.DraggingGroup .groupItem.dragging,
