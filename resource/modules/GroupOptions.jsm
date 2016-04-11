@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.GroupOptions = function(groupItem) {
 	this.groupItem = groupItem;
@@ -26,6 +26,14 @@ this.GroupOptions.prototype = {
 		return this.groupItem.onOverflow = v;
 	},
 
+	get showThumbs() {
+		return this.groupItem.showThumbs;
+	},
+
+	set showThumbs(v) {
+		return this.groupItem.showThumbs = v;
+	},
+
 	showDialog: function() {
 		GroupOptionsUI.show(this);
 	},
@@ -41,6 +49,7 @@ this.GroupOptionsUI = {
 	close: $('groupOptions-close'),
 	shade: $('groupOptions-shade'),
 	title: $('groupOptions-title'),
+	showThumbs: $('groupOptions-showThumbs'),
 	onOverflow: $$('[name="groupOptions-onOverflow"]'),
 	onOverflowBox: $('groupOptions-onOverflow'),
 
@@ -49,7 +58,15 @@ this.GroupOptionsUI = {
 	handleEvent: function(e) {
 		switch(e.type) {
 			case 'click':
-				this.hide();
+				switch(e.target) {
+					case this.showThumbs:
+						this.updateOnOverflow();
+						break;
+
+					default:
+						this.hide();
+						break;
+				}
 				break;
 
 			case 'keypress':
@@ -61,9 +78,18 @@ this.GroupOptionsUI = {
 		}
 	},
 
+	updateOnOverflow: function() {
+		let disabled = UI.single || !this.showThumbs.checked;
+		toggleAttribute(this.onOverflowBox, 'disabled', disabled);
+		for(let radio of this.onOverflow) {
+			toggleAttribute(radio, 'disabled', disabled);
+		}
+	},
+
 	show: function(groupOptions) {
 		if(this.activeOptions) { return; }
 
+		Listeners.add(this.showThumbs, 'click', this);
 		Listeners.add(this.shade, 'click', this);
 		Listeners.add(this.close, 'click', this);
 		Listeners.add(window, 'keypress', this);
@@ -72,14 +98,12 @@ this.GroupOptionsUI = {
 
 		this.title.value = this.activeOptions.title;
 		this.title.setAttribute('placeholder', this.activeOptions.placeholder);
-
-		toggleAttribute(this.onOverflowBox, 'disabled', UI.single);
-
+		this.showThumbs.checked = this.activeOptions.showThumbs;
 		for(let radio of this.onOverflow) {
 			radio.checked = radio.value == this.activeOptions.onOverflow;
-			toggleAttribute(radio, 'disabled', UI.single);
 		}
 
+		this.updateOnOverflow();
 		document.body.classList.add('groupOptions');
 
 		// make sure the cursor doesn't remain somewhere else
@@ -90,6 +114,7 @@ this.GroupOptionsUI = {
 		if(!this.activeOptions) { return; }
 
 		// We do this first so that only the first click/action actually goes through, no point in doing the same thing several times in case clicks stack up.
+		Listeners.remove(this.showThumbs, 'click', this);
 		Listeners.remove(this.shade, 'click', this);
 		Listeners.remove(this.close, 'click', this);
 		Listeners.remove(window, 'keypress', this);
@@ -100,7 +125,7 @@ this.GroupOptionsUI = {
 				break;
 			}
 		}
-
+		this.activeOptions.showThumbs = this.showThumbs.checked;
 		// The title should be the last thing to be set, as it calls save() for use.
 		this.activeOptions.title = this.title.value;
 

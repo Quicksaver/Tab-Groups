@@ -20,6 +20,7 @@
 <!ENTITY options.close.tooltip "Save and go back">
 <!ENTITY options.notapplicable.single "(not applicable in single view)">
 <!ENTITY options.title.tooltip "Name this tab group">
+<!ENTITY options.showThumbs.label "Show tab thumbnails">
 <!ENTITY options.onOverflow.caption "When this group has too many tabs...">
 <!ENTITY options.onOverflow.default.label "Use default behavior">
 <!ENTITY options.onOverflow.stack.label "Stack the group">

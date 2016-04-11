@@ -1,4 +1,4 @@
-// VERSION 2.3.0
+// VERSION 2.3.1
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -814,7 +814,7 @@ this.TabDrag.prototype = {
 
 		// Hovering the last item of a row should set the space an item next to it instead,
 		// as margins of items in flexboxes are still rendered next to the items as usual.
-		let columns = siblingToBe && !siblingToBe.isAnAppItem ? sibling.parent._lastTabSize.columns : 0;
+		let columns = (siblingToBe && !siblingToBe.isAnAppItem && sibling.parent._lastTabSize) ? sibling.parent._lastTabSize.columns : 0;
 		if(columns > 1) {
 			// Don't forget arrays are 0-based
 			let c = i +1;

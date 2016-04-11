@@ -1,4 +1,4 @@
-// VERSION 1.6.4
+// VERSION 1.6.5
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -47,6 +47,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 
 	// Per-group options
 	this.onOverflow = options.onOverflow || 'default';
+	this.showThumbs = options.showThumbs !== undefined ? options.showThumbs : true;
 
 	// The prompt text for the title field.
 	this.defaultName = Strings.get('TabView', 'groupItemUnnamed', [ [ "$num", this.id ] ]);
@@ -281,6 +282,7 @@ this.GroupItem.prototype = {
 			slot: this.slot,
 			userSize: null,
 			onOverflow: this.onOverflow,
+			showThumbs: this.showThumbs,
 			title: this.getTitle(),
 			id: this.id
 		};
@@ -1478,7 +1480,8 @@ this.GroupItem.prototype = {
 			return;
 		}
 
-		let shouldStack =	this.isOverflowing()
+		let shouldStack =	this.showThumbs
+					&& this.isOverflowing()
 					&& !UI.single
 					&& !this.expanded
 					&& (this.onOverflow == 'stack' || (this.onOverflow == 'default' && Prefs.stackTabs));
@@ -1590,6 +1593,25 @@ this.GroupItem.prototype = {
 
 		// Ensure the tab items are shown in the right order.
 		this.reorderTabItemsBasedOnTabOrder(true);
+
+		if(!this.showThumbs) {
+			// Ensure thumbs are shown next time if necessary.
+			if(this._lastArrange) {
+				this._lastArrange = null;
+
+				// Reset stacked info, the group can only be stacked if thumbs are being shown.
+				for(let child of this.children) {
+					child.inVisibleStack();
+				}
+			}
+
+			this.tabContainer.classList.add('noThumbs');
+			Styles.unload('group_'+this.id+'_'+_UUID);
+
+			// We don't show the group's thumb in this case either, since there would be nothing to show in it.
+			this._updateThumb();
+			return;
+		}
 
 		let count = this.count();
 		let bounds = this.getContentBounds(true);
@@ -1788,8 +1810,9 @@ this.GroupItem.prototype = {
 	},
 
 	_updateThumb: function(delay, force) {
-		if(!UI.single) {
+		if(!UI.single || !this.showThumbs) {
 			this._clearThumbNeedsUpdate();
+			this.canvas.hidden = true;
 			return;
 		}
 
@@ -1846,6 +1869,7 @@ this.GroupItem.prototype = {
 		}
 
 		let canvas = this.canvas;
+		canvas.hidden = false;
 		canvas.width = w;
 		canvas.height = h;
 
@@ -2073,6 +2097,7 @@ this.GroupItems = {
 							groupItem.slot = data.slot;
 							groupItem.userSize = data.userSize;
 							groupItem.onOverflow = data.onOverflow;
+							groupItem.showThumbs = data.showThumbs;
 							groupItem.setTitle(data.title);
 							groupItem.setBounds(data.bounds, true);
 							toggleAttribute(groupItem.container, 'draggable', UI.grid);
@@ -2170,6 +2195,11 @@ this.GroupItems = {
 
 		if(!groupItemData.onOverflow || typeof(groupItemData.onOverflow) != 'string') {
 			groupItemData.onOverflow = 'default';
+			corrupt = true;
+		}
+
+		if(typeof(groupItemData.showThumbs) != 'boolean') {
+			groupItemData.showThumbs = true;
 			corrupt = true;
 		}
 
