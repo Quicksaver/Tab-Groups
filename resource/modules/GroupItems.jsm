@@ -1,4 +1,4 @@
-// VERSION 1.6.8
+// VERSION 1.6.9
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2133,6 +2133,7 @@ this.GroupItems = {
 							groupItem.userSize = data.userSize;
 							groupItem.onOverflow = data.onOverflow;
 							groupItem.showThumbs = data.showThumbs;
+							groupItem.showUrls = data.showUrls;
 							groupItem.setTitle(data.title);
 							groupItem.setBounds(data.bounds, true);
 							toggleAttribute(groupItem.container, 'draggable', UI.grid);
