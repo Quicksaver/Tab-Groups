@@ -1,4 +1,4 @@
-// VERSION 1.1.15
+// VERSION 1.1.16
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -37,6 +37,7 @@ this.TabItem = function(tab, options = {}) {
 	this._inVisibleStack = null;
 	this._draggable = true;
 	this.lastMouseDownTarget = null;
+	this._thumbNeedsUpdate = false;
 
 	this._lastTabUpdateTime = Date.now();
 
@@ -287,6 +288,10 @@ this.TabItem.prototype = {
 		}
 		this.parent = parent;
 		this.save();
+
+		if(this._thumbNeedsUpdate && parent && !parent.noThumbs) {
+			TabItems.update(this.tab);
+		}
 	},
 
 	get hidden() {
@@ -728,6 +733,14 @@ this.TabItems = {
 			let label = tab.label;
 			let tabUrl = tab.linkedBrowser.currentURI.spec;
 			tabItem.updateLabel(label, tabUrl);
+
+			// If we're not taking thumbnails for this tab's group, we don't need to fetch it in the first place.
+			// This will be re-called if and when its thumb becomes necessary.
+			if(!tabItem.parent || tabItem.parent.noThumbs) {
+				tabItem._thumbNeedsUpdate = true;
+				return;
+			}
+			tabItem._thumbNeedsUpdate = false;
 
 			// ___ Make sure the tab is complete and ready for updating.
 			if(options.force) {

@@ -1,4 +1,4 @@
-// VERSION 1.6.7
+// VERSION 1.6.8
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -32,6 +32,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this._itemSizeFrozen = false;
 	this._lastArrange = null;
 	this._lastThumb = null;
+	this._noThumbs = false;
 	this._thumbNeedsUpdate = false;
 	this._userBounds = false;
 	this._slot = 0;
@@ -308,6 +309,26 @@ this.GroupItem.prototype = {
 	// or if it doesn't have one, its first child.
 	isTopOfStack: function(item) {
 		return this.isStacked && item == this.getTopChild();
+	},
+
+	get noThumbs() {
+		return this._noThumbs;
+	},
+	set noThumbs(v) {
+		if(this._noThumbs != v) {
+			this._noThumbs = v;
+			if(!v) {
+				this.tabContainer.classList.remove('noThumbs');
+				for(let tabItem of this.children) {
+					if(tabItem._thumbNeedsUpdate) {
+						TabItems.update(tabItem.tab);
+					}
+				}
+			} else {
+				this.tabContainer.classList.add('noThumbs');
+			}
+		}
+		return this._noThumbs;
 	},
 
 	get slot() {
@@ -1510,7 +1531,7 @@ this.GroupItem.prototype = {
 	// Arranges the children in a stack.
 	_stackArrange: function() {
 		this.container.classList.add('stackedGroup');
-		this.tabContainer.classList.remove('noThumbs');
+		this.noThumbs = false;
 		this.isStacked = true;
 		this.overflowing = false;
 		removeAttribute(this.tabContainer, 'columns');
@@ -1618,7 +1639,7 @@ this.GroupItem.prototype = {
 				}
 			}
 
-			this.tabContainer.classList.add('noThumbs');
+			this.noThumbs = true;
 			Styles.unload('group_'+this.id+'_'+_UUID);
 
 			// We don't show the group's thumb in this case either, since there would be nothing to show in it.
@@ -1659,11 +1680,11 @@ this.GroupItem.prototype = {
 		setAttribute(this.tabContainer, 'columns', columns);
 
 		if(overflowing && columns < GroupItems.minTabColumns) {
-			this.tabContainer.classList.add('noThumbs');
+			this.noThumbs = true;
 			Styles.unload('group_'+this.id+'_'+_UUID);
 			return;
 		}
-		this.tabContainer.classList.remove('noThumbs');
+		this.noThumbs = false;
 
 		let sscode = '\
 			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab,\n\
