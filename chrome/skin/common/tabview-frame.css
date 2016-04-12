@@ -1074,6 +1074,8 @@ body:not(.searching) #search {
 
 /* Per-group options sub-dialog */
 
+html.thumbing #groupOptions-shade,
+html.thumbing #groupOptions,
 body:not(.groupOptions) #groupOptions-shade,
 body:not(.groupOptions) #groupOptions,
 body:not(.single) .notapplicable-single {
