@@ -1,4 +1,4 @@
-// VERSION 1.6.5
+// VERSION 1.6.6
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1816,6 +1816,9 @@ this.GroupItem.prototype = {
 			return;
 		}
 
+		let canvas = this.canvas;
+		canvas.hidden = false;
+
 		// Discard the previous thumb data so that we're sure to update it afterwards.
 		// (Doesn't actually delete the thumb, only "expires" it.)
 		if(force) {
@@ -1868,8 +1871,6 @@ this.GroupItem.prototype = {
 			w *= ratio;
 		}
 
-		let canvas = this.canvas;
-		canvas.hidden = false;
 		canvas.width = w;
 		canvas.height = h;
 
