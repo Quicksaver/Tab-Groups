@@ -1,4 +1,4 @@
-// VERSION 1.1.14
+// VERSION 1.1.15
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -21,6 +21,7 @@ this.TabItem = function(tab, options = {}) {
 	this.thumb = $$('.thumb', this.container)[0];
 	this.fav = $$('.favicon', this.container)[0];
 	this.tabTitle = $$('.tab-title', this.container)[0];
+	this.tabUrl = $$('.tab-url', this.container)[0];
 	this.canvas = $$('.thumb canvas', this.container)[0];
 	this.$canvas = iQ(this.canvas);
 	this.cachedThumb = $$('img.cached-thumb', this.container)[0];
@@ -62,6 +63,8 @@ this.TabItem.prototype = {
 	// Shows the cached data i.e. image and title.  Note: this method should only be called at browser startup with the cached data avaliable.
 	showCachedData: function() {
 		let { title, url } = this.getTabState();
+		this.updateLabel(title, url);
+
 		let thumbnailURL = gPageThumbnails.getThumbnailURL(url);
 
 		// This method is only called when the tab item is first created during initialization.
@@ -72,9 +75,6 @@ this.TabItem.prototype = {
 		setAttribute(this.cachedThumb, "src", thumbnailURL);
 		this.container.classList.add("cached-data");
 
-		let tooltip = (title && title != url ? title + "\n" + url : url);
-		this.tabTitle.textContent = title;
-		setAttribute(this.tabTitle, "title", tooltip);
 		this._showsCachedData = true;
 	},
 
@@ -437,6 +437,25 @@ this.TabItem.prototype = {
 		UI.setActive(this);
 	},
 
+	updateLabel: function(title, url) {
+		title = title || url;
+		let tooltip = title;
+		if(title != url) {
+			tooltip += "\n" + url;
+			this.removeClass('onlyUrl');
+		} else {
+			this.addClass('onlyUrl');
+		}
+
+		if(this.tabTitle.textContent != title) {
+			this.tabTitle.textContent = title;
+		}
+		if(this.tabUrl.textContent != url) {
+			this.tabUrl.textContent = url;
+		}
+		setAttribute(this.container, "title", tooltip);
+	},
+
 	// Updates the tabitem's canvas.
 	updateCanvas: function() {
 		// ___ thumbnail
@@ -608,10 +627,23 @@ this.TabItems = {
 		favicon.classList.add('favicon');
 		faviconContainer.appendChild(favicon);
 
-		let span = document.createElement('span');
-		span.classList.add('tab-title');
-		span.textContent = ' ';
-		div.appendChild(span);
+		let label = document.createElement('span');
+		label.classList.add('tab-label');
+		div.appendChild(label);
+
+		let title = document.createElement('span');
+		title.classList.add('tab-title');
+		title.textContent = ' ';
+		label.appendChild(title);
+
+		let separator = document.createElement('span');
+		separator.classList.add('tab-label-separator');
+		separator.textContent = ' - ';
+		label.appendChild(separator);
+
+		let url = document.createElement('span');
+		url.classList.add('tab-url');
+		label.appendChild(url);
 
 		let close = document.createElement('div');
 		close.classList.add('close');
@@ -693,16 +725,9 @@ this.TabItems = {
 				tabItem._sendToSubscribers("iconUpdated");
 			});
 
-			// ___ label
 			let label = tab.label;
-			if(tabItem.tabTitle.textContent != label) {
-				tabItem.tabTitle.textContent = label;
-			}
-
-			// ___ URL
 			let tabUrl = tab.linkedBrowser.currentURI.spec;
-			let tooltip = (label == tabUrl ? label : label + "\n" + tabUrl);
-			setAttribute(tabItem.container, "title", tooltip);
+			tabItem.updateLabel(label, tabUrl);
 
 			// ___ Make sure the tab is complete and ready for updating.
 			if(options.force) {

@@ -1,4 +1,4 @@
-// VERSION 1.6.6
+// VERSION 1.6.7
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -48,6 +48,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 	// Per-group options
 	this.onOverflow = options.onOverflow || 'default';
 	this.showThumbs = options.showThumbs !== undefined ? options.showThumbs : true;
+	this._showUrls = options.showUrls !== undefined ? options.showUrls : true;
 
 	// The prompt text for the title field.
 	this.defaultName = Strings.get('TabView', 'groupItemUnnamed', [ [ "$num", this.id ] ]);
@@ -66,6 +67,9 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.isDragging = false;
 	this.isResizing = false;
 	GroupItems.workSpace.appendChild(this.container);
+
+	// We need to set the attribute in the container.
+	this.showUrls = this._showUrls;
 
 	// ___ Titlebar
 	this.titlebar = document.createElement('div');
@@ -283,6 +287,7 @@ this.GroupItem.prototype = {
 			userSize: null,
 			onOverflow: this.onOverflow,
 			showThumbs: this.showThumbs,
+			showUrls: this.showUrls,
 			title: this.getTitle(),
 			id: this.id
 		};
@@ -326,6 +331,14 @@ this.GroupItem.prototype = {
 			this.container.setAttribute('row', v);
 		}
 		return this._row;
+	},
+
+	get showUrls() {
+		return this._showUrls;
+	},
+	set showUrls(v) {
+		this.container.classList[v ? 'add' : 'remove']('showUrls');
+		return this._showUrls = v;
 	},
 
 	// Saves this groupItem to persistent storage.
@@ -2201,6 +2214,11 @@ this.GroupItems = {
 
 		if(typeof(groupItemData.showThumbs) != 'boolean') {
 			groupItemData.showThumbs = true;
+			corrupt = true;
+		}
+
+		if(typeof(groupItemData.showUrls) != 'boolean') {
+			groupItemData.showUrls = true;
 			corrupt = true;
 		}
 

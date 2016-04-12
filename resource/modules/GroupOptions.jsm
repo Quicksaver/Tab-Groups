@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 this.GroupOptions = function(groupItem) {
 	this.groupItem = groupItem;
@@ -34,6 +34,14 @@ this.GroupOptions.prototype = {
 		return this.groupItem.showThumbs = v;
 	},
 
+	get showUrls() {
+		return this.groupItem.showUrls;
+	},
+
+	set showUrls(v) {
+		return this.groupItem.showUrls = v;
+	},
+
 	showDialog: function() {
 		GroupOptionsUI.show(this);
 	},
@@ -50,6 +58,8 @@ this.GroupOptionsUI = {
 	shade: $('groupOptions-shade'),
 	title: $('groupOptions-title'),
 	showThumbs: $('groupOptions-showThumbs'),
+	showUrls: $('groupOptions-showUrls'),
+	showUrlsLabel: $('groupOptions-showUrls-label'),
 	onOverflow: $$('[name="groupOptions-onOverflow"]'),
 	onOverflowBox: $('groupOptions-onOverflow'),
 
@@ -60,7 +70,7 @@ this.GroupOptionsUI = {
 			case 'click':
 				switch(e.target) {
 					case this.showThumbs:
-						this.updateOnOverflow();
+						this.toggleThumbs();
 						break;
 
 					default:
@@ -78,7 +88,10 @@ this.GroupOptionsUI = {
 		}
 	},
 
-	updateOnOverflow: function() {
+	toggleThumbs: function() {
+		toggleAttribute(this.showUrls, 'disabled', this.showThumbs.checked);
+		toggleAttribute(this.showUrlsLabel, 'disabled', this.showThumbs.checked);
+
 		let disabled = UI.single || !this.showThumbs.checked;
 		toggleAttribute(this.onOverflowBox, 'disabled', disabled);
 		for(let radio of this.onOverflow) {
@@ -99,11 +112,12 @@ this.GroupOptionsUI = {
 		this.title.value = this.activeOptions.title;
 		this.title.setAttribute('placeholder', this.activeOptions.placeholder);
 		this.showThumbs.checked = this.activeOptions.showThumbs;
+		this.showUrls.checked = this.activeOptions.showUrls;
 		for(let radio of this.onOverflow) {
 			radio.checked = radio.value == this.activeOptions.onOverflow;
 		}
 
-		this.updateOnOverflow();
+		this.toggleThumbs();
 		document.body.classList.add('groupOptions');
 
 		// make sure the cursor doesn't remain somewhere else
@@ -126,6 +140,7 @@ this.GroupOptionsUI = {
 			}
 		}
 		this.activeOptions.showThumbs = this.showThumbs.checked;
+		this.activeOptions.showUrls = this.showUrls.checked;
 		// The title should be the last thing to be set, as it calls save() for use.
 		this.activeOptions.title = this.title.value;
 

@@ -211,7 +211,7 @@ body.DraggingTab .tab * {
 	left: 0;
 }
 
-.tab-title {
+.tab-label {
 	display: block;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -229,7 +229,7 @@ body.DraggingTab .tab * {
 	pointer-events: none;
 }
 
-.stacked .tab-title {
+.stacked .tab-label {
 	display: none;
 }
 
@@ -241,7 +241,7 @@ body.DraggingTab .tab * {
 	box-shadow: rgba(0,0,0,.2) -1px 1px 4px;
 }
 
-.groupItem.thumbing .tab-title,
+.groupItem.thumbing .tab-label,
 .groupItem.thumbing .favicon-container,
 .groupItem.thumbing .close {
 	opacity: 0;
@@ -445,6 +445,15 @@ body:not(.single) .groupItem:not(:hover) .tab.create-new,
 
 /* tab items shown without thumbnails (listed only) */
 
+.groupItem:not(.showUrls) .tab-label-separator,
+.groupItem:not(.showUrls) .tab-url,
+.tab-container:not(.noThumbs) .tab-label-separator,
+.tab-container:not(.noThumbs) .tab-url,
+.tab.onlyUrl .tab-label-separator,
+.tab.onlyUrl .tab-url {
+	display: none;
+}
+
 .tab-container.noThumbs .tab {
 	position: relative;
 	flex: 1 1 auto;
@@ -488,13 +497,17 @@ body:not(.single) .groupItem:not(:hover) .tab.create-new,
 	-moz-margin-end: 5px;
 }
 
-.tab-container.noThumbs .tab .tab-title {
+.tab-container.noThumbs .tab .tab-label {
 	text-align: start;
 	-moz-margin-end: 18px;
 }
 
-.tab-container.noThumbs .tab:not(.noFavicon) .tab-title {
+.tab-container.noThumbs .tab:not(.noFavicon) .tab-label {
 	-moz-margin-start: 24px;
+}
+
+.groupItem.showUrls .tab-container.noThumbs .tab:not(.onlyUrl) .tab-title {
+	font-weight: bold;
 }
 
 .tab-container.noThumbs .create-new-border {
@@ -1155,4 +1168,8 @@ body:not(.single) .notapplicable-single {
 
 #groupOptions *:not(input)[disabled="true"] {
 	opacity: 0.5;
+}
+
+.smallindent {
+	-moz-margin-start: 1.5em;
 }
