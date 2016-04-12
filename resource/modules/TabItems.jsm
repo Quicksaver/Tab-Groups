@@ -1,4 +1,4 @@
-// VERSION 1.1.16
+// VERSION 1.1.17
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -205,6 +205,9 @@ this.TabItem.prototype = {
 	handleSubscription: function(name, info) {
 		switch(name) {
 			case 'painted':
+				// This tab could have been closed in the meantime, while still somehow receiving this message.
+				if(!this.parent) { return; }
+
 				this.parent._updateThumb(true);
 				break;
 		}
