@@ -1,4 +1,4 @@
-// VERSION 2.3.1
+// VERSION 2.3.2
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -633,6 +633,8 @@ this.GroupSelectorDrag.prototype = {
 		Listeners.remove(this.item, 'dragend', this);
 		Listeners.remove(UI.groupSelector, 'drop', this);
 		document.body.classList.remove('DraggingGroupSelector');
+
+		DraggingGroupSelector = null;
 	}
 };
 
