@@ -1,4 +1,4 @@
-// VERSION 1.6.9
+// VERSION 1.6.10
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -50,6 +50,10 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.onOverflow = options.onOverflow || 'default';
 	this.showThumbs = options.showThumbs !== undefined ? options.showThumbs : true;
 	this._showUrls = options.showUrls !== undefined ? options.showUrls : true;
+	this.catchOnce = options.catchOnce !== undefined ? options.catchOnce : true;
+	this.catchRules = options.catchRules !== undefined ? options.catchRules : '';
+	this._savedCatchOnce = this.catchOnce;
+	this._savedCatchRules = this.catchRules;
 
 	// The prompt text for the title field.
 	this.defaultName = Strings.get('TabView', 'groupItemUnnamed', [ [ "$num", this.id ] ]);
@@ -289,6 +293,8 @@ this.GroupItem.prototype = {
 			onOverflow: this.onOverflow,
 			showThumbs: this.showThumbs,
 			showUrls: this.showUrls,
+			catchOnce: this.catchOnce,
+			catchRules: this.catchRules,
 			title: this.getTitle(),
 			id: this.id
 		};
@@ -370,6 +376,13 @@ this.GroupItem.prototype = {
 		let data = this.getStorageData();
 		if(GroupItems.storageSanityGroupItem(data)) {
 			Storage.saveGroupItem(gWindow, data);
+
+			// In case we've just saved a different set of rules, we need to update the live object.
+			if(this._savedCatchRules != this.catchRules || this._savedCatchOnce != this.catchOnce) {
+				CatchRules.init();
+				this._savedCatchOnce = this.catchOnce;
+				this._savedCatchRules = this.catchRules;
+			}
 		}
 	},
 
@@ -377,6 +390,11 @@ this.GroupItem.prototype = {
 	deleteData: function() {
 		this._uninited = true;
 		Storage.deleteGroupItem(gWindow, this.id);
+
+		// Stop checking for any rules this group may have had.
+		if(this.catchRules) {
+			CatchRules.init();
+		}
 	},
 
 	// Returns the title of this groupItem as a string.
@@ -2134,6 +2152,8 @@ this.GroupItems = {
 							groupItem.onOverflow = data.onOverflow;
 							groupItem.showThumbs = data.showThumbs;
 							groupItem.showUrls = data.showUrls;
+							groupItem.catchOnce = data.catchOnce;
+							groupItem.catchRules = data.catchRules;
 							groupItem.setTitle(data.title);
 							groupItem.setBounds(data.bounds, true);
 							toggleAttribute(groupItem.container, 'draggable', UI.grid);
@@ -2204,13 +2224,15 @@ this.GroupItems = {
 
 	// Given persistent storage data for a groupItem, returns true if it appears to not be damaged.
 	storageSanityGroupItem: function(groupItemData) {
-		if(!groupItemData.id
-		|| (groupItemData.userSize && !Utils.isPoint(groupItemData.userSize))) {
-			return false;
-		}
+		if(!groupItemData.id) { return false; }
 
 		// For compatibility with other add-ons that might modify (read: create) groups, instead of discarting invalid groups we "fix" them.
 		let corrupt = false;
+
+		if(groupItemData.userSize && !Utils.isPoint(groupItemData.userSize)) {
+			groupItemData.userSize = null;
+			corrupt = true;
+		}
 
 		if(!groupItemData.bounds || !Utils.isRect(groupItemData.bounds)) {
 			let pageBounds = UI.getPageBounds();
@@ -2241,6 +2263,16 @@ this.GroupItems = {
 
 		if(typeof(groupItemData.showUrls) != 'boolean') {
 			groupItemData.showUrls = true;
+			corrupt = true;
+		}
+
+		if(typeof(groupItemData.catchOnce) != 'boolean') {
+			groupItemData.catchOnce = true;
+			corrupt = true;
+		}
+
+		if(typeof(groupItemData.catchRules) != 'string') {
+			groupItemData.catchRules = '';
 			corrupt = true;
 		}
 
@@ -2462,19 +2494,23 @@ this.GroupItems = {
 	// Paramaters:
 	//  tab - the <xul:tab>.
 	//  groupItemId - the <groupItem>'s id.  If nothing, create a new <groupItem>.
-	moveTabToGroupItem: function(tab, groupItemId) {
+	moveTabToGroupItem: function(tab, groupItemId, focusIfSelected) {
 		if(tab.pinned) { return; }
 
 		// given tab is already contained in target group
-		if(tab._tabViewTabItem.parent && tab._tabViewTabItem.parent.id == groupItemId) { return; }
+		let tabItem = tab._tabViewTabItem;
+		if(tabItem.parent && tabItem.parent.id == groupItemId) { return; }
 
+		let shouldFocusTab = false;
 		let shouldUpdateTabBar = false;
 		let shouldShowTabView = false;
 		let groupItem;
 
 		// switch to the appropriate tab first.
 		if(tab.selected) {
-			if(Tabs.visible.length > 1) {
+			if(focusIfSelected) {
+				shouldFocusTab = true;
+			} else if(Tabs.visible.length > 1) {
 				gBrowser._blurTab(tab);
 				shouldUpdateTabBar = true;
 			} else {
@@ -2485,14 +2521,14 @@ this.GroupItems = {
 		}
 
 		// remove tab item from a groupItem
-		if(tab._tabViewTabItem.parent) {
-			tab._tabViewTabItem.parent.remove(tab._tabViewTabItem);
+		if(tabItem.parent) {
+			tabItem.parent.remove(tabItem);
 		}
 
 		// add tab item to a groupItem
 		if(groupItemId) {
 			groupItem = this.groupItem(groupItemId);
-			groupItem.add(tab._tabViewTabItem);
+			groupItem.add(tabItem);
 			groupItem.reorderTabsBasedOnTabItemOrder()
 		} else {
 			let pageBounds = this.getSafeWindowBounds();
@@ -2500,10 +2536,12 @@ this.GroupItems = {
 			box.width = 250;
 			box.height = 200;
 
-			new GroupItem([ tab._tabViewTabItem ], { bounds: box, immediately: true });
+			new GroupItem([ tabItem ], { bounds: box, immediately: true });
 		}
 
-		if(shouldUpdateTabBar) {
+		if(shouldFocusTab) {
+			this.updateActiveGroupItemAndTabBar(tabItem);
+		} else if(shouldUpdateTabBar) {
 			this._updateTabBar();
 		} else if(shouldShowTabView) {
 			UI.showTabView();

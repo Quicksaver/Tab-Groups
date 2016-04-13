@@ -1,4 +1,4 @@
-// VERSION 1.0.12
+// VERSION 1.0.13
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -6,6 +6,7 @@ this.__defineGetter__('gTabView', function() { return gWindow[objName].TabView; 
 this.__defineGetter__('gTabViewDeck', function() { return gWindow[objName].gTabViewDeck; });
 this.__defineGetter__('gBrowserPanel', function() { return gWindow[objName].$("browser-panel"); });
 this.__defineGetter__('gTabViewFrame', function() { return gTabView._iframe; });
+this.__defineGetter__('CatchRules', function() { return gWindow[objName].CatchRules; });
 
 this.TabView = {
 	_browserBundle: null,

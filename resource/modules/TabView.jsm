@@ -1,4 +1,4 @@
-// VERSION 1.0.31
+// VERSION 1.0.32
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -427,9 +427,9 @@ this.TabView = {
 		return menuItem;
 	},
 
-	moveTabTo: function(tab, groupItemId) {
+	moveTabTo: function(tab, groupItemId, focusIfSelected) {
 		this._initFrame(() => {
-			this._window[objName].GroupItems.moveTabToGroupItem(tab, groupItemId);
+			this._window[objName].GroupItems.moveTabToGroupItem(tab, groupItemId, focusIfSelected);
 		});
 	},
 
@@ -530,11 +530,13 @@ Modules.LOADMODULE = function() {
 	window.TabView = TabView;
 
 	Modules.load('AllTabs');
+	Modules.load('CatchRules');
 	Overlays.overlayWindow(window, 'TabView', TabView);
 };
 
 Modules.UNLOADMODULE = function() {
 	Overlays.removeOverlayWindow(window, 'TabView');
+	Modules.unload('CatchRules');
 	Modules.unload('AllTabs');
 
 	delete window.TabView;

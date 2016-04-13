@@ -1,4 +1,4 @@
-// VERSION 1.3.2
+// VERSION 1.3.3
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -164,7 +164,7 @@ this.UI = {
 				if(focused.length > 0) {
 					for(let element of focused) {
 						// don't fire blur event if the same input element is clicked.
-						if(e.target != element && element.nodeName == "input") {
+						if(e.target != element && element.nodeName == "input" && element.nodeName == "textarea") {
 							element.blur();
 						}
 					}
@@ -1294,7 +1294,7 @@ this.UI = {
 		};
 
 		let focused = $$(":focus");
-		if((focused.length && focused[0].nodeName == "input")
+		if((focused.length && (focused[0].nodeName == "input" || focused[0].nodeName == "textarea"))
 		|| Search.inSearch
 		|| GroupOptionsUI.activeOptions
 		|| this.ignoreKeypressForSearch) {

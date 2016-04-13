@@ -1,4 +1,4 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -393,7 +393,7 @@ this.Search = {
 		}
 
 		// If we are already in an input field, allow typing as normal.
-		if(e.target.nodeName == "input") { return; }
+		if(e.target.nodeName == "input" || e.target.nodeName == "textarea") { return; }
 
 		// / is used to activate the search feature so the key shouldn't be entered into the search box.
 		if(e.keyCode == e.DOM_VK_SLASH) {

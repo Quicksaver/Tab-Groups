@@ -60,7 +60,7 @@
 
 			<input id="groupOptions-title" type="text" title="&options.title.tooltip;"/>
 
-			<p>
+			<div class="groupOptions-section">
 				<div>
 					<label>
 						<input type="checkbox" id="groupOptions-showThumbs"/>
@@ -73,9 +73,9 @@
 						<span>&options.showUrls.label;</span>
 					</label>
 				</div>
-			</p>
+			</div>
 
-			<p id="groupOptions-onOverflow">
+			<div class="groupOptions-section" id="groupOptions-onOverflow">
 				<div class="caption">&options.onOverflow.caption;</div>
 				<div class="radio-group">
 					<label class="radio-option">
@@ -92,7 +92,26 @@
 					</label>
 				</div>
 				<div class="notapplicable-single">&options.notapplicable.single;</div>
-			</p>
+			</div>
+
+			<div class="groupOptions-section" id="groupOptions-catchRules-div">
+				<div class="caption">&options.catchOnce.caption;</div>
+				<label>
+					<input type="checkbox" id="groupOptions-catchOnce"/>
+					<span>&options.catchOnce.label;</span>
+				</label>
+				<div id="groupOptions-catchRules-container">
+					<textarea id="groupOptions-catchRules"/>
+					<div id="groupOptions-catchRules-placeholder">
+						&options.catchRules.placeholder1;<br/>
+						&options.catchRules.placeholder2;<br/><br/>
+						&options.catchRules.placeholder3;<br/>
+						&options.catchRules.placeholder4;<br/>
+						&options.catchRules.placeholder5;<br/>
+						&options.catchRules.placeholder6;
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div id="sessionRestoreNotice" class="banner" hidden="true">

@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 this.GroupOptions = function(groupItem) {
 	this.groupItem = groupItem;
@@ -42,6 +42,22 @@ this.GroupOptions.prototype = {
 		return this.groupItem.showUrls = v;
 	},
 
+	get catchOnce() {
+		return this.groupItem.catchOnce;
+	},
+
+	set catchOnce(v) {
+		return this.groupItem.catchOnce = v;
+	},
+
+	get catchRules() {
+		return this.groupItem.catchRules;
+	},
+
+	set catchRules(v) {
+		return this.groupItem.catchRules = v;
+	},
+
 	showDialog: function() {
 		GroupOptionsUI.show(this);
 	},
@@ -62,6 +78,9 @@ this.GroupOptionsUI = {
 	showUrlsLabel: $('groupOptions-showUrls-label'),
 	onOverflow: $$('[name="groupOptions-onOverflow"]'),
 	onOverflowBox: $('groupOptions-onOverflow'),
+	catchOnce: $('groupOptions-catchOnce'),
+	catchRules: $('groupOptions-catchRules'),
+	catchRulesPlaceholder: $('groupOptions-catchRules-placeholder'),
 
 	activeOptions: null,
 
@@ -85,6 +104,10 @@ this.GroupOptionsUI = {
 						this.hide();
 						break;
 				}
+
+			case 'input':
+				this.updateCatchRulesPlaceholder();
+				break;
 		}
 	},
 
@@ -99,12 +122,17 @@ this.GroupOptionsUI = {
 		}
 	},
 
+	updateCatchRulesPlaceholder: function() {
+		this.catchRulesPlaceholder.hidden = this.catchRules.value.length;
+	},
+
 	show: function(groupOptions) {
 		if(this.activeOptions) { return; }
 
 		Listeners.add(this.showThumbs, 'click', this);
 		Listeners.add(this.shade, 'click', this);
 		Listeners.add(this.close, 'click', this);
+		Listeners.add(this.catchRules, 'input', this);
 		Listeners.add(window, 'keypress', this);
 
 		this.activeOptions = groupOptions;
@@ -116,8 +144,11 @@ this.GroupOptionsUI = {
 		for(let radio of this.onOverflow) {
 			radio.checked = radio.value == this.activeOptions.onOverflow;
 		}
+		this.catchOnce.checked = this.activeOptions.catchOnce;
+		this.catchRules.value = this.activeOptions.catchRules;
 
 		this.toggleThumbs();
+		this.updateCatchRulesPlaceholder();
 		document.body.classList.add('groupOptions');
 
 		// make sure the cursor doesn't remain somewhere else
@@ -131,8 +162,11 @@ this.GroupOptionsUI = {
 		Listeners.remove(this.showThumbs, 'click', this);
 		Listeners.remove(this.shade, 'click', this);
 		Listeners.remove(this.close, 'click', this);
+		Listeners.remove(this.catchRules, 'input', this);
 		Listeners.remove(window, 'keypress', this);
 
+		this.activeOptions.catchOnce = this.catchOnce.checked;
+		this.activeOptions.catchRules = this.catchRules.value;
 		for(let radio of this.onOverflow) {
 			if(radio.checked) {
 				this.activeOptions.onOverflow = radio.value;
