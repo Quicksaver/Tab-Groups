@@ -18,6 +18,12 @@
 <!ENTITY howto.switch.caption "How do I switch between Tab Groups?">
 <!ENTITY howto.switch.description2 "It couldn't be simpler. Just enter the tab groups view, then click on the tab want to view. The tab you clicked on will be active and only the tabs in that group will be visible. You can also double-click on an empty area of any group, you will be taken to the last selected tab in that group.">
 
+<!ENTITY howto.overflow.caption "What's the difference between stacking and scrolling groups?">
+<!ENTITY howto.overflow.description "Tab thumbnails take up space. If a group isn't large enough for all its tabs to be shown, it can either be stacked or scrolled.">
+<!ENTITY howto.stack.description "Tabs in a stacked group are shown on top of one another. You can only interact with the active tab which will be at the top. Below this stack, there is a preview button, which you can click to access all the other tabs without changing the size of the group.">
+<!ENTITY howto.list.description "Instead, you can choose to display all tabs normally without stacking. Some of them will be hidden and you will have to scroll down to access them.">
+<!ENTITY howto.thumbs.description "You can also choose specific groups in which to not show tab thumbnails. The tabs will be listed with only their titles and optionally their addresses. This will happen as well in scrolled groups that aren't large enough to fit at least three columns of tabs, regardless of thumbnails being enabled or not.">
+
 <!ENTITY howto.search.caption "How do I search through my tabs?">
 <!ENTITY howto.search.step1 "Enter the Tab Groups view.">
 <!ENTITY howto.search.step2a "Click the search button on the right side of the window to bring up the search box and then just begin typing the name of the tab you're trying to find.">
@@ -31,7 +37,6 @@
 <!ENTITY howto.resize.caption "Resizing Tab Groups">
 <!ENTITY howto.resize.description3 "In free arrange mode, click and drag the resize handle at the bottom-right corner of a group to make it bigger or smaller. As you resize the group, its tabs will get bigger and smaller accordingly.">
 <!ENTITY howto.resize.description4 "In grid layout, this is all done for you, the groups will be stretched to show your tabs in as much space as they can.">
-<!ENTITY howto.resize.description5 "If a group is small enough, the tabs will get stacked on top of one another. Below this stack, a preview button will appear. Click the preview button to see what tabs are in the stack without changing the size of the group.">
 
 <!ENTITY howto.rearrange.caption "Rearranging Tab Groups">
 <!ENTITY howto.rearrange.description "Click and drag on an empty area along the sides or bottom of a group to move it around the screen.">

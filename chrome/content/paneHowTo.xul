@@ -73,6 +73,26 @@
 			<html:p>&howto.switch.description2;</html:p>
 		</groupbox>
 
+		<groupbox align="start" id="paneHowTo-overflow" collapsed="true" data-category="paneHowTo">
+			<caption label="&howto.overflow.caption;"/>
+			<html:p>&nbsp;</html:p>
+			<html:p>&howto.overflow.description;</html:p>
+			<html:ul>
+				<html:li>
+					<html:p>&howto.stack.description;</html:p>
+					<html:p><html:img src="chrome://objPathString/skin/howto/stack.jpg"/></html:p>
+				</html:li>
+				<html:li>
+					<html:p>&howto.list.description;</html:p>
+					<html:p><html:img src="chrome://objPathString/skin/howto/list.jpg"/></html:p>
+				</html:li>
+				<html:li>
+					<html:p>&howto.thumbs.description;</html:p>
+					<html:p><html:img src="chrome://objPathString/skin/howto/thumbs.jpg"/></html:p>
+				</html:li>
+			</html:ul>
+		</groupbox>
+
 		<groupbox align="start" id="paneHowTo-organize" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.organize.caption;"/>
 			<html:p>&nbsp;</html:p>
@@ -83,7 +103,6 @@
 					<html:p>&nbsp;</html:p>
 					<html:p>&howto.resize.description3;</html:p>
 					<html:p>&howto.resize.description4;</html:p>
-					<html:p>&howto.resize.description5;</html:p>
 				</html:li>
 				<html:li>
 					<caption label="&howto.rearrange.caption;"/>
