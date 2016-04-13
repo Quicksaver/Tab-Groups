@@ -1,4 +1,4 @@
-// VERSION 1.3.4
+// VERSION 1.3.5
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -369,6 +369,12 @@ this.UI = {
 					}
 				}
 				break;
+
+			case 'gridDynamicSize':
+				if(this.grid) {
+					GroupItems.arrange();
+				}
+				break;
 		}
 	},
 
@@ -420,6 +426,7 @@ this.UI = {
 			Prefs.listen('stackTabs', this);
 			Prefs.listen('displayMode', this);
 			Prefs.listen('showGroupThumbs', this);
+			Prefs.listen('gridDynamicSize', this);
 			document.body.classList.add(Prefs.displayMode);
 			if(Prefs.showGroupThumbs) {
 				document.body.classList.add('showGroupThumbs');
@@ -536,6 +543,7 @@ this.UI = {
 		Prefs.unlisten('stackTabs', this);
 		Prefs.unlisten('displayMode', this);
 		Prefs.unlisten('showGroupThumbs', this);
+		Prefs.unlisten('gridDynamicSize', this);
 
 		this._currentTab = null;
 		this._pageBounds = null;

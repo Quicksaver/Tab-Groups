@@ -1,4 +1,4 @@
-// VERSION 1.4.7
+// VERSION 1.4.8
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -17,6 +17,7 @@ addonUris = {
 prefList = {
 	displayMode: 'single',
 	showGroupThumbs: true,
+	gridDynamicSize: true,
 	stackTabs: true,
 
 	tabViewKeycode: 'E',

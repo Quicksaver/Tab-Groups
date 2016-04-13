@@ -19,6 +19,7 @@
 	<prefpane id="mainPrefPane">
 		<preferences>
 			<preference id="pref-showGroupThumbs" name="extensions.tabgroups.showGroupThumbs" type="bool"/>
+			<preference id="pref-gridDynamicSize" name="extensions.tabgroups.gridDynamicSize" type="bool"/>
 			<preference id="pref-stackTabs" name="extensions.tabgroups.stackTabs" type="bool"/>
 			<preference id="pref-tabViewKeycode" name="extensions.tabgroups.tabViewKeycode" type="string"/>
 			<preference id="pref-tabViewAccel" name="extensions.tabgroups.tabViewAccel" type="bool"/>
@@ -46,6 +47,15 @@
 				helptext="&opt.showGroupThumbs.tooltip;"
 				jump="showGroupThumbs"
 				delayPreference="pref-showGroupThumbs"/>
+			<checkbox label="&opt.gridDynamicSize.label;"
+				helpbox="paneTabGroups-gridDynamicSize-helptext"
+				jump="gridDynamicSize"
+				delayPreference="pref-gridDynamicSize"/>
+			<vbox id="paneTabGroups-gridDynamicSize-helptext" collapsed="true">
+				<description>&opt.gridDynamicSize.tooltip1;</description>
+				<description>&opt.gridDynamicSize.tooltip2;</description>
+				<description>&opt.gridDynamicSize.tooltip3;</description>
+			</vbox>
 		</groupbox>
 
 		<groupbox align="start" id="paneTabGroups-stackTabs" collapsed="true" data-category="paneTabGroups">

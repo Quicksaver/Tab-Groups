@@ -1,4 +1,4 @@
-// VERSION 1.6.11
+// VERSION 1.6.12
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2771,7 +2771,7 @@ this.GroupItems = {
 
 		// Do we need to re-arrange anything?
 		let lastArrange = this._lastArrange;
-		let arrange = !lastArrange || !lastArrange.count != count || !lastArrange.bounds.equals(bounds);
+		let arrange = !lastArrange || !lastArrange.count != count || !lastArrange.bounds.equals(bounds) || lastArrange.dynamicSize != Prefs.gridDynamicSize;
 		if(!arrange) {
 			for(let i = 0; i < groups.length; i++) {
 				if(groups[i] != lastArrange.groups[i]) {
@@ -2781,7 +2781,7 @@ this.GroupItems = {
 			}
 		}
 		if(!arrange) { return; }
-		this._lastArrange = { count, bounds, groups };
+		this._lastArrange = { count, bounds, groups, dynamicSize: Prefs.gridDynamicSize };
 
 		// If we have no groups, it's easy, flex-stretch the create new group item.
 		if(count == 1) {
@@ -2879,6 +2879,11 @@ this.GroupItems = {
 				return { high, low };
 			}
 			else {
+				// User has chosen not to use dynamic groups sizing.
+				if(!Prefs.gridDynamicSize) {
+					return null;
+				}
+
 				// If there's only one row left, we can't increase it anymore.
 				if(rows == 1) {
 					return null;

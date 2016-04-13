@@ -3,6 +3,10 @@
 
 <!ENTITY opt.showGroupThumbs.label "Show group thumbnails in single view">
 <!ENTITY opt.showGroupThumbs.tooltip "Hiding the group thumbnails will leave more room in which to show your tabs, at the expense of having to rely on the groups names to distinguish and switch between them.">
+<!ENTITY opt.gridDynamicSize.label "Use dynamic sizing of groups in grid layout">
+<!ENTITY opt.gridDynamicSize.tooltip1 "Dynamic size makes full use of your window size. The groups towards the top will have higher dimensions than those towards the bottom.">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Use this to your advantage by moving more important groups, or those with more tabs, towards the top slots.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "With this disabled, all groups will have similar dimensions, with only the necessary differences in order for them all to fit on screen.">
 
 <!ENTITY cat.stackTabs.label "When a group has too many tabs...">
 <!ENTITY cat.stackTabs.tooltip "If the group can't show all of its tabs because it has too many, you can...">
