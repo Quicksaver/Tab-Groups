@@ -1,4 +1,4 @@
-// VERSION 1.3.3
+// VERSION 1.3.4
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -356,6 +356,19 @@ this.UI = {
 					}
 				}
 				break;
+
+			case 'showGroupThumbs':
+				this.toggleGroupThumbs();
+
+				// When toggling this preference, we want to reaarange the groups, and ensure the group selector shows the placholder title if necessary.
+				if(this.single) {
+					this._resize(true);
+					for(let groupItem of GroupItems) {
+						groupItem.setTitle(groupItem.getTitle());
+						groupItem._updateThumb(true);
+					}
+				}
+				break;
 		}
 	},
 
@@ -406,7 +419,11 @@ this.UI = {
 			// Initialize the UI with the correct mode from the start, the groups will take care of themselves as they're added.
 			Prefs.listen('stackTabs', this);
 			Prefs.listen('displayMode', this);
+			Prefs.listen('showGroupThumbs', this);
 			document.body.classList.add(Prefs.displayMode);
+			if(Prefs.showGroupThumbs) {
+				document.body.classList.add('showGroupThumbs');
+			}
 
 			// ___ setup key handlers
 			this._setupBrowserKeys();
@@ -518,6 +535,7 @@ this.UI = {
 
 		Prefs.unlisten('stackTabs', this);
 		Prefs.unlisten('displayMode', this);
+		Prefs.unlisten('showGroupThumbs', this);
 
 		this._currentTab = null;
 		this._pageBounds = null;
@@ -588,6 +606,7 @@ this.UI = {
 		document.body.classList.remove('single');
 
 		document.body.classList.add(Prefs.displayMode);
+		this.toggleGroupThumbs();
 		this._resize(true);
 
 		try {
@@ -609,6 +628,17 @@ this.UI = {
 		}
 		finally {
 			GroupItems.resumeArrange();
+		}
+	},
+
+	toggleGroupThumbs: function() {
+		// don't bother
+		if(!this.single) { return; }
+
+		if(Prefs.showGroupThumbs) {
+			document.body.classList.add('showGroupThumbs');
+		} else {
+			document.body.classList.remove('showGroupThumbs');
 		}
 	},
 

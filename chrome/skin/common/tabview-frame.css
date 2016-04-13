@@ -43,6 +43,10 @@ body.single {
 	--group-single-height: calc(100% - (var(--group-border-width) * 2));
 }
 
+body.single:not(.showGroupThumbs) {
+	--workspace-height: calc(100% - (var(--group-selector-size) / 4) - (var(--group-border-width) * 2));
+}
+
 html {
 	overflow: hidden;
 	-moz-user-select: none;
@@ -510,6 +514,7 @@ body:not(.single) .groupItem:not(:hover) .tab.create-new,
 	font-weight: bold;
 }
 
+body.single:not(.showGroupThumbs) #singleNewGroup .create-new-border,
 .tab-container.noThumbs .create-new-border {
 	height: 100%;
 	width: 100%;
@@ -542,6 +547,11 @@ body:not(.single) #groupSelector {
 	height: var(--group-selector-size);
 }
 
+body.single:not(.showGroupThumbs) #groupSelector,
+body.single:not(.showGroupThumbs) .groupSelector {
+	height: calc(var(--group-selector-size) / 4);
+}
+
 body.DraggingGroupSelector .groupSelector {
 	transition: var(--drag-animation);
 }
@@ -570,6 +580,7 @@ body.DraggingGroupSelector .groupSelector {
 	background-color: var(--item-background);
 }
 
+body:not(.showGroupThumbs) .groupThumb,
 .groupSelector.closedGroup .groupThumb {
 	display: none;
 }
@@ -585,6 +596,12 @@ body.DraggingGroupSelector .groupSelector {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	text-align: center;
+}
+
+body:not(.showGroupThumbs) .groupSelector .group-title {
+	bottom: auto;
+	top: 50%;
+	transform: translate(-50%, -50%);
 }
 
 body.DraggingGroupSelector #singleNewGroup {

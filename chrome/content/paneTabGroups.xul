@@ -18,6 +18,7 @@
 
 	<prefpane id="mainPrefPane">
 		<preferences>
+			<preference id="pref-showGroupThumbs" name="extensions.tabgroups.showGroupThumbs" type="bool"/>
 			<preference id="pref-stackTabs" name="extensions.tabgroups.stackTabs" type="bool"/>
 			<preference id="pref-tabViewKeycode" name="extensions.tabgroups.tabViewKeycode" type="string"/>
 			<preference id="pref-tabViewAccel" name="extensions.tabgroups.tabViewAccel" type="bool"/>
@@ -39,6 +40,13 @@
 		<hbox id="header-tabGroups" class="header" collapsed="true" data-category="paneTabGroups">
 			<label class="header-name">&pane.tabGroups.label;</label>
 		</hbox>
+
+		<groupbox align="start" id="paneTabGroups-general" collapsed="true" data-category="paneTabGroups">
+			<checkbox label="&opt.showGroupThumbs.label;"
+				helptext="&opt.showGroupThumbs.tooltip;"
+				jump="showGroupThumbs"
+				delayPreference="pref-showGroupThumbs"/>
+		</groupbox>
 
 		<groupbox align="start" id="paneTabGroups-stackTabs" collapsed="true" data-category="paneTabGroups">
 			<caption label="&cat.stackTabs.label;"/>

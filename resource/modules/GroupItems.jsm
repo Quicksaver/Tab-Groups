@@ -1,4 +1,4 @@
-// VERSION 1.6.10
+// VERSION 1.6.11
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -410,7 +410,9 @@ this.GroupItem.prototype = {
 			this.title.value = title;
 		}
 
-		this.selectorTitle.textContent = title;
+		if(Prefs.showGroupThumbs) {
+			this.selectorTitle.textContent = title;
+		}
 		if(title) {
 			this.selectorTitle.classList.remove('unnamed-group');
 			this.title.classList.remove('unnamed-group');
@@ -418,6 +420,9 @@ this.GroupItem.prototype = {
 			this.selectorTitle.classList.add('unnamed-group');
 			this.title.classList.add('unnamed-group');
 			title = this.defaultName;
+		}
+		if(!Prefs.showGroupThumbs) {
+			this.selectorTitle.textContent = title;
 		}
 		this.selector.setAttribute('title', title);
 		this.save();
@@ -1862,7 +1867,7 @@ this.GroupItem.prototype = {
 	},
 
 	_updateThumb: function(delay, force) {
-		if(!UI.single || !this.showThumbs) {
+		if(!UI.single || !this.showThumbs || !Prefs.showGroupThumbs) {
 			this._clearThumbNeedsUpdate();
 			this.canvas.hidden = true;
 			return;
