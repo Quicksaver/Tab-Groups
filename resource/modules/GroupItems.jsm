@@ -1,4 +1,4 @@
-// VERSION 1.6.13
+// VERSION 1.6.14
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -247,7 +247,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 		this._userBounds = true;
 
 		// ___ Position
-		this.setBounds(this.bounds, options.immediately);
+		this.setBounds(this.bounds, true, true);
 
 		// Calling snap will also trigger pushAway
 		this.snap(options.immediately);
@@ -483,10 +483,8 @@ this.GroupItem.prototype = {
 	// Parameters:
 	//   inRect - a <Rect> giving the new bounds
 	//   immediately - true if it should not animate; default false
-	//   options - an object with additional parameters, see below
-	// Possible options:
 	//   force - true to always update the DOM even if the bounds haven't changed; default false
-	setBounds: function(inRect, immediately, options = {}) {
+	setBounds: function(inRect, immediately, force) {
 		// In grid mode, we don't control the group's bounds here. Reset everything so that it's all set up again if necessary later.
 		if(!UI.classic) {
 			if(this._userBounds) {
@@ -508,19 +506,19 @@ this.GroupItem.prototype = {
 		// ___ Determine what has changed
 		let css = {};
 
-		if(!this._userBounds || rect.left != this.bounds.left || options.force) {
+		if(!this._userBounds || rect.left != this.bounds.left || force) {
 			css.left = rect.left;
 		}
 
-		if(!this._userBounds || rect.top != this.bounds.top || options.force) {
+		if(!this._userBounds || rect.top != this.bounds.top || force) {
 			css.top = rect.top;
 		}
 
-		if(!this._userBounds || rect.width != this.bounds.width || options.force) {
+		if(!this._userBounds || rect.width != this.bounds.width || force) {
 			css.width = rect.width;
 		}
 
-		if(!this._userBounds || rect.height != this.bounds.height || options.force) {
+		if(!this._userBounds || rect.height != this.bounds.height || force) {
 			css.height = rect.height;
 		}
 
