@@ -1,4 +1,4 @@
-// VERSION 1.6.12
+// VERSION 1.6.13
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -47,9 +47,9 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this._activeTab = null;
 
 	// Per-group options
-	this.onOverflow = options.onOverflow || 'default';
-	this.showThumbs = options.showThumbs !== undefined ? options.showThumbs : true;
-	this._showUrls = options.showUrls !== undefined ? options.showUrls : true;
+	this.stackTabs = options.stackTabs !== undefined ? options.stackTabs : Prefs.stackTabs;
+	this.showThumbs = options.showThumbs !== undefined ? options.showThumbs : Prefs.showThumbs;
+	this._showUrls = options.showUrls !== undefined ? options.showUrls : Prefs.showUrls;
 	this.catchOnce = options.catchOnce !== undefined ? options.catchOnce : true;
 	this.catchRules = options.catchRules !== undefined ? options.catchRules : '';
 	this._savedCatchOnce = this.catchOnce;
@@ -290,7 +290,7 @@ this.GroupItem.prototype = {
 			bounds: this.getBounds({ classic: true }),
 			slot: this.slot,
 			userSize: null,
-			onOverflow: this.onOverflow,
+			stackTabs: this.stackTabs,
 			showThumbs: this.showThumbs,
 			showUrls: this.showUrls,
 			catchOnce: this.catchOnce,
@@ -1541,7 +1541,7 @@ this.GroupItem.prototype = {
 					&& this.isOverflowing()
 					&& !UI.single
 					&& !this.expanded
-					&& (this.onOverflow == 'stack' || (this.onOverflow == 'default' && Prefs.stackTabs));
+					&& this.stackTabs;
 
 		// if we should stack and we're not expanded
 		if(shouldStack) {
@@ -2154,7 +2154,7 @@ this.GroupItems = {
 
 							groupItem.slot = data.slot;
 							groupItem.userSize = data.userSize;
-							groupItem.onOverflow = data.onOverflow;
+							groupItem.stackTabs = data.stackTabs;
 							groupItem.showThumbs = data.showThumbs;
 							groupItem.showUrls = data.showUrls;
 							groupItem.catchOnce = data.catchOnce;
@@ -2256,18 +2256,18 @@ this.GroupItems = {
 			corrupt = true;
 		}
 
-		if(!groupItemData.onOverflow || typeof(groupItemData.onOverflow) != 'string') {
-			groupItemData.onOverflow = 'default';
+		if(typeof(groupItemData.stackTabs) != 'boolean') {
+			groupItemData.stackTabs = Prefs.stackTabs;
 			corrupt = true;
 		}
 
 		if(typeof(groupItemData.showThumbs) != 'boolean') {
-			groupItemData.showThumbs = true;
+			groupItemData.showThumbs = Prefs.showThumbs;
 			corrupt = true;
 		}
 
 		if(typeof(groupItemData.showUrls) != 'boolean') {
-			groupItemData.showUrls = true;
+			groupItemData.showUrls = Prefs.showUrls;
 			corrupt = true;
 		}
 
@@ -2321,6 +2321,16 @@ this.GroupItems = {
 	removeAll: function() {
 		for(let groupItem of this) {
 			groupItem.removeAll();
+		}
+	},
+
+	resetGroupsOptions: function() {
+		for(let groupItem of this) {
+			groupItem.stackTabs = Prefs.stackTabs;
+			groupItem.showThumbs = Prefs.showThumbs;
+			groupItem.showUrls = Prefs.showUrls;
+			groupItem.save();
+			groupItem.arrange();
 		}
 	},
 

@@ -30,10 +30,9 @@
 <!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups > catch all pages in the add-on's repository">
 <!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org > catch Firefox bug reports">
 <!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com > catch all your social pages">
-<!ENTITY options.onOverflow.caption "When this group has too many tabs...">
-<!ENTITY options.onOverflow.default.label "Use default behavior">
-<!ENTITY options.onOverflow.stack.label "Stack the group">
-<!ENTITY options.onOverflow.list.label "Scroll the group">
+<!ENTITY options.stackTabs.caption "When this group has too many tabs...">
+<!ENTITY options.stackTabs.stack.label "Stack the group">
+<!ENTITY options.stackTabs.list.label "Scroll the group">
 
 <!ENTITY sessionRestoreNotice.label "Your tabs and groups will not be restored the next time you start the browser! Click here to fix it.">
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Dismiss this warning until I restart the browser">

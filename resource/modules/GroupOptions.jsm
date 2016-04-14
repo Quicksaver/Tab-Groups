@@ -1,4 +1,4 @@
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 this.GroupOptions = function(groupItem) {
 	this.groupItem = groupItem;
@@ -18,12 +18,12 @@ this.GroupOptions.prototype = {
 		return this.groupItem.defaultName;
 	},
 
-	get onOverflow() {
-		return this.groupItem.onOverflow;
+	get stackTabs() {
+		return this.groupItem.stackTabs;
 	},
 
-	set onOverflow(v) {
-		return this.groupItem.onOverflow = v;
+	set stackTabs(v) {
+		return this.groupItem.stackTabs = v;
 	},
 
 	get showThumbs() {
@@ -76,8 +76,8 @@ this.GroupOptionsUI = {
 	showThumbs: $('groupOptions-showThumbs'),
 	showUrls: $('groupOptions-showUrls'),
 	showUrlsLabel: $('groupOptions-showUrls-label'),
-	onOverflow: $$('[name="groupOptions-onOverflow"]'),
-	onOverflowBox: $('groupOptions-onOverflow'),
+	stackTabs: $$('[name="groupOptions-stackTabs"]'),
+	stackTabsBox: $('groupOptions-stackTabs'),
 	catchOnce: $('groupOptions-catchOnce'),
 	catchRules: $('groupOptions-catchRules'),
 	catchRulesPlaceholder: $('groupOptions-catchRules-placeholder'),
@@ -116,8 +116,8 @@ this.GroupOptionsUI = {
 		toggleAttribute(this.showUrlsLabel, 'disabled', this.showThumbs.checked);
 
 		let disabled = UI.single || !this.showThumbs.checked;
-		toggleAttribute(this.onOverflowBox, 'disabled', disabled);
-		for(let radio of this.onOverflow) {
+		toggleAttribute(this.stackTabsBox, 'disabled', disabled);
+		for(let radio of this.stackTabs) {
 			toggleAttribute(radio, 'disabled', disabled);
 		}
 	},
@@ -141,8 +141,8 @@ this.GroupOptionsUI = {
 		this.title.setAttribute('placeholder', this.activeOptions.placeholder);
 		this.showThumbs.checked = this.activeOptions.showThumbs;
 		this.showUrls.checked = this.activeOptions.showUrls;
-		for(let radio of this.onOverflow) {
-			radio.checked = radio.value == this.activeOptions.onOverflow;
+		for(let radio of this.stackTabs) {
+			radio.checked = (radio.value == 'stack' && this.activeOptions.stackTabs) || (radio.value == 'list' && !this.activeOptions.stackTabs);
 		}
 		this.catchOnce.checked = this.activeOptions.catchOnce;
 		this.catchRules.value = this.activeOptions.catchRules;
@@ -167,9 +167,9 @@ this.GroupOptionsUI = {
 
 		this.activeOptions.catchOnce = this.catchOnce.checked;
 		this.activeOptions.catchRules = this.catchRules.value;
-		for(let radio of this.onOverflow) {
+		for(let radio of this.stackTabs) {
 			if(radio.checked) {
-				this.activeOptions.onOverflow = radio.value;
+				this.activeOptions.stackTabs = radio.value == 'stack';
 				break;
 			}
 		}

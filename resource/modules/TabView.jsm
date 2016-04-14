@@ -1,4 +1,4 @@
-// VERSION 1.0.32
+// VERSION 1.0.33
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -123,6 +123,16 @@ this.TabView = {
 		}
 	},
 
+	observe: function(aSubject, aTopic, aData) {
+		switch(aTopic) {
+			case objName+'-set-groups-defaults':
+				this._initFrame(() => {
+					this._window[objName].GroupItems.resetGroupsOptions();
+				});
+				break;
+		}
+	},
+
 	init: function(loaded) {
 		// ignore everything if this was called by the native initializer, we need to wait for our overlay to finish loading
 		if(!loaded) { return; }
@@ -143,6 +153,7 @@ this.TabView = {
 		Listeners.add($('tabContextMenu'), "popupshowing", this);
 		Tabs.listen("TabShow", this);
 		Tabs.listen("TabClose", this);
+		Observers.add(this, objName+'-set-groups-defaults');
 
 		// prevent thumbnail service from expiring thumbnails
 		// we can't wait for the panel view here since expiration may run before it is initialized
@@ -236,6 +247,7 @@ this.TabView = {
 		Listeners.remove($('tabContextMenu'), "popupshowing", this);
 		Tabs.unlisten("TabShow", this);
 		Tabs.unlisten("TabClose", this);
+		Observers.remove(this, objName+'-set-groups-defaults');
 
 		this._initialized = false;
 		this._deinitFrame();

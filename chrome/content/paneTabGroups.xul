@@ -21,6 +21,8 @@
 			<preference id="pref-showGroupThumbs" name="extensions.tabgroups.showGroupThumbs" type="bool"/>
 			<preference id="pref-gridDynamicSize" name="extensions.tabgroups.gridDynamicSize" type="bool"/>
 			<preference id="pref-stackTabs" name="extensions.tabgroups.stackTabs" type="bool"/>
+			<preference id="pref-showThumbs" name="extensions.tabgroups.showThumbs" type="bool"/>
+			<preference id="pref-showUrls" name="extensions.tabgroups.showUrls" type="bool"/>
 			<preference id="pref-tabViewKeycode" name="extensions.tabgroups.tabViewKeycode" type="string"/>
 			<preference id="pref-tabViewAccel" name="extensions.tabgroups.tabViewAccel" type="bool"/>
 			<preference id="pref-tabViewShift" name="extensions.tabgroups.tabViewShift" type="bool"/>
@@ -59,26 +61,57 @@
 		</groupbox>
 
 		<groupbox align="start" id="paneTabGroups-stackTabs" collapsed="true" data-category="paneTabGroups">
-			<caption label="&cat.stackTabs.label;"/>
-			<radiogroup delayPreference="pref-stackTabs"
-				jump="stackTabs"
-				onsyncfrompreference="return document.getElementById(this.getAttribute('delayPreference')).value ? 'stack' : 'list';"
-				onsynctopreference="return this.value == 'stack';">
-				<hbox helpbox="paneTabGroups-stackTabs-helptext">
-					<radio label="&opt.stackTabs.label;"
-						class="smallindent"
-						value="stack"/>
-					<radio label="&opt.listTabs.label;"
-						class="smallindent"
-						value="list"/>
-				</hbox>
-			</radiogroup>
+			<caption label="&cat.defaults.label;"/>
+			<checkbox label="&opt.showThumbs.label;"
+				helpbox="paneTabGroups-showThumbs-helptext"
+				jump="showThumbs"
+				delayPreference="pref-showThumbs"/>
+			<checkbox label="&opt.showUrls.label;"
+				helpbox="paneTabGroups-showThumbs-helptext"
+				jump="showUrls"
+				dependson="!pref-showThumbs"
+				delayPreference="pref-showUrls"/>
+			<vbox align="start" helpbox="paneTabGroups-stackTabs-helptext">
+				<label value="&cat.stackTabs.label;"
+					dependson="pref-showThumbs"/>
+				<radiogroup delayPreference="pref-stackTabs"
+					jump="stackTabs"
+					dependson="pref-showThumbs"
+					onsyncfrompreference="return document.getElementById(this.getAttribute('delayPreference')).value ? 'stack' : 'list';"
+					onsynctopreference="return this.value == 'stack';">
+					<hbox>
+						<radio label="&opt.stackTabs.label;"
+							class="smallindent"
+							dependson="pref-showThumbs"
+							value="stack"/>
+						<radio label="&opt.listTabs.label;"
+							class="smallindent"
+							dependson="pref-showThumbs"
+							value="list"/>
+					</hbox>
+				</radiogroup>
+			</vbox>
+			<groupbox align="start">
+				<button id="paneTabGroups-setdefaults-button"
+					label="&btn.setdefaults.label;"
+					helpbox="paneTabGroups-setdefaults-helptext"/>
+			</groupbox>
+			<vbox id="paneTabGroups-showThumbs-helptext" collapsed="true">
+				<description style="font-weight:bold;">&opt.showThumbs.label;</description>
+				<description>&opt.showThumbs.tooltip;</description>
+				<description style="font-weight:bold; margin-top:1em;">&opt.showUrls.label;</description>
+				<description>&opt.showUrls.tooltip;</description>
+			</vbox>
 			<vbox id="paneTabGroups-stackTabs-helptext" collapsed="true">
 				<description>&cat.stackTabs.tooltip;</description>
 				<description style="font-weight:bold; margin-top:1em;">&opt.stackTabs.label;</description>
 				<description>&opt.stackTabs.tooltip;</description>
 				<description style="font-weight:bold; margin-top:1em;">&opt.listTabs.label;</description>
 				<description>&opt.listTabs.tooltip;</description>
+			</vbox>
+			<vbox id="paneTabGroups-setdefaults-helptext" collapsed="true">
+				<description>&btn.setdefaults.tooltip1;</description>
+				<description>&btn.setdefaults.tooltip2;</description>
 			</vbox>
 		</groupbox>
 

@@ -1,4 +1,4 @@
-// VERSION 1.0.4
+// VERSION 1.1.0
 
 this.sessionRestore = {
 	get button() { return $('paneTabGroups-sessionRestore-button'); },
@@ -39,10 +39,28 @@ this.sessionRestore = {
 	}
 };
 
+this.setdefaults = {
+	btn: $('paneTabGroups-setdefaults-button'),
+
+	handleEvent: function() {
+		Observers.notify(objName+'-set-groups-defaults');
+	},
+
+	init: function() {
+		Listeners.add(this.btn, 'command', this);
+	},
+
+	uninit: function() {
+		Listeners.remove(this.btn, 'command', this);
+	}
+};
+
 Modules.LOADMODULE = function() {
 	sessionRestore.init();
+	setdefaults.init();
 };
 
 Modules.UNLOADMODULE = function() {
 	sessionRestore.uninit();
+	setdefaults.uninit();
 };

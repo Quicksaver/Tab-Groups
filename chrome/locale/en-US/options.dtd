@@ -8,12 +8,20 @@
 <!ENTITY opt.gridDynamicSize.tooltip2 "Use this to your advantage by moving more important groups, or those with more tabs, towards the top slots.">
 <!ENTITY opt.gridDynamicSize.tooltip3 "With this disabled, all groups will have similar dimensions, with only the necessary differences in order for them all to fit on screen.">
 
-<!ENTITY cat.stackTabs.label "When a group has too many tabs...">
-<!ENTITY cat.stackTabs.tooltip "If the group can't show all of its tabs because it has too many, you can...">
+<!ENTITY cat.defaults.label "By default, groups should...">
+<!ENTITY opt.showThumbs.label "Show tab thumbnails">
+<!ENTITY opt.showThumbs.tooltip "The thumbnails show the contents of each tab directly in the group. Disabling them turns the group into a list of tabs represented only by their title and icon.">
+<!ENTITY opt.showUrls.label "Show addresses next to page titles">
+<!ENTITY opt.showUrls.tooltip "To make full use of the space saved when not showing tab thumbnails, you can show the tab's location next to its title.">
+<!ENTITY cat.stackTabs.label "When groups have too many tabs...">
+<!ENTITY cat.stackTabs.tooltip "Tab thumbnails take up space. If the group can't show all of its tabs because it isn't large enough, you can...">
 <!ENTITY opt.stackTabs.label "Stack the group">
 <!ENTITY opt.stackTabs.tooltip "Only the active tab will be shown, stacked on top of the others. You can still access all the tabs by clicking the group's expand button.">
 <!ENTITY opt.listTabs.label "Scroll the group">
 <!ENTITY opt.listTabs.tooltip "Some of the tabs will be hidden and you will have to scroll the group to access them. Note that groups will always behave like this in single view, regardless of what you set here.">
+<!ENTITY btn.setdefaults.label "Set these options for all groups">
+<!ENTITY btn.setdefaults.tooltip1 "Because the options above are applied per-group, changing them here will only affect new groups you create from this point onward.">
+<!ENTITY btn.setdefaults.tooltip2 "Only click this button if you want to override the options of all existing groups with the values set here. Otherwise you'll have to manually set or change them in each individual group.">
 
 <!ENTITY cat.keyboardshortcuts.label "Keyboard Shortcuts">
 <!ENTITY cat.backup.label "Backup your Tab Groups">
