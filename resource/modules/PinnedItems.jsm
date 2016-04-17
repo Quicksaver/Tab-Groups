@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.PinnedItems = {
 	get actions() { return $('actions'); },
@@ -7,6 +7,16 @@ this.PinnedItems = {
 	icons: new Map(),
 	_delayedUpdates: new Set(),
 	_activeItem: null,
+
+	[Symbol.iterator]: function* () {
+		for(let icon of this.icons.values()) {
+			yield icon;
+		}
+	},
+
+	get: function(tab) {
+		return this.icons.get(tab);
+	},
 
 	handleEvent: function(e) {
 		let tab = e.target;
@@ -122,6 +132,7 @@ this.PinnedItems = {
 			if(!Utils.isValidXULTab(tab) || !tab.pinned || !this.icons.has(tab)) { return; }
 
 			let icon = this.icons.get(tab);
+			icon._iconUrl = iconUrl;
 			icon.setAttribute('title', tab.getAttribute('label'));
 			icon.style.backgroundImage = "url('"+iconUrl+"')";
 		});
@@ -143,6 +154,7 @@ this.PinnedItems = {
 			icon.parent = this.tray;
 			icon.container = icon; // for equivalency with tab items in drag handlers
 			icon.tab = tab;
+			icon._iconUrl = '';
 			icon.classList.add("appTabIcon");
 			icon.setAttribute('type', 'button');
 			icon.setAttribute('draggable', 'true');
@@ -178,6 +190,7 @@ this.PinnedItems = {
 			icon.addEventListener("dragstart", icon);
 
 			this.icons.set(tab, icon);
+			tab._tabViewAppItem = icon;
 		}
 
 		if(sibling && sibling.isAnAppItem) {
@@ -203,6 +216,7 @@ this.PinnedItems = {
 		if(icon) {
 			icon.remove();
 			this.icons.delete(tab);
+			delete tab._tabViewAppItem;
 			this.updateTray();
 		}
 	},

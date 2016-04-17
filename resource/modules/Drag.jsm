@@ -1,4 +1,4 @@
-// VERSION 2.3.2
+// VERSION 2.3.3
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -865,7 +865,7 @@ this.TabDrag.prototype = {
 		if(!tab.pinned) {
 			Listeners.remove(this.container, 'dragend', this);
 			gBrowser.pinTab(tab);
-			this.item = PinnedItems.icons.get(tab);
+			this.item = PinnedItems.get(tab);
 			this.container = this.item.container;
 			Listeners.add(this.container, 'dragend', this);
 		}

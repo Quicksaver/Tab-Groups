@@ -1,4 +1,4 @@
-// VERSION 1.0.13
+// VERSION 1.0.14
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -26,7 +26,7 @@ this.TabView = {
 		'TabItem', 'TabItems', 'TabPriorityQueue', 'TabCanvas',
 		'FavIcons',
 		'Trench', 'Trenches',
-		'TabUtils', 'TabMatcher', 'TabHandlers', 'Search',
+		'TabUtils', 'TabMatcher', 'Search',
 		'Keys', 'UI'
 	]
 };

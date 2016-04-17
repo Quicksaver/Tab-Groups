@@ -15,8 +15,6 @@
 <!ENTITY buttonSingle.label "Single view">
 <!ENTITY buttonNewGroup.label "Create new group">
 
-<!ENTITY searchOtherWindowTabs.label "Tabs from other windows">
-
 <!ENTITY options.close.tooltip "Save and go back">
 <!ENTITY options.notapplicable.single "(not applicable in single view)">
 <!ENTITY options.title.tooltip "Name this tab group">

@@ -1,4 +1,4 @@
-// VERSION 1.6.14
+// VERSION 1.6.15
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -62,33 +62,30 @@ this.GroupItem = function(listOfEls, options = {}) {
 		this.userSize = new Point(options.userSize);
 	}
 
-	this.container = document.createElement('div');
-	this.container.id = 'group'+this.id;
-	this.container.classList.add('groupItem');
-	toggleAttribute(this.container, 'draggable', UI.grid);
-	this.container._item = this;
-	this.$container = iQ(this.container);
+	let dom = GroupItems.fragment();
+	for(let x in dom) {
+		this[x] = dom[x];
+	}
 
 	this.isDragging = false;
 	this.isResizing = false;
+
+	this.container.id = 'group'+this.id;
+	this.container._item = this;
+	toggleAttribute(this.container, 'draggable', UI.grid);
+	this.$container = iQ(this.container);
 	GroupItems.workSpace.appendChild(this.container);
+
+	// Create a new selector item in single mode's top area for this group.
+	this.selector.isASelectorItem = true;
+	this.selector.groupItem = this;
+	UI.groupSelector.appendChild(this.selector);
 
 	// We need to set the attribute in the container.
 	this.showUrls = this._showUrls;
 
 	// ___ Titlebar
-	this.titlebar = document.createElement('div');
-	this.titlebar.classList.add('titlebar');
-	this.container.appendChild(this.titlebar);
-
-	let tbContainer = document.createElement('div');
-	tbContainer.classList.add('title-container');
-	this.titlebar.appendChild(tbContainer);
-
-	this.title = document.createElement('input');
-	this.title.classList.add('name');
 	this.title.setAttribute('placeholder', this.defaultName);
-	this.title.setAttribute("title", Strings.get("TabView", "groupItemDefaultName"));
 	this.title.handleEvent = (e) => {
 		switch(e.type) {
 			case 'mousedown':
@@ -139,76 +136,21 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.title.addEventListener('keyup', this.title);
 	this.title.addEventListener('focus', this.title);
 	this.title.addEventListener('blur', this.title);
-	tbContainer.appendChild(this.title);
 
-	this.titleShield = document.createElement('div');
-	this.titleShield.classList.add('title-shield');
-	this.titleShield.setAttribute('title', Strings.get("TabView", "groupItemDefaultName"));
-	tbContainer.appendChild(this.titleShield);
-
-	this.optionsBtn = document.createElement('input');
-	this.optionsBtn.classList.add('group-options');
-	this.optionsBtn.setAttribute('type', 'button');
-	this.optionsBtn.setAttribute("title", Strings.get("TabView", "groupItemOptionsGroup"));
-	this.titlebar.appendChild(this.optionsBtn);
-
-	this.closeButton = document.createElement('div');
-	this.closeButton.classList.add('close');
-	this.closeButton.setAttribute("title", Strings.get("TabView", "groupItemCloseGroup"));
 	this.closeButton.handleEvent = () => {
 		// click
 		this.closeAll();
 	};
 	this.closeButton.addEventListener('click', this.closeButton);
-	this.titlebar.appendChild(this.closeButton);
 
-	// content area
-	this.contents = document.createElement('div');
-	this.contents.classList.add('contents');
-	this.container.appendChild(this.contents);
-
-	// tabs container
-	this.tabContainer = document.createElement('div');
-	this.tabContainer.classList.add('tab-container');
-	this.contents.appendChild(this.tabContainer);
-
-	// The new tab item is a clone of the new group button placeholder, so that we can use the same style with it.
-	this.newTabItem = UI.gridNewGroupBtn.cloneNode(true);
-	this.newTabItem.id = '';
-	this.newTabItem.classList.remove('groupItem');
-	this.newTabItem.classList.add('tab');
-	setAttribute(this.newTabItem, "title", Strings.get("TabView", "openNewTab"));
-	this.tabContainer.appendChild(this.newTabItem);
-
-	// ___ Stack Expander
-	this.expander = document.createElement("div");
-	this.expander.classList.add("stackExpander");
 	this.expander.handleEvent = () => {
 		// click
 		this.expand();
 	};
 	this.expander.addEventListener("click", this.expander);
-	this.contents.appendChild(this.expander);
 
 	// ___ Undo Close
 	this.undoContainer = null;
-
-	// Create a new selector item in single mode's top area for this group.
-	this.selector = document.createElement('div');
-	this.selector.isASelectorItem = true;
-	this.selector.groupItem = this;
-	this.selector.classList.add('groupSelector');
-	this.selector.setAttribute('draggable', 'true');
-	UI.groupSelector.appendChild(this.selector);
-
-	this.canvas = document.createElement('canvas');
-	this.canvas.classList.add('groupThumb');
-	this.canvas.setAttribute('moz-opaque', '');
-	this.selector.appendChild(this.canvas);
-
-	this.selectorTitle = document.createElement('span');
-	this.selectorTitle.classList.add('group-title');
-	this.selector.appendChild(this.selectorTitle);
 
 	this.setTitle(options.title);
 	if(options.focusTitle) {
@@ -1967,7 +1909,7 @@ this.GroupItem.prototype = {
 		// There's no point in doing this when the group is stacked. The tabs will be re-ordered when it's expanded.
 		if(!this.isStacked) {
 			for(let i = 0; i < this.children.length; i++) {
-				this.children[i].container.style.order = i;
+				this.children[i].setOrder(i);
 			}
 		}
 	},
@@ -1993,6 +1935,7 @@ this.GroupItems = {
 	groupItems: new Map(),
 	nextID: 1,
 	_inited: false,
+	_fragment: null,
 	_activeGroupItem: null,
 	_arrangePaused: false,
 	_arrangesPending: new Set(),
@@ -2051,6 +1994,94 @@ this.GroupItems = {
 
 		// additional clean up
 		this.groupItems = new Map();
+	},
+
+	fragment: function() {
+		if(!this._fragment) {
+			let container = document.createElement('div');
+			container.classList.add('groupItem');
+
+			let titlebar = document.createElement('div');
+			titlebar.classList.add('titlebar');
+			container.appendChild(titlebar);
+
+			let tbContainer = document.createElement('div');
+			tbContainer.classList.add('title-container');
+			titlebar.appendChild(tbContainer);
+
+			let title = document.createElement('input');
+			title.classList.add('name');
+			title.setAttribute("title", Strings.get("TabView", "groupItemDefaultName"));
+			tbContainer.appendChild(title);
+
+			let titleShield = document.createElement('div');
+			titleShield.classList.add('title-shield');
+			titleShield.setAttribute('title', Strings.get("TabView", "groupItemDefaultName"));
+			tbContainer.appendChild(titleShield);
+
+			let optionsBtn = document.createElement('input');
+			optionsBtn.classList.add('group-options');
+			optionsBtn.setAttribute('type', 'button');
+			optionsBtn.setAttribute("title", Strings.get("TabView", "groupItemOptionsGroup"));
+			titlebar.appendChild(optionsBtn);
+
+			let closeButton = document.createElement('div');
+			closeButton.classList.add('close');
+			closeButton.setAttribute("title", Strings.get("TabView", "groupItemCloseGroup"));
+			titlebar.appendChild(closeButton);
+
+			let contents = document.createElement('div');
+			contents.classList.add('contents');
+			container.appendChild(contents);
+
+			let tabContainer = document.createElement('div');
+			tabContainer.classList.add('tab-container');
+			contents.appendChild(tabContainer);
+
+			// The new tab item is a clone of the new group button placeholder, so that we can use the same style with it.
+			let newTabItem = UI.gridNewGroupBtn.cloneNode(true);
+			newTabItem.id = '';
+			newTabItem.classList.remove('groupItem');
+			newTabItem.classList.add('tab');
+			setAttribute(newTabItem, "title", Strings.get("TabView", "openNewTab"));
+			tabContainer.appendChild(newTabItem);
+
+			let expander = document.createElement("div");
+			expander.classList.add("stackExpander");
+			contents.appendChild(expander);
+
+			// Create a new selector item in single mode's top area for this group.
+			let selector = document.createElement('div');
+			selector.classList.add('groupSelector');
+			selector.setAttribute('draggable', 'true');
+
+			let canvas = document.createElement('canvas');
+			canvas.classList.add('groupThumb');
+			canvas.setAttribute('moz-opaque', '');
+			selector.appendChild(canvas);
+
+			let selectorTitle = document.createElement('span');
+			selectorTitle.classList.add('group-title');
+			selector.appendChild(selectorTitle);
+
+			this._fragment = { container, selector };
+		}
+
+		let container = this._fragment.container.cloneNode(true);
+		let titlebar = container.firstChild;
+		let title = titlebar.firstChild.firstChild;
+		let titleShield = title.nextSibling;
+		let optionsBtn = titlebar.firstChild.nextSibling;
+		let closeButton = optionsBtn.nextSibling;
+		let contents = titlebar.nextSibling;
+		let tabContainer = contents.firstChild;
+		let newTabItem = tabContainer.firstChild;
+		let expander = tabContainer.nextSibling;
+		let selector = this._fragment.selector.cloneNode(true);
+		let canvas = selector.firstChild;
+		let selectorTitle = canvas.nextSibling;
+
+		return { container, titlebar, title, titleShield, optionsBtn, closeButton, contents, tabContainer, newTabItem, expander, selector, canvas, selectorTitle };
 	},
 
 	// Creates a new empty group.

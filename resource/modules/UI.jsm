@@ -1,4 +1,4 @@
-// VERSION 1.3.6
+// VERSION 1.3.7
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -39,6 +39,9 @@ this.UI = {
 	// Stores the page bounds.
 	_pageBounds: null,
 
+	// Set when selecting a pinned tab from search, but without leaving tab view.
+	_dontHideTabView: false,
+
 	// If true, the last visible tab has just been closed in the tab strip.
 	_closedLastVisibleTab: false,
 
@@ -72,9 +75,6 @@ this.UI = {
 
 	// Used to keep track of allowed browser keys.
 	_browserKeys: null,
-
-	// Used to prevent keypress being handled after quitting search mode.
-	ignoreKeypressForSearch: false,
 
 	// Used to keep track of the last opened tab.
 	_lastOpenedTab: null,
@@ -164,7 +164,7 @@ this.UI = {
 				if(focused.length > 0) {
 					for(let element of focused) {
 						// don't fire blur event if the same input element is clicked.
-						if(e.target != element && element.nodeName == "input" && element.nodeName == "textarea") {
+						if(e.target != element && this.isTextField(element)) {
 							element.blur();
 						}
 					}
@@ -680,13 +680,13 @@ this.UI = {
 			this._activeTab.addSubscriber("close", this);
 			this._activeTab.makeActive();
 
+			// Make sure the pinned items reflect this change as well.
+			// It won't actually select anything, rather it will unselect an item if it already is selected.
+			PinnedItems.makeActive(tabItem.tab);
+
 			// When setting a new active tab (i.e. when closing the previous active tab) TabView loses focus, probably because the physical tab gets it when it's "selected".
 			// This prevents the keyboard from working correctly unless we refocus our TabView.
-			Timers.init('focusTabView', () => {
-				if(this.isTabViewVisible() && !this._isChangingVisibility) {
-					window.focus();
-				}
-			}, 0);
+			this.focusTabView();
 		}
 	},
 
@@ -730,6 +730,14 @@ this.UI = {
 	// Returns true if the TabView UI is currently shown.
 	isTabViewVisible: function() {
 		return gTabViewDeck.selectedPanel == gTabViewFrame;
+	},
+
+	focusTabView: function() {
+		Timers.init('focusTabView', () => {
+			if(this.isTabViewVisible() && !this._isChangingVisibility) {
+				window.focus();
+			}
+		}, 0);
 	},
 
 	// To close the current tab, as commanded by the keyboard shortcut.
@@ -876,12 +884,10 @@ this.UI = {
 
 			gTabViewDeck.selectedPanel = gTabViewFrame;
 			gWindow.TabsInTitlebar.allowedBy("tabview-open", false);
-			gTabViewFrame.contentWindow.focus();
+			window.focus();
 
 			gBrowser.updateTitlebar();
-			if(DARWIN) {
-				this.setTitlebarColors(true);
-			}
+			this.setTitlebarColors(true);
 
 			// Trick to make Ctrl+F4 and Ctrl+Shift+PageUp/PageDown shortcuts behave as expected in TabView,
 			// we need to remove the gBrowser as a listener for these, otherwise it would consume these events and they would never reach our handler.
@@ -963,9 +969,7 @@ this.UI = {
 
 			gBrowser.updateTitlebar();
 			gBrowser.tabContainer.mTabstrip.smoothScroll = this._originalSmoothScroll;
-			if(DARWIN) {
-				this.setTitlebarColors(false);
-			}
+			this.setTitlebarColors(false);
 
 			this._els.addSystemEventListener(gWindow.document, "keydown", gBrowser, false);
 		}
@@ -987,7 +991,7 @@ this.UI = {
 		// Mac Only
 		if(!DARWIN) { return; }
 
-		let mainWindow = gWindow.document.getElementById("main-window");
+		let mainWindow = gWindow.document.documentElement;
 		if(colors === true) {
 			mainWindow.setAttribute("activetitlebarcolor", "#C4C4C4");
 			mainWindow.setAttribute("inactivetitlebarcolor", "#EDEDED");
@@ -1053,6 +1057,19 @@ this.UI = {
 		this._currentTab = tab;
 
 		if(this.isTabViewVisible()) {
+			// We may want to select a pinned tab without leaving tab view.
+			if(this._dontHideTabView) {
+				this._dontHideTabView = false;
+				if(tab.pinned) {
+					this.clearActiveTab();
+					PinnedItems.makeActive(tab);
+				}
+
+				// Sometimes keypresses stop working because focus goes who knows where...
+				this.focusTabView();
+				return;
+			}
+
 			// We want to zoom in if:
 			// 1) we didn't just restore a tab via Ctrl+Shift+T
 			// 2) the currently selected tab is the last created tab and has a tabItem
@@ -1085,6 +1102,7 @@ this.UI = {
 		}
 
 		// reset these vars, just in case.
+		this._dontHideTabView = false;
 		this._closedLastVisibleTab = false;
 		this._closedSelectedTabInTabView = false;
 		this.closedLastTabInTabView = false;
@@ -1332,11 +1350,9 @@ this.UI = {
 		};
 
 		let focused = $$(":focus");
-		if((focused.length && ((focused[0].nodeName == "input" && focused[0].getAttribute('type') == "text") || focused[0].nodeName == "textarea"))
+		if(this.isTextField(focused[0])
 		|| Search.inSearch
-		|| GroupOptionsUI.activeOptions
-		|| this.ignoreKeypressForSearch) {
-			this.ignoreKeypressForSearch = false;
+		|| GroupOptionsUI.activeOptions) {
 			processBrowserKeys(e, true);
 			return;
 		}
@@ -1468,6 +1484,10 @@ this.UI = {
 			e.stopPropagation();
 			e.preventDefault();
 		}
+	},
+
+	isTextField: function(node) {
+		return node && ((node.nodeName == "input" && node.getAttribute('type') == "text") || node.nodeName == "textarea");
 	},
 
 	// Enables the search feature.
@@ -1666,20 +1686,13 @@ this.UI = {
 
 	// Exits TabView UI.
 	exit: function() {
-		let zoomedIn = false;
-
 		if(Search.inSearch) {
-			let matcher = Search.createSearchTabMatcher();
-			let matches = matcher.matched();
-
-			if(matches.length > 0) {
-				matches[0].zoomIn();
-				zoomedIn = true;
+			if(Search.currentItem) {
+				Search.currentItem.zoomIn();
+				return;
 			}
 			Search.hide();
 		}
-
-		if(zoomedIn) { return; }
 
 		let unhiddenGroup = null;
 		for(let groupItem of GroupItems) {

@@ -1,4 +1,4 @@
-// VERSION 1.1.17
+// VERSION 1.1.18
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -13,19 +13,13 @@ this.TabItem = function(tab, options = {}) {
 	this.tab._tabViewTabItem = this;
 
 	// ___ set up div
-	this.container = TabItems.fragment().cloneNode(true);
-	this.container._item = this;
-	this.$container = iQ(this.container);
+	let dom = TabItems.fragment();
+	for(let x in dom) {
+		this[x] = dom[x];
+	}
 
-	this._showsCachedData = false;
-	this.thumb = $$('.thumb', this.container)[0];
-	this.fav = $$('.favicon', this.container)[0];
-	this.tabTitle = $$('.tab-title', this.container)[0];
-	this.tabUrl = $$('.tab-url', this.container)[0];
-	this.canvas = $$('.thumb canvas', this.container)[0];
+	this.$container = iQ(this.container);
 	this.$canvas = iQ(this.canvas);
-	this.cachedThumb = $$('img.cached-thumb', this.container)[0];
-	this.closeBtn = $$('.close', this.container)[0];
 
 	this.tabCanvas = new TabCanvas(this.tab, this.canvas);
 	this.tabCanvas.addSubscriber("painted", this);
@@ -33,8 +27,10 @@ this.TabItem = function(tab, options = {}) {
 	this.isATabItem = true;
 	this._hidden = false;
 	this._reconnected = false;
+	this._showsCachedData = false;
 	this.isStacked = false;
 	this._inVisibleStack = null;
+	this.order = 1;
 	this._draggable = true;
 	this.lastMouseDownTarget = null;
 	this._thumbNeedsUpdate = false;
@@ -360,6 +356,13 @@ this.TabItem.prototype = {
 		this.$container.css({ "transform": value });
 	},
 
+	// Set the slot, relative to other tabs, where this tab item should be placed.
+	setOrder: function(order) {
+		if(this.order == order) { return; }
+		this.order = order;
+		this.container.style.order = this.order;
+	},
+
 	// Closes this item (actually closes the tab associated with it, which automatically closes the item).
 	// Parameters:
 	//   groupClose - true if this method is called by group close action.
@@ -607,60 +610,67 @@ this.TabItems = {
 	// Return a DocumentFragment which has a single <div> child. This child node will act as a template for all TabItem containers.
 	// The first call of this function caches the DocumentFragment in _fragment.
 	fragment: function() {
-		if(this._fragment) {
-			return this._fragment;
+		if(!this._fragment) {
+			let div = document.createElement("div");
+			div.classList.add("tab");
+			div.setAttribute('draggable', 'true');
+
+			let thumb = document.createElement("div");
+			thumb.classList.add('thumb');
+			div.appendChild(thumb);
+
+			let img = document.createElement('img');
+			img.classList.add('cached-thumb');
+			thumb.appendChild(img);
+
+			let canvas = document.createElement('canvas');
+			canvas.setAttribute('moz-opaque', '');
+			thumb.appendChild(canvas);
+
+			let faviconContainer = document.createElement('div');
+			faviconContainer.classList.add('favicon-container');
+			thumb.appendChild(faviconContainer);
+
+			let favicon = document.createElement('div');
+			favicon.classList.add('favicon');
+			faviconContainer.appendChild(favicon);
+
+			let label = document.createElement('span');
+			label.classList.add('tab-label');
+			div.appendChild(label);
+
+			let title = document.createElement('span');
+			title.classList.add('tab-title');
+			title.textContent = ' ';
+			label.appendChild(title);
+
+			let separator = document.createElement('span');
+			separator.classList.add('tab-label-separator');
+			separator.textContent = ' - ';
+			label.appendChild(separator);
+
+			let url = document.createElement('span');
+			url.classList.add('tab-url');
+			label.appendChild(url);
+
+			let close = document.createElement('div');
+			close.classList.add('close');
+			setAttribute(close, "title", Strings.get("TabView", "closeTab"));
+			thumb.appendChild(close);
+
+			this._fragment = div;
 		}
 
-		let div = document.createElement("div");
-		div.classList.add("tab");
-		div.setAttribute('draggable', 'true');
+		let container = this._fragment.cloneNode(true);
+		let thumb = container.firstChild;
+		let cachedThumb = thumb.firstChild;
+		let canvas = cachedThumb.nextSibling;
+		let fav = canvas.nextSibling.firstChild;
+		let tabTitle = thumb.nextSibling.firstChild;
+		let tabUrl = tabTitle.nextSibling.nextSibling;
+		let closeBtn = thumb.nextSibling.nextSibling;
 
-		let thumb = document.createElement("div");
-		thumb.classList.add('thumb');
-		div.appendChild(thumb);
-
-		let img = document.createElement('img');
-		img.classList.add('cached-thumb');
-		thumb.appendChild(img);
-
-		let canvas = document.createElement('canvas');
-		canvas.setAttribute('moz-opaque', '');
-		thumb.appendChild(canvas);
-
-		let faviconContainer = document.createElement('div');
-		faviconContainer.classList.add('favicon-container');
-		thumb.appendChild(faviconContainer);
-
-		let favicon = document.createElement('div');
-		favicon.classList.add('favicon');
-		faviconContainer.appendChild(favicon);
-
-		let label = document.createElement('span');
-		label.classList.add('tab-label');
-		div.appendChild(label);
-
-		let title = document.createElement('span');
-		title.classList.add('tab-title');
-		title.textContent = ' ';
-		label.appendChild(title);
-
-		let separator = document.createElement('span');
-		separator.classList.add('tab-label-separator');
-		separator.textContent = ' - ';
-		label.appendChild(separator);
-
-		let url = document.createElement('span');
-		url.classList.add('tab-url');
-		label.appendChild(url);
-
-		let close = document.createElement('div');
-		close.classList.add('close');
-		setAttribute(close, "title", Strings.get("TabView", "closeTab"));
-		thumb.appendChild(close);
-
-		this._fragment = div;
-
-		return this._fragment;
+		return { container, thumb, cachedThumb, canvas, fav, tabTitle, tabUrl, closeBtn };
 	},
 
 	// Checks whether the xul:tab has fully loaded and calls a callback with a boolean indicates whether the tab is loaded or not.
