@@ -1,9 +1,10 @@
-// VERSION 1.0.33
+// VERSION 1.0.34
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
 this.__defineGetter__('gTaskbarTabGroup', function() { return window.gTaskbarTabGroup; });
 this.__defineGetter__('TabContextMenu', function() { return window.TabContextMenu; });
+this.__defineGetter__('goUpdateCommand', function() { return window.goUpdateCommand; });
 
 XPCOMUtils.defineLazyGetter(this, "AeroPeek", () => { return Cu.import("resource:///modules/WindowsPreviewPerTab.jsm", {}).AeroPeek; });
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
@@ -20,8 +21,10 @@ this.TabView = {
 
 	kTooltipId: objName+'-tab-view-tooltip',
 	kTabMenuPopupId: objName+'-context_tabViewMenuPopup',
+	kInputContextMenuId: objName+'-tabview-context-input',
 	get tooltip() { return $(this.kTooltipId); },
 	get tabMenuPopup() { return $(this.kTabMenuPopupId); },
+	get inputContextMenu() { return $(this.kInputContextMenuId); },
 
 	// compatibility shims, for other add-ons to interact with this object more closely to the original if needed
 	PREF_BRANCH: "extensions."+objPathString,
@@ -437,6 +440,19 @@ this.TabView = {
 		menuItem.addEventListener("command", menuItem);
 
 		return menuItem;
+	},
+
+	openInputContextMenu: function(e) {
+		// Update the relevant commands, so that the corresponding menu entries are enabled or disabled as appropriate.
+		goUpdateCommand("cmd_undo");
+		goUpdateCommand("cmd_redo");
+		goUpdateCommand("cmd_cut");
+		goUpdateCommand("cmd_copy");
+		goUpdateCommand("cmd_paste");
+		goUpdateCommand("cmd_selectAll");
+		goUpdateCommand("cmd_delete");
+
+		this.inputContextMenu.openPopupAtScreen(e.screenX, e.screenY, true);
 	},
 
 	moveTabTo: function(tab, groupItemId, focusIfSelected) {

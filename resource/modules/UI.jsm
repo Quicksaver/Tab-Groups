@@ -1,4 +1,4 @@
-// VERSION 1.3.8
+// VERSION 1.3.9
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -267,6 +267,18 @@ this.UI = {
 				}
 				break;
 
+			case 'contextmenu':
+				// When right-clicking a group title, we're actually right-clicking its shield if the cursor isn't already there.
+				// So we focus it now and pretend like it was already focused.
+				if(e.target.classList.contains('title-shield')) {
+					e.target._item.focusTitle();
+					gTabView.openInputContextMenu(e);
+				}
+				else if(this.isTextField(e.target)) {
+					gTabView.openInputContextMenu(e);
+				}
+				break;
+
 			case 'TabOpen':
 				if(!tab.pinned && this.isTabViewVisible() && !this._storageBusyCount) {
 					this._lastOpenedTab = tab;
@@ -439,6 +451,7 @@ this.UI = {
 			this._setupBrowserKeys();
 			Listeners.add(window, 'keyup', this);
 			Listeners.add(window, 'keypress', this, true);
+			Listeners.add(window, 'contextmenu', this);
 
 			Listeners.add(gWindow, "SSWindowStateBusy", this);
 			Listeners.add(gWindow, "SSWindowStateReady", this);
@@ -503,6 +516,7 @@ this.UI = {
 	uninit: function() {
 		Listeners.remove(window, 'keyup', this);
 		Listeners.remove(window, 'keypress', this, true);
+		Listeners.remove(window, 'contextmenu', this);
 		Listeners.remove(window, 'resize', this);
 		Listeners.remove(gWindow, "SSWindowClosing", this);
 		Listeners.remove(gWindow, "SSWindowStateBusy", this);

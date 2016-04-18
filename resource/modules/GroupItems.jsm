@@ -1,4 +1,4 @@
-// VERSION 1.6.15
+// VERSION 1.6.16
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -72,6 +72,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 
 	this.container.id = 'group'+this.id;
 	this.container._item = this;
+	this.titleShield._item = this;
 	toggleAttribute(this.container, 'draggable', UI.grid);
 	this.$container = iQ(this.container);
 	GroupItems.workSpace.appendChild(this.container);
@@ -2011,6 +2012,7 @@ this.GroupItems = {
 
 			let title = document.createElement('input');
 			title.classList.add('name');
+			title.setAttribute("type", "text");
 			title.setAttribute("title", Strings.get("TabView", "groupItemDefaultName"));
 			tbContainer.appendChild(title);
 

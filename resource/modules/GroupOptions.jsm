@@ -1,4 +1,4 @@
-// VERSION 1.0.5
+// VERSION 1.0.6
 
 this.GroupOptions = function(groupItem) {
 	this.groupItem = groupItem;
@@ -182,5 +182,9 @@ this.GroupOptionsUI = {
 
 		document.body.classList.remove('groupOptions');
 		this.activeOptions = null;
+
+		// Return focus to the tab window
+		UI.blurAll();
+		window.focus();
 	}
 };

@@ -1,7 +1,12 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://tabgroups/skin/TabView.css" type="text/css"?>
 <?xml-stylesheet href="chrome://tabgroups-os/skin/TabView.css" type="text/css"?>
-<!DOCTYPE overlay SYSTEM "chrome://tabgroups/locale/TabView.dtd">
+<!DOCTYPE overlay [
+  <!ENTITY % overlayDTD SYSTEM "chrome://tabgroups/locale/TabView.dtd">
+  %overlayDTD;
+  <!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd">
+  %browserDTD;
+]>
 <overlay id="TabView_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 	<broadcasterset id="mainBroadcasterSet">
@@ -25,6 +30,32 @@
 
 	<popupset id="mainPopupSet">
 		<tooltip id="objName-tab-view-tooltip"/>
+
+		<menupopup id="objName-tabview-context-input">
+			<menuitem label="&undoCmd.label;"
+				accesskey="&undoCmd.accesskey;"
+				command="cmd_undo"/>
+			<menuitem label="&redoCmd.label;"
+				accesskey="&redoCmd.accesskey;"
+				command="cmd_redo"/>
+			<menuseparator/>
+			<menuitem label="&cutCmd.label;"
+				accesskey="&cutCmd.accesskey;"
+				command="cmd_cut"/>
+			<menuitem label="&copyCmd.label;"
+				accesskey="&copyCmd.accesskey;"
+				command="cmd_copy"/>
+			<menuitem label="&pasteCmd.label;"
+				accesskey="&pasteCmd.accesskey;"
+				command="cmd_paste"/>
+			<menuitem label="&deleteCmd.label;"
+				accesskey="&deleteCmd.accesskey;"
+				command="cmd_delete"/>
+			<menuseparator/>
+			<menuitem label="&selectAllCmd.label;"
+				accesskey="&selectAllCmd.accesskey;"
+				command="cmd_selectAll"/>
+		</menupopup>
 	</popupset>
 
 	<menupopup id="alltabs-popup">
