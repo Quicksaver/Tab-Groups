@@ -1,4 +1,4 @@
-// VERSION 1.3.7
+// VERSION 1.3.8
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -75,6 +75,9 @@ this.UI = {
 
 	// Used to keep track of allowed browser keys.
 	_browserKeys: null,
+
+	// Browser keys that shouldn't follow through when user is typing anywhere.
+	_browserKeysNotInInput: null,
 
 	// Used to keep track of the last opened tab.
 	_lastOpenedTab: null,
@@ -1182,6 +1185,12 @@ this.UI = {
 	// Sets up the allowed browser keys using key elements.
 	_setupBrowserKeys: function() {
 		this._browserKeys = [];
+		this._browserKeysNotInInput = new Set([
+			"newNavigator", "closeWindow", "undoCloseWindow",
+			"newNavigatorTab", "close", "closeNotMac", "undoCloseTab",
+			"moveTabForward", "moveTabBackward", "moveTabToStart", "moveTabToEnd"
+		]);
+
 		let keyArray = [
 			"newNavigator", "closeWindow", "undoCloseWindow",
 			"newNavigatorTab", "close", "undoCloseTab",
@@ -1307,39 +1316,40 @@ this.UI = {
 							return;
 					}
 				}
-				else {
-					for(let k of this._browserKeys) {
-						if(k.key == key && k.accel == accel && k.alt == alt && k.shift == shift) {
-							switch(k.name) {
-								case "find":
-									this.enableSearch();
-									break;
 
-								case "close":
-								case "closeNotMac":
-									this.closeActiveTab();
-									break;
+				for(let k of this._browserKeys) {
+					if(k.key == key && k.accel == accel && k.alt == alt && k.shift == shift) {
+						if(input && this._browserKeysNotInInput.has(k.name)) { break; }
 
-								case "moveTabForward":
-									this.moveActiveTab("forward");
-									break;
+						switch(k.name) {
+							case "find":
+								this.enableSearch();
+								break;
 
-								case "moveTabBackward":
-									this.moveActiveTab("backward");
-									break;
+							case "close":
+							case "closeNotMac":
+								this.closeActiveTab();
+								break;
 
-								case "moveTabToStart":
-									this.moveActiveTab("tostart");
-									break;
+							case "moveTabForward":
+								this.moveActiveTab("forward");
+								break;
 
-								case "moveTabToEnd":
-									this.moveActiveTab("toend");
-									break;
+							case "moveTabBackward":
+								this.moveActiveTab("backward");
+								break;
 
-								default: return;
-							}
-							break;
+							case "moveTabToStart":
+								this.moveActiveTab("tostart");
+								break;
+
+							case "moveTabToEnd":
+								this.moveActiveTab("toend");
+								break;
+
+							default: return;
 						}
+						break;
 					}
 				}
 
@@ -1349,11 +1359,9 @@ this.UI = {
 			}
 		};
 
-		let focused = $$(":focus");
-		if(this.isTextField(focused[0])
-		|| Search.inSearch
-		|| GroupOptionsUI.activeOptions) {
-			processBrowserKeys(e, true);
+		let inTextField = this.isTextField($$(":focus")[0]);
+		if(inTextField || Search.inSearch || GroupOptionsUI.activeOptions) {
+			processBrowserKeys(e, inTextField);
 			return;
 		}
 
