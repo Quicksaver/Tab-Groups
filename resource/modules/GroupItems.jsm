@@ -1,4 +1,4 @@
-// VERSION 1.6.16
+// VERSION 1.6.17
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1290,6 +1290,7 @@ this.GroupItem.prototype = {
 	// Options:
 	//   index - (int) if set, add this tab at this index
 	//   dontArrange - (bool) if true, will not trigger an arrange on the group
+	//   dontSetActive - (bool) if true, the group won't be set active when moving a tab to it, even if it was the previously selected tab
 	add: function(item, options = {}) {
 		try {
 			// safeguard to remove the item from its previous group
@@ -1320,7 +1321,7 @@ this.GroupItem.prototype = {
 				}
 
 				// if it matches the selected tab or no active tab and the browser tab is hidden, the active group item would be set.
-				if(item.tab.selected || (!GroupItems.getActiveGroupItem() && !item.tab.hidden)) {
+				if(!options.dontSetActive && (item.tab.selected || (!GroupItems.getActiveGroupItem() && !item.tab.hidden))) {
 					UI.setActive(this);
 				}
 			}
@@ -2449,7 +2450,12 @@ this.GroupItems = {
 
 		let tabItems = this._activeGroupItem.children;
 		gBrowser.showOnlyTheseTabs(tabItems.map(item => item.tab));
-		gTabView.updateAeroPeek();
+		try {
+			gTabView.updateAeroPeek();
+		}
+		catch(ex) {
+			Cu.reportError(ex);
+		}
 	},
 
 	// Sets active TabItem and GroupItem, and updates tab bar appropriately.
@@ -2550,15 +2556,19 @@ this.GroupItems = {
 		let shouldFocusTab = false;
 		let shouldUpdateTabBar = false;
 		let shouldShowTabView = false;
-		let groupItem;
+		let shouldKeepCurrentGroup = false;
 
 		// switch to the appropriate tab first.
 		if(tab.selected) {
 			if(focusIfSelected) {
 				shouldFocusTab = true;
 			} else if(Tabs.visible.length > 1) {
-				gBrowser._blurTab(tab);
-				shouldUpdateTabBar = true;
+				if(!UI.isTabViewVisible()) {
+					gBrowser._blurTab(tab);
+					shouldUpdateTabBar = true;
+				} else {
+					shouldKeepCurrentGroup = true;
+				}
 			} else {
 				shouldShowTabView = true;
 			}
@@ -2567,14 +2577,16 @@ this.GroupItems = {
 		}
 
 		// remove tab item from a groupItem
-		if(tabItem.parent) {
-			tabItem.parent.remove(tabItem);
+		let parent = tabItem.parent;
+		if(parent) {
+			parent.remove(tabItem);
 		}
 
 		// add tab item to a groupItem
+		let groupItem;
 		if(groupItemId) {
 			groupItem = this.groupItem(groupItemId);
-			groupItem.add(tabItem);
+			groupItem.add(tabItem, { dontSetActive: true });
 			groupItem.reorderTabsBasedOnTabItemOrder()
 		} else {
 			let pageBounds = this.getSafeWindowBounds();
@@ -2582,13 +2594,17 @@ this.GroupItems = {
 			box.width = 250;
 			box.height = 200;
 
-			new GroupItem([ tabItem ], { bounds: box, immediately: true });
+			new GroupItem([ tabItem ], { bounds: box, immediately: true, dontSetActive: true });
 		}
 
 		if(shouldFocusTab) {
 			this.updateActiveGroupItemAndTabBar(tabItem);
 		} else if(shouldUpdateTabBar) {
 			this._updateTabBar();
+		} else if(shouldKeepCurrentGroup) {
+			if(parent) {
+				UI.setActive(parent);
+			}
 		} else if(shouldShowTabView) {
 			UI.showTabView();
 		}

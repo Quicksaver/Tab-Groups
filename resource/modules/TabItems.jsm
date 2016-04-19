@@ -1,4 +1,4 @@
-// VERSION 1.1.18
+// VERSION 1.1.19
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -18,6 +18,7 @@ this.TabItem = function(tab, options = {}) {
 		this[x] = dom[x];
 	}
 
+	this.container._item = this;
 	this.$container = iQ(this.container);
 	this.$canvas = iQ(this.canvas);
 

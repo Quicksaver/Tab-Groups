@@ -1,4 +1,4 @@
-// VERSION 1.3.9
+// VERSION 1.3.10
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -274,8 +274,46 @@ this.UI = {
 					e.target._item.focusTitle();
 					gTabView.openInputContextMenu(e);
 				}
+				// On input fields we should show the input context menu (duh).
 				else if(this.isTextField(e.target)) {
 					gTabView.openInputContextMenu(e);
+				}
+				else {
+					// There's nothing to do if we're not in main groups view.
+					if(Search.inSearch || GroupOptionsUI.activeOptions) { break; }
+
+					let tab = null;
+					let node = null;
+
+					// User could have pressed the context menu button in the keyboard, in which case the tab should be the currently active tab.
+					if(!e.button) {
+						let item = this.getActiveTab() || PinnedItems._activeItem;
+						if(item) {
+							tab = item.tab;
+							node = item.container;
+						}
+					}
+					else {
+						node = e.target;
+						while(node) {
+							if(node.isAnAppItem) {
+								tab = node.tab;
+								break;
+							} else if(node._item) {
+								tab = node._item.tab;
+								break;
+							}
+							node = node.parentNode;
+						}
+					}
+
+					if(tab) {
+						// Make this the active group item and update the tab bar accordingly immediately,
+						// since some of the context menu's items will need to act on an updated tab bar.
+						this.updateShownTabs(tab);
+						this.reorderTabsBasedOnTabItemOrder();
+						gTabView.openTabContextMenu(e, tab, node);
+					}
 				}
 				break;
 
@@ -969,12 +1007,7 @@ this.UI = {
 			GroupItems.pauseArrange();
 			TabItems.pausePainting();
 
-			for(let groupItem of this._reorderTabsOnHide) {
-				if(!groupItem.hidden && groupItem.container.parentNode) {
-					groupItem.reorderTabsBasedOnTabItemOrder();
-				}
-			}
-			this._reorderTabsOnHide = new Set();
+			this.reorderTabsBasedOnTabItemOrder();
 
 			if(fulfill) {
 				fulfill();
@@ -999,6 +1032,15 @@ this.UI = {
 		}
 
 		dispatch(window, { type: "tabviewhidden", cancelable: false });
+	},
+
+	reorderTabsBasedOnTabItemOrder: function() {
+		for(let groupItem of this._reorderTabsOnHide) {
+			if(!groupItem.hidden && groupItem.container.parentNode) {
+				groupItem.reorderTabsBasedOnTabItemOrder();
+			}
+		}
+		this._reorderTabsOnHide = new Set();
 	},
 
 	// Used on the Mac to make the title bar match the gradient in the rest of the TabView UI.
@@ -1155,7 +1197,7 @@ this.UI = {
 			// No tabItem; must be an app tab. Base the tab bar on the current group.
 			// If no current group, figure it out based on what's already in the tab bar.
 			if(!GroupItems.getActiveGroupItem()) {
-				let theTab = Tabs.notPinned[0];
+				let theTab = Tabs.notPinned[Tabs.numPinned];
 				if(theTab) {
 					let tabItem = theTab._tabViewTabItem;
 					this.setActive(tabItem.parent);

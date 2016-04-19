@@ -1,4 +1,4 @@
-// VERSION 1.0.34
+// VERSION 1.0.35
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -22,9 +22,11 @@ this.TabView = {
 	kTooltipId: objName+'-tab-view-tooltip',
 	kTabMenuPopupId: objName+'-context_tabViewMenuPopup',
 	kInputContextMenuId: objName+'-tabview-context-input',
+	kTabContextMenuId: 'tabContextMenu',
 	get tooltip() { return $(this.kTooltipId); },
 	get tabMenuPopup() { return $(this.kTabMenuPopupId); },
 	get inputContextMenu() { return $(this.kInputContextMenuId); },
+	get tabContextMenu() { return $(this.kTabContextMenuId); },
 
 	// compatibility shims, for other add-ons to interact with this object more closely to the original if needed
 	PREF_BRANCH: "extensions."+objPathString,
@@ -453,6 +455,26 @@ this.TabView = {
 		goUpdateCommand("cmd_delete");
 
 		this.inputContextMenu.openPopupAtScreen(e.screenX, e.screenY, true);
+	},
+
+	openTabContextMenu: function(e, tab, anchor) {
+		// The tab context menu is constructed based on the triggerNode property of the original event.
+		// Because we're in tabview, the triggerNode cannot actually be the tab itself, so we fake it here
+		// to avoid having to replace that whole handler just to open the popup correctly.
+		let fakeEvent = new window.MouseEvent('click', {
+			view: window,
+			bubbles: false,
+			cancelable: false,
+			button: -1,
+			buttons: 0
+		});
+		tab.dispatchEvent(fakeEvent);
+
+		if(!e.button) {
+			this.tabContextMenu.openPopup(anchor, 'end_before', 0, 0, true, false, fakeEvent);
+		} else {
+			this.tabContextMenu.openPopup(null, 'after_pointer', e.clientX +1, e.clientY +1, true, false, fakeEvent);
+		}
 	},
 
 	moveTabTo: function(tab, groupItemId, focusIfSelected) {
