@@ -84,7 +84,7 @@ body.grid #groups {
 body.grid #groups.overflowing {
 	-moz-padding-end: var(--scrollbar-width);
 	/* same as above, plus its own padding to add space to the scrollbar */
-	width: calc(100% - var(--workspace-width) - var(--scrollbar-width));
+	width: calc(var(--workspace-width) - var(--scrollbar-width));
 }
 
 html.thumbing,
