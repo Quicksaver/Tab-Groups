@@ -23,12 +23,18 @@
 <!ENTITY btn.setdefaults.tooltip1 "Because the options above are applied per-group, changing them here will only affect new groups you create from this point onward.">
 <!ENTITY btn.setdefaults.tooltip2 "Only click this button if you want to override the options of all existing groups with the values set here. Otherwise you'll have to manually set or change them in each individual group.">
 
+<!ENTITY cat.toolbarbutton.label "Toolbar Button">
+<!ENTITY opt.quickAccessButton.label "Click the toolbar button to show the quick access panel">
+<!ENTITY opt.quickAccessButton.tooltip1 "The quick access panel lets you quickly switch between groups and tabs without having to enter groups view.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Disable this to enter groups view when clicking the button.">
+
 <!ENTITY cat.keyboardshortcuts.label "Keyboard Shortcuts">
 <!ENTITY cat.backup.label "Backup your Tab Groups">
 <!ENTITY cat.restore.label "Restore Tab Groups">
 <!ENTITY cat.clear.label "Clear Tab Groups">
 
 <!ENTITY opt.tabViewKeyset.label "Enter and exit groups mode">
+<!ENTITY opt.quickAccessKeyset.label "Open quick access panel">
 <!ENTITY opt.nextGroupKeyset.label "Switch to the next group">
 <!ENTITY opt.previousGroupKeyset.label "Switch to the previous group">
 

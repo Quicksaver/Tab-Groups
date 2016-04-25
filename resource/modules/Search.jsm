@@ -1,4 +1,4 @@
-// VERSION 2.0.0
+// VERSION 2.0.1
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -296,11 +296,9 @@ this.Search = {
 
 	// Handles all keydown while search mode.
 	_inSearchKeyHandler: function(e) {
-		let term = this.searchbox.value;
-
 		switch(e.key) {
 			case "Backspace":
-				if(term.length > 1 || !this._initiatedByKeypress) { break; }
+				if(this.searchbox.value.length > 1 || !this._initiatedByKeypress) { break; }
 				// no break; continue to Escape
 
 			case "Escape":
@@ -560,11 +558,7 @@ this.Search = {
 			item.container._item = item;
 			item.zoomIn = (e) => {
 				this.hide(e);
-				if(tab.isATabItem) {
-					tab.zoomIn();
-				} else if(tab.isAnAppItem) {
-					UI.goToTab(tab.tab);
-				}
+				tab.zoomIn();
 			};
 			item.setActive = (e) => {
 				this.hide(e);

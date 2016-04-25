@@ -13,7 +13,7 @@
 
 /* tabview toolbar button */
 
-#tabGroups-tabview-button {
+.tabGroups-icon {
 	list-style-image: url(chrome://tabgroups-os/skin/Toolbar.png);
 }
 

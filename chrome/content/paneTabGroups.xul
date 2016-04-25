@@ -18,6 +18,7 @@
 
 	<prefpane id="mainPrefPane">
 		<preferences>
+			<preference id="pref-quickAccessButton" name="extensions.tabgroups.quickAccessButton" type="bool"/>
 			<preference id="pref-showGroupThumbs" name="extensions.tabgroups.showGroupThumbs" type="bool"/>
 			<preference id="pref-gridDynamicSize" name="extensions.tabgroups.gridDynamicSize" type="bool"/>
 			<preference id="pref-stackTabs" name="extensions.tabgroups.stackTabs" type="bool"/>
@@ -28,6 +29,11 @@
 			<preference id="pref-tabViewShift" name="extensions.tabgroups.tabViewShift" type="bool"/>
 			<preference id="pref-tabViewAlt" name="extensions.tabgroups.tabViewAlt" type="bool"/>
 			<preference id="pref-tabViewCtrl" name="extensions.tabgroups.tabViewCtrl" type="bool"/>
+			<preference id="pref-quickAccessKeycode" name="extensions.tabgroups.quickAccessKeycode" type="string"/>
+			<preference id="pref-quickAccessAccel" name="extensions.tabgroups.quickAccessAccel" type="bool"/>
+			<preference id="pref-quickAccessShift" name="extensions.tabgroups.quickAccessShift" type="bool"/>
+			<preference id="pref-quickAccessAlt" name="extensions.tabgroups.quickAccessAlt" type="bool"/>
+			<preference id="pref-quickAccessCtrl" name="extensions.tabgroups.quickAccessCtrl" type="bool"/>
 			<preference id="pref-nextGroupKeycode" name="extensions.tabgroups.nextGroupKeycode" type="string"/>
 			<preference id="pref-nextGroupAccel" name="extensions.tabgroups.nextGroupAccel" type="bool"/>
 			<preference id="pref-nextGroupShift" name="extensions.tabgroups.nextGroupShift" type="bool"/>
@@ -115,6 +121,18 @@
 			</vbox>
 		</groupbox>
 
+		<groupbox align="start" id="paneTabGroups-toolbarbutton" collapsed="true" data-category="paneTabGroups">
+			<caption label="&cat.toolbarbutton.label;"/>
+			<checkbox label="&opt.quickAccessButton.label;"
+				helpbox="paneTabGroups-quickAccessButton-helptext"
+				jump="quickAccessButton"
+				delayPreference="pref-quickAccessButton"/>
+			<vbox id="paneTabGroups-quickAccessButton-helptext" collapsed="true">
+				<description>&opt.quickAccessButton.tooltip1;</description>
+				<description>&opt.quickAccessButton.tooltip2;</description>
+			</vbox>
+		</groupbox>
+
 		<groupbox align="start" id="paneTabGroups-shortcut" collapsed="true" data-category="paneTabGroups">
 			<caption label="&cat.keyboardshortcuts.label;"/>
 			<vbox>
@@ -125,6 +143,14 @@
 					<checkbox class="smallindent" keysetShift="tabView" delayPreference="pref-tabViewShift"/>
 					<checkbox class="smallindent" keysetCtrl="tabView" delayPreference="pref-tabViewCtrl"/>
 					<menulist class="smallindent" keyset="tabView" delayPreference="pref-tabViewKeycode"/>
+				</hbox>
+				<hbox jump="quickAccessKeycode,&opt.quickAccessKeyset.label;">
+					<label class="stretch" value="&opt.quickAccessKeyset.label;" flex="1"/>
+					<checkbox class="smallindent" keysetAccel="quickAccess" delayPreference="pref-quickAccessAccel"/>
+					<checkbox class="smallindent" keysetAlt="quickAccess" delayPreference="pref-quickAccessAlt"/>
+					<checkbox class="smallindent" keysetShift="quickAccess" delayPreference="pref-quickAccessShift"/>
+					<checkbox class="smallindent" keysetCtrl="quickAccess" delayPreference="pref-quickAccessCtrl"/>
+					<menulist class="smallindent" keyset="quickAccess" delayPreference="pref-quickAccessKeycode"/>
 				</hbox>
 				<hbox jump="nextGroupKeycode,&opt.nextGroupKeyset.label;">
 					<label class="stretch" value="&opt.nextGroupKeyset.label;" flex="1"/>

@@ -73,15 +73,17 @@
 		<toolbarbutton id="objName-tabview-button"
 			type="custom"
 			defaultArea="TabsToolbar"
-			class="toolbarbutton-1 chromeclass-toolbar-additional"
+			class="toolbarbutton-1 chromeclass-toolbar-additional objName-icon"
 			label="&viewTabGroups.label;"
-			tooltiptext="&viewTabGroups.tooltip;"
-			command="objName:ToggleTabView"
+			closemenu="none"
+			command="objName:CommandButton"
 			observes="objName-tabviewGroupsNumber"/>
 	</toolbarpalette>
 
 	<commandset id="mainCommandSet">
 		<command id="objName:ToggleTabView" oncommand="objName.TabView.toggle();"/>
+		<command id="objName:TabViewSettings" oncommand="objName.TabView.goToPreferences();"/>
+		<command id="objName:CommandButton" oncommand="objName.TabView.commandButton();"/>
 		<command id="objName:NextGroup" oncommand="objName.TabView.switchGroup(false);"/>
 		<command id="objName:PreviousGroup" oncommand="objName.TabView.switchGroup(true);"/>
 	</commandset>

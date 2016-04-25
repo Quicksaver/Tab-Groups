@@ -1,0 +1,160 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+#tabGroups-quickaccess-panel {
+	width: 400px;
+	min-height: 175px;
+}
+
+.tabGroups-quickaccess .panel-arrowcontent {
+	-moz-box-orient: vertical;
+}
+
+.tabGroups-quickaccess textbox {
+	margin-bottom: 8px;
+}
+
+.tabGroups-quickaccess .loading {
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+.tabGroups-quickaccess:not([FF48]) .loading {
+	background-image: url("chrome://global/skin/icons/loading_16.png");
+}
+
+.quickaccess-contents toolbarbutton,
+.quickaccess-button {
+	-moz-appearance: none;
+	background: none;
+	border-top: 1px solid transparent;
+	border-bottom: 1px solid transparent;
+	border-left: none;
+	border-right: none;
+	box-shadow: none;
+	margin: 0;
+	padding: 3px 6px;
+}
+
+.quickaccess-groupbutton {
+	padding: 0;
+	overflow: hidden;
+}
+
+.quickaccess-contents toolbarbutton.quickaccess-button {
+	/* compensating for transparent border in group item's inner toolbarbuttons */
+	padding: 4px 6px;
+}
+
+.tabGroups-quickaccess toolbarbutton.quickaccess-currentbutton,
+.quickaccess-currentbutton {
+	background-color: hsla(210,4%,10%,.12);
+	border-color: hsla(210,4%,10%,.14);
+	box-shadow: 0 1px 0 hsla(210,4%,10%,.03) inset;
+}
+
+.tabGroups-quickaccess toolbarbutton.quickaccess-activebutton:not(.quickaccess-currentbutton),
+.quickaccess-activebutton:not(.quickaccess-currentbutton) {
+	background-color: hsla(210,4%,10%,.08);
+	border-color: hsla(210,4%,10%,.14);
+}
+
+.PanelUI-subView toolbarbutton.quickaccess-tabsbutton {
+	min-width: 75px;
+	background-image: url("chrome://tabgroups/skin/menu-arrow.svg#arrow");
+	background-repeat: no-repeat;
+	background-position: 0 center;
+	background-size: 16px 16px;
+	-moz-padding-start: 16px;
+}
+
+toolbarbutton.quickaccess-tabsbutton .toolbarbutton-text {
+	text-align: end;
+}
+
+toolbarbutton.quickaccess-tabsbutton:hover {
+	background-color: rgba(0,0,0,0.2);
+}
+
+.quickaccess-gobackbutton {
+	list-style-image: url("chrome://tabgroups/skin/menu-arrow.svg#arrow");
+}
+
+.quickaccess-gobackbutton .toolbarbutton-icon {
+	transform: scaleX(-1);
+}
+
+.quickaccess-grouplabel {
+	text-align: center;
+}
+
+.quickaccess-tabbutton .toolbarbutton-icon {
+	height: 16px;
+	width: 16px;
+}
+
+.quickaccess-tabbutton .toolbarbutton-text {
+	-moz-padding-start: 0;
+}
+
+#tabGroups-quickaccess-panelView .PanelUI-subView {
+	margin-bottom: -4px;
+	margin-left: -4px;
+	margin-right: -4px;
+}
+
+.tabGroups-quickaccess-panel-footer > .subviewbutton.panel-subview-footer:not(:first-child) {
+	-moz-margin-start: 0;
+}
+
+.tabGroups-quickaccess-panel-footer > .subviewbutton.panel-subview-footer:not(:last-child) {
+	-moz-margin-end: 0;
+}
+
+.tabGroups-quickaccess-panel-footer toolbarseparator {
+	opacity: 0.5;
+	border: 0;
+	border-left: 1px solid hsla(210,4%,10%,.14);
+	margin-top: 11px;
+	-moz-margin-start: -1px;
+	-moz-margin-end: 0;
+	-moz-appearance: none;
+	background: none !Important;
+	box-shadow: none !Important;
+}
+
+.tabGroups-quickaccess-panel-footer:hover toolbarseparator {
+	opacity: 1;
+	margin-top: 4px;
+}
+
+#tabGroups-quickaccess-panel .tabGroups-quickaccess-panel-footer toolbarseparator {
+	margin-bottom: 7px;
+}
+
+#tabGroups-quickaccess-panel .tabGroups-quickaccess-panel-footer:hover toolbarseparator {
+	margin-bottom: 0;
+}
+
+#tabGroups-quickaccess-panelView .tabGroups-quickaccess-panel-footer toolbarseparator {
+	margin-bottom: 3px;
+}
+
+#tabGroups-quickaccess-panelView .tabGroups-quickaccess-panel-footer:hover toolbarseparator {
+	margin-bottom: -4px;
+}
+
+/* extra selector is to override the original */
+.tabGroups-quickaccess-panel-manage.subviewbutton.panel-subview-footer > .toolbarbutton-text {
+	padding: 0 6px;
+	text-align: start;
+}
+
+.tabGroups-quickaccess-panel-settings {
+	list-style-image: url("chrome://tabgroups/skin/settings.png");
+}
+
+@media (min-resolution: 1.1dppx) {
+	.tabGroups-quickaccess-panel-settings {
+		list-style-image: url("chrome://tabgroups/skin/settings@2x.png");
+	}
+}

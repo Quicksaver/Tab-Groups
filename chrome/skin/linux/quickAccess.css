@@ -1,0 +1,9 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+.tabGroups-quickaccess[FF48] .loading {
+	background-image: url("chrome://global/skin/icons/loading.png");
+}
+
+.tabGroups-quickaccess-panel-footer toolbarseparator {
+	-moz-appearance: none !important;
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://tabgroups/skin/quickAccess.css" type="text/css"?>
+<?xml-stylesheet href="chrome://tabgroups-os/skin/quickAccess.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://tabgroups/locale/TabView.dtd">
+<overlay id="quickAccess-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<popupset id="mainPopupSet">
+		<panel id="objName-quickaccess-panel"
+			type="arrow"
+			class="objName-quickaccess cui-widget-panel cui-widget-panelview cui-widget-panelWithFooter PanelUI-subView">
+			<textbox id="objName-quickaccess-panel-find" placeholder="&searchForTab.label;"/>
+			<vbox id="objName-quickaccess-panel-contents" class="quickaccess-contents cui-widget-panelview PanelUI-subView" flex="1"/>
+			<hbox class="objName-quickaccess-panel-footer">
+				<toolbarbutton label="&manageTabGroups.label;"
+					tooltiptext="&manageTabGroups.tooltip;"
+					class="subviewbutton panel-subview-footer objName-icon objName-quickaccess-panel-manage"
+					flex="1"
+					command="objName:ToggleTabView"/>
+				<toolbarseparator/>
+				<toolbarbutton tooltiptext="&buttonOptionsTabGroups.label;"
+					class="subviewbutton panel-subview-footer objName-quickaccess-panel-settings"
+					command="objName:TabViewSettings"/>
+			</hbox>
+		</panel>
+	</popupset>
+
+	<panelmultiview id="PanelUI-multiView">
+		<panelview id="objName-quickaccess-panelView"
+			flex="1"
+			class="objName-quickaccess PanelUI-subView">
+				<label class="panel-subview-header" value="&viewTabGroups.label;"/>
+				<textbox id="objName-quickaccess-panelView-find" placeholder="&searchForTab.label;"/>
+				<vbox id="objName-quickaccess-panelView-contents" class="quickaccess-contents cui-widget-panelview PanelUI-subView" flex="1"/>
+				<hbox class="objName-quickaccess-panel-footer">
+					<toolbarbutton label="&manageTabGroups.label;"
+						tooltiptext="&manageTabGroups.tooltip;"
+						class="subviewbutton panel-subview-footer objName-icon objName-quickaccess-panel-manage"
+						flex="1"
+						command="objName:ToggleTabView"/>
+					<toolbarseparator/>
+					<toolbarbutton tooltiptext="&buttonOptionsTabGroups.label;"
+						class="subviewbutton panel-subview-footer objName-quickaccess-panel-settings"
+						command="objName:TabViewSettings"/>
+				</hbox>
+		</panelview>
+	</panelmultiview>
+
+</overlay>

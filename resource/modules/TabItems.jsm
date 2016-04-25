@@ -1,4 +1,4 @@
-// VERSION 1.1.19
+// VERSION 1.1.20
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -34,6 +34,7 @@ this.TabItem = function(tab, options = {}) {
 	this.order = 1;
 	this._draggable = true;
 	this.lastMouseDownTarget = null;
+	this._labelsNeedUpdate = true;
 	this._thumbNeedsUpdate = false;
 
 	this._lastTabUpdateTime = Date.now();
@@ -449,6 +450,30 @@ this.TabItem.prototype = {
 		UI.setActive(this);
 	},
 
+	_updateLabels: function() {
+		return new Promise((resolve, reject) => {
+			FavIcons.getFavIconUrlForTab(this.tab, (iconUrl) => {
+				if(iconUrl) {
+					this.fav._iconUrl = iconUrl;
+					this.fav.style.backgroundImage = 'url("'+iconUrl+'")';
+					this.removeClass('noFavicon');
+				} else {
+					this.fav._iconUrl = '';
+					this.fav.style.backgroundImage = '';
+					this.addClass('noFavicon');
+				}
+				this._sendToSubscribers("iconUpdated");
+
+				this._labelsNeedUpdate = false;
+				resolve(true);
+			});
+
+			let label = this.tab.label;
+			let tabUrl = this.tab.linkedBrowser.currentURI.spec;
+			this.updateLabel(label, tabUrl);
+		});
+	},
+
 	updateLabel: function(title, url) {
 		title = title || url;
 		let tooltip = title;
@@ -698,7 +723,10 @@ this.TabItems = {
 		try {
 			// It could have been closed in the meantime, in which case there's no point
 			// (not that we could "update" it even if we wanted to anyway).
-			if(!tab._tabViewTabItem) { return; }
+			let tabItem = tab._tabViewTabItem;
+			if(!tabItem) { return; }
+
+			tabItem._labelsNeedUpdate = true;
 
 			let shouldDefer =	this.isPaintingPaused()
 						|| this._tabsWaitingForUpdate.hasItems()
@@ -731,22 +759,9 @@ this.TabItems = {
 			let tabItem = tab._tabViewTabItem;
 
 			// Even if the page hasn't loaded, display the favicon and title
-			FavIcons.getFavIconUrlForTab(tab, function(iconUrl) {
-				if(iconUrl) {
-					tabItem.fav._iconUrl = iconUrl;
-					tabItem.fav.style.backgroundImage = 'url("'+iconUrl+'")';
-					tabItem.removeClass('noFavicon');
-				} else {
-					tabItem.fav._iconUrl = '';
-					tabItem.fav.style.backgroundImage = '';
-					tabItem.addClass('noFavicon');
-				}
-				tabItem._sendToSubscribers("iconUpdated");
-			});
-
-			let label = tab.label;
-			let tabUrl = tab.linkedBrowser.currentURI.spec;
-			tabItem.updateLabel(label, tabUrl);
+			if(tabItem._labelsNeedUpdate) {
+				tabItem._updateLabels();
+			}
 
 			// If we're not taking thumbnails for this tab's group, we don't need to fetch it in the first place.
 			// This will be re-called if and when its thumb becomes necessary.

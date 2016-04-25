@@ -1,0 +1,11 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+.tabGroups-quickaccess[FF48] .loading {
+	background-image: url("chrome://global/skin/icons/loading.png");
+}
+
+@media (min-resolution: 1.1dppx) {
+	.tabGroups-quickaccess[FF48] .loading {
+		background-image: url("chrome://global/skin/icons/loading@2x.png");
+	}
+}

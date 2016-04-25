@@ -1,4 +1,4 @@
-// VERSION 1.3.10
+// VERSION 1.3.11
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -608,7 +608,7 @@ this.UI = {
 	},
 
 	goToPreferences: function(aOptions) {
-		PrefPanes.open(gWindow, aOptions);
+		gTabView.goToPreferences(aOptions);
 
 		// we can't very well see the preferences if we're still in tabview
 		this.hideTabView();

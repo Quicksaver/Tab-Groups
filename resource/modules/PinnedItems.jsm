@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.PinnedItems = {
 	get actions() { return $('actions'); },
@@ -158,13 +158,16 @@ this.PinnedItems = {
 			icon.classList.add("appTabIcon");
 			icon.setAttribute('type', 'button');
 			icon.setAttribute('draggable', 'true');
+			icon.zoomIn = function() {
+				UI.goToTab(this.tab);
+			};
 			icon.handleEvent = function(e) {
 				switch(e.type) {
 					case 'click':
 						// left-clicks only
 						if(e.button != 0) { break; }
 
-						UI.goToTab(tab);
+						this.zoomIn();
 						break;
 
 					case 'dragenter':

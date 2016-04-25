@@ -1,4 +1,4 @@
-// VERSION 1.0.35
+// VERSION 1.1.0
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -19,10 +19,12 @@ this.TabView = {
 
 	_initFrameCallbacks: [],
 
+	kButtonId: objName+'-tabview-button',
 	kTooltipId: objName+'-tab-view-tooltip',
 	kTabMenuPopupId: objName+'-context_tabViewMenuPopup',
 	kInputContextMenuId: objName+'-tabview-context-input',
 	kTabContextMenuId: 'tabContextMenu',
+	get button() { return $(this.kButtonId); },
 	get tooltip() { return $(this.kTooltipId); },
 	get tabMenuPopup() { return $(this.kTabMenuPopupId); },
 	get inputContextMenu() { return $(this.kInputContextMenuId); },
@@ -135,7 +137,31 @@ this.TabView = {
 					this._window[objName].GroupItems.resetGroupsOptions();
 				});
 				break;
+
+			case 'nsPref:changed':
+				this.toggleQuickAccess();
+				break;
 		}
+	},
+
+	onWidgetAdded: function(aWidgetId) {
+		if(aWidgetId == this.kButtonId) {
+			this.setButtonTooltip();
+		}
+	},
+
+	onWidgetRemoved: function(aWidgetId) {
+		if(aWidgetId == this.kButtonId) {
+			this.setButtonTooltip();
+		}
+	},
+
+	onAreaNodeRegistered: function() {
+		this.setButtonTooltip();
+	},
+
+	onAreaNodeUnregstered: function() {
+		this.setButtonTooltip();
 	},
 
 	init: function(loaded) {
@@ -159,6 +185,12 @@ this.TabView = {
 		Tabs.listen("TabShow", this);
 		Tabs.listen("TabClose", this);
 		Observers.add(this, objName+'-set-groups-defaults');
+
+		// Check if we should initialize the quick access panel, there's no point in doing it if it will never be used.
+		CustomizableUI.addListener(this);
+		Prefs.listen('quickAccessButton', this);
+		Prefs.listen('quickAccessKeycode', this);
+		this.toggleQuickAccess();
 
 		// prevent thumbnail service from expiring thumbnails
 		// we can't wait for the panel view here since expiration may run before it is initialized
@@ -247,6 +279,11 @@ this.TabView = {
 		Piggyback.revert('TabView', window, 'undoCloseTab');
 		Piggyback.revert('TabView', gBrowser, 'updateTitlebar');
 
+		CustomizableUI.removeListener(this);
+		Prefs.unlisten('quickAccessButton', this);
+		Prefs.unlisten('quickAccessKeycode', this);
+		Modules.unload('quickAccess');
+
 		Listeners.remove(this.tooltip, "popupshowing", this, true);
 		Listeners.remove(this.tabMenuPopup, "popupshowing", this);
 		Listeners.remove($('tabContextMenu'), "popupshowing", this);
@@ -334,6 +371,11 @@ this.TabView = {
 	show: function() {
 		if(this.isVisible()) { return; }
 
+		// Make sure the quick access panel is hidden if we enter tab view
+		if(self.quickAccess) {
+			quickAccess.hide();
+		}
+
 		this._initFrame(() => {
 			this._window[objName].UI.showTabView(true);
 		});
@@ -358,6 +400,14 @@ this.TabView = {
 		} else {
 			this.show();
 		}
+	},
+
+	commandButton: function() {
+		if(Prefs.quickAccessButton && self.quickAccess) {
+			quickAccess.toggle();
+			return;
+		}
+		this.toggle();
 	},
 
 	switchGroup: function(aPrevious) {
@@ -509,7 +559,6 @@ this.TabView = {
 
 	// Fills in the tooltip text.
 	fillInTooltip: function(tipElement) {
-		let retVal = false;
 		let titleText = null;
 		let direction = tipElement.ownerDocument.dir;
 
@@ -524,10 +573,10 @@ this.TabView = {
 
 		if(titleText) {
 			setAttribute(this.tooltip, "label", titleText);
-			retVal = true;
+			return true;
 		}
 
-		return retVal;
+		return false;
 	},
 
 	// With Aero Peek enabled, it should only peek tabs of the current group.
@@ -558,6 +607,27 @@ this.TabView = {
 			// And if previews should even be shown at all.
 			AeroPeek.checkPreviewCount();
 		}
+	},
+
+	toggleQuickAccess: function() {
+		this.setButtonTooltip();
+		Modules.loadIf('quickAccess', Prefs.quickAccessButton || Prefs.quickAccessKeycode != 'none');
+	},
+
+	setButtonTooltip: function() {
+		let button = this.button;
+		if(button) {
+			let name = (Prefs.quickAccessButton) ? 'buttonQuickAccessTooltip' : 'buttonManageTooltip';
+			let tooltip = Strings.get('TabView', name);
+			setAttribute(button, 'tooltiptext', tooltip);
+		}
+	},
+
+	goToPreferences: function(aOptions) {
+		if(self.quickAccess) {
+			quickAccess.hide();
+		}
+		PrefPanes.open(window, aOptions);
 	},
 
 	onLoad: function() {

@@ -1,4 +1,4 @@
-// VERSION 1.4.9
+// VERSION 1.4.10
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -15,6 +15,8 @@ addonUris = {
 };
 
 prefList = {
+	quickAccessButton: true,
+
 	displayMode: 'single',
 	showGroupThumbs: true,
 	gridDynamicSize: true,
@@ -27,6 +29,12 @@ prefList = {
 	tabViewShift: true,
 	tabViewAlt: false,
 	tabViewCtrl: false,
+
+	quickAccessKeycode: 'none',
+	quickAccessAccel: true,
+	quickAccessShift: true,
+	quickAccessAlt: false,
+	quickAccessCtrl: false,
 
 	nextGroupKeycode: '`',
 	nextGroupAccel: true,
