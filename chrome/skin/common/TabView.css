@@ -34,3 +34,11 @@ toolbar[brighttext] #tabGroups-tabview-button {
 		list-style-image: url(chrome://tabgroups-os/skin/menuPanel@2x.png);
 	}
 }
+
+#tabGroups-tabview-button[showGroupTitle][cui-areatype="toolbar"] > .toolbarbutton-text {
+	display: -moz-box;
+}
+
+#tabGroups-tabview-button[showGroupTitle][cui-areatype="toolbar"]:not([overflowedItem="true"]) > .toolbarbutton-icon {
+	display: none;
+}

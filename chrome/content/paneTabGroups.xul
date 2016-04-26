@@ -19,6 +19,7 @@
 	<prefpane id="mainPrefPane">
 		<preferences>
 			<preference id="pref-quickAccessButton" name="extensions.tabgroups.quickAccessButton" type="bool"/>
+			<preference id="pref-groupTitleInButton" name="extensions.tabgroups.groupTitleInButton" type="bool"/>
 			<preference id="pref-showGroupThumbs" name="extensions.tabgroups.showGroupThumbs" type="bool"/>
 			<preference id="pref-gridDynamicSize" name="extensions.tabgroups.gridDynamicSize" type="bool"/>
 			<preference id="pref-stackTabs" name="extensions.tabgroups.stackTabs" type="bool"/>
@@ -123,11 +124,19 @@
 
 		<groupbox align="start" id="paneTabGroups-toolbarbutton" collapsed="true" data-category="paneTabGroups">
 			<caption label="&cat.toolbarbutton.label;"/>
+			<checkbox label="&opt.groupTitleInButton.label;"
+				helpbox="paneTabGroups-toolbarbutton-helptext"
+				jump="groupTitleInButton"
+				delayPreference="pref-groupTitleInButton"/>
 			<checkbox label="&opt.quickAccessButton.label;"
-				helpbox="paneTabGroups-quickAccessButton-helptext"
+				helpbox="paneTabGroups-toolbarbutton-helptext"
 				jump="quickAccessButton"
 				delayPreference="pref-quickAccessButton"/>
-			<vbox id="paneTabGroups-quickAccessButton-helptext" collapsed="true">
+			<vbox id="paneTabGroups-toolbarbutton-helptext" collapsed="true">
+				<description style="font-weight:bold;">&opt.groupTitleInButton.label;</description>
+				<description>&opt.groupTitleInButton.tooltip1;</description>
+				<description>&opt.groupTitleInButton.tooltip2;</description>
+				<description style="font-weight:bold; margin-top:1em;">&opt.quickAccessButton.label;</description>
 				<description>&opt.quickAccessButton.tooltip1;</description>
 				<description>&opt.quickAccessButton.tooltip2;</description>
 			</vbox>

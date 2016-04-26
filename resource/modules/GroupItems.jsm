@@ -1,4 +1,4 @@
-// VERSION 1.6.17
+// VERSION 1.6.18
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -369,6 +369,11 @@ this.GroupItem.prototype = {
 		}
 		this.selector.setAttribute('title', title);
 		this.save();
+
+		// We need to save the title of the active group item if it's changed
+		if(this == GroupItems._activeGroupItem) {
+			GroupItems._save();
+		}
 	},
 
 	// Hide the title's shield and focus the underlying input field.
@@ -1947,7 +1952,6 @@ this.GroupItems = {
 	_lastActiveList: null,
 	workSpace: $('groups'),
 
-	get size() { return this.groupItems.size; },
 	[Symbol.iterator]: function* () {
 		for(let groupItem of this.groupItems.values()) {
 			yield groupItem;
@@ -1957,6 +1961,15 @@ this.GroupItems = {
 		for(let groupItem of this.groupItems.values()) {
 			return groupItem;
 		}
+	},
+	get size() {
+		let size = 0;
+		for(let groupItem of this) {
+			if(!groupItem.hidden) {
+				size++;
+			}
+		}
+		return size;
 	},
 
 	// Will be calc'ed in init() from the values above.
@@ -2135,11 +2148,20 @@ this.GroupItems = {
 		if(!this._inited) { return; }
 
 		let activeGroupId = this._activeGroupItem ? this._activeGroupItem.id : null;
+		let activeGroupName = this.getActiveGroupTitle();
 		Storage.saveGroupItemsData(gWindow, {
 			nextID: this.nextID,
 			activeGroupId: activeGroupId,
+			activeGroupName: activeGroupName,
 			totalNumber: this.size
 		});
+
+		// Update the button's label if necessary.
+		gTabView.setButtonLabel();
+	},
+
+	getActiveGroupTitle: function() {
+		return (this.size > 1 && this._activeGroupItem) ? this._activeGroupItem.getTitle(true) : null;
 	},
 
 	// Given an array of DOM elements, returns a <Rect> with (roughly) the union of their locations.
@@ -2243,7 +2265,7 @@ this.GroupItems = {
 			}
 
 			this._inited = true;
-			this._save(); // for nextID
+			this._save(); // for nextID and activeGroupTitle
 		}
 		catch(ex) {
 			Cu.reportError(ex);

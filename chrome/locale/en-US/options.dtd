@@ -24,7 +24,10 @@
 <!ENTITY btn.setdefaults.tooltip2 "Only click this button if you want to override the options of all existing groups with the values set here. Otherwise you'll have to manually set or change them in each individual group.">
 
 <!ENTITY cat.toolbarbutton.label "Toolbar Button">
-<!ENTITY opt.quickAccessButton.label "Click the toolbar button to show the quick access panel">
+<!ENTITY opt.groupTitleInButton.label "Show the name of the active group">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Be sure of which group is active, directly from the main window without having to perform any action.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "The button will still only show the icon if it's placed in the main menu panel, or if you have only one group.">
+<!ENTITY opt.quickAccessButton.label "Click to open the quick access panel">
 <!ENTITY opt.quickAccessButton.tooltip1 "The quick access panel lets you quickly switch between groups and tabs without having to enter groups view.">
 <!ENTITY opt.quickAccessButton.tooltip2 "Disable this to enter groups view when clicking the button.">
 

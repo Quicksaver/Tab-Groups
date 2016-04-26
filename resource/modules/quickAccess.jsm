@@ -1,4 +1,4 @@
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -153,8 +153,19 @@ this.quickAccess = {
 
 		if(this.panel.state == 'closed') {
 			// Anchor the panel to the menu button if our button isn't placed in the window.
-			let btn = (placement) ? TabView.button : this.PanelUIBtn;
-			let anchor = $ª(btn, 'toolbarbutton-icon', 'class') || btn;
+			let btn;
+			let anchor;
+			if(placement) {
+				btn = TabView.button;
+				if(trueAttribute(btn, 'showGroupTitle')) {
+					anchor = $ª(btn, 'toolbarbutton-text', 'class');
+				}
+			} else {
+				btn = this.PanelUIBtn;
+			}
+			if(!anchor) {
+				anchor = $ª(btn, 'toolbarbutton-icon', 'class') || btn;
+			}
 			this.panel.openPopup(anchor, 'bottomcenter topright', 0, 0, false, false);
 		} else {
 			this.panel.hidePopup();

@@ -1,4 +1,4 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -127,6 +127,14 @@ this.TabView = {
 				gTaskbarTabGroup.enabled = AeroPeek.enabled;
 				this.updateAeroPeek();
 				break;
+
+			case 'beforecustomization':
+				this.setButtonLabel(true);
+				break;
+
+			case 'aftercustomization':
+				this.setButtonLabel(false);
+				break;
 		}
 	},
 
@@ -139,29 +147,43 @@ this.TabView = {
 				break;
 
 			case 'nsPref:changed':
-				this.toggleQuickAccess();
+				switch(aSubject) {
+					case 'quickAccessButton':
+					case 'quickAccessKeycode':
+						this.toggleQuickAccess();
+						break;
+
+					case 'groupTitleInButton':
+						this.setButtonLabel();
+						break;
+				}
 				break;
 		}
 	},
 
 	onWidgetAdded: function(aWidgetId) {
 		if(aWidgetId == this.kButtonId) {
-			this.setButtonTooltip();
+			this._onWidget();
 		}
 	},
 
 	onWidgetRemoved: function(aWidgetId) {
 		if(aWidgetId == this.kButtonId) {
-			this.setButtonTooltip();
+			this._onWidget();
 		}
 	},
 
 	onAreaNodeRegistered: function() {
-		this.setButtonTooltip();
+		this._onWidget();
 	},
 
 	onAreaNodeUnregstered: function() {
+		this._onWidget();
+	},
+
+	_onWidget: function() {
 		this.setButtonTooltip();
+		this.setButtonLabel();
 	},
 
 	init: function(loaded) {
@@ -191,6 +213,12 @@ this.TabView = {
 		Prefs.listen('quickAccessButton', this);
 		Prefs.listen('quickAccessKeycode', this);
 		this.toggleQuickAccess();
+
+		// Toggle the label and icon on the button according to if the user wants to show the group title in the button.
+		Prefs.listen('groupTitleInButton', this);
+		Listeners.add(window, 'beforecustomization', this);
+		Listeners.add(window, 'aftercustomization', this);
+		this.setButtonLabel();
 
 		// prevent thumbnail service from expiring thumbnails
 		// we can't wait for the panel view here since expiration may run before it is initialized
@@ -278,6 +306,10 @@ this.TabView = {
 		Piggyback.revert('TabView', window, 'WindowIsClosing');
 		Piggyback.revert('TabView', window, 'undoCloseTab');
 		Piggyback.revert('TabView', gBrowser, 'updateTitlebar');
+
+		Prefs.unlisten('groupTitleInButton', this);
+		Listeners.remove(window, 'beforecustomization', this);
+		Listeners.remove(window, 'aftercustomization', this);
 
 		CustomizableUI.removeListener(this);
 		Prefs.unlisten('quickAccessButton', this);
@@ -621,6 +653,62 @@ this.TabView = {
 			let tooltip = Strings.get('TabView', name);
 			setAttribute(button, 'tooltiptext', tooltip);
 		}
+	},
+
+	setButtonLabel: function(inCustomize = customizing) {
+		// We can't do anything without the button.
+		let btn = this.button;
+		if(!btn) { return; }
+
+		this.getGroupTitleForButton(inCustomize).then((title) => {
+			// In customize mode, the label is always the original.
+			if(title && !inCustomize) {
+				// Keep a backup of the label in case we need to revert it later.
+				if(!btn._label) {
+					btn._label = btn.getAttribute('label');
+				}
+				setAttribute(btn, 'label', title);
+			} else if(btn._label) {
+				setAttribute(btn, 'label', btn._label);
+			}
+
+			if(title) {
+				setAttribute(btn, 'showGroupTitle', 'true');
+			} else {
+				removeAttribute(btn, 'showGroupTitle');
+			}
+		});
+	},
+
+	getGroupTitleForButton: function() {
+		return new Promise((resolve, reject) => {
+			// Duh.
+			if(!Prefs.groupTitleInButton) {
+				resolve(null);
+				return;
+			}
+
+			// This doesn't work if the button is in the menu panel.
+			let placement = CustomizableUI.getPlacementOfWidget(this.kButtonId);
+			if(!placement || placement.area == 'PanelUI-contents') {
+				resolve(null);
+				return;
+			}
+
+			// Don't initialize tab view until it's necessary. But if it's already initialized, use its methods.
+			if(this._window) {
+				resolve(this._window[objName].GroupItems.getActiveGroupTitle());
+			} else {
+				let groupsData = Storage.readGroupItemsData(window);
+				if(groupsData && groupsData.activeGroupName !== undefined) {
+					resolve(groupsData.activeGroupName);
+				} else {
+					this._initFrame(() => {
+						resolve(this._window[objName].GroupItems.getActiveGroupTitle());
+					});
+				}
+			}
+		});
 	},
 
 	goToPreferences: function(aOptions) {
