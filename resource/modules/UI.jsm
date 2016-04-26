@@ -1,4 +1,4 @@
-// VERSION 1.3.11
+// VERSION 1.3.12
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -90,6 +90,9 @@ this.UI = {
 
 	// has the user clicked the close button in the notice in this window already
 	_noticeDismissed: false,
+
+	// To enable context menus on a delay when entering tab view, so it doesn't conflict with FireGestures.
+	_contextMenusEnabled: false,
 
 	get classic() { return Prefs.displayMode == 'classic'; },
 	get grid() { return Prefs.displayMode == 'grid'; },
@@ -268,6 +271,8 @@ this.UI = {
 				break;
 
 			case 'contextmenu':
+				if(!this._contextMenusEnabled) { break; }
+
 				// When right-clicking a group title, we're actually right-clicking its shield if the cursor isn't already there.
 				// So we focus it now and pretend like it was already focused.
 				if(e.target.classList.contains('title-shield')) {
@@ -966,6 +971,11 @@ this.UI = {
 			else if(!currentTab || !currentTab._tabViewTabItem) {
 				this.clearActiveTab();
 			}
+
+			this._contextMenusEnabled = false;
+			Timers.init('showTabView', () => {
+				this._contextMenusEnabled = true;
+			}, 50);
 		}
 		catch(ex) {
 			Cu.reportError(ex);
