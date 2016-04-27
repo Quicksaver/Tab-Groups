@@ -125,7 +125,7 @@ body.DraggingTab .tab * {
 	height: 100%;
 }
 
-.thumb > *:-moz-any(canvas,.cached-thumb) {
+.thumb > .tab-thumb {
 	background-color: white;
 	background-clip: content-box;
 	border: var(--item-border);
@@ -358,7 +358,8 @@ body:not(.grid) .groupItem:not(.phantom) {
 .groupItem.stackedGroup .tab-container {
 	/* leave space for the stack expander */
 	height: calc(100% - 32px);
-	overflow-y: hidden;
+	overflow-x: visible;
+	overflow-y: visible;
 }
 
 .undo {
@@ -480,8 +481,7 @@ body:not(.single) .groupItem:not(:hover) .tab.create-new,
 	height: 0;
 }
 
-.tab-container.noThumbs .tab .cached-thumb,
-.tab-container.noThumbs .tab canvas {
+.tab-container.noThumbs .tab-thumb {
 	display: none;
 }
 

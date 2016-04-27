@@ -1,4 +1,4 @@
-// VERSION 1.6.18
+// VERSION 1.6.19
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1545,17 +1545,21 @@ this.GroupItem.prototype = {
 		this._lastArrange = { isStacked: true, bounds, children };
 
 		// compute size of the entire stack, modulo rotation.
-		let itemAspect = TabItems.tabAspect;
+		let itemAspect = TabItems.invTabAspect;
 		let scale = 0.7;
 		let boundsAspect = bounds.height / bounds.width;
 
 		let size;
 		if(boundsAspect > itemAspect) {
 			// Tall, thin groupItem
-			size = TabItems.calcValidSize(new Point(bounds.width * scale, -1), true);
+			size = new Point(bounds.width * scale, -1);
+			size.stacked = true;
+			size = TabItems.calcValidSize(size);
 		} else {
 			// Short, wide groupItem
-			size = TabItems.calcValidSize(new Point(-1, bounds.height * scale), true);
+			size = new Point(-1, bounds.height * scale);
+			size.stacked = true;
+			size = TabItems.calcValidSize(size);
 		}
 
 		// x is the left margin that the stack will have, within the content area (bounds)
@@ -1710,7 +1714,7 @@ this.GroupItem.prototype = {
 		Listeners.add(tray, 'dragover', this);
 
 		let w = 180;
-		let h = w * (TabItems.tabHeight / TabItems.tabWidth) * 1.1;
+		let h = w * TabItems.invTabAspect * 1.1;
 		let padding = 20;
 		let col = Math.ceil(Math.sqrt(this.children.length));
 		let row = Math.ceil(this.children.length/col);

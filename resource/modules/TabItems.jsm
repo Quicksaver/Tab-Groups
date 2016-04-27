@@ -1,4 +1,4 @@
-// VERSION 1.1.20
+// VERSION 1.1.21
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -525,9 +525,6 @@ this.TabItem.prototype = {
 this.TabItems = {
 	minTabWidth: 90,
 	tabWidth: 160,
-	tabHeight: 160,
-	tabAspect: 0, // set in init
-	invTabAspect: 0, // set in init
 	fontSizeRange: new Range(8,15),
 	_fragment: null,
 	items: new Set(),
@@ -591,9 +588,15 @@ this.TabItems = {
 	init: function() {
 		// Set up tab priority queue
 		this._tabsWaitingForUpdate = new TabPriorityQueue();
-		this.minTabHeight = Math.floor(this.minTabWidth * this.tabHeight / this.tabWidth);
-		this.tabAspect = this.tabHeight / this.tabWidth;
+
+		// Screen ratio is unlikely to change -> significantly <- for the lifetime of this session.
+		// So let's just assume it remains constant from the first time tab view is opened.
+		// We use it for the tab thumbs ratio as well, so that they are as representative of the actual tab as possible.
+		this.thumbRatio = window.innerWidth / window.innerHeight;
+		this.tabHeight = this._getHeightForWidth(this.tabWidth);
+		this.tabAspect = this.tabWidth / this.tabHeight;
 		this.invTabAspect = 1 / this.tabAspect;
+		this.minTabHeight = Math.floor(this.minTabWidth / this.tabAspect);
 
 		Messenger.listenWindow(gWindow, "MozAfterPaint", this);
 
@@ -646,10 +649,12 @@ this.TabItems = {
 			div.appendChild(thumb);
 
 			let img = document.createElement('img');
+			img.classList.add('tab-thumb');
 			img.classList.add('cached-thumb');
 			thumb.appendChild(img);
 
 			let canvas = document.createElement('canvas');
+			canvas.classList.add('tab-thumb');
 			canvas.setAttribute('moz-opaque', '');
 			thumb.appendChild(canvas);
 
@@ -941,13 +946,23 @@ this.TabItems = {
 	},
 
 	// Private method that returns the tabitem width given a height.
-	_getWidthForHeight: function(height) {
-		return height * this.invTabAspect;
+	_getWidthForHeight: function(height, stacked) {
+		let thumbHeight = height - UICache.tabItemPadding;
+		if(!stacked) {
+			thumbHeight -= this.fontSizeRange.max +2; // +2 comes from max line height calculated in GroupItem._gridArrange()
+		}
+		let thumbWidth = thumbHeight * this.thumbRatio;
+		return Math.floor(thumbWidth + UICache.tabItemPadding);
 	},
 
 	// Private method that returns the tabitem height given a width.
-	_getHeightForWidth: function(width) {
-		return width * this.tabAspect;
+	_getHeightForWidth: function(width, stacked) {
+		let thumbWidth = width - UICache.tabItemPadding;
+		let thumbHeight = thumbWidth / this.thumbRatio;
+		if(!stacked) {
+			thumbHeight += this.fontSizeRange.max +2; // +2 comes from max line height calculated in GroupItem._gridArrange()
+		}
+		return Math.floor(thumbHeight + UICache.tabItemPadding);
 	},
 
 	// Arranges the given items in a grid within the given bounds, maximizing item size but maintaining standard tab aspect ratio for each
@@ -1007,31 +1022,30 @@ this.TabItems = {
 	},
 
 	// Pass in a desired size, and receive a size based on proper title size and aspect ratio.
-	calcValidSize: function(size, scaleDown) {
+	calcValidSize: function(size) {
 		let width = size.x;
 		let height = size.y;
-		if(!scaleDown) {
+		if(!size.stacked) {
 			width = Math.max(this.minTabWidth, width);
 			height = Math.max(this.minTabHeight, height);
 		}
-		let retSize = new Point(width, height);
 
 		if(size.x > -1) {
-			retSize.y = this._getHeightForWidth(width);
+			height = this._getHeightForWidth(width, size.stacked);
 		}
 		if(size.y > -1) {
-			retSize.x = this._getWidthForHeight(height);
+			width = this._getWidthForHeight(height, size.stacked);
 		}
 
 		if(size.x > -1 && size.y > -1) {
-			if(retSize.x < size.x) {
-				retSize.y = this._getHeightForWidth(retSize.x);
+			if(width < size.x) {
+				height = this._getHeightForWidth(width, size.stacked);
 			} else {
-				retSize.x = this._getWidthForHeight(retSize.y);
+				width = this._getWidthForHeight(height, size.stacked);
 			}
 		}
 
-		return retSize;
+		return new Point(Math.floor(width), Math.floor(height));
 	}
 };
 
