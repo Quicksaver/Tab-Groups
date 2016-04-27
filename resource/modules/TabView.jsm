@@ -1,4 +1,4 @@
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -7,7 +7,7 @@ this.__defineGetter__('TabContextMenu', function() { return window.TabContextMen
 this.__defineGetter__('goUpdateCommand', function() { return window.goUpdateCommand; });
 
 XPCOMUtils.defineLazyGetter(this, "AeroPeek", () => { return Cu.import("resource:///modules/WindowsPreviewPerTab.jsm", {}).AeroPeek; });
-XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
+XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 
 this.TabView = {
 	_deck: null,
@@ -16,6 +16,7 @@ this.TabView = {
 	_initialized: false,
 	_closedLastVisibleTabBeforeFrameInitialized: false,
 	_isFrameLoading: false,
+	_viewportRatio: 1,
 
 	_initFrameCallbacks: [],
 
@@ -222,7 +223,7 @@ this.TabView = {
 
 		// prevent thumbnail service from expiring thumbnails
 		// we can't wait for the panel view here since expiration may run before it is initialized
-		gPageThumbnails.addExpirationFilter(this);
+		PageThumbs.addExpirationFilter(this);
 
 		Piggyback.add('TabView', window, 'WindowIsClosing', () => {
 			if(this.hide()) {
@@ -301,7 +302,7 @@ this.TabView = {
 			Listeners.remove(window, 'tabviewhidden', this);
 		}
 
-		gPageThumbnails.removeExpirationFilter(this);
+		PageThumbs.removeExpirationFilter(this);
 
 		Piggyback.revert('TabView', window, 'WindowIsClosing');
 		Piggyback.revert('TabView', window, 'undoCloseTab');
@@ -349,6 +350,11 @@ this.TabView = {
 
 		if(this._isFrameLoading) { return; }
 		this._isFrameLoading = true;
+
+		// Screen ratio is unlikely to change -> significantly <- for the lifetime of this session.
+		// So let's just assume it remains constant from the first time tab view is opened.
+		// We use it for the tab thumbs ratio as well, so that they are as representative of the actual tab as possible.
+		this._viewportRatio = gBrowser.mCurrentBrowser.clientWidth / gBrowser.mCurrentBrowser.clientHeight;
 
 		// find the deck
 		this._deck = gTabViewDeck;

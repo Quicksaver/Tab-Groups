@@ -1,6 +1,8 @@
-// VERSION 1.1.22
+// VERSION 1.1.23
 
-XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
+XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
+Cu.importGlobalProperties(['FileReader']);
 
 // Class: TabItem - An <Item> that represents a tab.
 // Parameters:
@@ -20,7 +22,6 @@ this.TabItem = function(tab, options = {}) {
 
 	this.container._item = this;
 	this.$container = iQ(this.container);
-	this.$canvas = iQ(this.canvas);
 
 	this.tabCanvas = new TabCanvas(this.tab, this.canvas);
 	this.tabCanvas.addSubscriber("painted", this);
@@ -64,7 +65,7 @@ this.TabItem.prototype = {
 		let { title, url } = this.getTabState();
 		this.updateLabel(title, url);
 
-		let thumbnailURL = gPageThumbnails.getThumbnailURL(url);
+		let thumbnailURL = PageThumbs.getThumbnailURL(url);
 
 		// This method is only called when the tab item is first created during initialization.
 		// We should update the group's thumb when the tab's cached thumb loads, otherwise we end up with a bunch of white squares in there.
@@ -495,22 +496,11 @@ this.TabItem.prototype = {
 
 	// Updates the tabitem's canvas.
 	updateCanvas: function() {
-		// ___ thumbnail
-		let w = this.$canvas.width() - UICache.tabCanvasOffset;
-		let h = this.$canvas.height() - UICache.tabCanvasOffset;
-		let dimsChanged = w != this.canvas.width || h != this.canvas.height;
-
 		TabItems._lastUpdateTime = Date.now();
 		this._lastTabUpdateTime = TabItems._lastUpdateTime;
 
-		if(this.tabCanvas) {
-			if(dimsChanged) {
-				// more tasking as it involves the creation of a temp canvas.
-				this.tabCanvas.update(w, h);
-			} else {
-				this.tabCanvas.paint();
-			}
-		}
+		// ___ thumbnail
+		this.tabCanvas.update();
 
 		// ___ cache
 		if(this.isShowingCachedData()) {
@@ -589,10 +579,7 @@ this.TabItems = {
 		// Set up tab priority queue
 		this._tabsWaitingForUpdate = new TabPriorityQueue();
 
-		// Screen ratio is unlikely to change -> significantly <- for the lifetime of this session.
-		// So let's just assume it remains constant from the first time tab view is opened.
-		// We use it for the tab thumbs ratio as well, so that they are as representative of the actual tab as possible.
-		this.thumbRatio = window.innerWidth / window.innerHeight;
+		this.thumbRatio = gTabView._viewportRatio;
 		this.tabHeight = this._getHeightForWidth(this.tabWidth);
 		this.tabAspect = this.tabWidth / this.tabHeight;
 		this.invTabAspect = 1 / this.tabAspect;
@@ -1146,58 +1133,58 @@ this.TabCanvas = function(tab, canvas) {
 };
 
 this.TabCanvas.prototype = {
-	paint: function(evt) {
-		let w = this.canvas.width;
-		let h = this.canvas.height;
-		if(!w || !h) { return; }
+	persist(aBrowser) {
+		// capture to file, thumbnail service does not persist automatically when rendering to canvas.
+		PageThumbs.shouldStoreThumbnail(aBrowser, (storeAllowed) => {
+			if(!storeAllowed) { return; }
 
+			// bails out early if there already is an existing thumbnail less than 2 days old
+			// so this shouldn't cause excessive IO when a thumbnail is updated frequently
+			let url = aBrowser.currentURI.spec;
+			PageThumbsStorage.isFileRecentForURL(url).then((recent) => {
+				// Careful, the call to PageThumbsStorage is async, so the browser may have navigated away from the URL or even closed.
+				if(!recent && aBrowser.currentURI && aBrowser.currentURI.spec == url) {
+					// We used to use PageThumbs.captureAndStoreIfStale, but we're bypassing it because it only stored a portion (top-left) of the thumb,
+					// by mimicking its behavior here but sending the full blob of our canvas, we can store the whole thing.
+					// It's not pretty, but it works, and has the added bonus of not having to recapture the webpage onto a new canvas.
+					if(!PageThumbs._prefEnabled()) { return; }
+
+					try {
+						let originalURL = url;
+						let channelError = false;
+
+						if(!aBrowser.isRemoteBrowser) {
+							let channel = aBrowser.docShell.currentDocumentChannel;
+							originalURL = channel.originalURI.spec;
+							// see if this was an error response.
+							channelError = PageThumbs._isChannelErrorResponse(channel);
+						}
+
+						this.canvas.toBlob((blob) => {
+							let reader = new FileReader();
+							reader.onloadend = function() {
+								if(reader.readyState == FileReader.DONE) {
+									let buffer = reader.result;
+									PageThumbs._store(originalURL, url, buffer, channelError);
+								}
+							};
+							reader.readAsArrayBuffer(blob);
+						});
+					}
+					catch(ex) {
+						Cu.reportError("Tab Groups: exception thrown during thumbnail capture: '" + ex + "'");
+					}
+				}
+			});
+		});
+	},
+
+	update: function() {
 		let browser = this.tab.linkedBrowser;
-
-		gPageThumbnails.captureToCanvas(browser, this.canvas, () => {
+		PageThumbs.captureToCanvas(browser, this.canvas, () => {
 			this._sendToSubscribers("painted");
+			this.persist(browser);
 		});
 
-		this.persist(browser);
-	},
-
-	persist(browser) {
-		// capture to file, thumbnail service does not persist automatically when rendering to canvas
-		gPageThumbnails.shouldStoreThumbnail(browser, (storeAllowed) => {
-			if(storeAllowed) {
-				// ifStale bails out early if there already is an existing thumbnail less than 2 days old
-				// so this shouldn't cause excessive IO when a thumbnail is updated frequently
-				gPageThumbnails.captureAndStoreIfStale(browser, () => {})
-			}
-		});
-	},
-
-	// Changing the dims of a canvas will clear it, so we don't want to do do this to a canvas we're currently displaying.
-	// This method grabs a new thumbnail at the new dims and then copies it over to the displayed canvas.
-	update: function(aWidth, aHeight) {
-		let temp = gPageThumbnails.createCanvas(window);
-		temp.width = aWidth;
-		temp.height = aHeight;
-
-		let browser = this.tab.linkedBrowser;
-
-		gPageThumbnails.captureToCanvas(browser, temp, () => {
-			let ctx = this.canvas.getContext('2d');
-			this.canvas.width = aWidth;
-			this.canvas.height = aHeight;
-			try {
-				ctx.drawImage(temp, 0, 0);
-			}
-			catch(ex if ex.name == "InvalidStateError") {
-				// Can't draw if the canvas created by page thumbs isn't valid. This can happen during shutdown.
-				return;
-			}
-			this._sendToSubscribers("painted");
-		});
-
-		this.persist(browser);
-	},
-
-	toImageData: function() {
-		return this.canvas.toDataURL("image/png");
 	}
 };
