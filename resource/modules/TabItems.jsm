@@ -1,4 +1,4 @@
-// VERSION 1.1.21
+// VERSION 1.1.22
 
 XPCOMUtils.defineLazyModuleGetter(this, "gPageThumbnails", "resource://gre/modules/PageThumbs.jsm", "PageThumbs");
 
@@ -354,7 +354,7 @@ this.TabItem.prototype = {
 
 	// Rotates the object to the given number of degrees.
 	setRotation: function(degrees) {
-		let value = degrees ? "rotate("+degrees+"deg)" : null;
+		let value = degrees ? "translate(-50%, -50%) rotate("+degrees+"deg)" : null;
 		this.$container.css({ "transform": value });
 	},
 

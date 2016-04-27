@@ -1,4 +1,4 @@
-// VERSION 1.6.19
+// VERSION 1.6.20
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1545,36 +1545,24 @@ this.GroupItem.prototype = {
 		this._lastArrange = { isStacked: true, bounds, children };
 
 		// compute size of the entire stack, modulo rotation.
-		let itemAspect = TabItems.invTabAspect;
 		let scale = 0.7;
-		let boundsAspect = bounds.height / bounds.width;
 
-		let size;
-		if(boundsAspect > itemAspect) {
-			// Tall, thin groupItem
-			size = new Point(bounds.width * scale, -1);
-			size.stacked = true;
-			size = TabItems.calcValidSize(size);
-		} else {
-			// Short, wide groupItem
+		// Tall, thin groupItem
+		let size = new Point(bounds.width * scale, -1);
+		size.stacked = true;
+		size = TabItems.calcValidSize(size);
+
+		// If the items overflow, this is a short, wide groupItem
+		if(size.y / scale > bounds.height) {
 			size = new Point(-1, bounds.height * scale);
 			size.stacked = true;
 			size = TabItems.calcValidSize(size);
 		}
 
-		// x is the left margin that the stack will have, within the content area (bounds)
-		// y is the vertical margin
-		let position = {
-			x: (bounds.width - size.x - UICache.tabItemPadding) / 2,
-			y: (bounds.height - size.y - UICache.tabItemPadding) / 2
-		};
-
 		let sscode = '\
 			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab {\n\
 				width: '+size.x+'px;\n\
 				height: '+size.y+'px;\n\
-				top: '+position.y+'px;\n\
-				left: '+position.x+'px;\n\
 			}';
 
 		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);

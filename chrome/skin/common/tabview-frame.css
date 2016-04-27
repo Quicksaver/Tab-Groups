@@ -226,6 +226,9 @@ body.DraggingTab .tab * {
 
 .stacked {
 	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	overflow: visible;
 }
 
@@ -342,6 +345,10 @@ body:not(.grid) .groupItem:not(.phantom) {
 	overflow: hidden;
 	/* leave space for titlebar and for its own margin */
 	height: calc(100% - var(--group-titlebar-height) - var(--group-contents-top-margin));
+}
+
+.groupItem.stackedGroup .contents {
+	overflow: visible;
 }
 
 .tab-container {
