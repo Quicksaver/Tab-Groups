@@ -1,4 +1,4 @@
-// VERSION 1.1.24
+// VERSION 1.1.25
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -22,9 +22,6 @@ this.TabItem = function(tab, options = {}) {
 
 	this.container._item = this;
 	this.$container = iQ(this.container);
-
-	this.tabCanvas = new TabCanvas(this.tab, this.canvas);
-	this.tabCanvas.addSubscriber("painted", this);
 
 	this.isATabItem = true;
 	this._hidden = false;
@@ -55,11 +52,6 @@ this.TabItem = function(tab, options = {}) {
 };
 
 this.TabItem.prototype = {
-	// Returns a boolean indicates whether the cached data is being displayed or not.
-	isShowingCachedData: function() {
-		return this._showsCachedData;
-	},
-
 	// Shows the cached data i.e. image and title.  Note: this method should only be called at browser startup with the cached data avaliable.
 	showCachedData: function() {
 		let { title, url } = this.getTabState();
@@ -67,20 +59,33 @@ this.TabItem.prototype = {
 
 		let thumbnailURL = PageThumbs.getThumbnailURL(url);
 
-		// This method is only called when the tab item is first created during initialization.
-		// We should update the group's thumb when the tab's cached thumb loads, otherwise we end up with a bunch of white squares in there.
-		// Further updates to the tab's thumb will surely come through its canvas, which will also update the group's thumb accordingly.
-		this.cachedThumb.addEventListener('load', this);
+		// When the tab item is first created, the img element already exists, since we're sure this method will be called at least once,
+		// but it is removed once the canvas is created.
+		if(!this.cachedThumb) {
+			this.cachedThumb = TabItems.cachedThumbFragment();
+			this.thumb.appendChild(this.cachedThumb);
+		}
 
-		setAttribute(this.cachedThumb, "src", thumbnailURL);
+		if(this.cachedThumb.getAttribute("src") != thumbnailURL) {
+			// We should update the group's thumb when the tab's cached thumb loads, otherwise we end up with a bunch of white squares in there.
+			// Further updates to the tab's thumb will surely come through its canvas, which will also update the group's thumb accordingly.
+			this.cachedThumb.addEventListener('load', this);
+
+			setAttribute(this.cachedThumb, "src", thumbnailURL);
+		}
+
 		this.container.classList.add("cached-data");
-
 		this._showsCachedData = true;
 	},
 
-	// Hides the cached data i.e. image and title and show the canvas.
+	// Removes the cached data i.e. image and title and show the canvas.
 	hideCachedData: function() {
+		if(!this._showsCachedData) { return; }
+
+		this.cachedThumb.removeEventListener('load', this);
 		setAttribute(this.cachedThumb, "src", "");
+		this.cachedThumb.remove();
+		this.cachedThumb = null;
 		this.container.classList.remove("cached-data");
 		this._showsCachedData = false;
 	},
@@ -197,17 +202,6 @@ this.TabItem.prototype = {
 				// It's not necessary to keep the listener, this will surely only be called once per tab item.
 				this.cachedThumb.removeEventListener('load', this);
 				this.parent._updateThumb(true, true);
-				break;
-		}
-	},
-
-	handleSubscription: function(name, info) {
-		switch(name) {
-			case 'painted':
-				// This tab could have been closed in the meantime, while still somehow receiving this message.
-				if(!this.parent) { return; }
-
-				this.parent._updateThumb(true);
 				break;
 		}
 	},
@@ -499,13 +493,15 @@ this.TabItem.prototype = {
 		TabItems._lastUpdateTime = Date.now();
 		this._lastTabUpdateTime = TabItems._lastUpdateTime;
 
-		// ___ thumbnail
-		this.tabCanvas.update();
-
-		// ___ cache
-		if(this.isShowingCachedData()) {
-			this.hideCachedData();
+		// The canvas is only created when it is needed.
+		if(!this.tabCanvas) {
+			this.tabCanvas = new TabCanvas(this);
 		}
+
+		this.tabCanvas.update(() => {
+			this._sendToSubscribers("painted");
+			this.hideCachedData();
+		});
 
 		this._sendToSubscribers("updated");
 	}
@@ -517,6 +513,8 @@ this.TabItems = {
 	tabWidth: 160,
 	fontSizeRange: new Range(8,15),
 	_fragment: null,
+	_cachedThumbFragment: null,
+	_canvasFragment: null,
 	items: new Set(),
 	paintingPaused: 0,
 	_tabsWaitingForUpdate: null,
@@ -623,6 +621,26 @@ this.TabItems = {
 		this._tabsWaitingForUpdate.clear();
 	},
 
+	cachedThumbFragment: function() {
+		if(!this._cachedThumbFragment) {
+			let img = document.createElement('img');
+			img.classList.add('tab-thumb');
+			img.classList.add('cached-thumb');
+			this._cachedThumbFragment = img;
+		}
+		return this._cachedThumbFragment.cloneNode(true);
+	},
+
+	canvasFragment: function() {
+		if(!this._canvasFragment) {
+			let canvas = document.createElement('canvas');
+			canvas.classList.add('tab-thumb');
+			canvas.mozOpaque = true;
+			this._canvasFragment = canvas;
+		}
+		return this._canvasFragment.cloneNode(true);
+	},
+
 	// Return a DocumentFragment which has a single <div> child. This child node will act as a template for all TabItem containers.
 	// The first call of this function caches the DocumentFragment in _fragment.
 	fragment: function() {
@@ -635,15 +653,8 @@ this.TabItems = {
 			thumb.classList.add('thumb');
 			div.appendChild(thumb);
 
-			let img = document.createElement('img');
-			img.classList.add('tab-thumb');
-			img.classList.add('cached-thumb');
+			let img = this.cachedThumbFragment();
 			thumb.appendChild(img);
-
-			let canvas = document.createElement('canvas');
-			canvas.classList.add('tab-thumb');
-			canvas.setAttribute('moz-opaque', '');
-			thumb.appendChild(canvas);
 
 			let faviconContainer = document.createElement('div');
 			faviconContainer.classList.add('favicon-container');
@@ -682,13 +693,12 @@ this.TabItems = {
 		let container = this._fragment.cloneNode(true);
 		let thumb = container.firstChild;
 		let cachedThumb = thumb.firstChild;
-		let canvas = cachedThumb.nextSibling;
-		let fav = canvas.nextSibling.firstChild;
+		let fav = cachedThumb.nextSibling.firstChild;
 		let tabTitle = thumb.nextSibling.firstChild;
 		let tabUrl = tabTitle.nextSibling.nextSibling;
-		let closeBtn = canvas.nextSibling.nextSibling;
+		let closeBtn = cachedThumb.nextSibling.nextSibling;
 
-		return { container, thumb, cachedThumb, canvas, fav, tabTitle, tabUrl, closeBtn };
+		return { container, thumb, cachedThumb, fav, tabTitle, tabUrl, closeBtn };
 	},
 
 	// Checks whether the xul:tab has fully loaded and calls a callback with a boolean indicates whether the tab is loaded or not.
@@ -796,13 +806,17 @@ this.TabItems = {
 	// Takes in a xul:tab and destroys the TabItem associated with it.
 	unlink: function(tab) {
 		try {
-			tab._tabViewTabItem.destroy();
-			this.unregister(tab._tabViewTabItem);
-			tab._tabViewTabItem._sendToSubscribers("close", tab._tabViewTabItem);
+			let tabItem = tab._tabViewTabItem;
+			tabItem.destroy();
+			this.unregister(tabItem);
+			tabItem._sendToSubscribers("close", tabItem);
 
-			tab._tabViewTabItem.tab = null;
-			tab._tabViewTabItem.tabCanvas.tab = null;
-			tab._tabViewTabItem.tabCanvas = null;
+			tabItem.tab = null;
+			if(tabItem.tabCanvas) {
+				tabItem.tabCanvas.tab = null;
+				tabItem.tabCanvas.canvas.remove();
+				tabItem.tabCanvas = null;
+			}
 			tab._tabViewTabItem = null;
 			Storage.saveTab(tab, null);
 
@@ -1125,11 +1139,12 @@ this.TabPriorityQueue.prototype = {
 };
 
 // Class: TabCanvas - Takes care of the actual canvas for the tab thumbnail
-this.TabCanvas = function(tab, canvas) {
-	Subscribable(this);
+this.TabCanvas = function(tabItem) {
+	this.tabItem = tabItem;
+	this.tab = tabItem.tab;
 
-	this.tab = tab;
-	this.canvas = canvas;
+	this.canvas = TabItems.canvasFragment();
+	tabItem.thumb.appendChild(this.canvas);
 };
 
 this.TabCanvas.prototype = {
@@ -1179,12 +1194,13 @@ this.TabCanvas.prototype = {
 		});
 	},
 
-	update: function() {
+	update: function(callback) {
 		let browser = this.tab.linkedBrowser;
 		PageThumbs.captureToCanvas(browser, this.canvas, () => {
-			this._sendToSubscribers("painted");
 			this.persist(browser);
+			if(callback) {
+				callback();
+			}
 		});
-
 	}
 };

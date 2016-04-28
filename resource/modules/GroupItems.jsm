@@ -1,4 +1,4 @@
-// VERSION 1.6.20
+// VERSION 1.6.21
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -877,6 +877,10 @@ this.GroupItem.prototype = {
 				// info == tabItem
 				this._onChildClose(info);
 				break;
+
+			case 'painted':
+				this._updateThumb(true);
+				break;
 		}
 	},
 
@@ -1319,6 +1323,7 @@ this.GroupItem.prototype = {
 
 			if(!wasAlreadyInThisGroupItem) {
 				item.addSubscriber("close", this);
+				item.addSubscriber("painted", this);
 				item.setParent(this);
 
 				if(item == UI.getActiveTab() || !this._activeTab) {
@@ -1389,6 +1394,7 @@ this.GroupItem.prototype = {
 			item.setParent(null);
 			item.inVisibleStack();
 			item.removeSubscriber("close", this);
+			item.removeSubscriber("painted", this);
 
 			// if a blank tab is selected while restoring a tab the blank tab gets removed. we need to keep the group alive for the restored tab.
 			if(item.isRemovedAfterRestore) {
