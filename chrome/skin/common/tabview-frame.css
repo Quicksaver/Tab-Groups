@@ -125,18 +125,18 @@ body.DraggingTab .tab * {
 	height: 100%;
 }
 
-.thumb > .tab-thumb {
+.tab-thumb-container {
 	background-color: white;
 	background-clip: content-box;
 	border: var(--item-border);
+	width: calc(100% - var(--canvas-border-width) - var(--canvas-border-width));
+	height: calc(100% - var(--canvas-border-width) - var(--canvas-border-width));
 }
 
-.tab.cached-data .cached-thumb,
-.tab:not(.cached-data) canvas {
-	/* minus the borders, canvas are insane because they need width/height attributes to work properly,
-	   which completely messes up their layout unless overriden here. */
-	width: calc(100% - var(--canvas-border-width) - var(--canvas-border-width)) !important;
-	height: calc(100% - var(--canvas-border-width) - var(--canvas-border-width)) !important;
+.tab-thumb-container > .tab-thumb {
+	border: none;
+	width: 100% !important;
+	height: 100% !important;
 }
 
 .tab.cached-data canvas,

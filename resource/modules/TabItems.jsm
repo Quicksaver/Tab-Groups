@@ -1,4 +1,4 @@
-// VERSION 1.1.25
+// VERSION 1.1.26
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -59,35 +59,37 @@ this.TabItem.prototype = {
 
 		let thumbnailURL = PageThumbs.getThumbnailURL(url);
 
-		// When the tab item is first created, the img element already exists, since we're sure this method will be called at least once,
-		// but it is removed once the canvas is created.
+		// We create the cached thumb dynamically, and append it to the DOM only if there's a thumb to show.
 		if(!this.cachedThumb) {
 			this.cachedThumb = TabItems.cachedThumbFragment();
-			this.thumb.appendChild(this.cachedThumb);
 		}
 
 		if(this.cachedThumb.getAttribute("src") != thumbnailURL) {
 			// We should update the group's thumb when the tab's cached thumb loads, otherwise we end up with a bunch of white squares in there.
 			// Further updates to the tab's thumb will surely come through its canvas, which will also update the group's thumb accordingly.
 			this.cachedThumb.addEventListener('load', this);
+			this.cachedThumb.addEventListener('error', this);
+			this.cachedThumb.addEventListener('abort', this);
 
 			setAttribute(this.cachedThumb, "src", thumbnailURL);
 		}
-
-		this.container.classList.add("cached-data");
-		this._showsCachedData = true;
 	},
 
 	// Removes the cached data i.e. image and title and show the canvas.
 	hideCachedData: function() {
-		if(!this._showsCachedData) { return; }
+		if(this.cachedThumb) {
+			this.cachedThumb.removeEventListener('load', this);
+			this.cachedThumb.removeEventListener('error', this);
+			this.cachedThumb.removeEventListener('abort', this);
+			this.cachedThumb.setAttribute("src", "");
+			this.cachedThumb.remove();
+			this.cachedThumb = null;
+		}
 
-		this.cachedThumb.removeEventListener('load', this);
-		setAttribute(this.cachedThumb, "src", "");
-		this.cachedThumb.remove();
-		this.cachedThumb = null;
-		this.container.classList.remove("cached-data");
-		this._showsCachedData = false;
+		if(this._showsCachedData) {
+			this.container.classList.remove("cached-data");
+			this._showsCachedData = false;
+		}
 	},
 
 	// Get data to be used for persistent storage of this object.
@@ -201,7 +203,21 @@ this.TabItem.prototype = {
 			case 'load':
 				// It's not necessary to keep the listener, this will surely only be called once per tab item.
 				this.cachedThumb.removeEventListener('load', this);
+				this.cachedThumb.removeEventListener('error', this);
+				this.cachedThumb.removeEventListener('abort', this);
+
+				if(!this.cachedThumb.parentNode) {
+					this.thumb.appendChild(this.cachedThumb);
+				}
+				this.container.classList.add("cached-data");
+				this._showsCachedData = true;
+
 				this.parent._updateThumb(true, true);
+				break;
+
+			case 'error':
+			case 'abort':
+				this.hideCachedData();
 				break;
 		}
 	},
@@ -653,8 +669,9 @@ this.TabItems = {
 			thumb.classList.add('thumb');
 			div.appendChild(thumb);
 
-			let img = this.cachedThumbFragment();
-			thumb.appendChild(img);
+			let thumbContainer = document.createElement("div");
+			thumbContainer.classList.add('tab-thumb-container');
+			thumb.appendChild(thumbContainer);
 
 			let faviconContainer = document.createElement('div');
 			faviconContainer.classList.add('favicon-container');
@@ -691,14 +708,13 @@ this.TabItems = {
 		}
 
 		let container = this._fragment.cloneNode(true);
-		let thumb = container.firstChild;
-		let cachedThumb = thumb.firstChild;
-		let fav = cachedThumb.nextSibling.firstChild;
-		let tabTitle = thumb.nextSibling.firstChild;
+		let thumb = container.firstChild.firstChild;
+		let fav = thumb.nextSibling.firstChild;
+		let tabTitle = container.firstChild.nextSibling.firstChild;
 		let tabUrl = tabTitle.nextSibling.nextSibling;
-		let closeBtn = cachedThumb.nextSibling.nextSibling;
+		let closeBtn = container.firstChild.lastChild;
 
-		return { container, thumb, cachedThumb, fav, tabTitle, tabUrl, closeBtn };
+		return { container, thumb, fav, tabTitle, tabUrl, closeBtn };
 	},
 
 	// Checks whether the xul:tab has fully loaded and calls a callback with a boolean indicates whether the tab is loaded or not.
