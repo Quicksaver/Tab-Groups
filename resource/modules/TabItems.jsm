@@ -1,4 +1,4 @@
-// VERSION 1.1.23
+// VERSION 1.1.24
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -686,7 +686,7 @@ this.TabItems = {
 		let fav = canvas.nextSibling.firstChild;
 		let tabTitle = thumb.nextSibling.firstChild;
 		let tabUrl = tabTitle.nextSibling.nextSibling;
-		let closeBtn = thumb.nextSibling.nextSibling;
+		let closeBtn = canvas.nextSibling.nextSibling;
 
 		return { container, thumb, cachedThumb, canvas, fav, tabTitle, tabUrl, closeBtn };
 	},
