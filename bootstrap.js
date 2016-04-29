@@ -1,4 +1,4 @@
-// VERSION 1.8.9
+// VERSION 1.8.10
 
 // This looks for file defaults.js in resource folder, expects:
 //	objName - (string) main object name for the add-on, to be added to window element
@@ -182,12 +182,21 @@ function preparePreferences(window, aName) {
 
 function removeOnceListener(oncer) {
 	for(var i=0; i<onceListeners.length; i++) {
-		if(!oncer) {
-			onceListeners[i]();
+		let unwrapped = onceListeners[i].get();
+
+		// clean up dead weak ref
+		if(!unwrapped) {
+			onceListeners.splice(i, 1);
+			i--;
 			continue;
 		}
 
-		if(onceListeners[i] == oncer) {
+		if(!oncer) {
+			unwrapped();
+			continue;
+		}
+
+		if(unwrapped == oncer) {
 			onceListeners.splice(i, 1);
 			return;
 		}
@@ -212,7 +221,9 @@ function listenOnce(aSubject, type, handler, capture) {
 	};
 
 	aSubject.addEventListener(type, runOnce, capture);
-	onceListeners.push(runOnce);
+
+	let weak = Cu.getWeakReference(runOnce);
+	onceListeners.push(weak);
 }
 
 function callOnLoad(aSubject, aCallback, beforeComplete) {
