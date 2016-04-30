@@ -5,6 +5,8 @@
 :root {
 	--actions-icons: url("chrome://tabgroups/skin/actions.png");
 	--actions-icons-2x: url("chrome://tabgroups/skin/actions@2x.png");
+	--actions-width: 35px;
+	--actions-button-height: 28px;
 	--hover-color: rgba(128,128,128,0.4);
 	--item-normal-shadow: 0 1px 5px rgba(60, 60, 60, 0.6);
 	--scrollbar-width: 10px;
@@ -25,20 +27,19 @@
 	--group-selector-size: 160px;
 	--group-selector-padding: 15px;
 	--group-selector-title-height: 14px;
-	--actions-width: 29px;
 	--shade-background: rgba(0,0,0,.42);
 	--drag-animation: margin 150ms linear;
 }
 
 body {
 	--workspace-height: 100%;
-	/* active workspace excludes the width and borders of the action buttons, excludes its own borders (or of its items) as well */
-	--workspace-width: calc(100% - var(--actions-width) - (var(--group-border-width) * 2));
+	/* active workspace excludes the width of the action buttons */
+	--workspace-width: calc(100% - var(--actions-width));
 }
 
 body.single {
 	/* in single mode we need to exclude the borders from the groups/groupSelector themselves as well */
-	--workspace-width: calc(100% - var(--actions-width) - (var(--group-border-width) * 4));
+	--workspace-width: calc(100% - var(--actions-width) - (var(--group-border-width) * 2));
 	/* for single view, we need to exclude the group selector at the top and its borders */
 	--workspace-height: calc(100% - var(--group-selector-size) - (var(--group-border-width) * 2));
 	/* it's kind of silly that I have to exclude borders here as well... am I missing something? */
@@ -842,13 +843,14 @@ input.name:focus::-moz-placeholder {
 #actions {
 	position: absolute;
 	top: 0;
+	overflow: hidden;
 	align-self: start;
-	padding: 3px 0;
 	z-index: 30;
 	width: var(--actions-width);
 	text-align: center;
 	border: var(--group-border-width) solid transparent;
 	border-top-color: ThreeDHighlight;
+	-moz-border-end-width: 0;
 }
 
 #actions:-moz-locale-dir(ltr) {
@@ -863,12 +865,13 @@ body.classic #actions {
 	background-color: var(--item-background);
 	-moz-border-start-color: ThreeDHighlight;
 	border-bottom-color: ThreeDHighlight;
+	box-shadow: var(--item-normal-shadow);
 }
 
 body.grid #actions {
 	border-bottom-color: ThreeDShadow;
-	/* account for its own padding and borders */
-	height: calc(100% - 8px);
+	/* account for its own borders */
+	height: calc(100% - var(--group-border-width) - var(--group-border-width));
 }
 
 .group-options,
@@ -881,8 +884,8 @@ body.grid #actions {
 	border: none;
 	cursor: pointer;
 	padding: 0;
-	width: 24px;
-	height: 24px;
+	width: var(--actions-width);
+	height: var(--actions-button-height);
 }
 
 #actions #exit-button {
@@ -946,8 +949,8 @@ body.grid #actions {
 }
 
 #actions .grouped {
-	margin-top: 3px;
-	padding-top: 3px;
+	margin-top: 1px;
+	padding-top: 1px;
 }
 
 /* Pinned Tabs group */
@@ -957,7 +960,7 @@ body.grid #actions {
 }
 
 #actions.dragOver #pinnedTabs {
-	padding-bottom: 24px;
+	padding-bottom: var(--actions-button-height);
 }
 
 body.DraggingTab .appTabIcon {
@@ -965,11 +968,11 @@ body.DraggingTab .appTabIcon {
 }
 
 .appTabIcon.space-before {
-	margin-top: 24px;
+	margin-top: var(--actions-button-height);
 }
 
 .appTabIcon.space-after {
-	margin-bottom: 24px;
+	margin-bottom: var(--actions-button-height);
 }
 
 /* Various interaction effects */
@@ -987,7 +990,8 @@ body.DraggingTab .appTabIcon {
 .groupSelector.activeGroupItem,
 body.classic #classicbutton,
 body.grid #gridbutton,
-body.single #singlebutton {
+body.single #singlebutton,
+body.searching #searchbutton {
 	background-color: var(--hover-color);
 }
 
