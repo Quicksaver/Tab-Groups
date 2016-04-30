@@ -1,4 +1,4 @@
-// VERSION 1.6.21
+// VERSION 1.6.22
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -268,13 +268,19 @@ this.GroupItem.prototype = {
 			this._noThumbs = v;
 			if(!v) {
 				this.tabContainer.classList.remove('noThumbs');
+
+				// Ensure tabs update their thumbs if necessary, as they will be shown now.
 				for(let tabItem of this.children) {
-					if(tabItem._thumbNeedsUpdate) {
-						TabItems.update(tabItem.tab);
-					}
+					tabItem.checkUpdatedThumb();
 				}
 			} else {
 				this.tabContainer.classList.add('noThumbs');
+
+				// We don't destroy tab thumbs immediately in groups in no thumbs mode, it will be done in the background after leaving groups view.
+				// This has the added bonus of making switching between thumbs and no thumbs mode back and forth much more smoothly.
+				for(let tabItem of this.children) {
+					TabItems.tabStaled(tabItem);
+				}
 			}
 		}
 		return this._noThumbs;

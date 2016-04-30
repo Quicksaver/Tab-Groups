@@ -1,4 +1,4 @@
-// VERSION 1.2.1
+// VERSION 1.2.2
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -27,6 +27,7 @@ this.TabItem = function(tab, options = {}) {
 	this._hidden = false;
 	this._reconnected = false;
 	this._showsCachedData = false;
+	this._cachedThumbURL = '';
 	this.isStacked = false;
 	this._inVisibleStack = null;
 	this.order = 1;
@@ -51,12 +52,20 @@ this.TabItem = function(tab, options = {}) {
 
 this.TabItem.prototype = {
 	// Shows the cached data i.e. image and title.  Note: this method should only be called at browser startup with the cached data avaliable.
-	showCachedData: function(thumbnailURL) {
-		if(thumbnailURL === undefined) {
-			let { title, url } = this.getTabState();
-			this.updateLabel(title, url);
+	showCachedData: function() {
+		let { title, url } = this.getTabState();
+		this.updateLabel(title, url);
+		this._cachedThumbURL = PageThumbs.getThumbnailURL(url);
+	},
 
-			thumbnailURL = PageThumbs.getThumbnailURL(url);
+	showCachedThumb: function(thumbnailURL = this._cachedThumbURL) {
+		// If we're in a group where thumbs are not showing, we don't really need to show the cached thumb either.
+		if(this.parent && this.parent.noThumbs) {
+			if(this.tabCanvas && this.tabCanvas.destroying) {
+				this.tabCanvas.destroying.resolve();
+			}
+			this.hideCachedThumb();
+			return;
 		}
 
 		// We create the cached thumb dynamically, and append it to the DOM only if there's a thumb to show.
@@ -76,7 +85,7 @@ this.TabItem.prototype = {
 	},
 
 	// Removes the cached data i.e. image and title and show the canvas.
-	hideCachedData: function() {
+	hideCachedThumb: function() {
 		if(this.tabCanvas && this.tabCanvas.destroying) {
 			this.tabCanvas.destroying.reject();
 		}
@@ -93,6 +102,15 @@ this.TabItem.prototype = {
 		if(this._showsCachedData) {
 			this.container.classList.remove("cached-data");
 			this._showsCachedData = false;
+		}
+	},
+
+	// Note: only call this when a thumb should be shown!
+	checkUpdatedThumb: function() {
+		if(this._thumbNeedsUpdate) {
+			TabItems.update(this.tab);
+		} else if(!this.tabCanvas) {
+			this.showCachedThumb();
 		}
 	},
 
@@ -226,7 +244,7 @@ this.TabItem.prototype = {
 
 			case 'error':
 			case 'abort':
-				this.hideCachedData();
+				this.hideCachedThumb();
 				break;
 		}
 	},
@@ -256,6 +274,10 @@ this.TabItem.prototype = {
 			}
 
 			if(groupItem) {
+				// Show the cached thumb before adding the tabitem to the group (before activating its canvas).
+				if(!groupItem.noThumbs && groupItem.showThumbs) {
+					this.showCachedThumb();
+				}
 				groupItem.add(this);
 
 				// restore the active tab for each group between browser sessions
@@ -310,8 +332,8 @@ this.TabItem.prototype = {
 		this.parent = parent;
 		this.save();
 
-		if(this._thumbNeedsUpdate && parent && !parent.noThumbs) {
-			TabItems.update(this.tab);
+		if(parent && !parent.noThumbs && parent.showThumbs) {
+			this.checkUpdatedThumb();
 		}
 	},
 
@@ -525,7 +547,7 @@ this.TabItem.prototype = {
 		return new Promise((resolve, reject) => {
 			this.tabCanvas.update(() => {
 				this._sendToSubscribers("painted");
-				this.hideCachedData();
+				this.hideCachedThumb();
 				resolve();
 			});
 		});
@@ -872,13 +894,17 @@ this.TabItems = {
 
 	tabSelected: function(tab) {
 		let tabItem = tab && tab._tabViewTabItem;
-		if(tabItem) {
+		if(tabItem && (tabItem.tabCanvas || tabItem.cachedThumb)) {
 			this._staleTabs.append(tabItem, true);
 		}
 	},
 
 	tabUpdated: function(tabItem) {
 		this._lastUpdateTime = Date.now();
+		this.tabStaled(tabItem);
+	},
+
+	tabStaled: function(tabItem) {
 		this._staleTabs.append(tabItem);
 	},
 
@@ -910,6 +936,10 @@ this.TabItems = {
 					let tabItem = this._staleTabs.peek();
 					this._staleTabs.remove(tabItem);
 					yield tabItem.destroyCanvas();
+					if(tabItem.parent && tabItem.parent.noThumbs) {
+						// It's likely it could have had a cached thumbnail (hidden leftover from disabling thumbs in a group).
+						tabItem.hideCachedThumb();
+					}
 
 					let updateEnd = Date.now();
 					let deltaTime = updateEnd - updateBegin;
@@ -1327,7 +1357,7 @@ this.TabCanvas.prototype = {
 				this.toFile('DataURL', (reader) => {
 					if(reader.readyState == FileReader.DONE) {
 						try {
-							this.tabItem.showCachedData(reader.result);
+							this.tabItem.showCachedThumb(reader.result);
 						}
 						catch(ex) {
 							Cu.reportError(ex);
