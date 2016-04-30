@@ -1,8 +1,9 @@
-// VERSION 1.2.2
+// VERSION 1.2.3
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
 Cu.importGlobalProperties(['FileReader']);
+this.__defineGetter__('URL', function() { return window.URL; });
 
 // Class: TabItem - An <Item> that represents a tab.
 // Parameters:
@@ -28,6 +29,7 @@ this.TabItem = function(tab, options = {}) {
 	this._reconnected = false;
 	this._showsCachedData = false;
 	this._cachedThumbURL = '';
+	this._tempCanvasBlobURL = '';
 	this.isStacked = false;
 	this._inVisibleStack = null;
 	this.order = 1;
@@ -58,7 +60,9 @@ this.TabItem.prototype = {
 		this._cachedThumbURL = PageThumbs.getThumbnailURL(url);
 	},
 
-	showCachedThumb: function(thumbnailURL = this._cachedThumbURL) {
+	showCachedThumb: function() {
+		let thumbnailURL = this._tempCanvasBlobURL || this._cachedThumbURL;
+
 		// If we're in a group where thumbs are not showing, we don't really need to show the cached thumb either.
 		if(this.parent && this.parent.noThumbs) {
 			if(this.tabCanvas && this.tabCanvas.destroying) {
@@ -102,6 +106,11 @@ this.TabItem.prototype = {
 		if(this._showsCachedData) {
 			this.container.classList.remove("cached-data");
 			this._showsCachedData = false;
+		}
+
+		if(this._tempCanvasBlobURL) {
+			URL.revokeObjectURL(this._tempCanvasBlobURL);
+			this._tempCanvasBlobURL = '';
 		}
 	},
 
@@ -1289,11 +1298,15 @@ this.TabCanvas.prototype = {
 							channelError = PageThumbs._isChannelErrorResponse(channel);
 						}
 
-						this.toFile('ArrayBuffer', (reader) => {
-							if(reader.readyState == FileReader.DONE) {
-								let buffer = reader.result;
-								PageThumbs._store(originalURL, url, buffer, channelError);
-							}
+						this.canvas.toBlob((blob) => {
+							let reader = new FileReader();
+							reader.onloadend = function() {
+								if(reader.readyState == FileReader.DONE) {
+									let buffer = reader.result;
+									PageThumbs._store(originalURL, url, buffer, channelError);
+								}
+							};
+							reader.readAsArrayBuffer(blob);
 						});
 					}
 					catch(ex) {
@@ -1316,16 +1329,6 @@ this.TabCanvas.prototype = {
 			if(callback) {
 				callback();
 			}
-		});
-	},
-
-	toFile: function(howToRead, callback) {
-		this.canvas.toBlob((blob) => {
-			let reader = new FileReader();
-			reader.onloadend = function() {
-				callback(reader);
-			};
-			reader['readAs'+howToRead](blob);
 		});
 	},
 
@@ -1354,15 +1357,17 @@ this.TabCanvas.prototype = {
 			this.destroying._reject = reject;
 
 			try {
-				this.toFile('DataURL', (reader) => {
-					if(reader.readyState == FileReader.DONE) {
-						try {
-							this.tabItem.showCachedThumb(reader.result);
+				this.canvas.toBlob((blob) => {
+					try {
+						if(this.tabItem._tempCanvasBlobURL) {
+							URL.revokeObjectURL(this.tabItem._tempCanvasBlobURL);
 						}
-						catch(ex) {
-							Cu.reportError(ex);
-							this.destroying.reject(ex);
-						}
+						this.tabItem._tempCanvasBlobURL = URL.createObjectURL(blob);
+						this.tabItem.showCachedThumb();
+					}
+					catch(ex) {
+						Cu.reportError(ex);
+						this.destroying.reject(ex);
 					}
 				});
 			}
