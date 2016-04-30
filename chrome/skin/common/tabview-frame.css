@@ -1053,6 +1053,11 @@ body:not(.searching) #search,
 	max-width: 820px;
 	display: flex;
 	flex-direction: column;
+	pointer-events: none;
+}
+
+#search > * {
+	pointer-events: all;
 }
 
 #searchresults {
