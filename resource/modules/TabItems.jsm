@@ -1,4 +1,4 @@
-// VERSION 1.1.26
+// VERSION 1.2.0
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -35,8 +35,6 @@ this.TabItem = function(tab, options = {}) {
 	this._labelsNeedUpdate = true;
 	this._thumbNeedsUpdate = false;
 
-	this._lastTabUpdateTime = Date.now();
-
 	Listeners.add(this.container, 'mousedown', this);
 	Listeners.add(this.container, 'mouseup', this);
 	Listeners.add(this.container, 'dragstart', this, true);
@@ -53,11 +51,13 @@ this.TabItem = function(tab, options = {}) {
 
 this.TabItem.prototype = {
 	// Shows the cached data i.e. image and title.  Note: this method should only be called at browser startup with the cached data avaliable.
-	showCachedData: function() {
-		let { title, url } = this.getTabState();
-		this.updateLabel(title, url);
+	showCachedData: function(thumbnailURL) {
+		if(thumbnailURL === undefined) {
+			let { title, url } = this.getTabState();
+			this.updateLabel(title, url);
 
-		let thumbnailURL = PageThumbs.getThumbnailURL(url);
+			thumbnailURL = PageThumbs.getThumbnailURL(url);
+		}
 
 		// We create the cached thumb dynamically, and append it to the DOM only if there's a thumb to show.
 		if(!this.cachedThumb) {
@@ -77,6 +77,10 @@ this.TabItem.prototype = {
 
 	// Removes the cached data i.e. image and title and show the canvas.
 	hideCachedData: function() {
+		if(this.tabCanvas && this.tabCanvas.destroying) {
+			this.tabCanvas.destroying.reject();
+		}
+
 		if(this.cachedThumb) {
 			this.cachedThumb.removeEventListener('load', this);
 			this.cachedThumb.removeEventListener('error', this);
@@ -211,6 +215,11 @@ this.TabItem.prototype = {
 				}
 				this.container.classList.add("cached-data");
 				this._showsCachedData = true;
+
+				// Warn the canvas if it's waiting for the "cached" thumb to show to be destroyed.
+				if(this.tabCanvas && this.tabCanvas.destroying) {
+					this.tabCanvas.destroying.resolve();
+				}
 
 				this.parent._updateThumb(true, true);
 				break;
@@ -506,21 +515,29 @@ this.TabItem.prototype = {
 
 	// Updates the tabitem's canvas.
 	updateCanvas: function() {
-		TabItems._lastUpdateTime = Date.now();
-		this._lastTabUpdateTime = TabItems._lastUpdateTime;
+		TabItems.tabUpdated(this);
 
 		// The canvas is only created when it is needed.
 		if(!this.tabCanvas) {
-			this.tabCanvas = new TabCanvas(this);
+			new TabCanvas(this);
 		}
 
-		this.tabCanvas.update(() => {
-			this._sendToSubscribers("painted");
-			this.hideCachedData();
+		return new Promise((resolve, reject) => {
+			this.tabCanvas.update(() => {
+				this._sendToSubscribers("painted");
+				this.hideCachedData();
+				resolve();
+			});
 		});
+	},
 
-		this._sendToSubscribers("updated");
-	}
+	// Turns the canvas into an image and shows that instead.
+	destroyCanvas: Task.async(function* () {
+		if(this.tabCanvas) {
+			yield this.tabCanvas.toImage();
+			this.tabCanvas.destroy();
+		}
+	})
 };
 
 // Singleton for managing <TabItem>s
@@ -533,7 +550,7 @@ this.TabItems = {
 	_canvasFragment: null,
 	items: new Set(),
 	paintingPaused: 0,
-	_tabsWaitingForUpdate: null,
+	_heartbeatHiddenTiming: 20000, // milliseconds between calls when TabView is hidden (for discarding canvases)
 	_heartbeatTiming: 200, // milliseconds between calls
 	_maxTimeForUpdating: 200, // milliseconds that consecutive updates can take
 	_lastUpdateTime: Date.now(),
@@ -592,6 +609,7 @@ this.TabItems = {
 	init: function() {
 		// Set up tab priority queue
 		this._tabsWaitingForUpdate = new TabPriorityQueue();
+		this._staleTabs = new MRUList();
 
 		this.thumbRatio = gTabView._viewportRatio;
 		this.tabHeight = this._getHeightForWidth(this.tabWidth);
@@ -617,7 +635,6 @@ this.TabItems = {
 				options.groupItemId = activeGroupItemId;
 			}
 			this.link(tab, options);
-			this.update(tab);
 		}
 	},
 
@@ -635,6 +652,7 @@ this.TabItems = {
 		this.items = new Set();
 		this._lastUpdateTime = Date.now();
 		this._tabsWaitingForUpdate.clear();
+		this._staleTabs.clear();
 	},
 
 	cachedThumbFragment: function() {
@@ -722,7 +740,7 @@ this.TabItems = {
 		return new Promise(function(resolve, reject) {
 			// A pending tab can't be complete, yet.
 			if(tab.hasAttribute("pending")) {
-				aSync(() => resolve(false));
+				resolve(false);
 				return;
 			}
 
@@ -752,7 +770,9 @@ this.TabItems = {
 
 			if(shouldDefer) {
 				this._tabsWaitingForUpdate.push(tab);
-				this.startHeartbeat();
+				if(!this.isPaintingPaused()) {
+					this.startHeartbeat();
+				}
 			} else {
 				this._update(tab);
 			}
@@ -768,7 +788,7 @@ this.TabItems = {
 	//   options - an object with additional parameters, see below
 	// Possible options:
 	//   force - true to always update the tab item even if it's incomplete
-	_update: function(tab, options = {}) {
+	_update: Task.async(function* (tab, options = {}) {
 		try {
 			// ___ remove from waiting list now that we have no other early returns
 			this._tabsWaitingForUpdate.remove(tab);
@@ -791,23 +811,22 @@ this.TabItems = {
 
 			// ___ Make sure the tab is complete and ready for updating.
 			if(options.force) {
-				tabItem.updateCanvas();
+				yield tabItem.updateCanvas();
 			} else {
-				this._isComplete(tab).then((isComplete) => {
-					if(!Utils.isValidXULTab(tab) || tab.pinned) { return; }
+				let isComplete = yield this._isComplete(tab);
+				if(!Utils.isValidXULTab(tab) || tab.pinned) { return; }
 
-					if(isComplete) {
-						tabItem.updateCanvas();
-					} else {
-						this._tabsWaitingForUpdate.push(tab);
-					}
-				});
+				if(isComplete) {
+					yield tabItem.updateCanvas();
+				} else {
+					this._tabsWaitingForUpdate.push(tab);
+				}
 			}
 		}
 		catch(ex) {
 			Cu.reportError(ex);
 		}
-	},
+	}),
 
 	// Takes in a xul:tab, creates a TabItem for it and adds it to the scene.
 	link: function(tab, options) {
@@ -835,8 +854,6 @@ this.TabItems = {
 			}
 			tab._tabViewTabItem = null;
 			Storage.saveTab(tab, null);
-
-			this._tabsWaitingForUpdate.remove(tab);
 		}
 		catch(ex) {
 			Cu.reportError(ex);
@@ -851,23 +868,61 @@ this.TabItems = {
 	// when a tab becomes unpinned, create a TabItem for it
 	handleTabUnpin: function(xulTab) {
 		this.link(xulTab);
-		this.update(xulTab);
+	},
+
+	tabSelected: function(tab) {
+		let tabItem = tab && tab._tabViewTabItem;
+		if(tabItem) {
+			this._staleTabs.append(tabItem, true);
+		}
+	},
+
+	tabUpdated: function(tabItem) {
+		this._lastUpdateTime = Date.now();
+		this._staleTabs.append(tabItem);
 	},
 
 	// Start a new heartbeat if there isn't one already started. The heartbeat is a chain of aSync calls that allows us to spread
 	// out update calls over a period of time. We make sure not to add multiple aSync chains.
-	startHeartbeat: function() {
-		if(!Timers.heartbeat) {
+	startHeartbeat: function(timing) {
+		if(timing || !Timers.heartbeat) {
 			Timers.init('heartbeat', () => {
 				this._checkHeartbeat();
-			}, this._heartbeatTiming);
+			}, timing || this._heartbeatTiming);
 		}
+	},
+
+	startHeartbeatHidden: function() {
+		this.startHeartbeat(this._heartbeatHiddenTiming);
 	},
 
 	// This periodically checks for tabs waiting to be updated, and calls _update on them.
 	// Should only be called by startHeartbeat and resumePainting.
-	_checkHeartbeat: function() {
-		if(this.isPaintingPaused()) { return; }
+	_checkHeartbeat: Task.async(function* () {
+		if(this.isPaintingPaused()) {
+			// With tab view hidden, the heartbeat instead turns stale tabs canvas into images, and discards the canvas.
+			if(!UI.isTabViewVisible()) {
+				let accumTime = 0;
+				let now = Date.now();
+				while(accumTime < this._maxTimeForUpdating && !this._staleTabs.isEmpty()) {
+					let updateBegin = Date.now();
+
+					let tabItem = this._staleTabs.peek();
+					this._staleTabs.remove(tabItem);
+					yield tabItem.destroyCanvas();
+
+					let updateEnd = Date.now();
+					let deltaTime = updateEnd - updateBegin;
+					accumTime += deltaTime;
+				}
+
+				// If there are possibly still stale tabs, recheck in a while.
+				if(!this._staleTabs.isEmpty()) {
+					this.startHeartbeatHidden();
+				}
+			}
+			return;
+		}
 
 		// restart the heartbeat to update all waiting tabs once the UI becomes idle
 		if(!UI.isIdle()) {
@@ -880,11 +935,12 @@ this.TabItems = {
 		// Do as many updates as we can fit into a "perceived" amount of time, which is tunable.
 		while(accumTime < this._maxTimeForUpdating && items.length) {
 			let updateBegin = Date.now();
-			this._update(items.pop());
-			let updateEnd = Date.now();
+
+			yield this._update(items.pop());
 
 			// Maintain a simple average of time for each tabitem update
 			// We can use this as a base by which to delay things like tab zooming, so there aren't any hitches.
+			let updateEnd = Date.now();
 			let deltaTime = updateEnd - updateBegin;
 			accumTime += deltaTime;
 		}
@@ -892,15 +948,12 @@ this.TabItems = {
 		if(this._tabsWaitingForUpdate.hasItems()) {
 			this.startHeartbeat();
 		}
-	},
+	}),
 
 	// Tells TabItems to stop updating thumbnails (so you can do animations without thumbnail paints causing stutters).
 	// pausePainting can be called multiple times, but every call to pausePainting needs to be mirrored with a call to <resumePainting>.
 	pausePainting: function() {
 		this.paintingPaused++;
-		if(Timers.heartbeat) {
-			Timers.cancel('heartbeat');
-		}
 	},
 
 	// Undoes a call to <pausePainting>. For instance, if you called pausePainting three times in a row, you'll need to call resumePainting
@@ -908,7 +961,8 @@ this.TabItems = {
 	resumePainting: function() {
 		this.paintingPaused--;
 		if(!this.isPaintingPaused()) {
-			this.startHeartbeat();
+			// Ensure we override the heartbeat for staled tabs.
+			this.startHeartbeat(this._heartbeatTiming);
 		}
 	},
 
@@ -935,11 +989,16 @@ this.TabItems = {
 	// Adds the given <TabItem> to the master list.
 	register: function(item) {
 		this.items.add(item);
+		if(!item.tab.hasAttribute('pending')) {
+			this.update(item.tab);
+		}
 	},
 
 	// Removes the given <TabItem> from the master list.
 	unregister: function(item) {
 		this.items.delete(item);
+		this._tabsWaitingForUpdate.remove(item.tab);
+		this._staleTabs.remove(item);
 	},
 
 	// Saves all open <TabItem>s.
@@ -1158,6 +1217,9 @@ this.TabPriorityQueue.prototype = {
 this.TabCanvas = function(tabItem) {
 	this.tabItem = tabItem;
 	this.tab = tabItem.tab;
+	tabItem.tabCanvas = this;
+
+	this.destroying = null;
 
 	this.canvas = TabItems.canvasFragment();
 	tabItem.thumb.appendChild(this.canvas);
@@ -1191,15 +1253,11 @@ this.TabCanvas.prototype = {
 							channelError = PageThumbs._isChannelErrorResponse(channel);
 						}
 
-						this.canvas.toBlob((blob) => {
-							let reader = new FileReader();
-							reader.onloadend = function() {
-								if(reader.readyState == FileReader.DONE) {
-									let buffer = reader.result;
-									PageThumbs._store(originalURL, url, buffer, channelError);
-								}
-							};
-							reader.readAsArrayBuffer(blob);
+						this.toFile('ArrayBuffer', (reader) => {
+							if(reader.readyState == FileReader.DONE) {
+								let buffer = reader.result;
+								PageThumbs._store(originalURL, url, buffer, channelError);
+							}
 						});
 					}
 					catch(ex) {
@@ -1211,6 +1269,11 @@ this.TabCanvas.prototype = {
 	},
 
 	update: function(callback) {
+		// If this canvas has started to be destroyed, stop it, it's better to update it than to create a new one.
+		if(this.destroying) {
+			this.destroying.reject();
+		}
+
 		let browser = this.tab.linkedBrowser;
 		PageThumbs.captureToCanvas(browser, this.canvas, () => {
 			this.persist(browser);
@@ -1218,5 +1281,66 @@ this.TabCanvas.prototype = {
 				callback();
 			}
 		});
+	},
+
+	toFile: function(howToRead, callback) {
+		this.canvas.toBlob((blob) => {
+			let reader = new FileReader();
+			reader.onloadend = function() {
+				callback(reader);
+			};
+			reader['readAs'+howToRead](blob);
+		});
+	},
+
+	toImage: function() {
+		// This is the basis of this deferred object, with accessor methods for resolving and rejecting its promise.
+		this.destroying = {
+			resolve: function() {
+				this._resolve();
+				this.finish();
+			},
+
+			reject: function(r) {
+				this._reject(r);
+				this.finish();
+			},
+
+			finish: () => {
+				this.destroying = null;
+			}
+		};
+
+		// Init the actual promise.
+		this.destroying.promise = new Promise((resolve, reject) => {
+			// Store the resolve and reject methods in the deferred object.
+			this.destroying._resolve = resolve;
+			this.destroying._reject = reject;
+
+			try {
+				this.toFile('DataURL', (reader) => {
+					if(reader.readyState == FileReader.DONE) {
+						try {
+							this.tabItem.showCachedData(reader.result);
+						}
+						catch(ex) {
+							Cu.reportError(ex);
+							this.destroying.reject(ex);
+						}
+					}
+				});
+			}
+			catch(ex) {
+				Cu.reportError(ex);
+				this.destroying.reject(ex);
+			}
+		});
+
+		return this.destroying.promise;
+	},
+
+	destroy: function() {
+		this.canvas.remove();
+		this.tabItem.tabCanvas = null;
 	}
 };

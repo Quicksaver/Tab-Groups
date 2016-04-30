@@ -1,4 +1,4 @@
-// VERSION 1.2.2
+// VERSION 1.2.3
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -359,8 +359,12 @@ this.MRUList.prototype = {
 	},
 
 	// Inserts a new item at the end of the list if its not in it already.
-	append: function(entry) {
+	append: function(entry, force) {
 		let index = this._list.indexOf(entry);
+		if(force && index > -1) {
+			this._list.splice(index, 1);
+			index = -1;
+		}
 		if(index == -1) {
 			this._list.push(entry);
 		}
@@ -384,6 +388,14 @@ this.MRUList.prototype = {
 			}
 			return null;
 		}
-		return this._list.length > 0 ? this._list[0] : null;
+		return !this.isEmpty() ? this._list[0] : null;
 	},
+
+	isEmpty: function() {
+		return !this._list.length;
+	},
+
+	clear: function() {
+		this._list = [];
+	}
 };

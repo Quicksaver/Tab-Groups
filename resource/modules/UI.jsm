@@ -1,4 +1,4 @@
-// VERSION 1.3.12
+// VERSION 1.3.13
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -313,11 +313,17 @@ this.UI = {
 					}
 
 					if(tab) {
+						// Pause rendering of thumbs until the menu is shown, to speed things up.
+						TabItems.pausePainting();
+
 						// Make this the active group item and update the tab bar accordingly immediately,
 						// since some of the context menu's items will need to act on an updated tab bar.
 						this.updateShownTabs(tab);
 						this.reorderTabsBasedOnTabItemOrder();
 						gTabView.openTabContextMenu(e, tab, node);
+
+						// We can continue painting thumbs once this is all done.
+						TabItems.resumePainting();
 					}
 				}
 				break;
@@ -1041,6 +1047,9 @@ this.UI = {
 			if(this.isTabViewVisible()) { return; }
 		}
 
+		// Ensure a heartbeat is started when leaving tabview, so that canvases from stale tabs are captured into imgs in the background, to save memory.
+		TabItems.startHeartbeatHidden();
+
 		dispatch(window, { type: "tabviewhidden", cancelable: false });
 	},
 
@@ -1124,6 +1133,7 @@ this.UI = {
 	// Called when the user switches from one tab to another outside of the TabView UI.
 	onTabSelect: function(tab) {
 		this._currentTab = tab;
+		TabItems.tabSelected(tab);
 
 		if(this.isTabViewVisible()) {
 			// We may want to select a pinned tab without leaving tab view.
