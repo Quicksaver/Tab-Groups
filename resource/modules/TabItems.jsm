@@ -1,4 +1,4 @@
-// VERSION 1.2.0
+// VERSION 1.2.1
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -991,6 +991,12 @@ this.TabItems = {
 		this.items.add(item);
 		if(!item.tab.hasAttribute('pending')) {
 			this.update(item.tab);
+		}
+		else {
+			// This would be done in the update call above, but since we're bypassing it here...
+			if(item._labelsNeedUpdate) {
+				item._updateLabels();
+			}
 		}
 	},
 
