@@ -3,6 +3,8 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 :root {
+	--actions-icons: url("chrome://tabgroups/skin/actions.png");
+	--actions-icons-2x: url("chrome://tabgroups/skin/actions@2x.png");
 	--hover-color: rgba(128,128,128,0.4);
 	--item-normal-shadow: 0 1px 5px rgba(60, 60, 60, 0.6);
 	--scrollbar-width: 10px;
@@ -875,6 +877,7 @@ body.grid #actions {
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
 	background-attachment: scroll;
+	background-size: 18px 18px;
 	border: none;
 	cursor: pointer;
 	padding: 0;
@@ -882,29 +885,64 @@ body.grid #actions {
 	height: 24px;
 }
 
+#actions #exit-button {
+	background-image: -moz-image-rect(var(--actions-icons), 0, 18, 18, 0);
+}
+
 #actions #searchbutton {
-	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 20, 20, 0);
+	background-image: -moz-image-rect(var(--actions-icons), 0, 72, 18, 54);
 }
 
 .group-options,
 #actions #optionsbutton {
-	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 40, 20, 20);
+	background-image: -moz-image-rect(var(--actions-icons), 0, 36, 18, 18);
 }
 
 #actions #helpbutton {
-	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 60, 20, 40);
+	background-image: -moz-image-rect(var(--actions-icons), 0, 54, 18, 36);
 }
 
 #actions #classicbutton {
-	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 80, 20, 60);
+	background-image: -moz-image-rect(var(--actions-icons), 0, 126, 18, 108);
 }
 
 #actions #gridbutton {
-	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 100, 20, 80);
+	background-image: -moz-image-rect(var(--actions-icons), 0, 108, 18, 90);
 }
 
 #actions #singlebutton {
-	background-image: -moz-image-rect(url(chrome://tabgroups/skin/buttons.png), 0, 120, 20, 100);
+	background-image: -moz-image-rect(var(--actions-icons), 0, 90, 18, 72);
+}
+
+@media (min-resolution: 1.1dppx) {
+	#actions #exit-button {
+		background-image: -moz-image-rect(var(--actions-icons-2x), 0, 36, 36, 0);
+	}
+
+	#actions #searchbutton {
+		background-image: -moz-image-rect(var(--actions-icons-2x), 0, 144, 36, 108);
+	}
+
+	.group-options,
+	#actions #optionsbutton {
+		background-image: -moz-image-rect(var(--actions-icons-2x), 0, 72, 36, 36);
+	}
+
+	#actions #helpbutton {
+		background-image: -moz-image-rect(var(--actions-icons-2x), 0, 108, 36, 72);
+	}
+
+	#actions #classicbutton {
+		background-image: -moz-image-rect(var(--actions-icons-2x), 0, 252, 36, 216);
+	}
+
+	#actions #gridbutton {
+		background-image: -moz-image-rect(var(--actions-icons-2x), 0, 216, 36, 180);
+	}
+
+	#actions #singlebutton {
+		background-image: -moz-image-rect(var(--actions-icons-2x), 0, 180, 36, 144);
+	}
 }
 
 #actions .grouped {
@@ -924,10 +962,6 @@ body.grid #actions {
 
 body.DraggingTab .appTabIcon {
 	transition: var(--drag-animation);
-}
-
-.appTabIcon {
-	background-size: 18px 18px;
 }
 
 .appTabIcon.space-before {

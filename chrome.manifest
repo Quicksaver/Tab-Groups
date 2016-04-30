@@ -33,8 +33,6 @@ override  chrome://tabgroups-os/skin/Toolbar@2x.png     chrome://tabgroups-os/sk
 override  chrome://tabgroups-os/skin/Toolbar.png        chrome://tabgroups-os/skin/Toolbar-win8.png           os=WINNT osversion=6.3
 override  chrome://tabgroups-os/skin/Toolbar@2x.png     chrome://tabgroups-os/skin/Toolbar-win8@2x.png        os=WINNT osversion=6.3
 
-override  chrome://tabgroups-os/skin/tabview.png        chrome://tabgroups-os/skin/tabview-lion.png           os=Darwin osversion>=10.7
-
 override  chrome://tabgroups-os/skin/Toolbar.png        chrome://tabgroups-os/skin/Toolbar-yosemite.png       os=Darwin osversion>=10.10
 override  chrome://tabgroups-os/skin/Toolbar@2x.png     chrome://tabgroups-os/skin/Toolbar-yosemite@2x.png    os=Darwin osversion>=10.10
 override  chrome://tabgroups-os/skin/menuPanel.png      chrome://tabgroups-os/skin/menuPanel-yosemite.png     os=Darwin osversion>=10.10

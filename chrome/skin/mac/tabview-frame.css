@@ -67,26 +67,6 @@ body.classic #actions:-moz-locale-dir(rtl) {
 	border-radius: 0 var(--item-border-radius) var(--item-border-radius) 0;
 }
 
-#exit-button {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 100, 20, 80);
-}
-
-#exit-button[groups="0"] {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 20, 20, 0);
-}
-
-#exit-button[groups="1"] {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 40, 20, 20);
-}
-
-#exit-button[groups="2"] {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 60, 20, 40);
-}
-
-#exit-button[groups="3"] {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 80, 20, 60);
-}
-
 #actions .grouped {
 	border-top: 1px solid rgba(255, 255, 255, 0.5);
 }

@@ -53,26 +53,6 @@ body {
 
 /* Side buttons */
 
-#exit-button {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 80, 16, 64);
-}
-
-#exit-button[groups="0"] {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 16, 16, 0);
-}
-
-#exit-button[groups="1"] {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 32, 16, 16);
-}
-
-#exit-button[groups="2"] {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 48, 16, 32);
-}
-
-#exit-button[groups="3"] {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/tabview.png), 0, 64, 16, 48);
-}
-
 #actions .grouped {
 	border-top: 1px solid rgba(230,230,230,1);
 }
