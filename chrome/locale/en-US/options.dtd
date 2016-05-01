@@ -46,6 +46,8 @@
 <!ENTITY sessionRestore.button.label "Show my windows and tabs from last time when Firefox starts">
 <!ENTITY sessionRestore.button.tooltip.a "This is the same as changing the preference 'When Firefox Starts' to 'Show my windows and tabs from last time' in Firefox's options.">
 <!ENTITY sessionRestore.button.tooltip.b "If you change that option there afterwards, you'll again lose your tab groups when you restart the browser, until you change it back or until you press this button again.">
+<!ENTITY opt.noWarningsAboutSession.label "Don't warn me about this in groups view">
+<!ENTITY opt.noWarningsAboutSession.tooltip "The notifications are there to remind you that you shouldn't close the browser window if you don't want to lose your tabs and groups. Disable them only if you're sure that's what you want.">
 
 <!ENTITY session.backup.button "Create Backup File">
 <!ENTITY session.backup.description "Export your tab groups into a backup file for safe-keeping, so that you can restore them at a later time if necessary.">

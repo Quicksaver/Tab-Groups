@@ -49,7 +49,6 @@ prefList = {
 	previousGroupAlt: false,
 	previousGroupCtrl: false,
 
-	// hidden preferences
 	noWarningsAboutSession: false,
 
 	// for internal use

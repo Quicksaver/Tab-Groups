@@ -18,6 +18,7 @@
 
 	<prefpane id="mainPrefPane">
 		<preferences>
+			<preference id="pref-noWarningsAboutSession" name="extensions.tabgroups.noWarningsAboutSession" type="bool"/>
 			<preference id="pref-quickAccessButton" name="extensions.tabgroups.quickAccessButton" type="bool"/>
 			<preference id="pref-groupTitleInButton" name="extensions.tabgroups.groupTitleInButton" type="bool"/>
 			<preference id="pref-showGroupThumbs" name="extensions.tabgroups.showGroupThumbs" type="bool"/>
@@ -185,6 +186,10 @@
 			<vbox jump="sessionRestore">
 				<description>&sessionRestore.description;</description>
 				<vbox align="center">
+					<checkbox label="&opt.noWarningsAboutSession.label;"
+						helptext="&opt.noWarningsAboutSession.tooltip;"
+						jump="noWarningsAboutSession"
+						delayPreference="pref-noWarningsAboutSession"/>
 					<button id="paneTabGroups-sessionRestore-button"
 						class="content-cell-item"
 						label="&sessionRestore.button.label;"
