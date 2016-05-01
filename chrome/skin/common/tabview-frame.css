@@ -3,6 +3,8 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 :root {
+	--close-icon: url("chrome://tabgroups/skin/close.png");
+	--close-icon-2x: url("chrome://tabgroups/skin/close@2x.png");
 	--actions-icons: url("chrome://tabgroups/skin/actions.png");
 	--actions-icons-2x: url("chrome://tabgroups/skin/actions@2x.png");
 	--actions-width: 35px;
@@ -96,9 +98,45 @@ html.thumbing body.single #content {
 	overflow: visible;
 }
 
+/* Close buttons */
+
+.close {
+	cursor: pointer;
+	width: 22px;
+	height: 22px;
+	padding: 1px;
+	background-image: -moz-image-rect(var(--close-icon), 0, 20, 20, 0);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 20px 20px;
+}
+
+.close:hover {
+	background-image: -moz-image-rect(var(--close-icon), 0, 40, 20, 20);
+}
+
+.close:hover:active {
+	background-image: -moz-image-rect(var(--close-icon), 0, 60, 20, 40);
+}
+
+@media (min-resolution: 1.1dppx) {
+	.close {
+		background-image: -moz-image-rect(var(--close-icon-2x), 0, 40, 40, 0);
+	}
+
+	.close:hover {
+		background-image: -moz-image-rect(var(--close-icon-2x), 0, 80, 40, 40);
+	}
+
+	.close:hover:active {
+		background-image: -moz-image-rect(var(--close-icon-2x), 0, 120, 40, 80);
+	}
+}
+
 /* Tabs */
 
 .tab {
+	position: relative;
 	overflow: hidden;
 	padding: var(--thumbs-tab-padding);
 	margin: 0;
@@ -213,25 +251,17 @@ body.DraggingTab .tab * {
 	}
 }
 
-.close {
-	cursor: pointer;
-	background-repeat: no-repeat;
-	background-position: center center;
-}
-
 .tab .close {
 	position: absolute;
-	top: 0;
-	width: 22px;
-	height: 22px;
+	top: 8px;
 }
 
 .tab .close:-moz-locale-dir(ltr) {
-	right: 0;
+	right: 8px;
 }
 
 .tab .close:-moz-locale-dir(rtl) {
-	left: 0;
+	left: 8px;
 }
 
 .tab-label {
@@ -391,7 +421,7 @@ body:not(.grid) .groupItem:not(.phantom) {
 .undo {
 	position: absolute;
 	display: flex;
-	align-items: stretch;
+	align-items: center;
 	align-content: stretch;
 	cursor: pointer;
 	opacity: 0.75;
@@ -410,13 +440,11 @@ body:not(.classic) .undo {
 .undo > span {
 	flex: 1 1 auto;
 	margin: 0.5em 1em;
-	-moz-margin-end: 0.75em;
 }
 
+.undo > span,
 .undo .close {
-	width: 16px;
-	-moz-padding-end: 0.75em;
-	background-position: 0 50%;
+	-moz-margin-end: 0.5em;
 }
 
 .phantom {
@@ -521,15 +549,9 @@ body:not(.single) .groupItem:not(:hover) .tab.create-new,
 	-moz-margin-start: 2px;
 }
 
-.tab-container.noThumbs .tab .close {
-	top: 50%;
-	transform: translateY(-50%);
-	-moz-margin-end: 5px;
-}
-
 .tab-container.noThumbs .tab .tab-label {
 	text-align: start;
-	-moz-margin-end: 18px;
+	-moz-margin-end: 24px;
 }
 
 .tab-container.noThumbs .tab:not(.noFavicon) .tab-label {
@@ -707,11 +729,6 @@ body.classic .groupItem.dragging * {
 	flex: 1 1 auto;
 }
 
-.titlebar .close {
-	width: 26px;
-	background-position: center center;
-}
-
 input.name {
 	text-overflow: ellipsis;
 	background: transparent;
@@ -844,10 +861,16 @@ input.name:focus::-moz-placeholder {
 
 #sessionRestoreNotice .close {
 	position: absolute;
-	top: calc(50% - 8px);
-	right: 6px;
-	width: 16px;
-	height: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+#sessionRestoreNotice .close:-moz-locale-dir(ltr) {
+	right: 9px;
+}
+
+#sessionRestoreNotice .close:-moz-locale-dir(rtl) {
+	left: 9px;
 }
 
 #sessionRestoreNotice span {

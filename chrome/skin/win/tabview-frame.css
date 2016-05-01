@@ -32,20 +32,6 @@ body:not(.classic) {
 	background-color: var(--item-background);
 }
 
-/* Tabs */
-
-.close {
-	background-image: -moz-image-rect(url("chrome://tabgroups-os/skin/close.png"), 0, 16, 16, 0);
-}
-
-.close:hover {
-	background-image: -moz-image-rect(url("chrome://tabgroups-os/skin/close.png"), 0, 32, 16, 16);
-}
-
-.close:hover:active {
-	background-image: -moz-image-rect(url("chrome://tabgroups-os/skin/close.png"), 0, 48, 16, 32);
-}
-
 /* Tab GroupItem */
 
 @media (-moz-windows-default-theme) {

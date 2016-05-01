@@ -1,4 +1,4 @@
-// VERSION 1.2.3
+// VERSION 1.2.4
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -751,7 +751,7 @@ this.TabItems = {
 			let close = document.createElement('div');
 			close.classList.add('close');
 			setAttribute(close, "title", Strings.get("TabView", "closeTab"));
-			thumb.appendChild(close);
+			div.appendChild(close);
 
 			this._fragment = div;
 		}
@@ -761,7 +761,7 @@ this.TabItems = {
 		let fav = thumb.nextSibling.firstChild;
 		let tabTitle = container.firstChild.nextSibling.firstChild;
 		let tabUrl = tabTitle.nextSibling.nextSibling;
-		let closeBtn = container.firstChild.lastChild;
+		let closeBtn = container.lastChild;
 
 		return { container, thumb, fav, tabTitle, tabUrl, closeBtn };
 	},
