@@ -158,7 +158,6 @@ body.DraggingTab .tab * {
 .tab-container:not(.noThumbs) .thumb {
 	position: relative;
 	width: 100%;
-	background-color: var(--item-background);
 }
 
 .tab-container.noThumbs .thumb {
