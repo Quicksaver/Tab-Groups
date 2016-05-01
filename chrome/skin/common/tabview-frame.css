@@ -119,9 +119,12 @@ body.DraggingTab .tab * {
 
 .tab-container:not(.noThumbs) .thumb {
 	position: relative;
-	overflow: hidden;
 	width: 100%;
 	background-color: var(--item-background);
+}
+
+.tab-container.noThumbs .thumb {
+	overflow: hidden;
 }
 
 .tab.stacked .thumb {
@@ -157,30 +160,37 @@ body.DraggingTab .tab * {
 	-moz-border-end: var(--item-border);
 }
 
-.tab-container:not(.noThumbs) .favicon-container {
-	min-width: 17px;
-	min-height: 17px;
-	max-width: 27px;
-	max-height: 27px;
-	width: calc(100% - 10px - 4px);
-	height: calc(100% - 10px - 4px);
+.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container {
+	width: 22px;
+	height: 22px;
+	top: 0;
 }
 
-.tab-container:not(.noThumbs) .favicon-container:-moz-locale-dir(ltr) {
+.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container:-moz-locale-dir(ltr) {
+	left: 0;
+	border-bottom-right-radius: 80%;
+}
+
+.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container:-moz-locale-dir(rtl) {
+	right: 0;
+	border-bottom-left-radius: 80%;
+}
+
+.tab.stacked .favicon-container {
+	top: 1px;
+	width: 27px;
+	height: 27px;
+}
+
+.tab.stacked .favicon-container:-moz-locale-dir(ltr) {
+	left: 1px;
 	border-bottom-right-radius: 0.4em;
 }
 
-.tab-container:not(.noThumbs) .favicon-container:-moz-locale-dir(rtl) {
+.tab.stacked .favicon-container:-moz-locale-dir(rtl) {
+	right: 1px;
 	border-bottom-left-radius: 0.4em;
 }
-
-.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container { top: 0; }
-.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container:-moz-locale-dir(ltr) { left: 0; }
-.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container:-moz-locale-dir(rtl) { right: 0; }
-
-.tab.stacked .favicon-container { top: 1px; }
-.tab.stacked .favicon-container:-moz-locale-dir(ltr) { left: 1px; }
-.tab.stacked .favicon-container:-moz-locale-dir(rtl) { right: 1px; }
 
 .favicon {
 	width: 100%;
@@ -188,6 +198,12 @@ body.DraggingTab .tab * {
 	background-repeat: no-repeat;
 	background-size: var(--favicon-size) var(--favicon-size);
 	background-position: center center;
+}
+
+.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon {
+	position: relative;
+	top: -25%;
+	left: -25%;
 }
 
 /* Apply crisp rendering for favicons at exactly 2dppx resolution */
