@@ -3,8 +3,8 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 :root {
-	--close-icon: url("chrome://tabgroups/skin/close.png");
-	--close-icon-2x: url("chrome://tabgroups/skin/close@2x.png");
+	--control-icons: url("chrome://tabgroups/skin/group-controls.png");
+	--control-icons-2x: url("chrome://tabgroups/skin/group-controls@2x.png");
 	--actions-icons: url("chrome://tabgroups/skin/actions.png");
 	--actions-icons-2x: url("chrome://tabgroups/skin/actions@2x.png");
 	--actions-width: 35px;
@@ -23,8 +23,6 @@
 	--group-titlebar-height: 24px;
 	--group-contents-margin: 0;
 	--group-contents-top-margin: 2px;
-	--stack-expander-size: 24px;
-	--stack-expander-top-margin: 0;
 	--stack-expander-bottom-margin: 8px;
 	--group-selector-size: 160px;
 	--group-selector-padding: 15px;
@@ -98,38 +96,91 @@ html.thumbing body.single #content {
 	overflow: visible;
 }
 
-/* Close buttons */
+/* Control buttons */
 
-.close {
+.close,
+.group-options,
+.stackExpander {
 	cursor: pointer;
 	width: 22px;
 	height: 22px;
 	padding: 1px;
-	background-image: -moz-image-rect(var(--close-icon), 0, 20, 20, 0);
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-size: 20px 20px;
 }
 
+.close {
+	background-image: -moz-image-rect(var(--control-icons), 0, 20, 20, 0);
+}
+
 .close:hover {
-	background-image: -moz-image-rect(var(--close-icon), 0, 40, 20, 20);
+	background-image: -moz-image-rect(var(--control-icons), 0, 40, 20, 20);
 }
 
 .close:hover:active {
-	background-image: -moz-image-rect(var(--close-icon), 0, 60, 20, 40);
+	background-image: -moz-image-rect(var(--control-icons), 0, 60, 20, 40);
+}
+
+.group-options {
+	background-image: -moz-image-rect(var(--control-icons), 20, 20, 40, 0);
+}
+
+.group-options:hover {
+	background-image: -moz-image-rect(var(--control-icons), 20, 40, 40, 20);
+}
+
+.group-options:hover:active {
+	background-image: -moz-image-rect(var(--control-icons), 20, 60, 40, 40);
+}
+
+.stackExpander {
+	background-image: -moz-image-rect(var(--control-icons), 40, 20, 60, 0);
+}
+
+.stackExpander:hover {
+	background-image: -moz-image-rect(var(--control-icons), 40, 40, 60, 20);
+}
+
+.stackExpander:hover:active {
+	background-image: -moz-image-rect(var(--control-icons), 40, 60, 60, 40);
 }
 
 @media (min-resolution: 1.1dppx) {
 	.close {
-		background-image: -moz-image-rect(var(--close-icon-2x), 0, 40, 40, 0);
+		background-image: -moz-image-rect(var(--control-icons-2x), 0, 40, 40, 0);
 	}
 
 	.close:hover {
-		background-image: -moz-image-rect(var(--close-icon-2x), 0, 80, 40, 40);
+		background-image: -moz-image-rect(var(--control-icons-2x), 0, 80, 40, 40);
 	}
 
 	.close:hover:active {
-		background-image: -moz-image-rect(var(--close-icon-2x), 0, 120, 40, 80);
+		background-image: -moz-image-rect(var(--control-icons-2x), 0, 120, 40, 80);
+	}
+
+	.group-options {
+		background-image: -moz-image-rect(var(--control-icons-2x), 40, 40, 80, 0);
+	}
+
+	.group-options:hover {
+		background-image: -moz-image-rect(var(--control-icons-2x), 40, 80, 80, 40);
+	}
+
+	.group-options:hover:active {
+		background-image: -moz-image-rect(var(--control-icons-2x), 40, 120, 80, 80);
+	}
+
+	.stackExpander {
+		background-image: -moz-image-rect(var(--control-icons-2x), 80, 40, 120, 0);
+	}
+
+	.stackExpander:hover {
+		background-image: -moz-image-rect(var(--control-icons-2x), 80, 80, 120, 40);
+	}
+
+	.stackExpander:hover:active {
+		background-image: -moz-image-rect(var(--control-icons-2x), 80, 120, 120, 80);
 	}
 }
 
@@ -389,6 +440,7 @@ body:not(.grid) .groupItem:not(.phantom) {
 }
 
 .groupItem .contents {
+	position: relative;
 	margin-top: var(--group-contents-top-margin);
 	overflow: hidden;
 	/* leave space for titlebar and for its own margin */
@@ -411,8 +463,8 @@ body:not(.grid) .groupItem:not(.phantom) {
 }
 
 .groupItem.stackedGroup .tab-container {
-	/* leave space for the stack expander */
-	height: calc(100% - 32px);
+	/* try to center the stacked tabs in the group's boundaries */
+	height: calc(100% - var(--group-titlebar-height));
 	overflow-x: visible;
 	overflow-y: visible;
 }
@@ -790,15 +842,11 @@ input.name:focus::-moz-placeholder {
 }
 
 .stackExpander {
-	cursor: pointer;
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/stack-expander.png), 0, 48, 24, 24);
-	width: var(--stack-expander-size);
-	height: var(--stack-expander-size);
-	margin: var(--stack-expander-top-margin) auto var(--stack-expander-bottom-margin);
-}
-
-.stackExpander:hover {
-	background-image: -moz-image-rect(url(chrome://tabgroups-os/skin/stack-expander.png), 0, 24, 24, 0);
+	position: absolute;
+	bottom: var(--stack-expander-bottom-margin);
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10;
 }
 
 .expandedTray {
@@ -912,7 +960,6 @@ body.grid #actions {
 	height: calc(100% - var(--group-border-width) - var(--group-border-width));
 }
 
-.group-options,
 #actions input {
 	background-color: transparent;
 	background-repeat: no-repeat;
@@ -934,7 +981,6 @@ body.grid #actions {
 	background-image: -moz-image-rect(var(--actions-icons), 0, 72, 18, 54);
 }
 
-.group-options,
 #actions #optionsbutton {
 	background-image: -moz-image-rect(var(--actions-icons), 0, 36, 18, 18);
 }
@@ -964,7 +1010,6 @@ body.grid #actions {
 		background-image: -moz-image-rect(var(--actions-icons-2x), 0, 144, 36, 108);
 	}
 
-	.group-options,
 	#actions #optionsbutton {
 		background-image: -moz-image-rect(var(--actions-icons-2x), 0, 72, 36, 36);
 	}
@@ -1019,7 +1064,6 @@ body.DraggingTab .appTabIcon {
 .groupItem:not(.thumbing) .tab:not(.stacked):hover,
 .expandedTray .tab.focus,
 .expandedTray .tab:hover,
-.group-options:hover,
 #actions input:hover,
 #actions input.appTabIcon.activeAppTab,
 .search-result-group .tab.focus,

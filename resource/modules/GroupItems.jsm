@@ -1,4 +1,4 @@
-// VERSION 1.6.22
+// VERSION 1.6.23
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -406,7 +406,8 @@ this.GroupItem.prototype = {
 		bounds.height -= UICache.groupContentsMargin.y;
 		bounds.height -= UICache.groupTitlebarHeight;
 		if(justTabs && this.isStacked) {
-			bounds.height -= UICache.stackExpanderHeight;
+			// We're just trying to better center the stacked tabs in the group.
+			bounds.height -= UICache.groupTitlebarHeight;
 		}
 		return bounds;
 	},
@@ -2039,9 +2040,8 @@ this.GroupItems = {
 			titleShield.setAttribute('title', Strings.get("TabView", "groupItemDefaultName"));
 			tbContainer.appendChild(titleShield);
 
-			let optionsBtn = document.createElement('input');
+			let optionsBtn = document.createElement('div');
 			optionsBtn.classList.add('group-options');
-			optionsBtn.setAttribute('type', 'button');
 			optionsBtn.setAttribute("title", Strings.get("TabView", "groupItemOptionsGroup"));
 			titlebar.appendChild(optionsBtn);
 
@@ -2063,11 +2063,12 @@ this.GroupItems = {
 			newTabItem.id = '';
 			newTabItem.classList.remove('groupItem');
 			newTabItem.classList.add('tab');
-			setAttribute(newTabItem, "title", Strings.get("TabView", "openNewTab"));
+			newTabItem.setAttribute("title", Strings.get("TabView", "openNewTab"));
 			tabContainer.appendChild(newTabItem);
 
 			let expander = document.createElement("div");
 			expander.classList.add("stackExpander");
+			expander.setAttribute("title", Strings.get("TabView", "groupItemExpand"));
 			contents.appendChild(expander);
 
 			// Create a new selector item in single mode's top area for this group.

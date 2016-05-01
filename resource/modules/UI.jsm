@@ -1,4 +1,4 @@
-// VERSION 1.3.13
+// VERSION 1.3.14
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1973,12 +1973,6 @@ this.UICache = {
 
 		this.ghost('groupBorderWidth', function() {
 			return parseInt(style.getPropertyValue('--group-border-width')) *2;
-		});
-
-		this.ghost('stackExpanderHeight', function() {
-			return	parseInt(style.getPropertyValue('--stack-expander-size'))
-				+ parseInt(style.getPropertyValue('--stack-expander-top-margin'))
-				+ parseInt(style.getPropertyValue('--stack-expander-bottom-margin'));
 		});
 
 		this.ghost('groupContentsMargin', function() {
