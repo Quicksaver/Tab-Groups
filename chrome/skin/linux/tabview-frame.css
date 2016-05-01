@@ -14,16 +14,6 @@ body {
 	background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.2));
 }
 
-/* Tabs */
-
-.favicon-container {
-	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, -1px 0 0 rgba(225, 225, 225, 0.8) inset;
-}
-
-.favicon-container:-moz-locale-dir(rtl) {
-	box-shadow: 0 -1px 0 rgba(225, 225, 225, 0.8) inset, 1px 0 0 rgba(225, 225, 225, 0.8) inset;
-}
-
 /* Tab GroupItem */
 
 .phantom {
