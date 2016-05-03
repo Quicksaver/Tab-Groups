@@ -1,4 +1,4 @@
-// VERSION 1.6.23
+// VERSION 1.6.24
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1348,6 +1348,7 @@ this.GroupItem.prototype = {
 				this.arrange();
 			}
 
+			this.updateTabCount();
 			this._sendToSubscribers("childAdded", { item: item });
 
 			UI.setReorderTabsOnHide(this);
@@ -1416,6 +1417,7 @@ this.GroupItem.prototype = {
 				this.arrange();
 			}
 
+			this.updateTabCount();
 			this._sendToSubscribers("childRemoved", { item: item });
 		}
 		catch(ex) {
@@ -1430,6 +1432,10 @@ this.GroupItem.prototype = {
 		for(let child of this.children.concat()) {
 			this.remove(child, options);
 		}
+	},
+
+	updateTabCount: function() {
+		setAttribute(this.container, 'tabs', this.children.length);
 	},
 
 	// Returns true if the groupItem should stack (instead of grid).
@@ -2020,6 +2026,7 @@ this.GroupItems = {
 		if(!this._fragment) {
 			let container = document.createElement('div');
 			container.classList.add('groupItem');
+			container.setAttribute('tabs', '0');
 
 			let titlebar = document.createElement('div');
 			titlebar.classList.add('titlebar');

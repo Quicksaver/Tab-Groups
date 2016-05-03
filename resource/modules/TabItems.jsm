@@ -1,4 +1,4 @@
-// VERSION 1.2.4
+// VERSION 1.2.5
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -1150,12 +1150,14 @@ this.TabItems = {
 			width = Math.max(this.minTabWidth, width);
 			height = Math.max(this.minTabHeight, height);
 		}
+		let w = width;
+		let h = height;
 
 		if(size.x > -1) {
-			height = this._getHeightForWidth(width, size.stacked);
+			height = this._getHeightForWidth(w, size.stacked);
 		}
 		if(size.y > -1) {
-			width = this._getWidthForHeight(height, size.stacked);
+			width = this._getWidthForHeight(h, size.stacked);
 		}
 
 		if(size.x > -1 && size.y > -1) {
