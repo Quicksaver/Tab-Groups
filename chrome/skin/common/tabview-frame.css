@@ -11,6 +11,8 @@
 	--actions-button-height: 28px;
 	--hover-color: rgba(128,128,128,0.4);
 	--item-normal-shadow: 0 1px 5px rgba(60, 60, 60, 0.6);
+	--item-active-shadow-ltr: 2px 2px 8px rgba(0, 0, 0, 0.8);
+	--item-active-shadow-rtl: -2px 2px 8px rgba(0, 0, 0, 0.8);
 	--scrollbar-width: 10px;
 	--thumbs-tab-padding: 10px;
 	--list-tab-height: 37px;
@@ -23,6 +25,9 @@
 	--group-titlebar-height: 24px;
 	--group-contents-margin: 0;
 	--group-contents-top-margin: 2px;
+	--group-classic-active-shadow-ltr: 2px 2px 8px rgba(0, 0, 0, 0.8), inset 0 0 3px 2px var(--hover-color);
+	--group-classic-active-shadow-rtl: -2px 2px 8px rgba(0, 0, 0, 0.8), inset 0 0 3px 2px var(--hover-color);
+	--group-grid-active-shadow: inset 0 0 3px 2px var(--hover-color);
 	--stack-expander-bottom-margin: 8px;
 	--group-selector-size: 160px;
 	--group-selector-padding: 15px;
@@ -408,14 +413,24 @@ body.classic .groupItem,
 	box-shadow: var(--item-normal-shadow);
 }
 
-body.classic .groupItem.activeGroupItem,
-.expandedTray {
-	box-shadow: rgba(0,0,0,0.8) 2px 2px 8px;
+.expandedTray:-moz-locale-dir(ltr) {
+	box-shadow: var(--item-active-shadow-ltr);
 }
 
-body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl),
 .expandedTray:-moz-locale-dir(rtl) {
-	box-shadow: rgba(0,0,0,0.8) 2px 2px 8px;
+	box-shadow: var(--item-active-shadow-rtl);
+}
+
+body.grid .groupItem.activeGroupItem {
+	box-shadow: var(--group-grid-active-shadow);
+}
+
+body.classic .groupItem.activeGroupItem:-moz-locale-dir(ltr) {
+	box-shadow: var(--group-classic-active-shadow-ltr);
+}
+
+body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl) {
+	box-shadow: var(--group-classic-active-shadow-rtl);
 }
 
 .groupItem:not(.closed).stackedGroup {
@@ -1114,7 +1129,6 @@ body.searching #searchbutton {
 .groupItem:not(.thumbing) .tab-container:not(.noThumbs) .tab:not(.stacked):hover .favicon-container,
 .expandedTray .tab-container:not(.noThumbs) .tab.focus .favicon-container,
 .expandedTray .tab-container:not(.noThumbs) .tab:hover .favicon-container,
-.groupItem.stackedGroup.activeGroupItem,
 .groupItem.stackedGroup:hover,
 body.DraggingGroup .groupItem.dragging,
 body.DraggingGroup .groupItem.dragging .tab:not(.stacked) .favicon-container,
