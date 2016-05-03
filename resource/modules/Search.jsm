@@ -1,4 +1,4 @@
-// VERSION 2.0.1
+// VERSION 2.0.2
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -492,11 +492,6 @@ this.Search = {
 			showBtn.classList.add('tab-setactive');
 			showBtn.setAttribute('title', Strings.get('TabView', 'showItemInGroupTooltip'));
 			div.appendChild(showBtn);
-
-			let showLabel = document.createElement('div');
-			showLabel.classList.add('tab-setactive-label');
-			showLabel.textContent = Strings.get('TabView', 'showItemInGroupLabel');
-			showBtn.appendChild(showLabel);
 
 			this._fragmentResult = div;
 		}
