@@ -1,6 +1,9 @@
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 this.api = {
+	// weak-refing the listener may or may not be necessary to prevent leaks of the sandbox during addon reload due to dangling listeners
+	QueryInterface: XPCOMUtils.generateQI([Ci.nsISupports, Ci.nsISupportsWeakReference, Ci.nsIDOMEventListener]),
+	
 	handleEvent: function(e) {
 		let doc = e.originalTarget;
 		if(doc && doc.defaultView && doc instanceof doc.defaultView.HTMLDocument) {
@@ -41,6 +44,10 @@ this.api = {
 
 	onFrameDeleted: function(frame) {
 		frame.removeEventListener('DOMContentLoaded', this);
+		if(frame.content) {
+			frame.content.removeEventListener('load', this);
+		}
+
 	}
 };
 
