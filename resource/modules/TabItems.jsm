@@ -1,4 +1,4 @@
-// VERSION 1.2.7
+// VERSION 1.2.8
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -35,7 +35,6 @@ this.TabItem = function(tab, options = {}) {
 	this.order = 1;
 	this._draggable = true;
 	this.lastMouseDownTarget = null;
-	this._labelsNeedUpdate = true;
 	this._thumbNeedsUpdate = false;
 
 	Listeners.add(this.container, 'mousedown', this);
@@ -43,6 +42,8 @@ this.TabItem = function(tab, options = {}) {
 	Listeners.add(this.container, 'dragstart', this, true);
 	Listeners.add(this.container, 'dragover', this);
 	Listeners.add(this.container, 'dragenter', this);
+	Watchers.addAttributeWatcher(this.tab, "busy", this);
+	Watchers.addAttributeWatcher(this.tab, "progress", this);
 
 	TabItems.register(this);
 
@@ -258,6 +259,11 @@ this.TabItem.prototype = {
 		}
 	},
 
+	// Watching "busy" and "progress" attributes in tabs, at least "progress" doesn't fire TabAttrModified events, and "busy" seems a bit unreliable.
+	attrWatcher: function() {
+		this.updateThrobber();
+	},
+
 	// Load the reciever's persistent data from storage. If there is none, treats it as a new tab.
 	// Parameters:
 	//   options - an object with additional parameters, see below
@@ -324,6 +330,8 @@ this.TabItem.prototype = {
 		Listeners.remove(this.container, 'dragstart', this, true);
 		Listeners.remove(this.container, 'dragover', this);
 		Listeners.remove(this.container, 'dragenter', this);
+		Watchers.removeAttributeWatcher(this.tab, "busy", this);
+		Watchers.removeAttributeWatcher(this.tab, "progress", this);
 		this.container.remove();
 	},
 
@@ -501,6 +509,20 @@ this.TabItem.prototype = {
 		UI.setActive(this);
 	},
 
+	updateLabels: function(callback) {
+		if(!TabItems._tabsNeedingLabelsUpdate.has(this)) {
+			if(callback) {
+				callback();
+			}
+		} else {
+			this._updateLabels().then(() => {
+				if(callback) {
+					callback();
+				}
+			});
+		}
+	},
+
 	_updateLabels: function() {
 		return new Promise((resolve, reject) => {
 			FavIcons.getFavIconUrlForTab(this.tab, (iconUrl) => {
@@ -515,7 +537,7 @@ this.TabItem.prototype = {
 				}
 				this._sendToSubscribers("iconUpdated");
 
-				this._labelsNeedUpdate = false;
+				TabItems._tabsNeedingLabelsUpdate.delete(this);
 				resolve(true);
 			});
 
@@ -542,6 +564,11 @@ this.TabItem.prototype = {
 			this.tabUrl.textContent = url;
 		}
 		setAttribute(this.container, "title", tooltip);
+	},
+
+	updateThrobber: function() {
+		toggleAttribute(this.container, 'busy', this.tab.hasAttribute('busy'));
+		toggleAttribute(this.container, 'progress', this.tab.hasAttribute('progress'));
 	},
 
 	// Updates the tabitem's canvas.
@@ -639,6 +666,7 @@ this.TabItems = {
 	// Set up the necessary tracking to maintain the <TabItems>s.
 	init: function() {
 		// Set up tab priority queue
+		this._tabsNeedingLabelsUpdate = new Set();
 		this._tabsWaitingForUpdate = new TabPriorityQueue();
 		this._staleTabs = new MRUList();
 
@@ -729,6 +757,11 @@ this.TabItems = {
 			favicon.classList.add('favicon');
 			faviconContainer.appendChild(favicon);
 
+			let throbber = document.createElement('div');
+			throbber.classList.add('favicon');
+			throbber.classList.add('throbber');
+			faviconContainer.appendChild(throbber);
+
 			let label = document.createElement('span');
 			label.classList.add('tab-label');
 			div.appendChild(label);
@@ -792,7 +825,7 @@ this.TabItems = {
 			let tabItem = tab._tabViewTabItem;
 			if(!tabItem) { return; }
 
-			tabItem._labelsNeedUpdate = true;
+			this._tabsNeedingLabelsUpdate.add(tabItem);
 
 			let shouldDefer =	this.isPaintingPaused()
 						|| this._tabsWaitingForUpdate.hasItems()
@@ -801,6 +834,7 @@ this.TabItems = {
 			if(shouldDefer) {
 				this._tabsWaitingForUpdate.push(tab);
 				if(!this.isPaintingPaused()) {
+					tabItem._updateLabels();
 					this.startHeartbeat();
 				}
 			} else {
@@ -827,9 +861,7 @@ this.TabItems = {
 			let tabItem = tab._tabViewTabItem;
 
 			// Even if the page hasn't loaded, display the favicon and title
-			if(tabItem._labelsNeedUpdate) {
-				tabItem._updateLabels();
-			}
+			tabItem.updateLabels();
 
 			// If we're not taking thumbnails for this tab's group, we don't need to fetch it in the first place.
 			// This will be re-called if and when its thumb becomes necessary.
@@ -999,6 +1031,11 @@ this.TabItems = {
 	resumePainting: function() {
 		this.paintingPaused--;
 		if(!this.isPaintingPaused()) {
+			// Start by fetching the updated labels immediately for each tab, so that those are always up-to-date.
+			for(let tabItem of this._tabsNeedingLabelsUpdate) {
+				tabItem._updateLabels();
+			}
+
 			// Ensure we override the heartbeat for staled tabs.
 			this.startHeartbeat(this._heartbeatTiming);
 		}
@@ -1032,7 +1069,8 @@ this.TabItems = {
 		}
 		else {
 			// This would be done in the update call above, but since we're bypassing it here...
-			if(item._labelsNeedUpdate) {
+			this._tabsNeedingLabelsUpdate.add(item);
+			if(!this.isPaintingPaused()) {
 				item._updateLabels();
 			}
 		}

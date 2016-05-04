@@ -1,4 +1,4 @@
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -317,20 +317,13 @@ this.quickAccess = {
 
 		// Tab items won't have these fields set/updated until it has been accessed.
 		// We need to force them to update so that we reflect the most up-to-date titles and favicons in the quick access panel.
-		let setLabels = function() {
+		tabItem.updateLabels(function() {
 			button.setAttribute('label', tabItem.tabTitle.textContent);
 			button.setAttribute('tooltiptext', tabItem.container.getAttribute('title'));
 			if(tabItem.fav._iconUrl) {
 				button.style.listStyleImage = 'url("'+tabItem.fav._iconUrl+'")';
 			}
-		};
-		if(!tabItem._labelsNeedUpdate) {
-			setLabels();
-		} else {
-			tabItem._updateLabels().then(function() {
-				setLabels();
-			});
-		}
+		});
 
 		this.contents.appendChild(button);
 		this.items.push(button);
@@ -436,20 +429,13 @@ this.quickAccess = {
 		// Tab items won't have these fields set/updated until it has been accessed.
 		// We need to force them to update so that we reflect the most up-to-date titles and favicons in the quick access panel.
 		if(tab.isATabItem) {
-			let setLabels = function() {
+			tab.updateLabels(function() {
 				button.setAttribute('label', tab.tabTitle.textContent);
 				button.setAttribute('tooltiptext', tab.container.getAttribute('title'));
 				if(tab.fav._iconUrl) {
 					button.style.listStyleImage = 'url("'+tab.fav._iconUrl+'")';
 				}
-			};
-			if(!tab._labelsNeedUpdate) {
-				setLabels();
-			} else {
-				tab._updateLabels().then(function() {
-					setLabels();
-				});
-			}
+			});
 		}
 		else if(tab.isAnAppItem) {
 			button.setAttribute('label', tab.tab.label);

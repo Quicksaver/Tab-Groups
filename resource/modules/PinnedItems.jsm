@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 this.PinnedItems = {
 	get actions() { return $('actions'); },
@@ -65,6 +65,16 @@ this.PinnedItems = {
 		}
 	},
 
+	// Watching "busy" and "progress" attributes in tabs, at least "progress" doesn't fire TabAttrModified events, and "busy" seems a bit unreliable.
+	attrWatcher: function(tab) {
+		if(!!this.icons.has(tab)) { return; }
+		let icon = this.icons.get(tab);
+
+		if(tab.hasAttribute("busy") != icon.hasAttribute("busy") || tab.hasAttribute("progress") != icon.hasAttribute("progress")) {
+			this.updateIcon(tab);
+		}
+	},
+
 	init: function() {
 		// To optimize drag handlers.
 		this.tray._appTabsContainer = true;
@@ -127,6 +137,26 @@ this.PinnedItems = {
 	_updateIcon: function(tab) {
 		if(!tab.pinned) { return; }
 
+		if(this.icons.has(tab)) {
+			let icon = this.icons.get(tab);
+			let busy = tab.hasAttribute('busy');
+			let progress = tab.hasAttribute('progress');
+			if(busy || progress) {
+				icon.style.backgroundImage = '';
+				toggleAttribute(icon, 'busy', busy);
+				toggleAttribute(icon, 'progress', progress);
+				return;
+			}
+			else {
+				removeAttribute(icon, 'busy');
+				removeAttribute(icon, 'progress');
+				// Show the previous icon if there was one, until it is updated (if necessary).
+				if(!icon.style.backgroundImage && icon._iconUrl) {
+					icon.style.backgroundImage = "url('"+icon._iconUrl+"')";
+				}
+			}
+		}
+
 		this.getFavIconUrl(tab, (iconUrl) => {
 			// The tab might have been removed or unpinned while waiting.
 			if(!Utils.isValidXULTab(tab) || !tab.pinned || !this.icons.has(tab)) { return; }
@@ -134,7 +164,9 @@ this.PinnedItems = {
 			let icon = this.icons.get(tab);
 			icon._iconUrl = iconUrl;
 			icon.setAttribute('title', tab.getAttribute('label'));
-			icon.style.backgroundImage = "url('"+iconUrl+"')";
+			if(!icon.hasAttribute('busy') && !icon.hasAttribute('progress')) {
+				icon.style.backgroundImage = "url('"+iconUrl+"')";
+			}
 		});
 	},
 
@@ -194,6 +226,8 @@ this.PinnedItems = {
 
 			this.icons.set(tab, icon);
 			tab._tabViewAppItem = icon;
+			Watchers.addAttributeWatcher(tab, "busy", this);
+			Watchers.addAttributeWatcher(tab, "progress", this);
 		}
 
 		if(sibling && sibling.isAnAppItem) {
@@ -218,6 +252,8 @@ this.PinnedItems = {
 		let icon = this.icons.get(tab);
 		if(icon) {
 			icon.remove();
+			Watchers.removeAttributeWatcher(tab, "busy", this);
+			Watchers.removeAttributeWatcher(tab, "progress", this);
 			this.icons.delete(tab);
 			delete tab._tabViewAppItem;
 			this.updateTray();

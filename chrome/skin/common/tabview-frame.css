@@ -264,8 +264,7 @@ body.DraggingTab .tab * {
 }
 
 .tab.cached-data canvas,
-.tab:not(.cached-data) .cached-thumb,
-.tab.noFavicon .favicon-container {
+.tab:not(.cached-data) .cached-thumb {
 	display: none;
 }
 
@@ -329,6 +328,27 @@ body.DraggingTab .tab * {
 	.favicon {
 		image-rendering: -moz-crisp-edges;
 	}
+}
+
+.tab.noFavicon:not([busy]):not([progress]) .favicon-container,
+.tab:not([busy]):not([progress]) .throbber,
+.tab:-moz-any([busy],[progress]) .favicon:not(.throbber) {
+	display: none;
+}
+
+.tab[busy]:not([progress]) .throbber,
+.appTabIcon[busy]:not([progress]) {
+	background-image: url("chrome://browser/skin/tabbrowser/connecting.png");
+}
+
+body:not([FF48]) .tab[progress] .throbber,
+body:not([FF48]) .appTabIcon[progress] {
+	background-image: url("chrome://browser/skin/tabbrowser/loading.png");
+}
+
+body[FF48] .tab[progress] .throbber,
+body[FF48] .appTabIcon[progress] {
+	background-image: url("chrome://global/skin/icons/loading.png");
 }
 
 .tab .close {

@@ -1,4 +1,4 @@
-// VERSION 1.3.15
+// VERSION 1.3.16
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -464,6 +464,9 @@ this.UI = {
 			let data = Storage.readUIData(gWindow);
 			this.storageSanity(data);
 			this._pageBounds = data.pageBounds;
+
+			// Some things depend on the different FF versions.
+			toggleAttribute(document.body, 'FF48', Services.vc.compare(Services.appinfo.version, "48.0a1") >= 0);
 
 			// ___ search
 			Search.init();

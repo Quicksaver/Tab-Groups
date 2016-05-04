@@ -29,6 +29,25 @@ body {
 	}
 }
 
+/* Tab Item */
+
+@media (min-resolution: 1.1dppx) {
+	.tab[busy]:not([progress]) .throbber,
+	.appTabIcon[busy]:not([progress]) {
+		background-image: url("chrome://browser/skin/tabbrowser/connecting@2x.png");
+	}
+
+	body:not([FF48]) .tab[progress] .throbber,
+	body:not([FF48]) .appTabIcon[progress] {
+		background-image: url("chrome://browser/skin/tabbrowser/loading@2x.png");
+	}
+
+	body[FF48] .tab[progress] .throbber,
+	body[FF48] .appTabIcon[progress] {
+		background-image: url("chrome://global/skin/icons/loading@2x.png");
+	}
+}
+
 /* Tab GroupItem */
 
 body.classic .groupItem,

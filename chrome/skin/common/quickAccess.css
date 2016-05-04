@@ -19,7 +19,11 @@
 }
 
 .tabGroups-quickaccess:not([FF48]) .loading {
-	background-image: url("chrome://global/skin/icons/loading_16.png");
+	background-image: url("chrome://browser/skin/tabbrowser/loading.png");
+}
+
+.tabGroups-quickaccess[FF48] .loading {
+	background-image: url("chrome://global/skin/icons/loading.png");
 }
 
 .quickaccess-contents toolbarbutton,
