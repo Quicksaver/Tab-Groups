@@ -1,4 +1,4 @@
-// VERSION 1.2.5
+// VERSION 1.2.6
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -642,7 +642,6 @@ this.TabItems = {
 		this._tabsWaitingForUpdate = new TabPriorityQueue();
 		this._staleTabs = new MRUList();
 
-		this.thumbRatio = gTabView._viewportRatio;
 		this.tabHeight = this._getHeightForWidth(this.tabWidth);
 		this.tabAspect = this.tabWidth / this.tabHeight;
 		this.invTabAspect = 1 / this.tabAspect;
@@ -1072,14 +1071,14 @@ this.TabItems = {
 		if(!stacked) {
 			thumbHeight -= this.fontSizeRange.max +2; // +2 comes from max line height calculated in GroupItem._gridArrange()
 		}
-		let thumbWidth = thumbHeight * this.thumbRatio;
+		let thumbWidth = thumbHeight * UI._viewportRatio;
 		return Math.floor(thumbWidth + UICache.tabItemPadding);
 	},
 
 	// Private method that returns the tabitem height given a width.
 	_getHeightForWidth: function(width, stacked) {
 		let thumbWidth = width - UICache.tabItemPadding;
-		let thumbHeight = thumbWidth / this.thumbRatio;
+		let thumbHeight = thumbWidth / UI._viewportRatio;
 		if(!stacked) {
 			thumbHeight += this.fontSizeRange.max +2; // +2 comes from max line height calculated in GroupItem._gridArrange()
 		}
@@ -1273,6 +1272,13 @@ this.TabCanvas = function(tabItem) {
 };
 
 this.TabCanvas.prototype = {
+	getSize: function() {
+		let size = this.tabItem.parent._lastTabSize;
+		let width = size.tabWidth - UICache.tabCanvasOffset;
+		let height = size.tabHeight - size.lineHeight - UICache.tabCanvasOffset;
+		return new Point(width, height);
+	},
+
 	persist(aBrowser) {
 		// capture to file, thumbnail service does not persist automatically when rendering to canvas.
 		PageThumbs.shouldStoreThumbnail(aBrowser, (storeAllowed) => {
@@ -1325,8 +1331,32 @@ this.TabCanvas.prototype = {
 			this.destroying.reject();
 		}
 
+		let size = this.getSize();
+		let dimsChanged = this.canvas.width != size.x || this.canvas.height != size.y;
+
+		// Changing the dims of a canvas will clear it, so we don't want to do do this to a canvas we're currently displaying.
+		// So grab a new thumbnail at the new dims and then copy it over to the displayed canvas.
+		let canvas = this.canvas;
+		if(dimsChanged) {
+			canvas = TabItems.canvasFragment();
+			canvas.width = size.x;
+			canvas.height = size.y;
+		}
+
 		let browser = this.tab.linkedBrowser;
-		PageThumbs.captureToCanvas(browser, this.canvas, () => {
+		PageThumbs.captureToCanvas(browser, canvas, () => {
+			if(dimsChanged) {
+				this.canvas.width = size.x;
+				this.canvas.height = size.y;
+				try {
+					let ctx = this.canvas.getContext('2d');
+					ctx.drawImage(canvas, 0, 0);
+				}
+				catch(ex) {
+					// Can't draw if the canvas created by page thumbs isn't valid. This can happen during shutdown.
+				}
+			}
+
 			this.persist(browser);
 			if(callback) {
 				callback();

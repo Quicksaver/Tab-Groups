@@ -1,4 +1,4 @@
-// VERSION 1.3.14
+// VERSION 1.3.15
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -93,6 +93,9 @@ this.UI = {
 
 	// To enable context menus on a delay when entering tab view, so it doesn't conflict with FireGestures.
 	_contextMenusEnabled: false,
+
+	// For the thumbnails ratio, set every time we enter tab view and the window is resized while in tab view.
+	_viewportRatio: 1,
 
 	get classic() { return Prefs.displayMode == 'classic'; },
 	get grid() { return Prefs.displayMode == 'grid'; },
@@ -892,6 +895,22 @@ this.UI = {
 		return rect;
 	},
 
+	// Screen ratio is unlikely to change -> significantly <- for the lifetime of this session.
+	// However, it's best to try to have canvases always reflect the latest viewport ratio, so that thumbs are as accurate as possible;
+	// otherwise they could only show a portion of the webpage.
+	updateViewportRatio: function(arrangeGroups) {
+		let viewportRatio = gBrowser.mCurrentBrowser.clientWidth / gBrowser.mCurrentBrowser.clientHeight;
+		if(viewportRatio != this._viewportRatio) {
+			this._viewportRatio = viewportRatio;
+
+			if(arrangeGroups) {
+				for(let groupItem of GroupItems) {
+					groupItem.arrange();
+				}
+			}
+		}
+	},
+
 	// See if the provided element should be scrolled while dragging the mouse over to its top or bottom edge.
 	scrollAreaWhileDragging: function(e, element) {
 		let mouse = new Point(e.clientX, e.clientY);
@@ -977,6 +996,13 @@ this.UI = {
 			else if(!currentTab || !currentTab._tabViewTabItem) {
 				this.clearActiveTab();
 			}
+
+			// Make sure tabs in all groups are rearranged as necessary (arranging is still paused, so this won't happen right away).
+			// This won't repaint the canvases by itself though, only resizes the tabitems.
+			// The canvases will be updated as they need to be as usual, so they may look distorted for a moment if the dimensions change.
+			// (Canvases of background tabs can't be updated until those tabs send an actual repaint signal, because until then
+			// the dimensions of those tabs won't reflect the actual viewport dimensions, and we end up with black/blank edges in the canvas.)
+			this.updateViewportRatio(true);
 
 			this._contextMenusEnabled = false;
 			Timers.init('showTabView', () => {
@@ -1649,6 +1675,9 @@ this.UI = {
 		let oldPageBounds = this.getPageBounds();
 		let newPageBounds = this.getPageBounds(true);
 		if(newPageBounds.equals(oldPageBounds)) { return; }
+
+		// Check to see if the viewport ratio also changed, in which case we also need to update the thumbs ratio.
+		this.updateViewportRatio();
 
 		if(!UI.classic) {
 			this._pageBounds = newPageBounds;

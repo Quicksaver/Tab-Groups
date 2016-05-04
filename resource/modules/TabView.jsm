@@ -1,4 +1,4 @@
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -16,7 +16,6 @@ this.TabView = {
 	_initialized: false,
 	_closedLastVisibleTabBeforeFrameInitialized: false,
 	_isFrameLoading: false,
-	_viewportRatio: 1,
 
 	_initFrameCallbacks: [],
 
@@ -350,11 +349,6 @@ this.TabView = {
 
 		if(this._isFrameLoading) { return; }
 		this._isFrameLoading = true;
-
-		// Screen ratio is unlikely to change -> significantly <- for the lifetime of this session.
-		// So let's just assume it remains constant from the first time tab view is opened.
-		// We use it for the tab thumbs ratio as well, so that they are as representative of the actual tab as possible.
-		this._viewportRatio = gBrowser.mCurrentBrowser.clientWidth / gBrowser.mCurrentBrowser.clientHeight;
 
 		// find the deck
 		this._deck = gTabViewDeck;

@@ -1,4 +1,4 @@
-// VERSION 1.6.24
+// VERSION 1.6.25
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1551,7 +1551,12 @@ this.GroupItem.prototype = {
 
 		// Check against our cached values if we need to re-calc anything.
 		let lastArrange = this._lastArrange;
-		let arrange = !lastArrange || !lastArrange.isStacked || !lastArrange.bounds.equals(bounds) || !lastArrange.children;
+		let arrange =
+			!lastArrange
+			|| !lastArrange.isStacked
+			|| !lastArrange.bounds.equals(bounds)
+			|| lastArrange.viewportRatio != UI._viewportRatio
+			|| !lastArrange.children;
 		if(!arrange) {
 			for(let i = 0; i < children.length; i++) {
 				if(lastArrange.children[i] != children[i]) {
@@ -1561,7 +1566,7 @@ this.GroupItem.prototype = {
 			}
 		}
 		if(!arrange) { return; }
-		this._lastArrange = { isStacked: true, bounds, children };
+		this._lastArrange = { isStacked: true, bounds, viewportRatio: UI._viewportRatio, children };
 
 		// compute size of the entire stack, modulo rotation.
 		let scale = 0.7;
@@ -1578,10 +1583,18 @@ this.GroupItem.prototype = {
 			size = TabItems.calcValidSize(size);
 		}
 
+		let tabWidth = size.x -UICache.tabItemPadding;
+		let tabHeight = size.y -UICache.tabItemPadding;
+		this._lastTabSize = {
+			tabWidth,
+			tabHeight,
+			lineHeight: 0
+		};
+
 		let sscode = '\
 			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab {\n\
-				width: '+size.x+'px;\n\
-				height: '+size.y+'px;\n\
+				width: '+tabWidth+'px;\n\
+				height: '+tabHeight+'px;\n\
 			}';
 
 		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);
@@ -1633,9 +1646,14 @@ this.GroupItem.prototype = {
 
 		// Check against our cached values if we need to re-calc anything.
 		let lastArrange = this._lastArrange;
-		let arrange = !lastArrange || lastArrange.isStacked || !lastArrange.bounds.equals(bounds) || lastArrange.count != count;
+		let arrange =
+			!lastArrange
+			|| lastArrange.isStacked
+			|| !lastArrange.bounds.equals(bounds)
+			|| lastArrange.count != count
+			|| lastArrange.viewportRatio != UI._viewportRatio;
 		if(!arrange) { return; }
-		this._lastArrange = { isStacked: false, bounds, count };
+		this._lastArrange = { isStacked: false, bounds, count, viewportRatio: UI._viewportRatio };
 
 		// Reset stacked info, as this groups isn't stacked anymore (even when in the expanded tray, the tabs are still not considered stacked).
 		for(let child of this.children) {
@@ -1656,6 +1674,7 @@ this.GroupItem.prototype = {
 				lineHeight++;
 			}
 		}
+		this._lastTabSize.lineHeight = lineHeight;
 
 		this.overflowing = overflowing;
 		setAttribute(this.tabContainer, 'columns', columns);
