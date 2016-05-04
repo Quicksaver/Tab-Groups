@@ -1,4 +1,4 @@
-// VERSION 1.6.25
+// VERSION 1.6.26
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -138,11 +138,14 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.title.addEventListener('focus', this.title);
 	this.title.addEventListener('blur', this.title);
 
-	this.closeButton.handleEvent = () => {
+	this.closeButton.handleEvent = (e) => {
 		// click
+		e.preventDefault();
+		e.stopPropagation();
 		this.closeAll();
 	};
 	this.closeButton.addEventListener('click', this.closeButton);
+	this.closeButton2.addEventListener('click', this.closeButton);
 
 	this.expander.handleEvent = () => {
 		// click
@@ -781,7 +784,7 @@ this.GroupItem.prototype = {
 					else if(this.isStacked) {
 						this.zoomIn();
 					}
-					else {
+					else if(!e.target.classList.contains('close')) {
 						UI.setActive(this);
 					}
 				}
@@ -2111,6 +2114,9 @@ this.GroupItems = {
 			selectorTitle.classList.add('group-title');
 			selector.appendChild(selectorTitle);
 
+			let closeButton2 = closeButton.cloneNode(true);
+			selector.appendChild(closeButton2);
+
 			this._fragment = { container, selector };
 		}
 
@@ -2127,8 +2133,9 @@ this.GroupItems = {
 		let selector = this._fragment.selector.cloneNode(true);
 		let canvas = selector.firstChild;
 		let selectorTitle = canvas.nextSibling;
+		let closeButton2 = selector.lastChild;
 
-		return { container, titlebar, title, titleShield, optionsBtn, closeButton, contents, tabContainer, newTabItem, expander, selector, canvas, selectorTitle };
+		return { container, titlebar, title, titleShield, optionsBtn, closeButton, contents, tabContainer, newTabItem, expander, selector, canvas, selectorTitle, closeButton2 };
 	},
 
 	// Creates a new empty group.

@@ -538,6 +538,10 @@ body:not(.classic) .undo {
 	-moz-margin-end: 0.5em;
 }
 
+.undo .close {
+	flex: 0 0 auto;
+}
+
 .phantom {
 	position: absolute;
 	cursor: default;
@@ -711,7 +715,7 @@ body.DraggingGroupSelector .groupSelector {
 	-moz-margin-end: var(--group-selector-size);
 }
 
-.groupSelector:not(.closedGroup) * {
+.groupSelector:not(.closedGroup) > *:not(.close) {
 	pointer-events: none;
 }
 
@@ -728,7 +732,7 @@ body.DraggingGroupSelector .groupSelector {
 }
 
 body:not(.showGroupThumbs) .groupThumb,
-.groupSelector.closedGroup .groupThumb {
+.groupSelector.closedGroup > *:not(.undo) {
 	display: none;
 }
 
@@ -749,6 +753,45 @@ body:not(.showGroupThumbs) .groupSelector .group-title {
 	bottom: auto;
 	top: 50%;
 	transform: translate(-50%, -50%);
+	max-width: calc(100% - var(--group-selector-padding) - 24px);
+}
+
+body:not(.showGroupThumbs) .groupSelector .group-title:-moz-locale-dir(ltr) {
+	left: calc(50% - 8px);
+}
+
+body:not(.showGroupThumbs) .groupSelector .group-title:-moz-locale-dir(rtl) {
+	left: calc(50% + 8px);
+}
+
+.groupSelector > .close {
+	position: absolute;
+	top: 0;
+}
+
+.groupSelector > .close:-moz-locale-dir(ltr) {
+	right: 0;
+}
+
+.groupSelector > .close:-moz-locale-dir(rtl) {
+	left: 0;
+}
+
+body:not(.showGroupThumbs) .groupSelector > .close {
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+body:not(.showGroupThumbs) .groupSelector > .close:-moz-locale-dir(ltr) {
+	right: 2px;
+}
+
+body:not(.showGroupThumbs) .groupSelector > .close:-moz-locale-dir(rtl) {
+	left: 2px;
+}
+
+.groupSelector .undo {
+	width: 100%;
 }
 
 body.DraggingGroupSelector #singleNewGroup {
@@ -821,6 +864,14 @@ body.classic .groupItem.dragging * {
 
 .titlebar > *:not(.title-container) {
 	flex: 0 0 auto;
+}
+
+body.single .titlebar .close {
+	display: none;
+}
+
+body.single .group-options {
+	order: -1;
 }
 
 .title-container {
