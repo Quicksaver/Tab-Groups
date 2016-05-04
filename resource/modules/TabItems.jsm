@@ -1,4 +1,4 @@
-// VERSION 1.2.6
+// VERSION 1.2.7
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -1268,7 +1268,6 @@ this.TabCanvas = function(tabItem) {
 	this.destroying = null;
 
 	this.canvas = TabItems.canvasFragment();
-	tabItem.thumb.appendChild(this.canvas);
 };
 
 this.TabCanvas.prototype = {
@@ -1332,7 +1331,7 @@ this.TabCanvas.prototype = {
 		}
 
 		let size = this.getSize();
-		let dimsChanged = this.canvas.width != size.x || this.canvas.height != size.y;
+		let dimsChanged = !this.canvas.parentNode || this.canvas.width != size.x || this.canvas.height != size.y;
 
 		// Changing the dims of a canvas will clear it, so we don't want to do do this to a canvas we're currently displaying.
 		// So grab a new thumbnail at the new dims and then copy it over to the displayed canvas.
@@ -1346,6 +1345,10 @@ this.TabCanvas.prototype = {
 		let browser = this.tab.linkedBrowser;
 		PageThumbs.captureToCanvas(browser, canvas, () => {
 			if(dimsChanged) {
+				// We only append the canvas to the DOM once we paint it, to avoid showing a black/blank canvas while it's being painted.
+				if(!this.canvas.parentNode) {
+					this.tabItem.thumb.appendChild(this.canvas);
+				}
 				this.canvas.width = size.x;
 				this.canvas.height = size.y;
 				try {
