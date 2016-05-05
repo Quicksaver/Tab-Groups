@@ -147,6 +147,11 @@ toolbarbutton.quickaccess-tabsbutton:hover {
 	margin-bottom: -4px;
 }
 
+.tabGroups-quickaccess-panel-footer toolbarbutton > .toolbarbutton-icon {
+	width: 18px;
+	height: 18px;
+}
+
 /* extra selector is to override the original */
 .tabGroups-quickaccess-panel-manage.subviewbutton.panel-subview-footer > .toolbarbutton-text {
 	padding: 0 6px;
