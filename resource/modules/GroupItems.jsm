@@ -1,4 +1,4 @@
-// VERSION 1.6.27
+// VERSION 1.6.28
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1898,7 +1898,12 @@ this.GroupItem.prototype = {
 
 		if(delay) {
 			if(!this._thumbNeedsUpdate) {
-				this._thumbNeedsUpdate = aSync(() => { this._updateThumb(); }, 1000);
+				this._thumbNeedsUpdate = aSync(() => {
+					// Add-on could have been disabled or the window could have closed.
+					if(typeof(GroupItems) == 'undefined') { return; }
+
+					this._updateThumb();
+				}, 1000);
 			}
 			return;
 		}
