@@ -1,4 +1,4 @@
-// VERSION 2.6.6
+// VERSION 2.6.7
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -209,30 +209,40 @@ this.Watchers = {
 		};
 		handler.callAttrWatchers = function() {
 			this.disconnect();
-			let muts = this.mutations;
+
+			// Several different attributes can be aggregated in the same mutations array. It's best to handle them separately.
+			let changed = new Map();
+			for(let m of this.mutations) {
+				if(!changed.has(m.attributeName)) {
+					// This shouldn't happen, but...
+					if(!this.attributes.has(m.attributeName)) { continue; }
+					changed.set(m.attributeName, []);
+				}
+				changed.get(m.attributeName).push(m);
+			}
 			this.mutations = [];
 
-			for(let [ attr, handlers ] of this.attributes) {
-				let changes = 0;
+			for(let [ attr, mutations ] of changed) {
+				let handlers = this.attributes.get(attr);
+				let changed = false;
 				let oldValue = false;
 				let newValue = obj.hasAttribute(attr) ? obj.getAttribute(attr) : null;
-				captureMutations_loop: for(let m = 0; m < muts.length; m++) {
-					if(muts[m].attributeName != attr) { continue; }
+				captureMutations_loop: for(let m = 0; m < mutations.length; m++) {
+					let mutation = mutations[m];
+					let isLast = m == mutations.length -1;
 
-					oldValue = typeof(muts[m].realOldValue) != 'undefined' ? muts[m].realOldValue : muts[m].oldValue;
+					oldValue = typeof(mutation.realOldValue) != 'undefined' ? mutation.realOldValue : mutation.oldValue;
 					newValue = false;
-					for(let n = m+1; n < muts.length; n++) {
-						if(muts[n].attributeName == attr) {
-							newValue = typeof(muts[n].realOldValue) != 'undefined' ? muts[n].realOldValue : muts[n].oldValue;
-							break;
-						}
+					if(!isLast) {
+						let next = mutations[m+1];
+						newValue = typeof(next.realOldValue) != 'undefined' ? next.realOldValue : next.oldValue;
 					}
 					if(newValue === false) {
 						newValue = obj.hasAttribute(attr) ? obj.getAttribute(attr) : null;
 					}
 
 					if(oldValue === newValue) {
-						muts.splice(m, 1);
+						mutations.splice(m, 1);
 						m--;
 						continue captureMutations_loop;
 					}
@@ -240,37 +250,32 @@ this.Watchers = {
 					for(let a of handlers) {
 						if(!a.capture) { continue; }
 
-						if(Watchers.safeCallHandler(a.handler, 'attr', obj, attr, oldValue, newValue, m == muts.length -1) === false) {
-							for(let n = m+1; n < muts.length; n++) {
-								if(muts[n].attributeName == attr) {
-									muts[n].realOldValue = oldValue;
-									break;
-								}
+						if(Watchers.safeCallHandler(a.handler, 'attr', obj, attr, oldValue, newValue, isLast) === false) {
+							if(!isLast) {
+								mutations[m+1].realOldValue = oldValue;
 							}
 							newValue = oldValue;
-							muts.splice(m, 1);
+							mutations.splice(m, 1);
 							m--;
 							continue captureMutations_loop;
 						}
 					}
 
-					changes++;
+					changed = true;
 				}
 
 				toggleAttribute(obj, attr, newValue !== null, newValue);
 
-				if(changes > 0) {
-					let firstOldValue = typeof(muts[0].realOldValue) != 'undefined' ? muts[0].realOldValue : muts[0].oldValue;
-					for(let m = 0; m < muts.length; m++) {
-						if(muts[m].attributeName != attr) { continue; }
+				if(changed) {
+					for(let m = 0; m < mutations.length; m++) {
+						let mutation = mutations[m];
+						let isLast = m == mutations.length -1;
 
-						oldValue = typeof(muts[m].realOldValue) != 'undefined' ? muts[m].realOldValue : muts[m].oldValue;
+						oldValue = typeof(mutation.realOldValue) != 'undefined' ? mutation.realOldValue : mutation.oldValue;
 						newValue = false;
-						for(let n = m+1; n < muts.length; n++) {
-							if(muts[n].attributeName == attr) {
-								newValue = typeof(muts[n].realOldValue) != 'undefined' ? muts[n].realOldValue : muts[n].oldValue;
-								break;
-							}
+						if(!isLast) {
+							let next = mutations[m+1];
+							newValue = typeof(next.realOldValue) != 'undefined' ? next.realOldValue : next.oldValue;
 						}
 						if(newValue === false) {
 							newValue = obj.hasAttribute(attr) ? obj.getAttribute(attr) : null;
@@ -279,11 +284,13 @@ this.Watchers = {
 						for(let a of handlers) {
 							if(a.capture) { continue; }
 
-							let lastM = m == muts.length -1;
 							if(a.iterateAll) {
 								Watchers.safeCallHandler(a.handler, 'attr', obj, attr, oldValue, newValue);
 							}
-							else if(m == muts.length -1) {
+							else if(isLast) {
+								let firstOldValue = typeof(mutations[0].realOldValue) != 'undefined'
+									? mutations[0].realOldValue
+									: mutations[0].oldValue;
 								Watchers.safeCallHandler(a.handler, 'attr', obj, attr, firstOldValue, newValue);
 							}
 						}
@@ -293,7 +300,9 @@ this.Watchers = {
 
 			this.reconnect();
 		};
-		handler.mutationObserver = new obj.ownerDocument.defaultView.MutationObserver((mutations, observer) => { handler.scheduleWatchers(mutations, observer); });
+		handler.mutationObserver = new obj.ownerDocument.defaultView.MutationObserver((mutations, observer) => {
+			handler.scheduleWatchers(mutations, observer);
+		});
 
 		return true;
 	},

@@ -1,4 +1,4 @@
-// VERSION 1.2.9
+// VERSION 1.2.10
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -43,10 +43,13 @@ this.TabItem = function(tab, options = {}) {
 	Listeners.add(this.container, 'dragstart', this, true);
 	Listeners.add(this.container, 'dragover', this);
 	Listeners.add(this.container, 'dragenter', this);
-	Watchers.addAttributeWatcher(this.tab, "busy", this);
-	Watchers.addAttributeWatcher(this.tab, "progress", this);
-	Watchers.addAttributeWatcher(this.tab, "soundplaying", this);
-	Watchers.addAttributeWatcher(this.tab, "muted", this);
+	Watchers.addAttributeWatcher(this.tab, "busy", this, false, false);
+	Watchers.addAttributeWatcher(this.tab, "progress", this, false, false);
+	Watchers.addAttributeWatcher(this.tab, "soundplaying", this, false, false);
+	Watchers.addAttributeWatcher(this.tab, "muted", this, false, false);
+	Watchers.addAttributeWatcher(this.tab, "pending", this, false, false);
+	Watchers.addAttributeWatcher(this.tab, "tabmix_pending", this, false, false);
+	Watchers.addAttributeWatcher(this.tab, "tabmix_tabState", this, false, false);
 
 	TabItems.register(this);
 
@@ -281,6 +284,12 @@ this.TabItem.prototype = {
 			case "muted":
 				this.updateAudio();
 				break;
+
+			case "pending":
+			case "tabmix_pending":
+			case "tabmix_tabState":
+				this.updatePending();
+				break;
 		}
 	},
 
@@ -341,6 +350,7 @@ this.TabItem.prototype = {
 
 		this.updateThrobber();
 		this.updateAudio();
+		this.updatePending();
 
 		this._reconnected = true;
 		this.save();
@@ -353,10 +363,13 @@ this.TabItem.prototype = {
 		Listeners.remove(this.container, 'dragstart', this, true);
 		Listeners.remove(this.container, 'dragover', this);
 		Listeners.remove(this.container, 'dragenter', this);
-		Watchers.removeAttributeWatcher(this.tab, "busy", this);
-		Watchers.removeAttributeWatcher(this.tab, "progress", this);
-		Watchers.removeAttributeWatcher(this.tab, "soundplaying", this);
-		Watchers.removeAttributeWatcher(this.tab, "muted", this);
+		Watchers.removeAttributeWatcher(this.tab, "busy", this, false, false);
+		Watchers.removeAttributeWatcher(this.tab, "progress", this, false, false);
+		Watchers.removeAttributeWatcher(this.tab, "soundplaying", this, false, false);
+		Watchers.removeAttributeWatcher(this.tab, "muted", this, false, false);
+		Watchers.removeAttributeWatcher(this.tab, "pending", this, false, false);
+		Watchers.removeAttributeWatcher(this.tab, "tabmix_pending", this, false, false);
+		Watchers.removeAttributeWatcher(this.tab, "tabmix_tabState", this, false, false);
 		this.container.remove();
 	},
 
@@ -627,6 +640,11 @@ this.TabItem.prototype = {
 		}
 	},
 
+	updatePending: function() {
+		toggleAttribute(this.container, "pending", this.tab.hasAttribute("pending") || this.tab.hasAttribute("tabmix_pending"));
+		toggleAttribute(this.container, "unread", this.tab.getAttribute("tabmix_tabState") == "unread");
+	},
+
 	// Updates the tabitem's canvas.
 	updateCanvas: function() {
 		TabItems.tabUpdated(this);
@@ -867,7 +885,7 @@ this.TabItems = {
 	_isComplete: function(tab, callback) {
 		return new Promise(function(resolve, reject) {
 			// A pending tab can't be complete, yet.
-			if(tab.hasAttribute("pending")) {
+			if(tab.hasAttribute("pending") || tab.hasAttribute("tabmix_pending")) {
 				resolve(false);
 				return;
 			}
@@ -1129,7 +1147,7 @@ this.TabItems = {
 	// Adds the given <TabItem> to the master list.
 	register: function(item) {
 		this.items.add(item);
-		if(!item.tab.hasAttribute('pending')) {
+		if(!item.tab.hasAttribute('pending') && !item.tab.hasAttribute("tabmix_pending")) {
 			this.update(item.tab);
 		}
 		else {
