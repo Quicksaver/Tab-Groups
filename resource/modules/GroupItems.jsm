@@ -1,4 +1,4 @@
-// VERSION 1.6.26
+// VERSION 1.6.27
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -38,6 +38,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this._slot = 0;
 	this._row = '';
 	this._gridBounds = null;
+	this._soundplaying = new Set();
 
 	// A <Point> that describes the last size specifically chosen by the user.
 	this.userSize = null;
@@ -389,6 +390,27 @@ this.GroupItem.prototype = {
 	focusTitle: function() {
 		this.titleShield.hidden = true;
 		this.title.focus();
+	},
+
+	// Update the group's audio icon to appear if there is any tab in the group with sound playing.
+	soundplaying: function(tabItem, playing) {
+		this._soundplaying[playing ? 'add' : 'delete'](tabItem);
+		let sound = !!this._soundplaying.size;
+		if(sound) {
+			this.container.classList.add('soundplaying');
+			this.selector.classList.add('soundplaying');
+		} else {
+			this.container.classList.remove('soundplaying');
+			this.selector.classList.remove('soundplaying');
+		}
+	},
+
+	// Mute all playing tabs in the group.
+	muteAll: function() {
+		for(let tabItem of this._soundplaying) {
+			// Don't remove the item from the set, the tab listeners will take care of that to keep everything in sync.
+			tabItem.tab.toggleMuteAudio();
+		}
 	},
 
 	// Returns a <Rect> for the groupItem's content area (which doesn't include the title, etc).
@@ -781,6 +803,9 @@ this.GroupItem.prototype = {
 					else if(e.target == this.optionsBtn) {
 						new GroupOptions(this);
 					}
+					else if(e.target.classList.contains('group-audio')) {
+						this.muteAll();
+					}
 					else if(this.isStacked) {
 						this.zoomIn();
 					}
@@ -811,7 +836,8 @@ this.GroupItem.prototype = {
 							this.lastMouseDownTarget = e.target;
 							if(!this.childHandling
 							&& UI.classic
-							&& e.target != this.optionsBtn) {
+							&& e.target != this.optionsBtn
+							&& !e.target.classList.contains('group-audio')) {
 								new GroupDrag(this, e);
 							}
 						}
@@ -834,6 +860,14 @@ this.GroupItem.prototype = {
 
 			case 'dragstart':
 				this.lastMouseDownTarget = null;
+
+				let originalTarget = e.explicitOriginalTarget;
+				if(originalTarget.classList.contains("close")
+				|| originalTarget.classList.contains("group-options")
+				|| originalTarget.classList.contains("group-audio")) {
+					return;
+				}
+
 				if(e.target == this.selector) {
 					if(!this.hidden) {
 						new GroupSelectorDrag(e, e.target);
@@ -2069,6 +2103,11 @@ this.GroupItems = {
 			titleShield.setAttribute('title', Strings.get("TabView", "groupItemDefaultName"));
 			tbContainer.appendChild(titleShield);
 
+			let audioBtn = document.createElement('div');
+			audioBtn.classList.add('group-audio');
+			audioBtn.setAttribute("title", Strings.get("TabView", "groupItemMute"));
+			titlebar.appendChild(audioBtn);
+
 			let optionsBtn = document.createElement('div');
 			optionsBtn.classList.add('group-options');
 			optionsBtn.setAttribute("title", Strings.get("TabView", "groupItemOptionsGroup"));
@@ -2114,8 +2153,15 @@ this.GroupItems = {
 			selectorTitle.classList.add('group-title');
 			selector.appendChild(selectorTitle);
 
+			let selectorControls = document.createElement('div');
+			selectorControls.classList.add('selector-controls');
+			selector.appendChild(selectorControls);
+
+			let audioBtn2 = audioBtn.cloneNode(true);
+			selectorControls.appendChild(audioBtn2);
+
 			let closeButton2 = closeButton.cloneNode(true);
-			selector.appendChild(closeButton2);
+			selectorControls.appendChild(closeButton2);
 
 			this._fragment = { container, selector };
 		}
@@ -2124,7 +2170,7 @@ this.GroupItems = {
 		let titlebar = container.firstChild;
 		let title = titlebar.firstChild.firstChild;
 		let titleShield = title.nextSibling;
-		let optionsBtn = titlebar.firstChild.nextSibling;
+		let optionsBtn = titlebar.firstChild.nextSibling.nextSibling;
 		let closeButton = optionsBtn.nextSibling;
 		let contents = titlebar.nextSibling;
 		let tabContainer = contents.firstChild;
@@ -2133,7 +2179,7 @@ this.GroupItems = {
 		let selector = this._fragment.selector.cloneNode(true);
 		let canvas = selector.firstChild;
 		let selectorTitle = canvas.nextSibling;
-		let closeButton2 = selector.lastChild;
+		let closeButton2 = selector.lastChild.lastChild;
 
 		return { container, titlebar, title, titleShield, optionsBtn, closeButton, contents, tabContainer, newTabItem, expander, selector, canvas, selectorTitle, closeButton2 };
 	},

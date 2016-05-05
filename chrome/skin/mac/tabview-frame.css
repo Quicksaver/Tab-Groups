@@ -37,13 +37,13 @@ body {
 		background-image: url("chrome://browser/skin/tabbrowser/connecting@2x.png");
 	}
 
-	body:not([FF48]) .tab[progress] .throbber,
-	body:not([FF48]) .appTabIcon[progress] {
+	body:not([FF48]) .tab[busy][progress] .throbber,
+	body:not([FF48]) .appTabIcon[busy][progress] {
 		background-image: url("chrome://browser/skin/tabbrowser/loading@2x.png");
 	}
 
-	body[FF48] .tab[progress] .throbber,
-	body[FF48] .appTabIcon[progress] {
+	body[FF48] .tab[busy][progress] .throbber,
+	body[FF48] .appTabIcon[busy][progress] {
 		background-image: url("chrome://global/skin/icons/loading@2x.png");
 	}
 }

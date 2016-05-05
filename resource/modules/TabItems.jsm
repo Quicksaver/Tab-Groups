@@ -1,4 +1,4 @@
-// VERSION 1.2.8
+// VERSION 1.2.9
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -36,6 +36,7 @@ this.TabItem = function(tab, options = {}) {
 	this._draggable = true;
 	this.lastMouseDownTarget = null;
 	this._thumbNeedsUpdate = false;
+	this._soundplaying = false;
 
 	Listeners.add(this.container, 'mousedown', this);
 	Listeners.add(this.container, 'mouseup', this);
@@ -44,6 +45,8 @@ this.TabItem = function(tab, options = {}) {
 	Listeners.add(this.container, 'dragenter', this);
 	Watchers.addAttributeWatcher(this.tab, "busy", this);
 	Watchers.addAttributeWatcher(this.tab, "progress", this);
+	Watchers.addAttributeWatcher(this.tab, "soundplaying", this);
+	Watchers.addAttributeWatcher(this.tab, "muted", this);
 
 	TabItems.register(this);
 
@@ -204,6 +207,8 @@ this.TabItem.prototype = {
 					if(e.target == this.closeBtn || e.button == 1) {
 						this.closedManually = true;
 						this.close();
+					} else if(e.target == this.audioBtn) {
+						this.tab.toggleMuteAudio();
 					} else if(!this.parent.isDragging) {
 						this.zoomIn();
 					}
@@ -211,12 +216,17 @@ this.TabItem.prototype = {
 				break;
 
 			case 'dragstart':
-				if(this.lastMouseDownTarget == this.closeBtn) {
-					e.preventDefault();
-					e.stopPropagation();
-				} else {
-					this.lastMouseDownTarget = null;
-					new TabDrag(e, this);
+				switch(this.lastMoudeDownTarget) {
+					case this.closeBtn:
+					case this.audioBtn:
+						e.preventDefault();
+						e.stopPropagation();
+						break;
+
+					default:
+						this.lastMouseDownTarget = null;
+						new TabDrag(e, this);
+						break;
 				}
 				break;
 
@@ -259,9 +269,19 @@ this.TabItem.prototype = {
 		}
 	},
 
-	// Watching "busy" and "progress" attributes in tabs, at least "progress" doesn't fire TabAttrModified events, and "busy" seems a bit unreliable.
-	attrWatcher: function() {
-		this.updateThrobber();
+	// Watching several attributes in tabs, at least "progress" doesn't fire TabAttrModified events, and "busy" seems a bit unreliable.
+	attrWatcher: function(tab, attr) {
+		switch(attr) {
+			case "busy":
+			case "progress":
+				this.updateThrobber();
+				break;
+
+			case "soundplaying":
+			case "muted":
+				this.updateAudio();
+				break;
+		}
 	},
 
 	// Load the reciever's persistent data from storage. If there is none, treats it as a new tab.
@@ -319,6 +339,9 @@ this.TabItem.prototype = {
 			}
 		}
 
+		this.updateThrobber();
+		this.updateAudio();
+
 		this._reconnected = true;
 		this.save();
 		this._sendToSubscribers("reconnected");
@@ -332,6 +355,8 @@ this.TabItem.prototype = {
 		Listeners.remove(this.container, 'dragenter', this);
 		Watchers.removeAttributeWatcher(this.tab, "busy", this);
 		Watchers.removeAttributeWatcher(this.tab, "progress", this);
+		Watchers.removeAttributeWatcher(this.tab, "soundplaying", this);
+		Watchers.removeAttributeWatcher(this.tab, "muted", this);
 		this.container.remove();
 	},
 
@@ -341,6 +366,10 @@ this.TabItem.prototype = {
 
 	// Sets the receiver's parent to the given <GroupItem>.
 	setParent: function(parent) {
+		if(this.parent && this._soundplaying) {
+			this.parent.soundplaying(this, false);
+		}
+
 		if(!parent) {
 			this.container.remove();
 		} else {
@@ -349,8 +378,14 @@ this.TabItem.prototype = {
 		this.parent = parent;
 		this.save();
 
-		if(parent && !parent.noThumbs && parent.showThumbs) {
-			this.checkUpdatedThumb();
+		if(parent) {
+			if(!parent.noThumbs && parent.showThumbs) {
+				this.checkUpdatedThumb();
+			}
+
+			if(this._soundplaying) {
+				parent.soundplaying(this, true);
+			}
 		}
 	},
 
@@ -567,8 +602,29 @@ this.TabItem.prototype = {
 	},
 
 	updateThrobber: function() {
-		toggleAttribute(this.container, 'busy', this.tab.hasAttribute('busy'));
-		toggleAttribute(this.container, 'progress', this.tab.hasAttribute('progress'));
+		toggleAttribute(this.container, "busy", this.tab.hasAttribute("busy"));
+		toggleAttribute(this.container, "progress", this.tab.hasAttribute("progress"));
+	},
+
+	updateAudio: function() {
+		this._soundplaying = false;
+		if(this.tab.hasAttribute("muted")) {
+			this.container.setAttribute("muted", "true");
+			this.audioBtn.setAttribute("title", Strings.get("TabView", "unmuteTab"));
+		} else {
+			this.container.removeAttribute("muted");
+			if(this.tab.hasAttribute("soundplaying")) {
+				this.container.setAttribute("soundplaying", "true");
+				this.audioBtn.setAttribute("title", Strings.get("TabView", "muteTab"));
+				this._soundplaying = true;
+			} else {
+				this.container.removeAttribute("soundplaying");
+			}
+		}
+
+		if(this.parent) {
+			this.parent.soundplaying(this, this._soundplaying);
+		}
 	},
 
 	// Updates the tabitem's canvas.
@@ -780,10 +836,18 @@ this.TabItems = {
 			url.classList.add('tab-url');
 			label.appendChild(url);
 
+			let tabControls = document.createElement('div');
+			tabControls.classList.add('tab-controls');
+			div.appendChild(tabControls);
+
+			let audioBtn = document.createElement('div');
+			audioBtn.classList.add('tab-audio');
+			tabControls.appendChild(audioBtn);
+
 			let close = document.createElement('div');
 			close.classList.add('close');
 			setAttribute(close, "title", Strings.get("TabView", "closeTab"));
-			div.appendChild(close);
+			tabControls.appendChild(close);
 
 			this._fragment = div;
 		}
@@ -793,9 +857,10 @@ this.TabItems = {
 		let fav = thumb.nextSibling.firstChild;
 		let tabTitle = container.firstChild.nextSibling.firstChild;
 		let tabUrl = tabTitle.nextSibling.nextSibling;
-		let closeBtn = container.lastChild;
+		let audioBtn = container.lastChild.firstChild;
+		let closeBtn = audioBtn.nextSibling;
 
-		return { container, thumb, fav, tabTitle, tabUrl, closeBtn };
+		return { container, thumb, fav, tabTitle, tabUrl, audioBtn, closeBtn };
 	},
 
 	// Checks whether the xul:tab has fully loaded and calls a callback with a boolean indicates whether the tab is loaded or not.

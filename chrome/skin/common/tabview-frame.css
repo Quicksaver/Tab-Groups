@@ -106,7 +106,9 @@ html.thumbing body.single #content {
 .close,
 .group-options,
 .stackExpander,
-.tab-setactive {
+.tab-setactive,
+.tab-audio,
+.group-audio {
 	cursor: pointer;
 	width: 22px;
 	height: 22px;
@@ -164,6 +166,33 @@ html.thumbing body.single #content {
 	background-image: -moz-image-rect(var(--control-icons), 60, 60, 80, 40);
 }
 
+.group-audio,
+.tab[soundplaying] .tab-audio {
+	background-image: -moz-image-rect(var(--control-icons), 80, 20, 100, 0);
+}
+
+.group-audio:hover,
+.tab[soundplaying] .tab-audio:hover {
+	background-image: -moz-image-rect(var(--control-icons), 80, 40, 100, 20);
+}
+
+.group-audio:hover:active,
+.tab[soundplaying] .tab-audio:hover:active {
+	background-image: -moz-image-rect(var(--control-icons), 80, 60, 100, 40);
+}
+
+.tab[muted] .tab-audio {
+	background-image: -moz-image-rect(var(--control-icons), 100, 20, 120, 0);
+}
+
+.tab[muted] .tab-audio:hover {
+	background-image: -moz-image-rect(var(--control-icons), 100, 40, 120, 20);
+}
+
+.tab[muted] .tab-audio:hover:active {
+	background-image: -moz-image-rect(var(--control-icons), 100, 60, 120, 40);
+}
+
 @media (min-resolution: 1.1dppx) {
 	.close {
 		background-image: -moz-image-rect(var(--control-icons-2x), 0, 40, 40, 0);
@@ -211,6 +240,33 @@ html.thumbing body.single #content {
 
 	.tab-setactive:hover:active {
 		background-image: -moz-image-rect(var(--control-icons-2x), 120, 120, 160, 80);
+	}
+
+	.group-audio,
+	.tab[soundplaying] .tab-audio {
+		background-image: -moz-image-rect(var(--control-icons-2x), 160, 40, 200, 0);
+	}
+
+	.group-audio:hover,
+	.tab[soundplaying] .tab-audio:hover {
+		background-image: -moz-image-rect(var(--control-icons-2x), 160, 80, 200, 40);
+	}
+
+	.group-audio:hover:active,
+	.tab[soundplaying] .tab-audio:hover:active {
+		background-image: -moz-image-rect(var(--control-icons-2x), 160, 120, 200, 80);
+	}
+
+	.tab[muted] .tab-audio {
+		background-image: -moz-image-rect(var(--control-icons-2x), 200, 40, 240, 0);
+	}
+
+	.tab[muted] .tab-audio:hover {
+		background-image: -moz-image-rect(var(--control-icons-2x), 200, 80, 240, 40);
+	}
+
+	.tab[muted] .tab-audio:hover:active {
+		background-image: -moz-image-rect(var(--control-icons-2x), 200, 120, 240, 80);
 	}
 }
 
@@ -341,27 +397,35 @@ body.DraggingTab .tab * {
 	background-image: url("chrome://browser/skin/tabbrowser/connecting.png");
 }
 
-body:not([FF48]) .tab[progress] .throbber,
-body:not([FF48]) .appTabIcon[progress] {
+body:not([FF48]) .tab[busy][progress] .throbber,
+body:not([FF48]) .appTabIcon[busy][progress] {
 	background-image: url("chrome://browser/skin/tabbrowser/loading.png");
 }
 
-body[FF48] .tab[progress] .throbber,
-body[FF48] .appTabIcon[progress] {
+body[FF48] .tab[busy][progress] .throbber,
+body[FF48] .appTabIcon[busy][progress] {
 	background-image: url("chrome://global/skin/icons/loading.png");
 }
 
-.tab .close {
+.tab-controls {
 	position: absolute;
 	top: 8px;
 }
 
-.tab .close:-moz-locale-dir(ltr) {
+.tab-controls:-moz-locale-dir(ltr) {
 	right: 8px;
 }
 
-.tab .close:-moz-locale-dir(rtl) {
+.tab-controls:-moz-locale-dir(rtl) {
 	left: 8px;
+}
+
+.tab-controls > * {
+	display: inline-block;
+}
+
+.tab:not([soundplaying]):not([muted]) .tab-audio {
+	display: none;
 }
 
 .tab-label {
@@ -399,7 +463,7 @@ body[FF48] .appTabIcon[progress] {
 
 .groupItem.thumbing .tab-label,
 .groupItem.thumbing .favicon-container,
-.groupItem.thumbing .close {
+.groupItem.thumbing .tab-controls {
 	opacity: 0;
 }
 
@@ -677,7 +741,11 @@ body:-moz-any(.DraggingTab,.DraggingGroup) .tab.create-new,
 	-moz-margin-end: 24px;
 }
 
-.tab-container.noThumbs .tab:not(.noFavicon) .tab-label {
+.tab-container.noThumbs .tab:-moz-any([soundplaying],[mute]) .tab-label {
+	-moz-margin-end: 48px;
+}
+
+.tab-container.noThumbs .tab:-moz-any(:not(.noFavicon),[busy]) .tab-label {
 	-moz-margin-start: 24px;
 }
 
@@ -735,7 +803,7 @@ body.DraggingGroupSelector .groupSelector {
 	-moz-margin-end: var(--group-selector-size);
 }
 
-.groupSelector:not(.closedGroup) > *:not(.close) {
+.groupSelector:not(.closedGroup) > *:not(.selector-controls) {
 	pointer-events: none;
 }
 
@@ -772,42 +840,30 @@ body:not(.showGroupThumbs) .groupThumb,
 body:not(.showGroupThumbs) .groupSelector .group-title {
 	bottom: auto;
 	top: 50%;
+	left: calc(50% - 12px);
 	transform: translate(-50%, -50%);
 	max-width: calc(100% - var(--group-selector-padding) - 24px);
 }
 
-body:not(.showGroupThumbs) .groupSelector .group-title:-moz-locale-dir(ltr) {
-	left: calc(50% - 8px);
+body:not(.showGroupThumbs) .groupSelector.soundplaying .group-title {
+	left: calc(50% - 24px);
+	max-width: calc(100% - var(--group-selector-padding) - 48px);
 }
 
-body:not(.showGroupThumbs) .groupSelector .group-title:-moz-locale-dir(rtl) {
-	left: calc(50% + 8px);
-}
-
-.groupSelector > .close {
+.selector-controls {
 	position: absolute;
 	top: 0;
-}
-
-.groupSelector > .close:-moz-locale-dir(ltr) {
 	right: 0;
 }
 
-.groupSelector > .close:-moz-locale-dir(rtl) {
-	left: 0;
+.selector-controls > * {
+	display: inline-block;
 }
 
-body:not(.showGroupThumbs) .groupSelector > .close {
+body:not(.showGroupThumbs) .selector-controls {
 	top: 50%;
 	transform: translateY(-50%);
-}
-
-body:not(.showGroupThumbs) .groupSelector > .close:-moz-locale-dir(ltr) {
 	right: 2px;
-}
-
-body:not(.showGroupThumbs) .groupSelector > .close:-moz-locale-dir(rtl) {
-	left: 2px;
 }
 
 .groupSelector .undo {
@@ -886,6 +942,7 @@ body.classic .groupItem.dragging * {
 	flex: 0 0 auto;
 }
 
+body.single .titlebar .group-audio,
 body.single .titlebar .close {
 	display: none;
 }
@@ -956,6 +1013,8 @@ input.name:focus::-moz-placeholder {
 	border: 1px solid transparent !important;
 }
 
+.groupSelector:not(.soundplaying) .group-audio,
+.groupItem:not(.soundplaying) .group-audio,
 .groupItem:not(.stackedGroup) .stackExpander {
 	display: none;
 }
