@@ -18,11 +18,13 @@
 	--list-tab-height: 37px;
 	--list-tab-padding: 6px;
 	--favicon-size: 16px;
+	--favicon-radius: 0.4em;
 	--canvas-border-width: 1px;
 	--group-min-width: 120px;
 	--group-min-height: 145px;
 	--group-border-width: 1px;
 	--group-titlebar-height: 24px;
+	--group-titlebar-edit-icon: url("chrome://tabgroups/skin/edit-light.png");
 	--group-contents-margin: 0;
 	--group-contents-top-margin: 2px;
 	--group-classic-active-shadow-ltr: 2px 2px 8px rgba(0, 0, 0, 0.8), inset 0 0 3px 2px var(--hover-color);
@@ -360,12 +362,12 @@ body.DraggingTab .tab * {
 
 .tab.stacked .favicon-container:-moz-locale-dir(ltr) {
 	left: 1px;
-	border-bottom-right-radius: 0.4em;
+	border-bottom-right-radius: var(--favicon-radius);
 }
 
 .tab.stacked .favicon-container:-moz-locale-dir(rtl) {
 	right: 1px;
-	border-bottom-left-radius: 0.4em;
+	border-bottom-left-radius: var(--favicon-radius);
 }
 
 .favicon {
@@ -984,7 +986,7 @@ input.name:focus {
 }
 
 input.name:not(:focus)::-moz-placeholder {
-	background-image: url("chrome://tabgroups/skin/edit-light.png");
+	background-image: var(--group-titlebar-edit-icon);
 	background-repeat: no-repeat;
 }
 
@@ -1135,7 +1137,7 @@ body.classic #actions {
 	box-shadow: var(--item-normal-shadow);
 }
 
-body.grid #actions {
+body:not(.classic) #actions {
 	border-bottom-color: ThreeDShadow;
 	/* account for its own borders */
 	height: calc(100% - var(--group-border-width) - var(--group-border-width));

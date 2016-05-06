@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 Modules.LOADMODULE = function() {
 	AddonManager.getAddonByID('bug566510@vovcacik.addons.mozilla.org', function(addon) {
@@ -9,11 +9,16 @@ Modules.LOADMODULE = function() {
 		Modules.loadIf('compatibilityFix/TabMixPlus', (addon && addon.isActive));
 	});
 
+	AddonManager.getAddonByID('{77d2ed30-4cd2-11e0-b8af-0800200c9a66}', function(addon) {
+		Modules.loadIf('compatibilityFix/FTDeepDark', (addon && addon.isActive));
+	});
+
 	Modules.load('compatibilityFix/SessionManager');
 };
 
 Modules.UNLOADMODULE = function() {
 	Modules.unload('compatibilityFix/bug566510');
 	Modules.unload('compatibilityFix/TabMixPlus');
+	Modules.unload('compatibilityFix/FTDeepDark');
 	Modules.unload('compatibilityFix/SessionManager');
 };
