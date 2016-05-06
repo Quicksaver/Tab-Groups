@@ -42,6 +42,11 @@ body {
 	--workspace-width: calc(100% - var(--actions-width));
 }
 
+body.grid.groups-overflowing {
+	/* same as above, plus its own padding to add space to the scrollbar */
+	--workspace-width: calc(100% - var(--actions-width) - var(--scrollbar-width));
+}
+
 body.single {
 	/* in single mode we need to exclude the borders from the groups/groupSelector themselves as well */
 	--workspace-width: calc(100% - var(--actions-width) - (var(--group-border-width) * 2));
@@ -89,10 +94,8 @@ body.grid #groups {
 	overflow-y: auto;
 }
 
-body.grid #groups.overflowing {
+body.grid.groups-overflowing #groups {
 	-moz-padding-end: var(--scrollbar-width);
-	/* same as above, plus its own padding to add space to the scrollbar */
-	width: calc(var(--workspace-width) - var(--scrollbar-width));
 }
 
 html.thumbing,

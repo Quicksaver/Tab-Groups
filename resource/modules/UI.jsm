@@ -1,4 +1,4 @@
-// VERSION 1.3.16
+// VERSION 1.3.17
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -256,7 +256,7 @@ this.UI = {
 						UI.scrollAreaWhileDragging(e, this.groupSelector);
 					}
 				}
-				else if(DraggingGroup && this.grid && GroupItems.workSpace.classList.contains('overflowing')) {
+				else if(DraggingGroup && this.grid && document.body.classList.contains('groups-overflowing')) {
 					UI.scrollAreaWhileDragging(e, GroupItems.workSpace);
 				}
 				else if(DraggingGroupSelector && (e.target == this.groupSelector || e.target.parentNode == this.groupSelector)) {

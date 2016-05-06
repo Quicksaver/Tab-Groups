@@ -1,4 +1,4 @@
-// VERSION 1.6.28
+// VERSION 1.6.29
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -3106,11 +3106,11 @@ this.GroupItems = {
 			if(!factor) {
 				// If we're overflowing, we need to re-do the final widths leaving space for the scrollbar.
 				if(totalHeight > bounds.height) {
-					this.workSpace.classList.add('overflowing');
+					document.body.classList.add('groups-overflowing');
 					bounds.width -= UICache.scrollbarWidth;
 					findOptimal();
 				} else {
-					this.workSpace.classList.remove('overflowing');
+					document.body.classList.remove('groups-overflowing');
 				}
 				return { rows, columns, width, height };
 			}
