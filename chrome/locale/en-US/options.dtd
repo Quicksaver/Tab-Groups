@@ -7,6 +7,8 @@
 <!ENTITY opt.gridDynamicSize.tooltip1 "Dynamic size makes full use of your window size. The groups towards the top will have higher dimensions than those towards the bottom.">
 <!ENTITY opt.gridDynamicSize.tooltip2 "Use this to your advantage by moving more important groups, or those with more tabs, towards the top slots.">
 <!ENTITY opt.gridDynamicSize.tooltip3 "With this disabled, all groups will have similar dimensions, with only the necessary differences in order for them all to fit on screen.">
+<!ENTITY opt.closeIfEmpty.label "Automatically close empty groups">
+<!ENTITY opt.closeIfEmpty.tooltip "A group is discarded immediately when its last tab is closed. You can keep an empty group by disabling this preference, or by simply giving it a name or changing some of its options.">
 
 <!ENTITY cat.defaults.label "By default, groups should...">
 <!ENTITY opt.showThumbs.label "Show tab thumbnails">

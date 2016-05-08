@@ -1,4 +1,4 @@
-// VERSION 1.6.29
+// VERSION 1.6.30
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -253,9 +253,14 @@ this.GroupItem.prototype = {
 		return data;
 	},
 
-	// Returns true if the tab groupItem is empty and unnamed.
+	// Returns true if the tab groupItem is empty, unnamed and has no options set.
 	isEmpty: function() {
-		return !this.children.length && !this.getTitle();
+		return	!this.children.length
+			&& !this.getTitle()
+			&& this.stackTabs == Prefs.stackTabs
+			&& this.showThumbs == Prefs.showThumbs
+			&& this.showUrls == Prefs.showUrls
+			&& !this.catchRules;
 	},
 
 	// Returns true if the item is showing on top of this group's stack, determined by whether the tab is this group's topChild,
@@ -982,7 +987,7 @@ this.GroupItem.prototype = {
 
 	// Closes the groupItem and all of its children.
 	closeAll: function() {
-		if(this.children.length) {
+		if(!this.isEmpty()) {
 			this._unfreezeItemSize();
 
 			if(UI.classic) {
@@ -1020,12 +1025,16 @@ this.GroupItem.prototype = {
 	// Closes the group if it's empty, is closable, and autoclose is enabled (see pauseAutoclose()).
 	// Returns true if the close occurred and false otherwise.
 	closeIfEmpty: function() {
-		if(this.isEmpty()
-		&& !UI._closedLastVisibleTab
+		if(Prefs.closeIfEmpty
+		&& this.isEmpty()
 		&& !GroupItems._autoclosePaused) {
 			this.close();
+			this._makeLastActiveGroupItemActive();
 			return true;
 		}
+
+		// Sometimes keypresses stop working because focus goes who knows where...
+		UI.focusTabView();
 		return false;
 	},
 
@@ -1399,8 +1408,8 @@ this.GroupItem.prototype = {
 	// Parameters:
 	//   tabItem - The tabItem that is closed.
 	_onChildClose: function(tabItem) {
-		let dontArrange = tabItem.closedManually && (this.expanded || !this.isOverflowing());
-		let dontClose = !tabItem.closedManually && Tabs.numPinned && !UI.isTabViewVisible();
+		let dontArrange = tabItem.closedManually && this.children.length > 1 && (this.expanded || !this.isOverflowing());
+		let dontClose = !tabItem.closedManually && !UI.isTabViewVisible();
 		this.remove(tabItem, { dontArrange: dontArrange, dontClose: dontClose });
 
 		if(dontArrange) {
@@ -1446,10 +1455,14 @@ this.GroupItem.prototype = {
 				options.dontClose = true;
 			}
 
-			let closed = options.dontClose ? false : this.closeIfEmpty();
-			if(closed || (!this.children.length && !Tabs.numPinned && !item.isDragging)) {
-				this._makeLastActiveGroupItemActive();
-			} else if(!options.dontArrange) {
+			// If we just closed the active and last visible tab in the tab-bar.
+			// create and select a placeholder tab to prevent other tabs from being loaded unnecessarily.
+			if(!this.children.length && !Tabs.numPinned) {
+				gTabView.onCloseLastTab();
+			}
+
+			let closed = !options.dontClose && this.closeIfEmpty();
+			if(!closed && !options.dontArrange) {
 				this._unfreezeItemSize(true);
 				this.arrange();
 			}
@@ -1975,7 +1988,7 @@ this.GroupItem.prototype = {
 
 		UI.setActive(this, { dontSetActiveTabInGroup: true });
 
-		return gBrowser.loadOneTab(url || gWindow.BROWSER_NEW_TAB_URL, { inBackground: !!options.dontZoomIn });
+		return gTabView.newTab(url, { inBackground: !!options.dontZoomIn });
 	},
 
 	// Reorders the tabs in a groupItem based on the arrangement of the tabs shown in the tab bar.

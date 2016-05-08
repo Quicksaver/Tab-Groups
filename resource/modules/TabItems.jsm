@@ -1,4 +1,4 @@
-// VERSION 1.2.10
+// VERSION 1.2.11
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -976,6 +976,9 @@ this.TabItems = {
 	// Takes in a xul:tab, creates a TabItem for it and adds it to the scene.
 	link: function(tab, options) {
 		try {
+			// Don't add an item for temporary tabs created by us.
+			if(gTabView._closedLastVisibleTab === tab || gTabView._closedLastVisibleTab === true) { return; }
+
 			new TabItem(tab, options); // sets tab._tabViewTabItem to itself
 		}
 		catch(ex) {
@@ -987,6 +990,8 @@ this.TabItems = {
 	unlink: function(tab) {
 		try {
 			let tabItem = tab._tabViewTabItem;
+			if(!tabItem) { return; }
+
 			tabItem.destroy();
 			this.unregister(tabItem);
 			tabItem._sendToSubscribers("close", tabItem);

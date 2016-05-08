@@ -23,6 +23,7 @@
 			<preference id="pref-groupTitleInButton" name="extensions.tabgroups.groupTitleInButton" type="bool"/>
 			<preference id="pref-showGroupThumbs" name="extensions.tabgroups.showGroupThumbs" type="bool"/>
 			<preference id="pref-gridDynamicSize" name="extensions.tabgroups.gridDynamicSize" type="bool"/>
+			<preference id="pref-closeIfEmpty" name="extensions.tabgroups.closeIfEmpty" type="bool"/>
 			<preference id="pref-stackTabs" name="extensions.tabgroups.stackTabs" type="bool"/>
 			<preference id="pref-showThumbs" name="extensions.tabgroups.showThumbs" type="bool"/>
 			<preference id="pref-showUrls" name="extensions.tabgroups.showUrls" type="bool"/>
@@ -61,6 +62,10 @@
 				helpbox="paneTabGroups-gridDynamicSize-helptext"
 				jump="gridDynamicSize"
 				delayPreference="pref-gridDynamicSize"/>
+			<checkbox label="&opt.closeIfEmpty.label;"
+				helptext="&opt.closeIfEmpty.tooltip;"
+				jump="closeIfEmpty"
+				delayPreference="pref-closeIfEmpty"/>
 			<vbox id="paneTabGroups-gridDynamicSize-helptext" collapsed="true">
 				<description>&opt.gridDynamicSize.tooltip1;</description>
 				<description>&opt.gridDynamicSize.tooltip2;</description>

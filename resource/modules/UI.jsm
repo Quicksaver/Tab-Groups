@@ -1,4 +1,4 @@
-// VERSION 1.3.17
+// VERSION 1.3.18
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -41,9 +41,6 @@ this.UI = {
 
 	// Set when selecting a pinned tab from search, but without leaving tab view.
 	_dontHideTabView: false,
-
-	// If true, the last visible tab has just been closed in the tab strip.
-	_closedLastVisibleTab: false,
 
 	// If true, a select tab has just been closed in TabView.
 	_closedSelectedTabInTabView: false,
@@ -352,23 +349,27 @@ this.UI = {
 				// do this only if not closing the last tab
 				if(Tabs.length <= 1) { return; }
 
-				// Don't return to TabView if there are any app tabs
-				if(Tabs.numPinned) { return; }
-
 				let groupItem = GroupItems.getActiveGroupItem();
+				if(!groupItem) { return; } // This shouldn't happen under normal circumstances though.
 
-				// 1) Only go back to the TabView tab when there you close the last tab of a groupItem.
-				let closingLastOfGroup = (groupItem && groupItem.children.length == 1 && groupItem.children[0].tab == tab);
+				// We could have closed the last pinned tab as well.
+				if(Tabs.numPinned) {
+					// Open a new tab in the current group if closing the last pinned (and visible) tab.
+					if(tab.pinned && Tabs.numPinned == 1 && !groupItem.children.length) {
+						gTabView.onCloseLastTab(tab);
+					}
 
-				// 2) When a blank tab is active while restoring a closed tab the blank tab gets removed.
-				// The active group is not closed as this is where the restored tab goes. So do not show the TabView.
-				let tabItem = tab && tab._tabViewTabItem;
-				let closingBlankTabAfterRestore = (tabItem && tabItem.isRemovedAfterRestore);
+					// Otherwise do nothing, at the very least the next pinned tab will be selected.
+					return;
+				}
 
-				if(closingLastOfGroup && !closingBlankTabAfterRestore) {
-					// for the tab focus event to pick up.
-					this._closedLastVisibleTab = true;
-					this.showTabView();
+				// Only open a new tab there when you close the last tab of a groupItem.
+				if(groupItem.children.length == 1 && groupItem.children[0].tab == tab) {
+					// When a blank tab is active while restoring a closed tab the blank tab gets removed.
+					// The active group is not closed as this is where the restored tab goes. So do not open another new tab.
+					if(!tab._tabViewTabItem || !tab._tabViewTabItem.isRemovedAfterRestore) {
+						gTabView.onCloseLastTab(tab);
+					}
 				}
 				break;
 			}
@@ -472,7 +473,8 @@ this.UI = {
 			Search.init();
 
 			// ___ currentTab
-			this._currentTab = Tabs.selected;
+			let selectedTab = Tabs.selected;
+			this._currentTab = (selectedTab != gTabView._closedLastVisibleTab) ? selectedTab : null;
 
 			Listeners.add(this.exitBtn, 'click', this);
 			Listeners.add(this.optionsBtn, 'click', this);
@@ -787,9 +789,7 @@ this.UI = {
 			GroupItems.setActiveGroupItem(item);
 			if(!options.dontSetActiveTabInGroup) {
 				let activeTab = item.getActiveTab();
-				if(activeTab) {
-					this._setActiveTab(activeTab);
-				}
+				this._setActiveTab(activeTab);
 			}
 		}
 	},
@@ -963,8 +963,6 @@ this.UI = {
 			this._originalSmoothScroll = tabStrip.smoothScroll;
 			tabStrip.smoothScroll = false;
 
-			let currentTab = this._currentTab;
-
 			for(let groupItem of this._reorderTabItemsOnShow) {
 				groupItem.reorderTabItemsBasedOnTabOrder();
 			}
@@ -981,23 +979,26 @@ this.UI = {
 			// we need to remove the gBrowser as a listener for these, otherwise it would consume these events and they would never reach our handler.
 			this._els.removeSystemEventListener(gWindow.document, "keydown", gBrowser, false);
 
-			if(zoomOut && currentTab && currentTab._tabViewTabItem) {
-				let item = currentTab._tabViewTabItem;
+			let currentTab = this._currentTab;
+			if(currentTab) {
+				if(zoomOut && currentTab._tabViewTabItem) {
+					let item = currentTab._tabViewTabItem;
 
-				// Zoom out!
-				item.zoomOut();
+					// Zoom out!
+					item.zoomOut();
 
-				// if the tab's been destroyed
-				if(!currentTab._tabViewTabItem) {
-					item = null;
+					// if the tab's been destroyed
+					if(!currentTab._tabViewTabItem) {
+						item = null;
+					}
+
+					this.setActive(item);
+
+					this._resize(true);
 				}
-
-				this.setActive(item);
-
-				this._resize(true);
-			}
-			else if(!currentTab || !currentTab._tabViewTabItem) {
-				this.clearActiveTab();
+				else if(!currentTab._tabViewTabItem) {
+					this.clearActiveTab();
+				}
 			}
 
 			// Make sure tabs in all groups are rearranged as necessary (arranging is still paused, so this won't happen right away).
@@ -1161,6 +1162,19 @@ this.UI = {
 
 	// Called when the user switches from one tab to another outside of the TabView UI.
 	onTabSelect: function(tab) {
+		// Our placeholder tab (that opens when closing the last visible tab) was selected; ignore it.
+		if(gTabView._closedLastVisibleTab === true || tab === gTabView._closedLastVisibleTab) {
+			this._currentTab = null;
+
+			// reset these vars as well, just in case.
+			this._dontHideTabView = false;
+			this._closedSelectedTabInTabView = false;
+			this.closedLastTabInTabView = false;
+			this.restoredClosedTab = false;
+			this._lastOpenedTab = null;
+			return;
+		}
+
 		this._currentTab = tab;
 		TabItems.tabSelected(tab);
 
@@ -1186,7 +1200,7 @@ this.UI = {
 				this._lastOpenedTab = null;
 				return;
 			}
-			if(this._closedLastVisibleTab || (this._closedSelectedTabInTabView && !this.closedLastTabInTabView) || this.restoredClosedTab) {
+			if((this._closedSelectedTabInTabView && !this.closedLastTabInTabView) || this.restoredClosedTab) {
 				if(this.restoredClosedTab) {
 					// when the tab view UI is being displayed, update the thumb for the restored closed tab after the page load
 					let receiver = function() {
@@ -1196,7 +1210,6 @@ this.UI = {
 					Messenger.listenBrowser(tab.linkedBrowser, "documentLoaded", receiver);
 					Messenger.messageBrowser(tab.linkedBrowser, "waitForDocumentLoad");
 				}
-				this._closedLastVisibleTab = false;
 				this._closedSelectedTabInTabView = false;
 				this.closedLastTabInTabView = false;
 				this.restoredClosedTab = false;
@@ -1211,7 +1224,6 @@ this.UI = {
 
 		// reset these vars, just in case.
 		this._dontHideTabView = false;
-		this._closedLastVisibleTab = false;
 		this._closedSelectedTabInTabView = false;
 		this.closedLastTabInTabView = false;
 		this.restoredClosedTab = false;
@@ -1810,60 +1822,58 @@ this.UI = {
 			Search.hide();
 		}
 
-		let unhiddenGroup = null;
-		for(let groupItem of GroupItems) {
-			if(!groupItem.hidden && groupItem.children.length > 0) {
-				unhiddenGroup = groupItem;
-				break;
+		let activeGroup = GroupItems.getActiveGroupItem();
+		if(!activeGroup) {
+			for(let groupItem of GroupItems) {
+				if(!groupItem.hidden) {
+					this.setActive(groupItem);
+					activeGroup = groupItem;
+					break;
+				}
 			}
 		}
 
 		// no pinned tabs and no visible groups: open a new group. open a blank tab and return
-		if(!unhiddenGroup && !Tabs.numPinned) {
-			let group;
-			for(let groupItem of GroupItems) {
-				if(!groupItem.hidden && !groupItem.children.length) {
-					group = groupItem;
-					break;
-				}
-			}
-			if(!group) {
-				group = GroupItems.newGroup();
-			}
-
-			group.newTab(null, { closedLastTab: true });
+		if(!activeGroup && !Tabs.numPinned) {
+			let newGroup = GroupItems.newGroup();
+			newGroup.newTab(null, { closedLastTab: true });
 			return;
 		}
 
-		// If there's an active TabItem, zoom into it. If not (for instance when the selected tab is an app tab), just go there.
 		let activeTabItem = this.getActiveTab();
 		if(!activeTabItem) {
 			let tabItem = Tabs.selected._tabViewTabItem;
 			if(tabItem) {
 				if(!tabItem.parent || !tabItem.parent.hidden) {
 					activeTabItem = tabItem;
-				} else {
-					// set active tab item if there is at least one unhidden group
-					if(unhiddenGroup) {
-						activeTabItem = unhiddenGroup.getActiveTab();
-					}
+				}
+				// set active tab item if there is at least one unhidden group
+				else if(activeGroup) {
+					activeTabItem = activeGroup.getActiveTab();
 				}
 			}
 		}
 
+		// If there's an active TabItem, zoom into it.
 		if(activeTabItem) {
 			activeTabItem.zoomIn();
-		} else {
-			if(Tabs.numPinned > 0) {
-				if(Tabs.selected.pinned) {
-					this.goToTab(Tabs.selected);
-				} else {
-					let tab = Tabs.pinned[0];
-					if(tab) {
-						this.goToTab(tab);
-					}
+		}
+
+		// If not (for instance when the selected tab is an app tab), just go there.
+		else if(Tabs.numPinned > 0) {
+			if(Tabs.selected.pinned) {
+				this.goToTab(Tabs.selected);
+			} else {
+				let tab = Tabs.pinned[0];
+				if(tab) {
+					this.goToTab(tab);
 				}
 			}
+		}
+
+		// If we have no active tab and no pinned tabs, open a new tab in the active unhidden group.
+		else if(activeGroup) {
+			activeGroup.newTab();
 		}
 	},
 

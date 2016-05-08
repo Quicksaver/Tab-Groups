@@ -1,4 +1,4 @@
-// VERSION 1.4.11
+// VERSION 1.4.12
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -21,6 +21,7 @@ prefList = {
 	displayMode: 'single',
 	showGroupThumbs: true,
 	gridDynamicSize: true,
+	closeIfEmpty: true,
 	stackTabs: true,
 	showThumbs: true,
 	showUrls: true,

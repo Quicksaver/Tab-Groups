@@ -1,4 +1,4 @@
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -14,7 +14,7 @@ this.TabView = {
 	_iframe: null,
 	_window: null,
 	_initialized: false,
-	_closedLastVisibleTabBeforeFrameInitialized: false,
+	_closedLastVisibleTab: null,
 	_isFrameLoading: false,
 
 	_initFrameCallbacks: [],
@@ -70,28 +70,22 @@ this.TabView = {
 				Tabs.unlisten("TabShow", this);
 				Tabs.unlisten("TabClose", this);
 
+				// Close the active group if it's empty and we got here by closing its last tab.
+				// Do this before actually showing TabView, so it's less confusing for the user, and easier on the browser as well.
+				if(this._closedLastVisibleTab) {
+					let activeGroup = this._window[objName].GroupItems.getActiveGroupItem();
+					activeGroup.closeIfEmpty();
+				}
+
 				this._initFrameCallbacks.forEach(cb => cb());
 				this._initFrameCallbacks = [];
 
 				break;
 
-			case 'TabShow':
-				// if a tab is changed from hidden to unhidden and the iframe is not initialized, load the iframe and setup the tab.
-				if(!this._window) {
-					this._initFrame(() => {
-						this._window[objName].UI.onTabSelect(Tabs.selected);
-						if(this._closedLastVisibleTabBeforeFrameInitialized) {
-							this._closedLastVisibleTabBeforeFrameInitialized = false;
-							this._window[objName].UI.showTabView(false);
-						}
-					});
-				}
-
-				break;
-
+			// If we're closing the last visible tab, make sure we open a new one; there's no need to initialize TabView just for this.
 			case 'TabClose':
 				if(!this._window && !Tabs.visible.length) {
-					this._closedLastVisibleTabBeforeFrameInitialized = true;
+					this.onCloseLastTab(e.target);
 				}
 				break;
 
@@ -124,6 +118,11 @@ this.TabView = {
 				break;
 
 			case 'tabviewhidden':
+				if(this._closedLastVisibleTab) {
+					gBrowser.removeTab(this._closedLastVisibleTab);
+					this._closedLastVisibleTab = null;
+				}
+
 				gTaskbarTabGroup.enabled = AeroPeek.enabled;
 				this.updateAeroPeek();
 				break;
@@ -204,7 +203,6 @@ this.TabView = {
 		Listeners.add(this.tooltip, "popupshowing", this, true);
 		Listeners.add(this.tabMenuPopup, "popupshowing", this);
 		Listeners.add($('tabContextMenu'), "popupshowing", this);
-		Tabs.listen("TabShow", this);
 		Tabs.listen("TabClose", this);
 		Observers.add(this, objName+'-set-groups-defaults');
 
@@ -319,7 +317,6 @@ this.TabView = {
 		Listeners.remove(this.tooltip, "popupshowing", this, true);
 		Listeners.remove(this.tabMenuPopup, "popupshowing", this);
 		Listeners.remove($('tabContextMenu'), "popupshowing", this);
-		Tabs.unlisten("TabShow", this);
 		Tabs.unlisten("TabClose", this);
 		Observers.remove(this, objName+'-set-groups-defaults');
 
@@ -364,6 +361,9 @@ this.TabView = {
 
 		this._iframe.setAttribute("src", "chrome://"+objPathString+"/content/tabview.xhtml");
 		this._deck.appendChild(this._iframe);
+
+		// We don't need this anymore.
+		Tabs.unlisten("TabClose", this);
 	},
 
 	_deinitFrame: function() {
@@ -394,13 +394,16 @@ this.TabView = {
 			this._iframe.remove();
 			this._iframe = null;
 		}
+
+		// We need this again.
+		Tabs.listen("TabClose", this);
 	},
 
 	isVisible: function() {
 		return (this._deck ? this._deck.selectedPanel == this._iframe : false);
 	},
 
-	show: function() {
+	show: function(zoomOut = true) {
 		if(this.isVisible()) { return; }
 
 		// Make sure the quick access panel is hidden if we enter tab view
@@ -409,7 +412,7 @@ this.TabView = {
 		}
 
 		this._initFrame(() => {
-			this._window[objName].UI.showTabView(true);
+			this._window[objName].UI.showTabView(zoomOut);
 		});
 	},
 
@@ -557,6 +560,33 @@ this.TabView = {
 		} else {
 			this.tabContextMenu.openPopup(null, 'after_pointer', e.clientX +1, e.clientY +1, true, false, fakeEvent);
 		}
+	},
+
+	onCloseLastTab: function(tab) {
+		// We already have a placeholder tab present, there's no need to open another one or do anything else.
+		if(this._closedLastVisibleTab) { return; }
+
+		// When closing the last visible tab of a group (including pinned tabs), we open a new tab in its place, so that the group isn't closed immediately,
+		// giving the user a choise to keep using the same group.
+		// But if we're closing that new tab (really, any about:newtab or equivalent), we go into groups view.
+		if(!tab || tab.linkedBrowser.currentURI.spec == window.BROWSER_NEW_TAB_URL) {
+			// So that listeners inside TabView catch at the time the tab is opened but before it's assigned to our property here,
+			// as would happen when TabView is already initialized (the callback is synchronous).
+			this._closedLastVisibleTab = true;
+			this._closedLastVisibleTab = this.newTab("about:blank");
+
+			// We open a temporary blank tab to avoid potentially loading a tab from another group unnecessarily.
+			// This temp tab will be removed immediately after leaving groups view.
+			this.show(false);
+			return;
+		}
+
+		// We're closing the last visible tab, so open a new one.
+		this.newTab();
+	},
+
+	newTab: function(url, options = {}) {
+		return gBrowser.loadOneTab(url || window.BROWSER_NEW_TAB_URL, options);
 	},
 
 	moveTabTo: function(tab, groupItemId, focusIfSelected) {
