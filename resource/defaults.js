@@ -1,4 +1,4 @@
-// VERSION 1.4.12
+// VERSION 1.4.13
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -39,16 +39,16 @@ prefList = {
 	quickAccessCtrl: false,
 
 	nextGroupKeycode: '`',
-	nextGroupAccel: true,
+	nextGroupAccel: !DARWIN,
 	nextGroupShift: false,
 	nextGroupAlt: false,
-	nextGroupCtrl: false,
+	nextGroupCtrl: DARWIN,
 
 	previousGroupKeycode: '`',
-	previousGroupAccel: true,
+	previousGroupAccel: !DARWIN,
 	previousGroupShift: true,
 	previousGroupAlt: false,
-	previousGroupCtrl: false,
+	previousGroupCtrl: DARWIN,
 
 	noWarningsAboutSession: false,
 
