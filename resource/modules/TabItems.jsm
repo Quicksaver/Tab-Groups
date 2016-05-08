@@ -1,4 +1,4 @@
-// VERSION 1.2.12
+// VERSION 1.2.13
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -481,7 +481,7 @@ this.TabItem.prototype = {
 		// If closing tab doesn't belong to a group and no empty group, create a new one for the new tab.
 		if(!groupClose && Tabs.length == 1) {
 			let group = this.tab._tabViewTabItem.parent;
-			group.newTab(null, { closedLastTab: true });
+			group.newTab(true);
 		}
 
 		gBrowser.removeTab(this.tab);

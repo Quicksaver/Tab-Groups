@@ -1,4 +1,4 @@
-// VERSION 1.6.30
+// VERSION 1.6.31
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1078,40 +1078,33 @@ this.GroupItem.prototype = {
 	closeHidden: function() {
 		this._cancelFadeAwayUndoButtonTimer();
 
-		// When the last non-empty groupItem is closed then create a new group with a blank tab.
+		// When the last non-empty groupItem is closed then create a new group.
 		let remainingGroups = false;
 		for(let groupItem of GroupItems) {
-			if(groupItem != this && groupItem.children.length) {
+			if(groupItem != this && !groupItem.isEmpty()) {
 				remainingGroups = true;
 				break;
 			}
 		}
 
-		let tab = null;
+		let createdGroup = null;
 		if(!remainingGroups) {
-			let group;
+			let hasEmptyGroups = false;
 			for(let groupItem of GroupItems) {
-				if(groupItem != this && !groupItem.children.length) {
-					group = groupItem;
+				if(groupItem != this && groupItem.isEmpty()) {
+					hasEmptyGroups = true;
 					break;
 				}
 			}
-			if(!group) {
-				group = GroupItems.newGroup();
+			if(!hasEmptyGroups) {
+				createdGroup = GroupItems.newGroup();
 			}
-			tab = group.newTab(null, { dontZoomIn: true });
 		}
 
 		let closed = this.destroy();
-
-		if(!tab) { return; }
-
-		if(closed) {
-			// Let's make the new tab the selected tab.
-			UI.goToTab(tab);
-		} else {
-			// Remove the new tab and group, if this group is no longer closed.
-			tab._tabViewTabItem.parent.destroy({ immediately: true });
+		if(!closed && createdGroup) {
+			// Remove the new group, if this group is no longer closed.
+			createdGroup.destroy({ immediately: true });
 		}
 	},
 
@@ -1977,18 +1970,15 @@ this.GroupItem.prototype = {
 
 	// Creates a new tab within this groupItem.
 	// Parameters:
-	//  url - the new tab should open this url as well
-	//  options - the options object
-	//    dontZoomIn - set to true to not zoom into the newly created tab
-	//    closedLastTab - boolean indicates the last tab has just been closed
-	newTab: function(url, options = {}) {
-		if(options.closedLastTab) {
+	//  closedLastTab - boolean indicates the last tab has just been closed
+	newTab: function(closedLastTab) {
+		if(closedLastTab) {
 			UI.closedLastTabInTabView = true;
 		}
 
 		UI.setActive(this, { dontSetActiveTabInGroup: true });
 
-		return gTabView.newTab(url, { inBackground: !!options.dontZoomIn });
+		return gTabView.newTab();
 	},
 
 	// Reorders the tabs in a groupItem based on the arrangement of the tabs shown in the tab bar.
@@ -2627,13 +2617,9 @@ this.GroupItems = {
 				return child;
 			}
 
-			// if the group has no tabs, open a new one in it
-			let newTab = groupItem.newTab();
-			if(newTab) {
-				return newTab._tabViewTabItem;
-			}
-
-			break;
+			// There's no easy way to open a new tab in another group and switch to it, because window.BrowserOpenTab doesn't return the new tab.
+			// A nice TO DO here would be to remake all of this with async promises/tasks and have them resolve to that new tab.
+			// But empty groups aren't really a thing, it's a very edge-case, so... maybe later. Skip them for now.
 		}
 
 		return null;
@@ -2651,7 +2637,7 @@ this.GroupItems = {
 		let tabItem = null;
 		let activeGroupItem = this.getActiveGroupItem();
 		if(!activeGroupItem) {
-			tabItem = this.getNextItemTabFromGroups(groupItem);
+			tabItem = this.getNextItemTabFromGroups(groupItems);
 		}
 		else {
 			let currentIndex = groupItems.indexOf(activeGroupItem);

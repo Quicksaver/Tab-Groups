@@ -1,4 +1,4 @@
-// VERSION 1.3.18
+// VERSION 1.3.19
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1836,7 +1836,7 @@ this.UI = {
 		// no pinned tabs and no visible groups: open a new group. open a blank tab and return
 		if(!activeGroup && !Tabs.numPinned) {
 			let newGroup = GroupItems.newGroup();
-			newGroup.newTab(null, { closedLastTab: true });
+			newGroup.newTab(true);
 			return;
 		}
 

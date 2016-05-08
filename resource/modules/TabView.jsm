@@ -1,4 +1,4 @@
-// VERSION 1.1.4
+// VERSION 1.1.5
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -569,11 +569,11 @@ this.TabView = {
 		// When closing the last visible tab of a group (including pinned tabs), we open a new tab in its place, so that the group isn't closed immediately,
 		// giving the user a choise to keep using the same group.
 		// But if we're closing that new tab (really, any about:newtab or equivalent), we go into groups view.
-		if(!tab || tab.linkedBrowser.currentURI.spec == window.BROWSER_NEW_TAB_URL) {
+		if(!tab || tab.linkedBrowser.currentURI.spec == Prefs.url || window.BROWSER_NEW_TAB_URL) {
 			// So that listeners inside TabView catch at the time the tab is opened but before it's assigned to our property here,
 			// as would happen when TabView is already initialized (the callback is synchronous).
 			this._closedLastVisibleTab = true;
-			this._closedLastVisibleTab = this.newTab("about:blank");
+			this._closedLastVisibleTab = this.openTab("about:blank");
 
 			// We open a temporary blank tab to avoid potentially loading a tab from another group unnecessarily.
 			// This temp tab will be removed immediately after leaving groups view.
@@ -585,8 +585,13 @@ this.TabView = {
 		this.newTab();
 	},
 
-	newTab: function(url, options = {}) {
-		return gBrowser.loadOneTab(url || window.BROWSER_NEW_TAB_URL, options);
+	newTab: function() {
+		// This should obey any new tab custom settings and add-ons (as long as they obey this method themselves of course).
+		window.BrowserOpenTab();
+	},
+
+	openTab: function(url) {
+		return gBrowser.loadOneTab(url);
 	},
 
 	moveTabTo: function(tab, groupItemId, focusIfSelected) {
@@ -766,6 +771,10 @@ this.TabView = {
 Modules.LOADMODULE = function() {
 	// compatibility shim, for other add-ons to interact with this object more closely to the original if needed
 	window.TabView = TabView;
+
+	// We need to know what's the url for the new tab page, as other add-ons may override it.
+	// Even though this preference isn't used directly anymore, it still seems a valid reference point (so far).
+	Prefs.setDefaults({ url: '' }, 'newtab', 'browser');
 
 	Modules.load('AllTabs');
 	Modules.load('CatchRules');
