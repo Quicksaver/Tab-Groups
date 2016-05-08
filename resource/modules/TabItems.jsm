@@ -1,4 +1,4 @@
-// VERSION 1.2.11
+// VERSION 1.2.12
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -573,6 +573,12 @@ this.TabItem.prototype = {
 
 	_updateLabels: function() {
 		return new Promise((resolve, reject) => {
+			// Tab could have been closed in the meantime.
+			if(!this.tab) {
+				reject();
+				return;
+			}
+
 			FavIcons.getFavIconUrlForTab(this.tab, (iconUrl) => {
 				if(iconUrl) {
 					this.fav._iconUrl = iconUrl;
@@ -1168,6 +1174,7 @@ this.TabItems = {
 	unregister: function(item) {
 		this.items.delete(item);
 		this._tabsWaitingForUpdate.remove(item.tab);
+		this._tabsNeedingLabelsUpdate.delete(item);
 		this._staleTabs.remove(item);
 	},
 
