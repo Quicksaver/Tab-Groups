@@ -1,4 +1,4 @@
-// VERSION 1.6.32
+// VERSION 1.6.33
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -39,6 +39,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this._row = '';
 	this._gridBounds = null;
 	this._soundplaying = new Set();
+	this._willUpdateTabCount = null;
 
 	// A <Point> that describes the last size specifically chosen by the user.
 	this.userSize = null;
@@ -157,11 +158,6 @@ this.GroupItem = function(listOfEls, options = {}) {
 	// ___ Undo Close
 	this.undoContainer = null;
 
-	this.setTitle(options.title);
-	if(options.focusTitle) {
-		this.focusTitle();
-	}
-
 	// ___ Children
 	// We explicitly set dontArrange=true to prevent the groupItem from re-arranging its children after a tabItem has been added.
 	// This saves us a group.arrange() call per child.
@@ -205,7 +201,11 @@ this.GroupItem = function(listOfEls, options = {}) {
 	}
 
 	this._inited = true;
-	this.save();
+
+	this.setTitle(options.title); // calls this.save() for us
+	if(options.focusTitle) {
+		this.focusTitle();
+	}
 };
 
 this.GroupItem.prototype = {
@@ -1348,16 +1348,19 @@ this.GroupItem.prototype = {
 	//   dontSetActive - (bool) if true, the group won't be set active when moving a tab to it, even if it was the previously selected tab
 	add: function(item, options = {}) {
 		try {
-			// safeguard to remove the item from its previous group
-			if(item.parent && item.parent !== this) {
-				item.parent.remove(item);
-			}
-
 			let wasAlreadyInThisGroupItem = false;
-			let oldIndex = this.children.indexOf(item);
-			if(oldIndex != -1) {
-				this.children.splice(oldIndex, 1);
-				wasAlreadyInThisGroupItem = true;
+			if(item.parent) {
+				// safeguard to remove the item from its previous group
+				if(item.parent !== this) {
+					item.parent.remove(item);
+				}
+				else {
+					let oldIndex = this.children.indexOf(item);
+					if(oldIndex != -1) {
+						this.children.splice(oldIndex, 1);
+						wasAlreadyInThisGroupItem = true;
+					}
+				}
 			}
 
 			// Insert the tab into the right position.
@@ -1380,6 +1383,8 @@ this.GroupItem.prototype = {
 				if(!options.dontSetActive && (item.tab.selected || (!GroupItems.getActiveGroupItem() && !item.tab.hidden))) {
 					UI.setActive(this);
 				}
+
+				this.updateTabCount();
 			}
 
 			this._unfreezeItemSize(true);
@@ -1387,7 +1392,6 @@ this.GroupItem.prototype = {
 				this.arrange();
 			}
 
-			this.updateTabCount();
 			this._sendToSubscribers("childAdded", { item: item });
 
 			UI.setReorderTabsOnHide(this);
@@ -1478,9 +1482,18 @@ this.GroupItem.prototype = {
 	},
 
 	updateTabCount: function() {
-		setAttribute(this.container, 'tabs', this.children.length);
-		this.tabCounter.textContent = Strings.get('TabView', 'tabs', [ [ '$tabs', this.children.length ] ], this.children.length);
-		this.selector.setAttribute('title', this.getTitle(true) + ' - ' + this.tabCounter.textContent);
+		// No need to do this every single time, as both DOM operations and string calculations can become expensive with multiple calls;
+		// i.e. during startup when the group is first being built and its tabs are all added at once.
+		if(!this._willUpdateTabCount) {
+			this._willUpdateTabCount = aSync(() => {
+				this._willUpdateTabCount = null;
+				let tabs = this.children.length;
+				let text = Strings.get('TabView', 'tabs', [ [ '$tabs', tabs ] ], tabs);
+				setAttribute(this.container, 'tabs', tabs);
+				this.tabCounter.textContent = text;
+				this.selector.setAttribute('title', this.getTitle(true) + ' - ' + text);
+			}, 100);
+		}
 	},
 
 	// Returns true if the groupItem should stack (instead of grid).
@@ -2926,6 +2939,9 @@ this.GroupItems = {
 
 	// Arranges the groups in grid mode, based on the available workspace dimensions.
 	arrange: function(delayChildren) {
+		// This will be called as soon as arrange is unpaused.
+		if(this._arrangePaused) { return; }
+
 		// In single mode we can skip to arranging the tabs in each group, as all groups will have the same full-size dimensions.
 		if(UI.single) {
 			this.arrangeAllGroups(delayChildren);
@@ -2934,9 +2950,6 @@ this.GroupItems = {
 
 		// The rest is only meant for grid mode.
 		if(!UI.grid) { return; }
-
-		// This will be called as soon as arrange is unpaused.
-		if(this._arrangePaused) { return; }
 
 		let bounds = UI.getPageBounds();
 

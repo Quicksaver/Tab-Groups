@@ -1,4 +1,4 @@
-// VERSION 2.6.7
+// VERSION 2.7.0
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -12,7 +12,7 @@ Modules.BASEUTILS = true;
 //		see addPropertyWatcher()
 //	addAttributeWatcher(obj, attr, handler, capture, iterateAll) - registers handler as a watcher for object attribute attr changes
 //		obj - (xul element or object) to watch for changes
-//		attr - (string) attribute name in obj to watch
+//		attr - (string) attribute name in obj to watch or (array) of such attribute names
 //		handler - (function) method or (obj) with attrWatcher() method to fire when attr is set, removed or changed
 //		(optional) capture - when (bool) true it cancels setting the attribute if handler returns (bool) false, defaults to (bool) false
 //		(optional) iterateAll -	when (bool) false only triggers handler for the last change in the attribute, merging all the changes queued in between.
@@ -115,51 +115,67 @@ this.Watchers = {
 
 	// Attributes part, works through delayed DOM Mutation Observers
 	addAttributeWatcher: function(obj, attr, handler, capture, iterateAll) {
-		if(!this.setWatchers(obj)) { return false; }
+		if(!this.setWatchers(obj)) { return; }
 		capture = (capture) ? true : false;
 		iterateAll = (capture || iterateAll) ? true : false;
 
-		let handlers = obj[this._obj].attributes.get(attr);
-		if(!handlers) {
-			handlers = new Set();
-
-			obj[this._obj].disconnect();
-			obj[this._obj].attributes.set(attr, handlers);
-			obj[this._obj].reconnect();
+		if(typeof(attr) == 'string') {
+			attr = [attr];
 		}
-		else {
-			for(let a of handlers) {
-				if(a.handler == handler && a.capture == capture && a.iterateAll == iterateAll) { return true; }
+
+		attr_loop: for(let a of attr) {
+			let handlers = obj[this._obj].attributes.get(a);
+			if(handlers) {
+				for(let h of handlers) {
+					if(h.handler == handler && h.capture == capture && h.iterateAll == iterateAll) {
+						continue attr_loop;
+					}
+				}
+
+				handlers.add({ handler, capture, iterateAll });
+				obj[this._obj].setters++;
+			}
+			else {
+				obj[this._obj].disconnect();
+				obj[this._obj].attributes.set(a, new Set([{ handler, capture, iterateAll }]));
+				obj[this._obj].setters++;
 			}
 		}
 
-		handlers.add({ handler: handler, capture: capture, iterateAll: iterateAll });
-		obj[this._obj].setters++;
-		return true;
+		obj[this._obj].reconnect();
 	},
 
 	removeAttributeWatcher: function(obj, attr, handler, capture, iterateAll) {
-		if(!obj || !obj[this._obj] || !obj[this._obj].attributes.has(attr)) { return false; }
+		if(!obj || !obj[this._obj]) { return; }
 		capture = (capture) ? true : false;
 		iterateAll = (capture || iterateAll) ? true : false;
 
-		let handlers = obj[this._obj].attributes.get(attr);
-		for(let stored of handlers) {
-			if(stored.handler == handler && stored.capture == capture && stored.iterateAll == iterateAll) {
-				handlers.delete(stored);
-				if(!handlers.size) {
-					obj[this._obj].disconnect();
-					obj[this._obj].attributes.delete(attr);
-					obj[this._obj].reconnect();
-				}
+		if(typeof(attr) == 'string') {
+			attr = [attr];
+		}
 
-				obj[this._obj].setters--;
-				this.unsetWatchers(obj);
-				return true;
+		for(let a of attr) {
+			let handlers = obj[this._obj].attributes.get(a);
+			if(!handlers) { continue; }
+
+			for(let h of handlers) {
+				if(h.handler == handler && h.capture == capture && h.iterateAll == iterateAll) {
+					handlers.delete(h);
+					if(!handlers.size) {
+						obj[this._obj].disconnect();
+						obj[this._obj].attributes.delete(attr);
+					}
+					obj[this._obj].setters--;
+					break;
+				}
 			}
 		}
 
-		return false;
+		if(obj[this._obj].setters) {
+			obj[this._obj].reconnect();
+		} else {
+			this.unsetWatchers(obj);
+		}
 	},
 
 	setWatchers: function(obj) {
@@ -174,10 +190,14 @@ this.Watchers = {
 
 		if(!obj.ownerDocument) { return true; }
 
+		handler._connected = false;
 		handler.attributes = new Map();
 		handler.mutations = [];
 		handler.scheduler = null;
 		handler.reconnect = function() {
+			if(this.connected) { return; }
+			this.connected = true;
+
 			let attrList = [];
 			for(let a of this.attributes.keys()) {
 				attrList.push(a);
@@ -191,6 +211,9 @@ this.Watchers = {
 			}
 		};
 		handler.disconnect = function() {
+			if(!this.connected) { return; }
+			this.connected = false;
+
 			this.mutationObserver.disconnect();
 		};
 		handler.scheduleWatchers = function(mutations, observer) {

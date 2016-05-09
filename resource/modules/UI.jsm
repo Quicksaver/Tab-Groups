@@ -1,4 +1,4 @@
-// VERSION 1.3.20
+// VERSION 1.3.21
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1302,10 +1302,16 @@ this.UI = {
 	},
 
 	updateTabButton: function() {
-		let numberOfGroups = GroupItems.size;
+		// No need to do this every single time, as DOM operations can become expensive with multiple calls, especially dealing with broadcasters;
+		// i.e. during startup when the groups are all created at once.
+		if(!Timers.updateTabButton) {
+			Timers.init('updateTabButton', () => {
+				let numberOfGroups = GroupItems.size;
 
-		setAttribute(this.exitBtn, "groups", numberOfGroups);
-		gTabView.updateGroupNumberBroadcaster(numberOfGroups);
+				setAttribute(this.exitBtn, "groups", numberOfGroups);
+				gTabView.updateGroupNumberBroadcaster(numberOfGroups);
+			}, 100);
+		}
 	},
 
 	// Sets up the allowed browser keys using key elements.

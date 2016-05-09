@@ -1,4 +1,4 @@
-// VERSION 1.2.13
+// VERSION 1.2.14
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -38,18 +38,12 @@ this.TabItem = function(tab, options = {}) {
 	this._thumbNeedsUpdate = false;
 	this._soundplaying = false;
 
-	Listeners.add(this.container, 'mousedown', this);
-	Listeners.add(this.container, 'mouseup', this);
-	Listeners.add(this.container, 'dragstart', this, true);
-	Listeners.add(this.container, 'dragover', this);
-	Listeners.add(this.container, 'dragenter', this);
-	Watchers.addAttributeWatcher(this.tab, "busy", this, false, false);
-	Watchers.addAttributeWatcher(this.tab, "progress", this, false, false);
-	Watchers.addAttributeWatcher(this.tab, "soundplaying", this, false, false);
-	Watchers.addAttributeWatcher(this.tab, "muted", this, false, false);
-	Watchers.addAttributeWatcher(this.tab, "pending", this, false, false);
-	Watchers.addAttributeWatcher(this.tab, "tabmix_pending", this, false, false);
-	Watchers.addAttributeWatcher(this.tab, "tabmix_tabState", this, false, false);
+	this.container.addEventListener('mousedown', this);
+	this.container.addEventListener('mouseup', this);
+	this.container.addEventListener('dragstart', this, true);
+	this.container.addEventListener('dragover', this);
+	this.container.addEventListener('dragenter', this);
+	Watchers.addAttributeWatcher(this.tab, [ "busy", "progress", "soundplaying", "muted", "pending", "tabmix_pending", "tabmix_tabState" ], this, false, false);
 
 	TabItems.register(this);
 
@@ -67,7 +61,7 @@ this.TabItem.prototype = {
 		this._cachedThumbURL = PageThumbs.getThumbnailURL(url);
 	},
 
-	showCachedThumb: function() {
+	showCachedThumb: function(immediately) {
 		let thumbnailURL = this._tempCanvasBlobURL || this._cachedThumbURL;
 
 		// If we're in a group where thumbs are not showing, we don't really need to show the cached thumb either.
@@ -82,17 +76,27 @@ this.TabItem.prototype = {
 		// We create the cached thumb dynamically, and append it to the DOM only if there's a thumb to show.
 		if(!this.cachedThumb) {
 			this.cachedThumb = TabItems.cachedThumbFragment();
+			this.cachedThumb._src = "";
 		}
 
-		if(this.cachedThumb.getAttribute("src") != thumbnailURL) {
-			// We should update the group's thumb when the tab's cached thumb loads, otherwise we end up with a bunch of white squares in there.
-			// Further updates to the tab's thumb will surely come through its canvas, which will also update the group's thumb accordingly.
-			this.cachedThumb.addEventListener('load', this);
-			this.cachedThumb.addEventListener('error', this);
-			this.cachedThumb.addEventListener('abort', this);
-
-			setAttribute(this.cachedThumb, "src", thumbnailURL);
+		if(this.cachedThumb._src != thumbnailURL) {
+			if(!immediately) {
+				TabItems.queueCachedThumb(this, thumbnailURL);
+			} else {
+				this._showCachedThumb(thumbnailURL);
+			}
 		}
+	},
+
+	_showCachedThumb: function(thumbnailURL) {
+		// We should update the group's thumb when the tab's cached thumb loads, otherwise we end up with a bunch of white squares in there.
+		// Further updates to the tab's thumb will surely come through its canvas, which will also update the group's thumb accordingly.
+		this.cachedThumb.addEventListener('load', this);
+		this.cachedThumb.addEventListener('error', this);
+		this.cachedThumb.addEventListener('abort', this);
+
+		this.cachedThumb._src = thumbnailURL;
+		this.cachedThumb.setAttribute("src", thumbnailURL);
 	},
 
 	// Removes the cached data i.e. image and title and show the canvas.
@@ -106,6 +110,7 @@ this.TabItem.prototype = {
 			this.cachedThumb.removeEventListener('error', this);
 			this.cachedThumb.removeEventListener('abort', this);
 			this.cachedThumb.setAttribute("src", "");
+			this.cachedThumb._src = "";
 			this.cachedThumb.remove();
 			this.cachedThumb = null;
 		}
@@ -358,18 +363,12 @@ this.TabItem.prototype = {
 	},
 
 	destroy: function() {
-		Listeners.remove(this.container, 'mousedown', this);
-		Listeners.remove(this.container, 'mouseup', this);
-		Listeners.remove(this.container, 'dragstart', this, true);
-		Listeners.remove(this.container, 'dragover', this);
-		Listeners.remove(this.container, 'dragenter', this);
-		Watchers.removeAttributeWatcher(this.tab, "busy", this, false, false);
-		Watchers.removeAttributeWatcher(this.tab, "progress", this, false, false);
-		Watchers.removeAttributeWatcher(this.tab, "soundplaying", this, false, false);
-		Watchers.removeAttributeWatcher(this.tab, "muted", this, false, false);
-		Watchers.removeAttributeWatcher(this.tab, "pending", this, false, false);
-		Watchers.removeAttributeWatcher(this.tab, "tabmix_pending", this, false, false);
-		Watchers.removeAttributeWatcher(this.tab, "tabmix_tabState", this, false, false);
+		this.container.removeEventListener('mousedown', this);
+		this.container.removeEventListener('mouseup', this);
+		this.container.removeEventListener('dragstart', this, true);
+		this.container.removeEventListener('dragover', this);
+		this.container.removeEventListener('dragenter', this);
+		Watchers.removeAttributeWatcher(this.tab, [ "busy", "progress", "soundplaying", "muted", "pending", "tabmix_pending", "tabmix_tabState" ], this, false, false);
 		this.container.remove();
 	},
 
@@ -691,6 +690,7 @@ this.TabItems = {
 	_heartbeatHiddenTiming: 20000, // milliseconds between calls when TabView is hidden (for discarding canvases)
 	_heartbeatTiming: 200, // milliseconds between calls
 	_maxTimeForUpdating: 200, // milliseconds that consecutive updates can take
+	_maxTimeForCachedThumbs: 25,
 	_lastUpdateTime: Date.now(),
 	reconnectingPaused: false,
 
@@ -748,6 +748,7 @@ this.TabItems = {
 		// Set up tab priority queue
 		this._tabsNeedingLabelsUpdate = new Set();
 		this._tabsWaitingForUpdate = new TabPriorityQueue();
+		this._queuedCachedThumbs = new Map();
 		this._staleTabs = new MRUList();
 
 		this.tabHeight = this._getHeightForWidth(this.tabWidth);
@@ -1113,6 +1114,48 @@ this.TabItems = {
 			this.startHeartbeat();
 		}
 	}),
+
+	// Cached thumbs are created asynchronously, in a similar way to how canvases are painted above
+	// as to avoid locking up the browser during the first initialize of TabView where a lot of images would be loaded sequentially.
+	queueCachedThumb: function(tabItem, thumbnailURL) {
+		let shouldStart = !this._queuedCachedThumbs.size;
+		this._queuedCachedThumbs.set(tabItem, thumbnailURL);
+		if(shouldStart) {
+			this.startCachedThumbsHeartbeat();
+		}
+	},
+
+	startCachedThumbsHeartbeat: function() {
+		if(!Timers.cachedThumbsHeartbeat) {
+			Timers.init('cachedThumbsHeartbeat', () => {
+				this._checkCachedThumbsHeartbeat();
+			}, this._heartbeatTiming);
+		}
+	},
+
+	_checkCachedThumbsHeartbeat: function() {
+		let accumTime = 0;
+		for(let [ tabItem, thumbnailURL ] of this._queuedCachedThumbs) {
+			this._queuedCachedThumbs.delete(tabItem);
+
+			// The canvas could have painted in the meantime, in which case we don't need to show the cached thumb anymore.
+			if(!tabItem.cachedThumb) { continue; }
+
+			let updateBegin = Date.now();
+
+			tabItem._showCachedThumb(thumbnailURL);
+
+			// Do as many updates as we can fit into a "perceived" amount of time, which is tunable.
+			let updateEnd = Date.now();
+			let deltaTime = updateEnd - updateBegin;
+			accumTime += deltaTime;
+			if(accumTime >= this._maxTimeForCachedThumbs) { break; }
+		}
+
+		if(this._queuedCachedThumbs.size) {
+			this.startCachedThumbsHeartbeat();
+		}
+	},
 
 	// Tells TabItems to stop updating thumbnails (so you can do animations without thumbnail paints causing stutters).
 	// pausePainting can be called multiple times, but every call to pausePainting needs to be mirrored with a call to <resumePainting>.
@@ -1531,7 +1574,7 @@ this.TabCanvas.prototype = {
 							URL.revokeObjectURL(this.tabItem._tempCanvasBlobURL);
 						}
 						this.tabItem._tempCanvasBlobURL = URL.createObjectURL(blob);
-						this.tabItem.showCachedThumb();
+						this.tabItem.showCachedThumb(true);
 					}
 					catch(ex) {
 						Cu.reportError(ex);
