@@ -1,4 +1,4 @@
-// VERSION 1.6.33
+// VERSION 1.6.34
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -782,7 +782,7 @@ this.GroupItem.prototype = {
 		Trenches.defaultRadius = 2 * defaultRadius; // bump up from 10 to 20!
 
 		new GroupDrag(this);
-		DraggingGroup.start();
+		DraggingGroup.start(true);
 		DraggingGroup.snap('none');
 		DraggingGroup.stop(immediately);
 

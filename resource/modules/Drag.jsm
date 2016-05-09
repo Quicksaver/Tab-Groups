@@ -1,4 +1,4 @@
-// VERSION 2.3.3
+// VERSION 2.3.4
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -53,7 +53,7 @@ this.GroupDrag.prototype = {
 		return DraggingGroup == this;
 	},
 
-	start: function() {
+	start: function(isAuto) {
 		if(!this.check()) { return; }
 
 		// If we're in grid mode, this is an HTML5 drag.
@@ -73,7 +73,9 @@ this.GroupDrag.prototype = {
 			this.container.classList.add('dragging');
 
 			if(!this.item.isAFauxItem) {
-				UI.setActive(this.item);
+				if(!isAuto) {
+					UI.setActive(this.item);
+				}
 				this.item._unfreezeItemSize(true);
 			}
 
