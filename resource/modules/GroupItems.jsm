@@ -1,4 +1,4 @@
-// VERSION 1.6.31
+// VERSION 1.6.32
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -382,7 +382,7 @@ this.GroupItem.prototype = {
 		if(!Prefs.showGroupThumbs) {
 			this.selectorTitle.textContent = title;
 		}
-		this.selector.setAttribute('title', title);
+		this.updateTabCount();
 		this.save();
 
 		// We need to save the title of the active group item if it's changed
@@ -1479,6 +1479,8 @@ this.GroupItem.prototype = {
 
 	updateTabCount: function() {
 		setAttribute(this.container, 'tabs', this.children.length);
+		this.tabCounter.textContent = Strings.get('TabView', 'tabs', [ [ '$tabs', this.children.length ] ], this.children.length);
+		this.selector.setAttribute('title', this.getTitle(true) + ' - ' + this.tabCounter.textContent);
 	},
 
 	// Returns true if the groupItem should stack (instead of grid).
@@ -2111,6 +2113,11 @@ this.GroupItems = {
 			titleShield.setAttribute('title', Strings.get("TabView", "groupItemDefaultName"));
 			tbContainer.appendChild(titleShield);
 
+			let tabCounter = document.createElement('span');
+			tabCounter.classList.add('tab-counter');
+			tabCounter.textContent = Strings.get('TabView', 'tabs', [ [ '$tabs', 0 ] ], 0);
+			titlebar.appendChild(tabCounter);
+
 			let audioBtn = document.createElement('div');
 			audioBtn.classList.add('group-audio');
 			audioBtn.setAttribute("title", Strings.get("TabView", "groupItemMute"));
@@ -2178,7 +2185,8 @@ this.GroupItems = {
 		let titlebar = container.firstChild;
 		let title = titlebar.firstChild.firstChild;
 		let titleShield = title.nextSibling;
-		let optionsBtn = titlebar.firstChild.nextSibling.nextSibling;
+		let tabCounter = titlebar.firstChild.nextSibling;
+		let optionsBtn = tabCounter.nextSibling.nextSibling;
 		let closeButton = optionsBtn.nextSibling;
 		let contents = titlebar.nextSibling;
 		let tabContainer = contents.firstChild;
@@ -2189,7 +2197,7 @@ this.GroupItems = {
 		let selectorTitle = canvas.nextSibling;
 		let closeButton2 = selector.lastChild.lastChild;
 
-		return { container, titlebar, title, titleShield, optionsBtn, closeButton, contents, tabContainer, newTabItem, expander, selector, canvas, selectorTitle, closeButton2 };
+		return { container, titlebar, title, titleShield, tabCounter, optionsBtn, closeButton, contents, tabContainer, newTabItem, expander, selector, canvas, selectorTitle, closeButton2 };
 	},
 
 	// Creates a new empty group.

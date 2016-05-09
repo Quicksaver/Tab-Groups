@@ -9,6 +9,8 @@
 <!ENTITY opt.gridDynamicSize.tooltip3 "With this disabled, all groups will have similar dimensions, with only the necessary differences in order for them all to fit on screen.">
 <!ENTITY opt.closeIfEmpty.label "Automatically close empty groups">
 <!ENTITY opt.closeIfEmpty.tooltip "A group is discarded immediately when its last tab is closed. You can keep an empty group by disabling this preference, or by simply giving it a name or changing some of its options.">
+<!ENTITY opt.showTabCounter.label "Show number of tabs next to group title">
+<!ENTITY opt.showTabCounter.tooltip "An indicator is shown at the top of the group, so you can easily know how many tabs you have in each group.">
 
 <!ENTITY cat.defaults.label "By default, groups should...">
 <!ENTITY opt.showThumbs.label "Show tab thumbnails">

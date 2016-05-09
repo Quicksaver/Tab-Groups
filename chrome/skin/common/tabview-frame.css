@@ -20,7 +20,7 @@
 	--favicon-size: 16px;
 	--favicon-radius: 0.4em;
 	--canvas-border-width: 1px;
-	--group-min-width: 120px;
+	--group-min-width: 150px;
 	--group-min-height: 145px;
 	--group-border-width: 1px;
 	--group-titlebar-height: 24px;
@@ -965,9 +965,9 @@ input.name {
 	text-overflow: ellipsis;
 	background: transparent;
 	border: 1px solid transparent;
-	margin-top: 3px;
+	margin-top: 1px;
 	-moz-margin-start: 3px;
-	padding: 1px;
+	padding: 1px 1px 2px 1px;
 	/* subtract own borders, margin and padding... */
 	width: calc(100% - 7px);
 }
@@ -1016,6 +1016,20 @@ input.name:focus::-moz-placeholder {
 
 .transparentBorder {
 	border: 1px solid transparent !important;
+}
+
+body:not(.showTabCounter) .tab-counter {
+	display: none;
+}
+
+.tab-counter {
+	padding-top: 4px;
+	-moz-padding-start: 4px;
+	-moz-padding-end: 2px;
+}
+
+body.single .tab-counter {
+	-moz-padding-end: 4px;
 }
 
 .groupSelector:not(.soundplaying) .group-audio,

@@ -1,4 +1,4 @@
-// VERSION 1.3.19
+// VERSION 1.3.20
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -443,6 +443,10 @@ this.UI = {
 					GroupItems.arrange();
 				}
 				break;
+
+			case 'showTabCounter':
+				document.body.classList[(Prefs.showTabCounter) ? 'add' : 'remove']('showTabCounter');
+				break;
 		}
 	},
 
@@ -499,9 +503,13 @@ this.UI = {
 			Prefs.listen('displayMode', this);
 			Prefs.listen('showGroupThumbs', this);
 			Prefs.listen('gridDynamicSize', this);
+			Prefs.listen('showTabCounter', this);
 			document.body.classList.add(Prefs.displayMode);
 			if(Prefs.showGroupThumbs) {
 				document.body.classList.add('showGroupThumbs');
+			}
+			if(Prefs.showTabCounter) {
+				document.body.classList.add('showTabCounter');
 			}
 
 			// ___ setup key handlers
@@ -618,6 +626,7 @@ this.UI = {
 		Prefs.unlisten('displayMode', this);
 		Prefs.unlisten('showGroupThumbs', this);
 		Prefs.unlisten('gridDynamicSize', this);
+		Prefs.unlisten('showTabCounter', this);
 
 		this._currentTab = null;
 		this._pageBounds = null;
