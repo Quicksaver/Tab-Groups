@@ -1,4 +1,4 @@
-// VERSION 1.2.14
+// VERSION 1.2.15
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -370,6 +370,14 @@ this.TabItem.prototype = {
 		this.container.removeEventListener('dragenter', this);
 		Watchers.removeAttributeWatcher(this.tab, [ "busy", "progress", "soundplaying", "muted", "pending", "tabmix_pending", "tabmix_tabState" ], this, false, false);
 		this.container.remove();
+
+		delete this.tab._tabViewTabItem;
+		this.tab = null;
+		if(this.tabCanvas) {
+			this.tabCanvas.tab = null;
+			this.tabCanvas.canvas.remove();
+			this.tabCanvas = null;
+		}
 	},
 
 	getBounds: function() {
@@ -785,7 +793,7 @@ this.TabItems = {
 		Tabs.unlisten("TabClose", this);
 
 		for(let tabItem of this) {
-			delete tabItem.tab._tabViewTabItem;
+			tabItem.destroy();
 		}
 
 		this.items = new Set();
@@ -888,8 +896,8 @@ this.TabItems = {
 		return { container, thumb, fav, tabTitle, tabUrl, audioBtn, closeBtn };
 	},
 
-	// Checks whether the xul:tab has fully loaded and calls a callback with a boolean indicates whether the tab is loaded or not.
-	_isComplete: function(tab, callback) {
+	// Checks whether the xul:tab has fully loaded and resolves a promise with a boolean that indicates whether the tab is loaded or not.
+	_isComplete: function(tab) {
 		return new Promise(function(resolve, reject) {
 			// A pending tab can't be complete, yet.
 			if(tab.hasAttribute("pending") || tab.hasAttribute("tabmix_pending")) {
@@ -999,17 +1007,9 @@ this.TabItems = {
 			let tabItem = tab._tabViewTabItem;
 			if(!tabItem) { return; }
 
-			tabItem.destroy();
 			this.unregister(tabItem);
 			tabItem._sendToSubscribers("close", tabItem);
-
-			tabItem.tab = null;
-			if(tabItem.tabCanvas) {
-				tabItem.tabCanvas.tab = null;
-				tabItem.tabCanvas.canvas.remove();
-				tabItem.tabCanvas = null;
-			}
-			tab._tabViewTabItem = null;
+			tabItem.destroy();
 			Storage.saveTab(tab, null);
 		}
 		catch(ex) {
@@ -1201,15 +1201,9 @@ this.TabItems = {
 	// Adds the given <TabItem> to the master list.
 	register: function(item) {
 		this.items.add(item);
+		this._tabsNeedingLabelsUpdate.add(item);
 		if(!item.tab.hasAttribute('pending') && !item.tab.hasAttribute("tabmix_pending")) {
 			this.update(item.tab);
-		}
-		else {
-			// This would be done in the update call above, but since we're bypassing it here...
-			this._tabsNeedingLabelsUpdate.add(item);
-			if(!this.isPaintingPaused()) {
-				item._updateLabels();
-			}
 		}
 	},
 
@@ -1219,6 +1213,7 @@ this.TabItems = {
 		this._tabsWaitingForUpdate.remove(item.tab);
 		this._tabsNeedingLabelsUpdate.delete(item);
 		this._staleTabs.remove(item);
+		this._queuedCachedThumbs.delete(item);
 	},
 
 	// Saves all open <TabItem>s.

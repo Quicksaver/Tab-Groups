@@ -1,4 +1,4 @@
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 this.PinnedItems = {
 	get actions() { return $('actions'); },
@@ -106,7 +106,7 @@ this.PinnedItems = {
 		Listeners.remove(this.actions, 'dragover', this);
 
 		for(let icon of this.icons.values()) {
-			icon.remove();
+			this.destroy(icon);
 		}
 		this.icons.clear();
 		removeAttribute(this.tray, 'visible');
@@ -226,8 +226,7 @@ this.PinnedItems = {
 
 			this.icons.set(tab, icon);
 			tab._tabViewAppItem = icon;
-			Watchers.addAttributeWatcher(tab, "busy", this);
-			Watchers.addAttributeWatcher(tab, "progress", this);
+			Watchers.addAttributeWatcher(tab, [ "busy", "progress" ], this);
 		}
 
 		if(sibling && sibling.isAnAppItem) {
@@ -251,13 +250,16 @@ this.PinnedItems = {
 
 		let icon = this.icons.get(tab);
 		if(icon) {
-			icon.remove();
-			Watchers.removeAttributeWatcher(tab, "busy", this);
-			Watchers.removeAttributeWatcher(tab, "progress", this);
 			this.icons.delete(tab);
-			delete tab._tabViewAppItem;
+			this.destroy(icon);
 			this.updateTray();
 		}
+	},
+
+	destroy: function(icon) {
+		icon.remove();
+		Watchers.removeAttributeWatcher(icon.tab, [ "busy", "progress" ], this);
+		delete icon.tab._tabViewAppItem;
 	},
 
 	// Arranges the given xul:tab as an app tab in the group's apptab tray

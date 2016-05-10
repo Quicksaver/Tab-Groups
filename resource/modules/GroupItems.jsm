@@ -1,4 +1,4 @@
-// VERSION 1.6.34
+// VERSION 1.6.35
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -867,9 +867,11 @@ this.GroupItem.prototype = {
 				this.lastMouseDownTarget = null;
 
 				let originalTarget = e.explicitOriginalTarget;
-				if(originalTarget.classList.contains("close")
-				|| originalTarget.classList.contains("group-options")
-				|| originalTarget.classList.contains("group-audio")) {
+				if(originalTarget
+				&& (	originalTarget.classList.contains("close")
+					|| originalTarget.classList.contains("group-options")
+					|| originalTarget.classList.contains("group-audio")
+				)) {
 					return;
 				}
 
@@ -961,11 +963,7 @@ this.GroupItem.prototype = {
 		this._unfreezeItemSize(true);
 
 		let destroyGroup = () => {
-			this.container.remove();
-			this.selector.remove();
-			this.destroyUndoButton();
-			this.removeTrenches();
-			Styles.unload('group_'+this.id+'_'+_UUID);
+			this.destroy();
 			GroupItems.unsquish();
 			this._sendToSubscribers("close");
 		};
@@ -983,6 +981,14 @@ this.GroupItem.prototype = {
 		}
 
 		this.deleteData();
+	},
+
+	destroy: function() {
+		this.container.remove();
+		this.selector.remove();
+		this.destroyUndoButton();
+		this.removeTrenches();
+		Styles.unload('group_'+this.id+'_'+_UUID);
 	},
 
 	// Closes the groupItem and all of its children.
@@ -1101,10 +1107,10 @@ this.GroupItem.prototype = {
 			}
 		}
 
-		let closed = this.destroy();
+		let closed = this.tryToClose();
 		if(!closed && createdGroup) {
 			// Remove the new group, if this group is no longer closed.
-			createdGroup.destroy({ immediately: true });
+			createdGroup.tryToClose({ immediately: true });
 		}
 	},
 
@@ -1115,7 +1121,7 @@ this.GroupItem.prototype = {
 	//   immediately - (bool) if true, no animation will be used
 	// Returns true if the groupItem has been closed, or false otherwise.
 	// A group could not have been closed due to a tab with an onUnload handler (that waits for user interaction).
-	destroy: function(options) {
+	tryToClose: function(options) {
 		// when "TabClose" event is fired, the browser tab is about to close and our item "close" event is fired. And then, the browser tab gets closed.
 		// In other words, the group "close" event is fired before all browser tabs in the group are closed.
 		// The below code would fire the group "close" event only after all browser tabs in that group are closed.
@@ -2093,7 +2099,7 @@ this.GroupItems = {
 	// Function: uninit
 	uninit: function() {
 		for(let group of this) {
-			Styles.unload('group_'+group.id+'_'+_UUID);
+			group.destroy();
 		}
 		Styles.unload("GroupItems.arrange_"+_UUID);
 

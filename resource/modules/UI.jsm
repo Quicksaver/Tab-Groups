@@ -1,4 +1,4 @@
-// VERSION 1.3.21
+// VERSION 1.3.22
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -537,8 +537,8 @@ this.UI = {
 			PinnedItems.init();
 
 			// ___ tabs
-			TabItems.init();
 			TabItems.pausePainting();
+			TabItems.init();
 
 			// ___ favicons
 			FavIcons.init();
