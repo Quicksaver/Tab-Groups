@@ -1,4 +1,4 @@
-// VERSION 1.1.5
+// VERSION 1.1.6
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -569,7 +569,8 @@ this.TabView = {
 		// When closing the last visible tab of a group (including pinned tabs), we open a new tab in its place, so that the group isn't closed immediately,
 		// giving the user a choise to keep using the same group.
 		// But if we're closing that new tab (really, any about:newtab or equivalent), we go into groups view.
-		if(!tab || tab.linkedBrowser.currentURI.spec == Prefs.url || window.BROWSER_NEW_TAB_URL) {
+		let newTabUrl = Prefs.url || window.BROWSER_NEW_TAB_URL;
+		if(!tab || tab.linkedBrowser.currentURI.spec == newTabUrl) {
 			// So that listeners inside TabView catch at the time the tab is opened but before it's assigned to our property here,
 			// as would happen when TabView is already initialized (the callback is synchronous).
 			this._closedLastVisibleTab = true;
@@ -773,8 +774,17 @@ Modules.LOADMODULE = function() {
 	window.TabView = TabView;
 
 	// We need to know what's the url for the new tab page, as other add-ons may override it.
-	// Even though this preference isn't used directly anymore, it still seems a valid reference point (so far).
-	Prefs.setDefaults({ url: '' }, 'newtab', 'browser');
+	// Even though this preference isn't used directly anymore, it still seems to be a valid reference point (so far).
+	let defaultBranch = Services.prefs.getDefaultBranch("browser.newtab.")
+	let defaultValue;
+	// Remember this preference went away in FF47 (I think), so this will throw because a default value doesn't actually exist.
+	try {
+		defaultValue = defaultBranch.getCharPref("url");
+	}
+	catch(ex) {
+		defaultValue = "";
+	}
+	Prefs.setDefaults({ url: defaultValue }, 'newtab', 'browser');
 
 	Modules.load('AllTabs');
 	Modules.load('CatchRules');
