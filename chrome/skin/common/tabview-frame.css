@@ -1026,6 +1026,10 @@ body:not(.showTabCounter) .tab-counter {
 	padding-top: 4px;
 	-moz-padding-start: 4px;
 	-moz-padding-end: 2px;
+	max-width: 40%;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
 body.single .tab-counter {
