@@ -1,4 +1,4 @@
-// VERSION 2.3.4
+// VERSION 2.3.5
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -905,7 +905,7 @@ this.TabDrag.prototype = {
 			dropTarget.add(this.item, { dontArrange: true });
 
 			// Make sure the thumbnail for that group is updated even when the group isn't active, to reflect this change.
-			dropTarget._updateThumb(true, true);
+			dropTarget.updateThumb(true);
 		}
 		// If we have a valid drop target (group), add the item to it.
 		else if(dropTarget.isAGroupItem) {

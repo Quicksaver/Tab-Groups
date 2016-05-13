@@ -1,4 +1,4 @@
-// VERSION 1.2.3
+// VERSION 1.3.0
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -397,5 +397,96 @@ this.MRUList.prototype = {
 
 	clear: function() {
 		this._list = [];
+	}
+};
+
+// Class: PriorityQueue - Container that returns items in a priority order
+// Current implementation assigns an item to either a high priority or low priority queue, and toggles which queue items are popped from.
+// This guarantees that high priority items which are constantly being added will not eclipse changes for lower priority items.
+// Instanciation requires a method that will be called when pushing items to the queue;
+// if this method returns true, the item is added to the high priority queue, otherwise it is added to the low priority queue.
+this.PriorityQueue = function(isHighPriority) {
+	this._isHighPriority = isHighPriority;
+
+	this._low = []; // low priority queue
+	this._high = []; // high priority queue
+};
+
+this.PriorityQueue.prototype = {
+	// Empty the update queue
+	clear: function() {
+		this._low = [];
+		this._high = [];
+	},
+
+	// Return whether pending items exist
+	hasItems: function() {
+		return (this._low.length > 0) || (this._high.length > 0);
+	},
+
+	// Returns all queued items, ordered from low to high priority
+	getItems: function() {
+		return this._high.concat(this._low);
+	},
+
+	// Add an item to be prioritized
+	push: function(item) {
+		// Push onto correct priority queue.
+		// If it already exists in the destination queue, leave it.
+		// If it exists in a different queue, remove it first and push onto new queue.
+		let highPriority = this._isHighPriority(item);
+		if(highPriority) {
+			let i = this._low.indexOf(item);
+			if(i != -1) {
+				this._low.splice(i, 1);
+			}
+			else if(this._high.indexOf(item) == -1) {
+				this._high.push(item);
+			}
+		}
+		else {
+			let i = this._high.indexOf(item);
+			if(i != -1) {
+				this._high.splice(i, 1);
+			}
+			else if(this._low.indexOf(item) == -1) {
+				this._low.push(item);
+			}
+		}
+	},
+
+	// Remove and return the next item in priority order
+	pop: function() {
+		if(this._high.length) {
+			return this._high.shift();
+		}
+		if(this._low.length) {
+			return this._low.shift();
+		}
+		return null;
+	},
+
+	// Return the next item in priority order, without removing it
+	peek: function() {
+		if(this._high.length) {
+			return this._high[0];
+		}
+		if(this._low.length) {
+			return this._low[0];
+		}
+		return null;
+	},
+
+	// Remove the passed item
+	remove: function(item) {
+		let i = this._high.indexOf(item);
+		if(i != -1) {
+			this._high.splice(i, 1);
+		} else {
+			i = this._low.indexOf(item);
+			if(i != -1) {
+				this._low.splice(i, 1);
+			}
+		}
 	}
 };

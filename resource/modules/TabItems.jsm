@@ -1,4 +1,4 @@
-// VERSION 1.2.15
+// VERSION 1.2.16
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -267,7 +267,7 @@ this.TabItem.prototype = {
 					this.tabCanvas.destroying.resolve();
 				}
 
-				this.parent._updateThumb(true, true);
+				this.parent.updateThumb(true);
 				break;
 
 			case 'error':
@@ -755,9 +755,25 @@ this.TabItems = {
 	init: function() {
 		// Set up tab priority queue
 		this._tabsNeedingLabelsUpdate = new Set();
-		this._tabsWaitingForUpdate = new TabPriorityQueue();
 		this._queuedCachedThumbs = new Map();
 		this._staleTabs = new MRUList();
+		this._tabsWaitingForUpdate = new PriorityQueue(function(tab) {
+			let item = tab._tabViewTabItem;
+			let parent = item.parent;
+
+			// This doesn't really happen, but if the tab isn't in any group, it won't be shown.
+			if(!parent) {
+				return false;
+			}
+
+			// In single view, we should give higher priority to tabs in the active group.
+			if(UI.single) {
+				return (parent == GroupItems.getActiveGroupItem());
+			}
+
+			// Otherwise, it's only low priority if it's in a stack, and isn't the top, and the stack isn't expanded.
+			return (!parent.isStacked || parent.isTopOfStack(item) || parent.expanded);
+		});
 
 		this.tabHeight = this._getHeightForWidth(this.tabWidth);
 		this.tabAspect = this.tabWidth / this.tabHeight;
@@ -1101,7 +1117,7 @@ this.TabItems = {
 		while(accumTime < this._maxTimeForUpdating && items.length) {
 			let updateBegin = Date.now();
 
-			yield this._update(items.pop());
+			yield this._update(items.shift());
 
 			// Maintain a simple average of time for each tabitem update
 			// We can use this as a base by which to delay things like tab zooming, so there aren't any hitches.
@@ -1175,6 +1191,7 @@ this.TabItems = {
 
 			// Ensure we override the heartbeat for staled tabs.
 			this.startHeartbeat(this._heartbeatTiming);
+			GroupItems.startHeartbeat();
 		}
 	},
 
@@ -1339,94 +1356,6 @@ this.TabItems = {
 		}
 
 		return new Point(Math.floor(width), Math.floor(height));
-	}
-};
-
-// Class: TabPriorityQueue - Container that returns tab items in a priority order
-// Current implementation assigns tab to either a high priority or low priority queue, and toggles which queue items are popped from.
-// This guarantees that high priority items which are constantly being added will not eclipse changes for lower priority items.
-this.TabPriorityQueue = function() {};
-
-this.TabPriorityQueue.prototype = {
-	_low: [], // low priority queue
-	_high: [], // high priority queue
-
-	// Empty the update queue
-	clear: function() {
-		this._low = [];
-		this._high = [];
-	},
-
-	// Return whether pending items exist
-	hasItems: function() {
-		return (this._low.length > 0) || (this._high.length > 0);
-	},
-
-	// Returns all queued items, ordered from low to high priority
-	getItems: function() {
-		return this._low.concat(this._high);
-	},
-
-	// Add an item to be prioritized
-	push: function(tab) {
-		// Push onto correct priority queue.
-		// It's only low priority if it's in a stack, and isn't the top, and the stack isn't expanded.
-		// If it already exists in the destination queue, leave it.
-		// If it exists in a different queue, remove it first and push onto new queue.
-		let item = tab._tabViewTabItem;
-		if(item.parent && (item.parent.isStacked && !item.parent.isTopOfStack(item) && !item.parent.expanded)) {
-			let idx = this._high.indexOf(tab);
-			if(idx != -1) {
-				this._high.splice(idx, 1);
-				this._low.unshift(tab);
-			} else if(this._low.indexOf(tab) == -1) {
-				this._low.unshift(tab);
-			}
-		}
-		else {
-			let idx = this._low.indexOf(tab);
-			if(idx != -1) {
-				this._low.splice(idx, 1);
-				this._high.unshift(tab);
-			} else if(this._high.indexOf(tab) == -1) {
-				this._high.unshift(tab);
-			}
-		}
-	},
-
-	// Remove and return the next item in priority order
-	pop: function() {
-		if(this._high.length) {
-			return this._high.pop();
-		}
-		if(this._low.length) {
-			return this._low.pop();
-		}
-		return null;
-	},
-
-	// Return the next item in priority order, without removing it
-	peek: function() {
-		if(this._high.length) {
-			return this._high[this._high.length-1];
-		}
-		if(this._low.length) {
-			return this._low[this._low.length-1];
-		}
-		return null;
-	},
-
-	// Remove the passed item
-	remove: function(tab) {
-		let index = this._high.indexOf(tab);
-		if(index != -1) {
-			this._high.splice(index, 1);
-		} else {
-			index = this._low.indexOf(tab);
-			if(index != -1) {
-				this._low.splice(index, 1);
-			}
-		}
 	}
 };
 

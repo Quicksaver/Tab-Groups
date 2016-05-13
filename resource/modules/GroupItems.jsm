@@ -1,4 +1,4 @@
-// VERSION 1.6.35
+// VERSION 1.6.36
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -432,6 +432,8 @@ this.GroupItem.prototype = {
 		} else {
 			bounds = new Rect((UI.classic) ? this.bounds : this._gridBounds);
 		}
+		// The following line takes 100ms longer on the first iniitalization in grid layout.
+		// Because it's the first call to getting values from the stylesheet? I dunno...
 		bounds.width -= UICache.groupContentsMargin.x;
 		bounds.height -= UICache.groupContentsMargin.y;
 		bounds.height -= UICache.groupTitlebarHeight;
@@ -930,7 +932,7 @@ this.GroupItem.prototype = {
 				break;
 
 			case 'painted':
-				this._updateThumb(true);
+				this.updateThumb();
 				break;
 		}
 	},
@@ -1701,7 +1703,7 @@ this.GroupItem.prototype = {
 			Styles.unload('group_'+this.id+'_'+_UUID);
 
 			// We don't show the group's thumb in this case either, since there would be nothing to show in it.
-			this._updateThumb();
+			this.updateThumb();
 			return;
 		}
 
@@ -1781,8 +1783,7 @@ this.GroupItem.prototype = {
 		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);
 
 		// Update the group's thumb if necessary in single view's top selectors.
-		// There's no need to update immediately if the group already has a thumb.
-		this._updateThumb(!!this._lastThumb);
+		this.updateThumb();
 	},
 
 	expand: function() {
@@ -1898,24 +1899,12 @@ this.GroupItem.prototype = {
 		this.arrange();
 	},
 
-	_clearThumbNeedsUpdate: function() {
-		if(this._thumbNeedsUpdate) {
-			this._thumbNeedsUpdate.cancel();
-			this._thumbNeedsUpdate = null;
-			return true;
-		}
-		return false;
-	},
-
-	_updateThumb: function(delay, force) {
+	updateThumb: function(force) {
 		if(!UI.single || !this.showThumbs || !Prefs.showGroupThumbs) {
-			this._clearThumbNeedsUpdate();
+			GroupItems._thumbsNeedingUpdate.remove(this);
 			this.canvas.hidden = true;
 			return;
 		}
-
-		let canvas = this.canvas;
-		canvas.hidden = false;
 
 		// Discard the previous thumb data so that we're sure to update it afterwards.
 		// (Doesn't actually delete the thumb, only "expires" it.)
@@ -1923,29 +1912,29 @@ this.GroupItem.prototype = {
 			this._lastThumb = null;
 		}
 
-		if(delay) {
-			if(!this._thumbNeedsUpdate) {
-				this._thumbNeedsUpdate = aSync(() => {
-					// Add-on could have been disabled or the window could have closed.
-					if(typeof(GroupItems) == 'undefined') { return; }
-
-					this._updateThumb();
-				}, 1000);
-			}
-			return;
+		let shouldStart = !GroupItems._thumbsNeedingUpdate.hasItems();
+		GroupItems._thumbsNeedingUpdate.push(this);
+		if(shouldStart) {
+			GroupItems.startHeartbeat();
 		}
+	},
+
+	_updateThumb: function() {
+		GroupItems._thumbsNeedingUpdate.remove(this);
+
+		let canvas = this.canvas;
+		canvas.hidden = false;
 
 		let isActive = GroupItems.getActiveGroupItem() == this && !this.hidden;
 		let bounds = UI.getPageBounds();
 		let count = this.count();
-		let needsUpdate = this._clearThumbNeedsUpdate();
 
 		// Don't update the thumb if nothing has changed in the group.
 		if(this._lastThumb) {
 			// Don't update the thumb of a background group until it is selected.
 			if(!isActive) { return; }
 
-			if(!needsUpdate && bounds.equals(this._lastThumb.bounds) && count == this._lastThumb.count) { return; }
+			if(bounds.equals(this._lastThumb.bounds) && count == this._lastThumb.count) { return; }
 		}
 		this._lastThumb = { bounds, count };
 
@@ -2039,6 +2028,8 @@ this.GroupItems = {
 	nextID: 1,
 	_inited: false,
 	_fragment: null,
+	_heartbeatTiming: 250, // milliseconds between calls
+	_maxTimeForUpdating: 25, // milliseconds that consecutive updates can take
 	_activeGroupItem: null,
 	_arrangePaused: false,
 	_arrangesPending: new Set(),
@@ -2087,6 +2078,10 @@ this.GroupItems = {
 	// Function: init
 	init: function() {
 		this._lastActiveList = new MRUList();
+		this._thumbsNeedingUpdate = new PriorityQueue(function(groupItem) {
+			// We should set the group's first thumb as soon as possible, so it doesn't have a noticeable empty space in its place for long.
+			return !groupItem._lastThumb && !groupItem.canvas.hidden;
+		});
 
 		this.minGroupHeight = UICache.minGroupHeight;
 		this.minGroupWidth = UICache.minGroupWidth;
@@ -2181,6 +2176,7 @@ this.GroupItems = {
 			let canvas = document.createElement('canvas');
 			canvas.classList.add('groupThumb');
 			canvas.setAttribute('moz-opaque', '');
+			canvas.setAttribute('hidden', '');
 			selector.appendChild(canvas);
 
 			let selectorTitle = document.createElement('span');
@@ -2479,6 +2475,7 @@ this.GroupItems = {
 		}
 
 		this._lastActiveList.remove(groupItem);
+		this._thumbsNeedingUpdate.remove(groupItem);
 		this._arrangesPending.delete(groupItem);
 		this.arrange(true);
 
@@ -2574,7 +2571,7 @@ this.GroupItems = {
 		this._save();
 
 		// When changing the current groupItem while in single view, make sure its thumb is up-to-date.
-		groupItem._updateThumb(true);
+		groupItem.updateThumb();
 	},
 
 	// Gets last active group item. Returns the <groupItem>. If nothing is found, return null.
@@ -3227,5 +3224,51 @@ this.GroupItems = {
 	// Re-enables the auto-close behavior.
 	resumeAutoclose: function() {
 		this._autoclosePaused = false;
-	}
+	},
+
+	// Start a new heartbeat if there isn't one already started. The heartbeat is a chain of aSync calls that allows us to spread
+	// out update calls over a period of time. We make sure not to add multiple aSync chains.
+	startHeartbeat: function() {
+		// There's no point, group thumbs are only shown in single mode.
+		if(!UI.single) { return; }
+
+		if(!Timers.groupThumbsHeartbeat) {
+			Timers.init('groupThumbsHeartbeat', () => {
+				this._checkHeartbeat();
+			}, this._heartbeatTiming);
+		}
+	},
+
+	// This periodically checks for group's thumbs waiting to be updated, and calls _updateThumb on them.
+	// Should only be called by startHeartbeat and resumePainting.
+	_checkHeartbeat: Task.async(function* () {
+		// We follow the same rules as TabItems's tab thumbs hearbeat here; if they don't paint, we don't either.
+		if(TabItems.isPaintingPaused()) { return; }
+
+		// restart the heartbeat to update once the UI becomes idle
+		if(!UI.isIdle()) {
+			this.startHeartbeat();
+			return;
+		}
+
+		let accumTime = 0;
+		let items = this._thumbsNeedingUpdate.getItems();
+		// Do as many updates as we can fit into a "perceived" amount of time, which is tunable.
+		while(accumTime < this._maxTimeForUpdating && items.length) {
+			let updateBegin = Date.now();
+
+			let groupItem = items.shift();
+			groupItem._updateThumb();
+
+			// Maintain a simple average of time for each tabitem update
+			// We can use this as a base by which to delay things like tab zooming, so there aren't any hitches.
+			let updateEnd = Date.now();
+			let deltaTime = updateEnd - updateBegin;
+			accumTime += deltaTime;
+		}
+
+		if(this._thumbsNeedingUpdate.hasItems()) {
+			this.startHeartbeat();
+		}
+	})
 };

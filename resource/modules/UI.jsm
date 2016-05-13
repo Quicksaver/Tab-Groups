@@ -1,4 +1,4 @@
-// VERSION 1.3.22
+// VERSION 1.3.23
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -433,7 +433,7 @@ this.UI = {
 					this._resize(true);
 					for(let groupItem of GroupItems) {
 						groupItem.setTitle(groupItem.getTitle());
-						groupItem._updateThumb(true);
+						groupItem.updateThumb();
 					}
 				}
 				break;
@@ -702,6 +702,7 @@ this.UI = {
 
 		try {
 			GroupItems.pauseArrange();
+			TabItems.pausePainting();
 
 			// Any hidden (closed) groups are removed from view when toggling between modes.
 			GroupItems.removeHiddenGroups();
@@ -719,6 +720,7 @@ this.UI = {
 		}
 		finally {
 			GroupItems.resumeArrange();
+			TabItems.resumePainting();
 		}
 	},
 
@@ -2033,9 +2035,11 @@ this.UICache = {
 		});
 
 		this.ghost('groupContentsMargin', function() {
+			let val = parseInt(style.getPropertyValue('--group-contents-margin'));
+			let top = parseInt(style.getPropertyValue('--group-contents-top-margin'));
 			return {
-				x: parseInt(style.getPropertyValue('--group-contents-margin')) *2,
-				y: parseInt(style.getPropertyValue('--group-contents-margin')) + parseInt(style.getPropertyValue('--group-contents-top-margin'))
+				x: val *2,
+				y: val + top
 			};
 		});
 

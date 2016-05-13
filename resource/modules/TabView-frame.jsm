@@ -1,4 +1,4 @@
-// VERSION 1.0.14
+// VERSION 1.0.15
 
 this.__defineGetter__('gWindow', function() { return window.parent; });
 this.__defineGetter__('gBrowser', function() { return gWindow.gBrowser; });
@@ -23,7 +23,7 @@ this.TabView = {
 		'Point', 'Rect', 'Range', 'Subscribable', 'Utils', 'MRUList',
 		'iQ',
 		'GroupItem', 'GroupItems', 'PinnedItems',
-		'TabItem', 'TabItems', 'TabPriorityQueue', 'TabCanvas',
+		'TabItem', 'TabItems', 'TabCanvas',
 		'FavIcons',
 		'Trench', 'Trenches',
 		'TabUtils', 'TabMatcher', 'Search',
