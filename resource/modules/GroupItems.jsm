@@ -1,4 +1,4 @@
-// VERSION 1.6.36
+// VERSION 1.6.37
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2024,7 +2024,7 @@ this.GroupItem.prototype = {
 
 // Singleton for managing all <GroupItem>s.
 this.GroupItems = {
-	groupItems: new Map(),
+	_items: new Map(),
 	nextID: 1,
 	_inited: false,
 	_fragment: null,
@@ -2040,12 +2040,12 @@ this.GroupItems = {
 	workSpace: $('groups'),
 
 	[Symbol.iterator]: function* () {
-		for(let groupItem of this.groupItems.values()) {
+		for(let groupItem of this._items.values()) {
 			yield groupItem;
 		}
 	},
 	get [0]() {
-		for(let groupItem of this.groupItems.values()) {
+		for(let groupItem of this._items.values()) {
 			return groupItem;
 		}
 	},
@@ -2057,6 +2057,15 @@ this.GroupItems = {
 			}
 		}
 		return size;
+	},
+
+	// For backwards compatibility with Tab Groups Helper
+	get groupItems() {
+		let groups = [];
+		for(let groupItem of this) {
+			groups.push(groupItem);
+		}
+		return groups;
 	},
 
 	// Will be calc'ed in init() from the values above.
@@ -2099,7 +2108,7 @@ this.GroupItems = {
 		Styles.unload("GroupItems.arrange_"+_UUID);
 
 		// additional clean up
-		this.groupItems = new Map();
+		this._items = new Map();
 	},
 
 	fragment: function() {
@@ -2459,7 +2468,7 @@ this.GroupItems = {
 
 	// Adds the given <GroupItem> to the list of groupItems we're tracking.
 	register: function(groupItem) {
-		this.groupItems.set(groupItem.id, groupItem);
+		this._items.set(groupItem.id, groupItem);
 
 		this._lastActiveList.append(groupItem);
 		this.arrange(true);
@@ -2468,7 +2477,7 @@ this.GroupItems = {
 
 	// Removes the given <GroupItem> from the list of groupItems we're tracking.
 	unregister: function(groupItem) {
-		this.groupItems.delete(groupItem.id);
+		this._items.delete(groupItem.id);
 
 		if(groupItem == this._activeGroupItem) {
 			this._activeGroupItem = null;
@@ -2484,7 +2493,7 @@ this.GroupItems = {
 
 	// Given some sort of identifier, returns the appropriate groupItem. Currently only supports groupItem ids.
 	groupItem: function(a) {
-		return this.groupItems.get(a) || null;
+		return this._items.get(a) || null;
 	},
 
 	// Removes all tabs from all groupItems (which automatically closes all unnamed groupItems).
