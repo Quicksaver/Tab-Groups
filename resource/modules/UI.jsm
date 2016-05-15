@@ -1,4 +1,4 @@
-// VERSION 1.3.23
+// VERSION 1.3.24
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -52,7 +52,7 @@ this.UI = {
 	_isChangingVisibility: false,
 
 	// Keeps track of the <GroupItem>s which their tab items' tabs have been moved and re-orders the tab items when switching to TabView.
-	_reorderTabItemsOnShow: [],
+	_reorderTabItemsOnShow: new Set(),
 
 	// Keeps track of the <GroupItem>s which their tab items have been moved in TabView UI and re-orders the tabs when switcing back to main browser.
 	_reorderTabsOnHide: new Set(),
@@ -630,7 +630,7 @@ this.UI = {
 
 		this._currentTab = null;
 		this._pageBounds = null;
-		this._reorderTabItemsOnShow = null;
+		this._reorderTabItemsOnShow = new Set();
 		this._reorderTabsOnHide = new Set();
 		this._frameInitialized = false;
 	},
@@ -977,7 +977,6 @@ this.UI = {
 			for(let groupItem of this._reorderTabItemsOnShow) {
 				groupItem.reorderTabItemsBasedOnTabOrder();
 			}
-			this._reorderTabItemsOnShow = [];
 
 			gTabViewDeck.selectedPanel = gTabViewFrame;
 			gWindow.TabsInTitlebar.allowedBy("tabview-open", false);
@@ -1296,10 +1295,7 @@ this.UI = {
 	//   groupItem - the groupItem which would be used for re-ordering tab items.
 	setReorderTabItemsOnShow: function(groupItem) {
 		if(!this.isTabViewVisible()) {
-			let index = this._reorderTabItemsOnShow.indexOf(groupItem);
-			if(index == -1) {
-				this._reorderTabItemsOnShow.push(groupItem);
-			}
+			this._reorderTabItemsOnShow.add(groupItem);
 		}
 	},
 

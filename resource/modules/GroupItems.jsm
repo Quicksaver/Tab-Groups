@@ -1,4 +1,4 @@
-// VERSION 1.6.38
+// VERSION 1.6.39
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1995,6 +1995,8 @@ this.GroupItem.prototype = {
 	// Reorders the tabs in a groupItem based on the arrangement of the tabs shown in the tab bar.
 	// It does it by sorting the children of the groupItem by the positions of their respective tabs in the tab bar.
 	reorderTabItemsBasedOnTabOrder: function(justItems) {
+		UI._reorderTabItemsOnShow.delete(this);
+
 		if(!justItems) {
 			this.children.sort((a,b) => a.tab._tPos - b.tab._tPos);
 		}

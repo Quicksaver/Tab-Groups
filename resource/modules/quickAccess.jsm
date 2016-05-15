@@ -1,4 +1,4 @@
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -287,6 +287,11 @@ this.quickAccess = {
 
 		let label = this._createLabel(groupItem.getTitle(true));
 		this.contents.appendChild(label);
+
+		// The tab order should be updated if necessary.
+		if(TabView._window[objName].UI._reorderTabItemsOnShow.has(groupItem)) {
+			groupItem.reorderTabItemsBasedOnTabOrder();
+		}
 
 		let activeTab = TabView._window[objName].UI._currentTab;
 		let tabItems = groupItem.children;
