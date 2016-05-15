@@ -1,0 +1,90 @@
+@-moz-document url("chrome://browser/content/browser.xul") {
+	.tabGroups-quickaccess-panel-footer > toolbarbutton,
+	#tabGroups-tabview-button {
+		list-style-image: url("chrome://browser/skin/Toolbar.png");
+		-moz-image-region: rect(0, 648px, 18px, 630px);
+	}
+	@media (min-resolution: 1.25dppx) {
+		.tabGroups-quickaccess-panel-footer > toolbarbutton,
+		#tabGroups-tabview-button {
+			list-style-image: url("chrome://browser/skin/Toolbar.svg");
+		}
+	}
+
+	toolbar[brighttext] #tabGroups-tabview-button {
+		list-style-image: url(chrome://browser/skin/Toolbar-inverted.png);
+	}
+	@media (min-resolution: 1.25dppx) {
+		toolbar[brighttext] #tabGroups-tabview-button {
+			list-style-image: url(chrome://browser/skin/Toolbar-inverted.svg);
+		}
+	}
+
+	#tabGroups-tabview-button[cui-areatype="menu-panel"],
+	toolbarpaletteitem[place="palette"] > #tabGroups-tabview-button {
+		list-style-image: url(chrome://browser/skin/menuPanel.png);
+		-moz-image-region: rect(0px, 608px, 32px, 576px);
+	}
+	@media (min-resolution: 1.25dppx) {
+		#tabGroups-tabview-button[cui-areatype="menu-panel"],
+		toolbarpaletteitem[place="palette"] > #tabGroups-tabview-button {
+			list-style-image: url(chrome://browser/skin/menuPanel.svg);
+		}
+	}
+
+	#main-window[tabsintitlebar]:not([inFullscreen]) :-moz-any(#TabsToolbar, #toolbar-menubar) > toolbarpaletteitem > #tabGroups-tabview-button:-moz-system-metric(windows-classic):not(:-moz-lwtheme),
+	#main-window[tabsintitlebar]:not([inFullscreen]) :-moz-any(#TabsToolbar, #toolbar-menubar) > #tabGroups-tabview-button:-moz-system-metric(windows-classic):not(:-moz-lwtheme) {
+		position: relative;
+		z-index: 1;
+		list-style-image: url("chrome://browser/skin/Toolbar-inverted.png");
+	}
+	@media (min-resolution: 1.25dppx) {
+		#main-window[tabsintitlebar]:not([inFullscreen]) :-moz-any(#TabsToolbar, #toolbar-menubar) > toolbarpaletteitem > #tabGroups-tabview-button:-moz-system-metric(windows-classic):not(:-moz-lwtheme),
+		#main-window[tabsintitlebar]:not([inFullscreen]) :-moz-any(#TabsToolbar, #toolbar-menubar) > #tabGroups-tabview-button:-moz-system-metric(windows-classic):not(:-moz-lwtheme) {
+			list-style-image: url("chrome://browser/skin/Toolbar-inverted.svg");
+		}
+	}
+
+	@media (-moz-windows-glass) {
+		/* Use inverted icons for glassed toolbars */
+		#toolbar-menubar > toolbarpaletteitem > #tabGroups-tabview-button:not(:-moz-lwtheme),
+		#toolbar-menubar > #tabGroups-tabview-button:not(:-moz-lwtheme),
+		#TabsToolbar > toolbarpaletteitem > #tabGroups-tabview-button:not(:-moz-lwtheme),
+		#TabsToolbar > #tabGroups-tabview-button:not(:-moz-lwtheme) {
+			list-style-image: url("chrome://browser/skin/Toolbar-inverted.png");
+		}
+		@media (min-resolution: 1.25dppx) {
+			/* Use inverted icons for glassed toolbars */
+			#toolbar-menubar > toolbarpaletteitem > #tabGroups-tabview-button:not(:-moz-lwtheme),
+			#toolbar-menubar > #tabGroups-tabview-button:not(:-moz-lwtheme),
+			#TabsToolbar > toolbarpaletteitem > #tabGroups-tabview-button:not(:-moz-lwtheme),
+			#TabsToolbar > #tabGroups-tabview-button:not(:-moz-lwtheme) {
+				list-style-image: url("chrome://browser/skin/Toolbar-inverted.svg");
+			}
+		}
+	}
+
+	.tabGroups-quickaccess-panel-footer > toolbarbutton.tabGroups-quickaccess-panel-settings {
+		-moz-image-region: rect(0, 468px, 18px, 450px);
+	}
+}
+
+@-moz-document url-prefix("about:tabgroups") {
+	#categories .category image { list-style-image: url("chrome://tabgroups/skin/panes@2x.png"); }
+	#categories .category[value="paneTabGroups"] image { -moz-image-region: rect(0px 96px 48px 48px); }
+	#categories .category[value="paneHowTo"] image { -moz-image-region: rect(0px 144px 48px 96px); }
+	#categories .category[value="paneSession"] image { -moz-image-region: rect(0px 192px 48px 144px); }
+}
+
+@-moz-document url("chrome://tabgroups/content/tabview.xhtml") {
+	body {
+		font: message-box;
+		color: rgb(166,166,166);
+		font-size: 13px;
+		background-color: rgb(24,24,24);
+	}
+
+	body:not(:-moz-system-metric(windows-compositor)) {
+		background-color: rgb(24,24,24);
+	}
+}

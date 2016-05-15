@@ -1,4 +1,4 @@
-// VERSION 1.1.6
+// VERSION 1.1.7
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -199,6 +199,9 @@ this.TabView = {
 			}
 		}
 		catch(ex) {}
+
+		// Try to adapt to dark themes, even OS ones.
+		brightText.check(document.documentElement);
 
 		Listeners.add(this.tooltip, "popupshowing", this, true);
 		Listeners.add(this.tabMenuPopup, "popupshowing", this);
