@@ -1,4 +1,4 @@
-// VERSION 1.3.25
+// VERSION 1.3.26
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1986,6 +1986,26 @@ this.UI = {
 
 // Keep a few values cached, to avoid constant reflows.
 this.UICache = {
+	_blackCanvases: new Map(),
+
+	blackCanvas: function(aCanvas) {
+		let w = aCanvas.width;
+		let h = aCanvas.height;
+		let id = w+'x'+h;
+		let dataURL = this._blackCanvases.get(id);
+		if(!dataURL) {
+			let canvas = TabItems.canvasFragment();
+			canvas.width = w;
+			canvas.height = h;
+			let ctx = canvas.getContext("2d");
+			ctx.fillStyle = "rgb(0,0,0)";
+			ctx.fillRect(0, 0, w, h);
+			dataURL = canvas.toDataURL();
+			this._blackCanvases.set(id, dataURL);
+		}
+		return dataURL;
+	},
+
 	ghost: function(aName, aLambda) {
 		this.__defineGetter__(aName, () => {
 			delete this[aName];

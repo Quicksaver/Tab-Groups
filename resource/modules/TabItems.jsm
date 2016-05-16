@@ -1,4 +1,4 @@
-// VERSION 1.2.17
+// VERSION 1.2.18
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -36,6 +36,7 @@ this.TabItem = function(tab, options = {}) {
 	this._draggable = true;
 	this.lastMouseDownTarget = null;
 	this._thumbNeedsUpdate = false;
+	this._hasHadThumb = false;
 	this._soundplaying = false;
 
 	this.container.addEventListener('mousedown', this);
@@ -674,9 +675,11 @@ this.TabItem.prototype = {
 		}
 
 		return new Promise((resolve, reject) => {
-			this.tabCanvas.update(() => {
-				this._sendToSubscribers("painted");
-				this.hideCachedThumb();
+			this.tabCanvas.update((painted) => {
+				if(painted) {
+					this._sendToSubscribers("painted");
+					this.hideCachedThumb();
+				}
 				resolve();
 			});
 		});
@@ -923,6 +926,12 @@ this.TabItems = {
 		return new Promise(function(resolve, reject) {
 			// A pending tab can't be complete, yet.
 			if(tab.hasAttribute("pending") || tab.hasAttribute("tabmix_pending")) {
+				// If a loaded tab becomes unloaded (through other add-ons), assume the next time it is loaded it may lead to a black canvas again.
+				// See notes about this in TabCanvas.update() below.
+				if(tab._tabViewTabItem) {
+					tab._tabViewTabItem._hasHadThumb = false;
+				}
+
 				resolve(false);
 				return;
 			}
@@ -969,10 +978,7 @@ this.TabItems = {
 	// Takes in a xul:tab.
 	// Parameters:
 	//   tab - a xul tab to update
-	//   options - an object with additional parameters, see below
-	// Possible options:
-	//   force - true to always update the tab item even if it's incomplete
-	_update: Task.async(function* (tab, options = {}) {
+	_update: Task.async(function* (tab) {
 		try {
 			// ___ remove from waiting list now that we have no other early returns
 			this._tabsWaitingForUpdate.remove(tab);
@@ -992,17 +998,13 @@ this.TabItems = {
 			tabItem._thumbNeedsUpdate = false;
 
 			// ___ Make sure the tab is complete and ready for updating.
-			if(options.force) {
+			let isComplete = yield this._isComplete(tab);
+			if(!Utils.isValidXULTab(tab) || tab.pinned) { return; }
+
+			if(isComplete) {
 				yield tabItem.updateCanvas();
 			} else {
-				let isComplete = yield this._isComplete(tab);
-				if(!Utils.isValidXULTab(tab) || tab.pinned) { return; }
-
-				if(isComplete) {
-					yield tabItem.updateCanvas();
-				} else {
-					this._tabsWaitingForUpdate.push(tab);
-				}
+				this._tabsWaitingForUpdate.push(tab);
 			}
 		}
 		catch(ex) {
@@ -1423,7 +1425,8 @@ this.TabCanvas.prototype = {
 						});
 					}
 					catch(ex) {
-						Cu.reportError("Tab Groups: exception thrown during thumbnail capture: '" + ex + "'");
+						Cu.reportError("Tab Groups: exception thrown during thumbnail capture.");
+						Cu.reportError(ex);
 					}
 				}
 			});
@@ -1450,25 +1453,43 @@ this.TabCanvas.prototype = {
 
 		let browser = this.tab.linkedBrowser;
 		PageThumbs.captureToCanvas(browser, canvas, () => {
+			let painted = !dimsChanged;
+
 			if(dimsChanged) {
-				// We only append the canvas to the DOM once we paint it, to avoid showing a black/blank canvas while it's being painted.
-				if(!this.canvas.parentNode) {
-					this.tabItem.thumb.appendChild(this.canvas);
-				}
-				this.canvas.width = size.x;
-				this.canvas.height = size.y;
-				try {
-					let ctx = this.canvas.getContext('2d');
-					ctx.drawImage(canvas, 0, 0);
-				}
-				catch(ex) {
-					// Can't draw if the canvas created by page thumbs isn't valid. This can happen during shutdown.
+				// In non-e10s, many times the first canvas returned is completely black, probably because it tries to paint it too soon.
+				// I haven't been able to figure out if this a problem with how soon we are trying to paint, or a problem with PageThumbs itself,
+				// although it seems like snapshotCanvas in PageThumbUtils.createSnapshotThumbnail() is black already.
+				// This doesn't seem to happen in e10s with remote browsers.
+				// (This is not about local pages, but remote pages on non-remote browsers.)
+				// The toDataURL() call is a little expensive, so lets try to only use it when it can actually make a difference;
+				let isBlack =	!browser.isRemoteBrowser
+						&& !this.canvas.parentNode
+						&& !this.tabItem._hasHadThumb
+						&& canvas.toDataURL() == UICache.blackCanvas(canvas);
+				if(!isBlack) {
+					// We only append the canvas to the DOM once we paint it, to avoid showing a black/blank canvas while it's being painted.
+					if(!this.canvas.parentNode) {
+						this.tabItem.thumb.appendChild(this.canvas);
+						this.tabItem._hasHadThumb = true;
+					}
+					this.canvas.width = size.x;
+					this.canvas.height = size.y;
+					try {
+						let ctx = this.canvas.getContext('2d');
+						ctx.drawImage(canvas, 0, 0);
+						painted = true;
+					}
+					catch(ex) {
+						// Can't draw if the canvas created by page thumbs isn't valid. This can happen during shutdown.
+					}
 				}
 			}
 
-			this.persist(browser);
+			if(painted) {
+				this.persist(browser);
+			}
 			if(callback) {
-				callback();
+				callback(painted);
 			}
 		});
 	},
