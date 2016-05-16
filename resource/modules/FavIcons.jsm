@@ -1,4 +1,4 @@
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 this.FavIcons = {
 	waiting: new Set(),
@@ -138,9 +138,7 @@ Modules.LOADMODULE = function() {
 };
 
 Modules.UNLOADMODULE = function() {
-	if(FavIcons.waiting.size) {
-		for(let receiver of FavIcons.waiting.size) {
-			receiver.reject();
-		}
+	for(let receiver of FavIcons.waiting) {
+		receiver.reject();
 	}
 };

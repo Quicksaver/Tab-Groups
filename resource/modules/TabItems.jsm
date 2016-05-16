@@ -1,4 +1,4 @@
-// VERSION 1.2.16
+// VERSION 1.2.17
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -587,6 +587,12 @@ this.TabItem.prototype = {
 			}
 
 			FavIcons.getFavIconUrlForTab(this.tab, (iconUrl) => {
+				// Add-on disabled or window closed in the meantime.
+				if(typeof(TabItems) == 'undefined') {
+					reject();
+					return;
+				}
+
 				if(iconUrl) {
 					this.fav._iconUrl = iconUrl;
 					this.fav.style.backgroundImage = 'url("'+iconUrl+'")';
