@@ -1,4 +1,4 @@
-// VERSION 1.3.24
+// VERSION 1.3.25
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -466,7 +466,7 @@ this.UI = {
 				this.storageBusy();
 			}
 
-			let data = Storage.readUIData(gWindow);
+			let data = Storage.readUIData(gWindow) || {};
 			this.storageSanity(data);
 			this._pageBounds = data.pageBounds;
 

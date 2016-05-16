@@ -1,4 +1,4 @@
-// VERSION 1.6.39
+// VERSION 1.6.40
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1463,7 +1463,7 @@ this.GroupItem.prototype = {
 
 			// If we just closed the active and last visible tab in the tab-bar.
 			// create and select a placeholder tab to prevent other tabs from being loaded unnecessarily.
-			if(!this.children.length && !Tabs.numPinned) {
+			if(UI._frameInitialized && !this.children.length && !Tabs.numPinned) {
 				gTabView.onCloseLastTab();
 			}
 

@@ -1,4 +1,4 @@
-// VERSION 1.1.9
+// VERSION 1.1.10
 
 this.paneSession = {
 	manualAction: false,
@@ -795,11 +795,7 @@ this.paneSession = {
 		Storage._scope.SessionStoreInternal.onLoad(gWindow);
 
 		// get the next id to be used for the imported groups
-		let groups = Storage.readGroupItemData(gWindow);
-		let groupItems = Storage.readGroupItemsData(gWindow);
-		if(!groupItems) {
-			groupItems = {};
-		}
+		let groupItems = Storage.readGroupItemsData(gWindow) || {};
 		if(!groupItems.nextID) {
 			groupItems.nextID = 1;
 		}

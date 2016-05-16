@@ -1,4 +1,4 @@
-// VERSION 1.1.4
+// VERSION 1.2.0
 
 this.Storage = {
 	kGroupIdentifier: "tabview-group",
@@ -16,59 +16,48 @@ this.Storage = {
 
 	// Load tab data from session store and return it.
 	getTabData: function(tab) {
-		let existingData = null;
-
 		try {
 			let tabData = SessionStore.getTabValue(tab, this.kTabIdentifier);
-			if(tabData != "") {
-				existingData = JSON.parse(tabData);
+			if(tabData) {
+				return JSON.parse(tabData);
 			}
 		}
 		catch(ex) { /* getTabValue will fail if the property doesn't exist. */ }
 
-		return existingData;
+		return null;
 	},
 
 	// Returns the current state of the given tab.
 	getTabState: function(tab) {
-		let tabState;
-
 		try {
-			tabState = JSON.parse(SessionStore.getTabState(tab));
+			let tabState = SessionStore.getTabState(tab);
+			if(tabState) {
+				return JSON.parse(tabState);
+			}
 		}
 		catch(ex) {}
 
-		return tabState;
+		return null;
 	},
 
 	// Saves the data for a single groupItem, associated with a specific window.
 	saveGroupItem: function(win, data) {
 		let id = data.id;
-		let existingData = this.readGroupItemData(win);
+		let existingData = this.readGroupItemData(win) || {};
 		existingData[id] = data;
-		SessionStore.setWindowValue(win, this.kGroupIdentifier, JSON.stringify(existingData));
+		this.saveData(win, this.kGroupIdentifier, existingData);
 	},
 
 	// Deletes the data for a single groupItem from the given window.
 	deleteGroupItem: function(win, id) {
-		let existingData = this.readGroupItemData(win);
+		let existingData = this.readGroupItemData(win) || {};
 		delete existingData[id];
-		SessionStore.setWindowValue(win, this.kGroupIdentifier, JSON.stringify(existingData));
+		this.saveData(win, this.kGroupIdentifier, existingData);
 	},
 
 	// Returns the data for all groupItems associated with the given window.
 	readGroupItemData: function(win) {
-		let existingData = {};
-
-		try {
-			let data = SessionStore.getWindowValue(win, this.kGroupIdentifier);
-			if(data) {
-				existingData = JSON.parse(data);
-			}
-		}
-		catch(ex) { /* getWindowValue will fail if the property doesn't exist */ }
-
-		return existingData;
+		return this.readData(win, this.kGroupIdentifier);
 	},
 
 	// Returns the current busyState for the given window.
@@ -116,16 +105,15 @@ this.Storage = {
 
 	// Generic routine for reading data from a window.
 	readData: function(win, id) {
-		let existingData = {};
 		try {
 			let data = SessionStore.getWindowValue(win, id);
 			if(data) {
-				existingData = JSON.parse(data);
+				return JSON.parse(data);
 			}
 		}
 		catch(ex) {}
 
-		return existingData;
+		return null;
 	}
 };
 

@@ -1,4 +1,4 @@
-// VERSION 1.1.7
+// VERSION 1.1.8
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -738,10 +738,19 @@ this.TabView = {
 			if(this._window) {
 				resolve(this._window[objName].GroupItems.getActiveGroupTitle());
 			} else {
+				// If there's no groupsData saved, it's extremely unlikely there are actual groups in this window; i.e. new windows won't have this for sure.
+				// So assume there's no name to show and skip TabView's initialization entirely.
 				let groupsData = Storage.readGroupItemsData(window);
-				if(groupsData && groupsData.activeGroupName !== undefined) {
+				if(!groupsData) {
+					resolve(null);
+					return;
+				}
+
+				if(groupsData.activeGroupName !== undefined) {
 					resolve(groupsData.activeGroupName);
 				} else {
+					// We only initialize TabView if there is some data to process but there's not an activeGroupName saved.
+					// This way, TabView's initialization will take care of "re-selecting" the active group and update the activeGroupName.
 					this._initFrame(() => {
 						resolve(this._window[objName].GroupItems.getActiveGroupTitle());
 					});
