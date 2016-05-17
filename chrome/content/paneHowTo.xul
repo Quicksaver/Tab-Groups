@@ -140,9 +140,8 @@
 					<html:p>&howto.search.step2b;</html:p>
 				</html:li>
 				<html:li>
-					<html:p>&howto.search.step3;</html:p>
+					<html:p>&howto.search.step4;</html:p>
 					<html:img src="chrome://objPathString/skin/howto/search.jpg"/>
-					<html:p>&howto.search.final;</html:p>
 				</html:li>
 			</html:ol>
 		</groupbox>
