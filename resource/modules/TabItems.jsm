@@ -1,4 +1,4 @@
-// VERSION 1.2.18
+// VERSION 1.2.19
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -1386,7 +1386,7 @@ this.TabCanvas.prototype = {
 		return new Point(width, height);
 	},
 
-	persist(aBrowser) {
+	persist(aBrowser, forceStale) {
 		// capture to file, thumbnail service does not persist automatically when rendering to canvas.
 		PageThumbs.shouldStoreThumbnail(aBrowser, (storeAllowed) => {
 			if(!storeAllowed) { return; }
@@ -1396,7 +1396,7 @@ this.TabCanvas.prototype = {
 			let url = aBrowser.currentURI.spec;
 			PageThumbsStorage.isFileRecentForURL(url).then((recent) => {
 				// Careful, the call to PageThumbsStorage is async, so the browser may have navigated away from the URL or even closed.
-				if(!recent && aBrowser.currentURI && aBrowser.currentURI.spec == url) {
+				if((!recent || forceStale) && aBrowser.currentURI && aBrowser.currentURI.spec == url) {
 					// We used to use PageThumbs.captureAndStoreIfStale, but we're bypassing it because it only stored a portion (top-left) of the thumb,
 					// by mimicking its behavior here but sending the full blob of our canvas, we can store the whole thing.
 					// It's not pretty, but it works, and has the added bonus of not having to recapture the webpage onto a new canvas.
@@ -1453,6 +1453,7 @@ this.TabCanvas.prototype = {
 
 		let browser = this.tab.linkedBrowser;
 		PageThumbs.captureToCanvas(browser, canvas, () => {
+			let hasHadThumb = this.tabItem._hadHadThumb;
 			let painted = !dimsChanged;
 
 			if(dimsChanged) {
@@ -1464,7 +1465,7 @@ this.TabCanvas.prototype = {
 				// The toDataURL() call is a little expensive, so lets try to only use it when it can actually make a difference;
 				let isBlack =	!browser.isRemoteBrowser
 						&& !this.canvas.parentNode
-						&& !this.tabItem._hasHadThumb
+						&& !hasHadThumb
 						&& canvas.toDataURL() == UICache.blackCanvas(canvas);
 				if(!isBlack) {
 					// We only append the canvas to the DOM once we paint it, to avoid showing a black/blank canvas while it's being painted.
@@ -1486,7 +1487,12 @@ this.TabCanvas.prototype = {
 			}
 
 			if(painted) {
-				this.persist(browser);
+				// Force persist the first thumb we get, to avoid showing stored black thumbs.
+				// Even though we don't actually persist those, browser-ctrlTab.js always persists the first thumb of a tab when it is first restored,
+				// which, lucky us, can be black if it happens while we're in TabView.
+				// See http://mxr.mozilla.org/mozilla-central/source/browser/base/content/browser-ctrlTab.js#51.
+				let forceStale = !hasHadThumb && !browser.isRemoteBrowser;
+				this.persist(browser, forceStale);
 			}
 			if(callback) {
 				callback(painted);
