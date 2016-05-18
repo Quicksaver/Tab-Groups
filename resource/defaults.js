@@ -1,4 +1,4 @@
-// VERSION 1.4.14
+// VERSION 1.4.15
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -8,7 +8,7 @@ addonUris = {
 	homepage: 'https://addons.mozilla.org/firefox/addon/tab-groups-panorama/',
 	support: 'https://github.com/Quicksaver/Tab-Groups/issues',
 	fullchangelog: 'https://github.com/Quicksaver/Tab-Groups/commits/master',
-	email: 'quicksaver@gmail.com',
+	email: 'mailto:quicksaver@gmail.com',
 	profile: 'https://addons.mozilla.org/firefox/user/quicksaver/',
 	api: 'http://fasezero.com/addons/api/tabgroups',
 	development: 'http://fasezero.com/addons/'
