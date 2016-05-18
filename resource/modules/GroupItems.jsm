@@ -1,4 +1,4 @@
-// VERSION 1.6.40
+// VERSION 1.6.41
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -210,8 +210,15 @@ this.GroupItem = function(listOfEls, options = {}) {
 
 this.GroupItem.prototype = {
 	// For backwards compatibility with other add-ons possibly interacting with the group.
-	get _children() { return this.children; },
-	set _children(v) { return this.children = v; },
+	get _children() { return this.children; }, // shim used by Tab Groups Helper
+	set _children(v) { return this.children = v; }, // shim used by Tab Groups Helper
+	getChildren: function() { return this.children; }, // shim used by TabGroups Menu
+	getChild: function(i) { // shim used by TabGroups Menu
+		if(i < 0) {
+			i = this.children.length +i;
+		}
+		return this.children[i] || null;
+	},
 
 	count: function() {
 		// +1 for new tab item
@@ -2062,7 +2069,7 @@ this.GroupItems = {
 		return size;
 	},
 
-	// For backwards compatibility with Tab Groups Helper
+	// For backwards compatibility, shim used by Tab Groups Helper
 	get groupItems() {
 		let groups = [];
 		for(let groupItem of this) {
