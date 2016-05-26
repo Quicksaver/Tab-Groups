@@ -1,4 +1,4 @@
-// VERSION 1.2.0
+// VERSION 1.2.1
 
 this.Storage = {
 	kGroupIdentifier: "tabview-group",
@@ -140,6 +140,22 @@ Modules.LOADMODULE = function() {
 		return this.__prepWindowToRestoreInto(aWindow);
 	});
 
+	Piggyback.add('Storage', Storage._scope.SessionStoreInternal, 'restoreWindow', function(aWindow, winData, aOptions) {
+		// Deinitialize tab view in any window that will have its session overwritten.
+		// Nothing in TabView will be useful anyway, just let it reinistialize if/when necessary later by itself.
+		if(aWindow.TabView) {
+			aWindow.TabView._deinitFrame();
+		}
+
+		// Call the original method.
+		this._restoreWindow(aWindow, winData, aOptions);
+
+		// Update our button's label, to reflect the groups data in the new/different session.
+		if(aWindow.TabView) {
+			aWindow.TabView.setButtonLabel();
+		}
+	});
+
 	Piggyback.add('Storage', Storage._migrationScope.SessionMigrationInternal, 'convertState', function(aStateObj) {
 		let state = {
 			selectedWindow: aStateObj.selectedWindow,
@@ -186,5 +202,6 @@ Modules.LOADMODULE = function() {
 
 Modules.UNLOADMODULE = function() {
 	Piggyback.revert('Storage', Storage._scope.SessionStoreInternal, '_prepWindowToRestoreInto');
+	Piggyback.revert('Storage', Storage._scope.SessionStoreInternal, 'restoreWindow');
 	Piggyback.revert('Storage', Storage._migrationScope.SessionMigrationInternal, 'convertState');
 };

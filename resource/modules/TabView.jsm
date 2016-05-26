@@ -1,4 +1,4 @@
-// VERSION 1.1.8
+// VERSION 1.1.9
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -568,6 +568,10 @@ this.TabView = {
 	onCloseLastTab: function(tab) {
 		// We already have a placeholder tab present, there's no need to open another one or do anything else.
 		if(this._closedLastVisibleTab) { return; }
+
+		// Don't do anything if the session state for this window is busy, that usually means it's being re-done by session store
+		// (switching sessions, restoring a session, etc).
+		if(Storage.readWindowBusyState(window)) { return; }
 
 		// When closing the last visible tab of a group (including pinned tabs), we open a new tab in its place, so that the group isn't closed immediately,
 		// giving the user a choise to keep using the same group.
