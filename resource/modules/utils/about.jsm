@@ -1,4 +1,4 @@
-// VERSION 1.2.2
+// VERSION 1.2.3
 
 this.about = {
 	kNS: 'http://www.w3.org/1999/xhtml',
@@ -19,19 +19,39 @@ this.about = {
 		return this._gShowTabOnUpdates;
 	},
 
+	get openAddonsMgrLink() { return $('openAddonsMgr'); },
+	get allVersionsLink() { return $('allVersions'); },
+
 	changelog: null,
 
 	handleEvent: function(e) {
-		// are we mousing over the Show On Updates checkbox? That requires a specific action
-		if(e.target == this.gShowTabOnUpdates) {
-			this.disableNoticeShowOnUpdates();
-		}
+		switch(e.type) {
+			case 'click':
+				switch(e.target) {
+					case this.openAddonsMgrLink:
+						this.openAddonsMgr();
+						break;
 
-		// only do this for links and checkboxes
-		if(e.target.nodeName != 'a' && e.target.nodeName != 'html:a' && e.target.nodeName != 'checkbox') { return; }
+					case this.allVersionsLink:
+						this.fillChangeLog('0');
+						break;
+				}
+				break;
 
-		if(e.target == document.activeElement) {
-			document.activeElement.blur();
+			case 'mouseup':
+			case 'mouseover':
+				// are we mousing over the Show On Updates checkbox? That requires a specific action
+				if(e.target == this.gShowTabOnUpdates) {
+					this.disableNoticeShowOnUpdates();
+				}
+
+				// only do this for links and checkboxes
+				if(e.target.nodeName != 'a' && e.target.nodeName != 'html:a' && e.target.nodeName != 'checkbox') { return; }
+
+				if(e.target == document.activeElement) {
+					document.activeElement.blur();
+				}
+				break;
 		}
 	},
 
@@ -41,6 +61,9 @@ this.about = {
 	},
 
 	init: function() {
+		Listeners.add(this.openAddonsMgrLink, 'click', this);
+		Listeners.add(this.allVersionsLink, 'click', this);
+
 		// place the current version in the page
 		$('currentVersion').textContent = $('currentVersion').textContent.replace('{v}', AddonData.version);
 		removeAttribute($('version'), 'invisible');
@@ -81,6 +104,8 @@ this.about = {
 	},
 
 	uninit: function() {
+		Listeners.remove(this.openAddonsMgrLink, 'click', this);
+		Listeners.remove(this.allVersionsLink, 'click', this);
 		Listeners.remove(window, 'mouseup', this);
 		Listeners.remove(window, 'mouseover', this, true);
 	},
