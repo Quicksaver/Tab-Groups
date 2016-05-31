@@ -2,13 +2,45 @@
 <!ENTITY moveToGroup.accesskey "r">
 <!ENTITY moveToNewGroup.label "Nieuwe groep">
 <!ENTITY viewTabGroups.label "Tabbladgroepen">
-<!ENTITY viewTabGroups.tooltip "Uw tabbladen groeperen">
 <!ENTITY viewTabGroups.accesskey "T">
+<!ENTITY searchForTab.label "Zoeken naar een tabblad…">
+<!ENTITY manageTabGroups.label "Mijn groepen beheren">
+<!ENTITY manageTabGroups.tooltip "Open de groepenweergave om uw tabbladen te ordenen en nieuwe groepen te maken">
 <!ENTITY buttonSearchTabs.label "Tabbladgroepen doorzoeken">
 <!ENTITY buttonExitTabGroups.label "Tabbladgroepen sluiten">
 <!ENTITY buttonOptionsTabGroups.label "Voorkeuren van tabbladgroepen wijzigen">
 <!ENTITY buttonHelpTabGroups.label "Tabbladgroepen gebruiken">
+<!ENTITY buttonClassic.label "Vrij schikken">
+<!ENTITY buttonGrid.label "Rasterweergave">
+<!ENTITY buttonSingle.label "Enkele weergave">
+<!ENTITY buttonNewGroup.label "Nieuwe groep maken">
+<!ENTITY options.close.tooltip "Opslaan en teruggaan">
+<!ENTITY options.notapplicable.single "(niet van toepassing in enkele weergave)">
+<!ENTITY options.title.tooltip "Deze tabbladgroep een naam geven">
+<!ENTITY options.showThumbs.label "Tabbladminiaturen tonen">
+<!ENTITY options.showUrls.label "Adressen naast paginatitels tonen">
+<!ENTITY options.catchOnce.caption "Regels voor vangen van tabbladen in deze groep">
+<!ENTITY options.catchOnce.label "Alleen nieuwe tabbladen vangen">
+<!ENTITY options.catchRules.placeholder1 "Voeg hier reguliere expressies voor webadressen in. Overeenkomende tabbladen worden automatisch naar deze groep verplaatst.">
+<!ENTITY options.catchRules.placeholder2 "Gebruik één regel per regel, en maak er zo veel u wilt.">
+<!ENTITY options.catchRules.placeholder3 "Voorbeelden:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - alle pagina’s in de add-on-repository vangen">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - Firefox-bugrapporten vangen">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - al uw sociale pagina’s vangen">
+<!ENTITY options.stackTabs.caption "Als deze groep te veel tabbladen bevat…">
+<!ENTITY options.stackTabs.stack.label "De groep stapelen">
+<!ENTITY options.stackTabs.list.label "De groep scrollen">
 <!ENTITY sessionRestoreNotice.label "Uw tabbladen en groepen zullen de volgende keer dat u de browser start niet worden hersteld! Klik hier om dit in orde te maken.">
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Deze waarschuwing verwijderen totdat ik de browser herstart">
 <!ENTITY sessionRestoreAutoChanged.label "Uw tabbladen en groepen zullen de volgende keer dat u de browser start automatisch worden hersteld.">
 <!ENTITY sessionRestorePrivate.label "Dit is een privévenster; uw tabbladen en groepen kunnen niet worden hersteld zodra u het sluit.">
+<!ENTITY message.close "Dit bericht sluiten">
+<!ENTITY message.later.label "later herinneren">
+<!ENTITY message.later.tooltip "Dit bericht een andere keer opnieuw tonen">
+<!ENTITY message.1 "Ik weet zeker dat u inmiddels veel van de uitgebreide wijzigingen in Tab Groups 2 hebt opgemerkt. Ik hoop dat alles goed werkt en dat u plezier beleeft aan de verbeterde ervaring.">
+<!ENTITY message.2 "Maar wist u dat mijn computer het eerder dit jaar niet deed?">
+<!ENTITY message.3 "Inderdaad. Het meeste wat u ziet is geschreven op een oude back-upmachine die ik toevallig nog had, eentje die erg als een grasmaaier klinkt. Een zeer trage, trage grasmaaier…">
+<!ENTITY message.4 "Als de add-on u bevalt en er nieuwe functies zijn die u bevallen, overweeg me dan te helpen bij de aanschaf van een nieuw werkstation door een contributie te doen voor actieve ontwikkeling van de add-on.">
+<!ENTITY message.5 "Klik hier om te lezen hoe elk klein beetje de ontwikkeling in stand houdt.">
+<!ENTITY message.6 "Als u het niet kunt doen, zou ik natuurlijk ook een leuke beoordeling op de startpagina van de add-on waarderen, of dat u de add-on met al uw vrienden deelt. :)">
+<!ENTITY message.7 "Bedankt voor het lezen. Ik hoop dat Tab Groups u bevalt, en laat het me zoals gewoonlijk weten als u problemen ervaart.">

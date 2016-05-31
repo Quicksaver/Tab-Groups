@@ -1,31 +1,42 @@
 <!ENTITY howto.pane.label "如何使用">
 <!ENTITY howto.overview.a "分頁群組是用來依工作分類群組化的分頁的絕佳方法。舉例來說，您可能會有一個群組是與找禮物相關，而另一個群組是與您的線上付款相關。嘗試為您平常在線上所作的事建立群組，並使用分頁群組在它們之間切換。這是一個讓事情有條不紊的好方法。">
+<!ENTITY howto.mode.caption "我要如何在群組檢視中工作？">
+<!ENTITY howto.mode.description "要進入群組檢視，只要點選工具列按鈕或是使用鍵盤快捷鍵。您有三種可能的模式，可以在右邊的控制器中在任意時間中切換：">
+<!ENTITY howto.single.description "單一檢視是預設的模式。它最易於使用，非常適合保持分離但相近的群組。">
+<!ENTITY howto.grid.description "在網格佈局中，您的群組會自動根據有多少可用空間來調整大小。">
+<!ENTITY howto.classic.description "在自由排列模式中，您可以在工作空間內擺放並調整您群組的大小。您可以在許多不同的群組中工作時使用這個佈局方式。">
 <!ENTITY howto.create.caption "我要如何建立分頁群組？">
-<!ENTITY howto.create.step1 "不論是透過工具列按鈕或鍵盤快捷鍵都可以進入分頁群組檢視。">
-<!ENTITY howto.create.step2a "當您第一次進入分頁群組檢視，您將會看到在一個群組中有著您所有分頁的縮圖預覽。要建立一個新的群組，只要拖曳一個分頁到由框框繪製出的群組外。">
+<!ENTITY howto.create.step0 "當您第一次進入群組檢視，您將可以看到在一個群組中有您所有的分頁的縮圖預覽。">
+<!ENTITY howto.create.step1a "在單一檢視或是網格檢視中，只要點選在底部的建立新群組的按鈕。您不會錯過它的。">
+<!ENTITY howto.create.step1b "在自由排列模式中，要建立新群組，只要把一個分頁拖曳出群組外，在它週邊就會繪製出一個框框。或是直接在剩餘空間中點選並拖曳來自行繪製出一個新的，您想要的大小的群組。">
 <!ENTITY howto.create.step2b "您可以繼續加入分頁到該新群組以及建立更多群組。">
 <!ENTITY howto.create.step3 "當您完成後，只要點選分頁以離開檢視。您將會回到 Firefox，您點選的分頁將會回到前景，且只有該分頁所在的群組可見。">
 <!ENTITY howto.switch.caption "我要如何在分頁群組間切換？">
-<!ENTITY howto.switch.description "在分頁群組間切換相當簡單。只要進入分頁群組檢視，然後在您要檢視的分頁群組上點選。您點選的分頁將會回到前景，且只有該分頁所在的群組可見。">
+<!ENTITY howto.switch.description2 "不能再更簡單了。只要進入分頁群組檢視，然後點選您想要檢視的分頁。您點選的分頁就會回到前景並且僅有該分頁所在的群組可見。您也可以在任何群組中的空白區域雙擊，然後您就會被帶到該群組中最後一個被選取的分頁。">
+<!ENTITY howto.overflow.caption "堆疊與捲動群組間有什麼不同？">
+<!ENTITY howto.overflow.description "分頁縮圖會佔用空間。若某群組並未大到所有分頁都可以顯示，它將會被堆疊或是捲動。">
+<!ENTITY howto.stack.description "在堆疊群組中的分頁會顯示在其他分頁之上。您只能與最上面的前景分頁互動。在這個堆疊之下，有一個預覽按鈕，您可以點選它來存取所有其他分頁而不必變更群組的大小。">
+<!ENTITY howto.list.description "相反地，您可以選擇顯示所有的分頁而不要堆疊。它們的其中一些將會被隱藏，然後您將需要向下捲動來存取它們。">
+<!ENTITY howto.thumbs.description "您也可以選擇特定的群組不要顯示分頁縮圖。此時分頁將只會列出它們的標題以及網址（可選）。這也會在捲動群組大小不足以讓至少三欄的分頁顯示時發生，而不論縮圖是否啟用。">
 <!ENTITY howto.search.caption "我要如何在我的分頁間搜尋？">
 <!ENTITY howto.search.step1 "進入分頁群組檢視">
 <!ENTITY howto.search.step2a "點選在視窗右邊的搜尋按鈕，就會把您帶到搜尋框，然後您只需要開始鍵入您要尋找的分頁名稱。">
 <!ENTITY howto.search.step2b "或只要開始打字就會自動開始搜尋。">
-<!ENTITY howto.search.step3 "在您輸入時，符合您搜尋的分頁將會被突顯。只要點選分頁以選取它，然後就會回到 Firefox。">
-<!ENTITY howto.search.final "若您開啟了多於一個的 Firefox 視窗，您將會看到從其他視窗而來的符合搜尋條件的分頁列在視窗底部。點選其中的一個就會切換到該 Firefox 視窗、分頁與群組。">
+<!ENTITY howto.search.step4 "當您輸入時，符合您搜尋條件的分頁將會被突顯。只要在分頁上點選就可以選取它，您將會離開群組檢視，然後被帶到該分頁。">
 <!ENTITY howto.organize.caption "我要如何組織我的分頁群組？">
 <!ENTITY howto.organize.description1 "分頁群組可以很容易的重新調整大小、重新排列及命名。當您在某個群組中完成工作後，您可以關閉它並一次關閉其中的所有分頁。">
-<!ENTITY howto.organize.description2 "進入分頁群組檢視。">
 <!ENTITY howto.resize.caption "調整分頁群組大小">
-<!ENTITY howto.resize.description1 "在群組的右下角點選並拖曳調整大小可以讓群組更大或更小。當您調整群組的大小時，該群組中的分頁將會相對應的變大或變小。">
-<!ENTITY howto.resize.description2 "若您讓群組變得足夠小，分頁們將會互相堆疊起來。在堆疊下面，將會出現一個預覽按鈕。點選預覽按鈕以觀看有哪些分頁在堆疊內而不需要變更群組的大小。">
+<!ENTITY howto.resize.description3 "在自由排列模式中，點選並拖曳在群組右下角的調整大小手把就可以讓群組變大或變小。當您變更群組大小時，其中的分頁也會相應的變大或變小。">
+<!ENTITY howto.resize.description4 "在網格佈局中，這一切都幫您做好了，群組將會盡可能地伸展以顯示您的分頁。">
 <!ENTITY howto.rearrange.caption "重新排列分頁群組">
 <!ENTITY howto.rearrange.description "在一個空的區域上點選並沿著群組的邊邊或底部拖曳來讓它在螢幕四周移動。">
+<!ENTITY howto.rearrange.description2 "在網格佈局中，把一個群組丟到另一個群組中以讓它們交換位置。將您最重要的群組，或是有最多分頁的群組放到底部，因為通常其會比在底部的群組大。">
 <!ENTITY howto.name.caption "命名分頁群組">
 <!ENTITY howto.name.description "點選在群組頂部的鉛筆圖示，並輸入要給它的名字。然後只要按下 Enter 或在視窗其它區域點擊就可以了。">
 <!ENTITY howto.close.caption "關閉分頁群組">
 <!ENTITY howto.close.description1 "每個分頁群組的右上角都有一個關閉按鈕。點選它將會關閉該群組以及其中所有的分頁。">
 <!ENTITY howto.close.description2 "若您意外地關祕了一個分頁群組，您可以點選復原關閉的群組按鈕以在離開前恢復它。">
 <!ENTITY howto.pinned.caption "在分頁群組中釘選分頁">
-<!ENTITY howto.pinned.description "當您與分頁群組一同使用釘選分頁，它們將會在每個分頁群組的右邊以它們的網頁圖示表示。">
+<!ENTITY howto.pinned.description2 "釘選的分頁不屬於任何群組。它們會使用其網頁圖示在群組模式時的右側顯示，且不論在哪一個群組活躍時都可見。">
+<!ENTITY howto.pinned.description3 "您可以在群組檢視時釘選分頁，只要把它拖曳進該區域。同樣地，將任一個分頁拖出該區域即為取消釘選它。">
 <!ENTITY howto.credits "這些說明是基於原先在 support.mozilla.org 上的一篇文章，由以下這些人所編寫：">

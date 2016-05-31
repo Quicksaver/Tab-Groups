@@ -1,0 +1,76 @@
+<!ENTITY pane.tabGroups.label "Skupine zavihkov">
+<!ENTITY pane.session.label "Varnostno kopiranje/Obnavljanje">
+<!ENTITY opt.showGroupThumbs.label "Prikaži sličice skupine v enojnem pogledu">
+<!ENTITY opt.showGroupThumbs.tooltip "Skrivanje sličic skupine bo pustilo več prostora za zavihke na račun prikaza samo imen skupin.">
+<!ENTITY opt.gridDynamicSize.label "Uporabi dinamično dodeljevanje velikosti skupinam v mrežni razporeditvi">
+<!ENTITY opt.gridDynamicSize.tooltip1 "Dinamična velikost v celoti uporabi velikost okna. Zgornje skupine bodo imele večje mere kot spodnje.">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Uporabite to za premikanje bolj pomembnih skupin ali tistih z več zavihki na vrh.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "Ko je to onemogočeno, bodo vse skupine imele podobne mere s samo potrebnimi razlikami, da se vse prikažejo na zaslonu.">
+<!ENTITY opt.closeIfEmpty.label "Samodejno zapri prazne skupine">
+<!ENTITY opt.closeIfEmpty.tooltip "Skupina se takoj zavrže, ko zaprete zadnji zavihek. Z onemogočanjem te možnosti, s poimenovanjem skupne ali s spreminjanjem njenih možnosti lahko ohranite prazno skupino.">
+<!ENTITY opt.showTabCounter.label "Prikaži število zavihkov poleg naziva skupine">
+<!ENTITY opt.showTabCounter.tooltip "Na vrhu skupine se prikaže kazalnik števila zavihkov v skupni.">
+<!ENTITY cat.defaults.label "Privzeto naj skupine …">
+<!ENTITY opt.showThumbs.label "prikažejo sličice zavihkov">
+<!ENTITY opt.showThumbs.tooltip "Sličice prikazujejo vsebino vsakega zavihka neposredno v skupini. Onemogočanje spremeni skupine v seznam zavihkov z njihovim nazivom in ikono.">
+<!ENTITY opt.showUrls.label "prikažejo naslove poleg nazivov strani">
+<!ENTITY opt.showUrls.tooltip "Za poln izkoristek prostora prihranjenega s skrivanjem sličic lahko poleg naziva zavihkov pokažete njihov naslov">
+<!ENTITY cat.stackTabs.label "Ko imajo skupine preveč zavihkov …">
+<!ENTITY cat.stackTabs.tooltip "Sličice zavihkov zasedajo prostor. Če skupina ne more prikazati vseh svojih zavihkov, ker ni dovolj velika, lahko …">
+<!ENTITY opt.stackTabs.label "zloži zavihke">
+<!ENTITY opt.stackTabs.tooltip "Prikazan bo samo dejaven zavihek, ki bo zložen na vrh drugih. Dostop do vseh zavihkov je še vedno mogoč s klikom na gumb za razširjanje skupine.">
+<!ENTITY opt.listTabs.label "naredi zavihke pomične">
+<!ENTITY opt.listTabs.tooltip "Nekateri zavihki bodo skriti in za dostop do njih se boste morali pomakniti po skupini. Upoštevajte, da se bodo skupine vedno tako vedle v enojnem pogledu ne glede na to nastavitev.">
+<!ENTITY btn.setdefaults.label "Nastavi te možnosti za vse skupine">
+<!ENTITY btn.setdefaults.tooltip1 "Ker se zgornje možnosti uporabijo na skupino, bodo spremembe vplivale samo na novo ustvarjene skupine.">
+<!ENTITY btn.setdefaults.tooltip2 "Kliknite to možnost samo, če želite preglasiti možnosti obstoječih skupin s temi nastavitvami. Drugače jih boste morali spremeniti za vsako skupino posebej.">
+<!ENTITY cat.toolbarbutton.label "Gumb orodne vrstice">
+<!ENTITY opt.groupTitleInButton.label "Prikaži ime vsake dejavne skupine">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Prepričajte se, katera skupina je dejavna, neposredno iz glavnega okna brez opravljanja dejanj.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "Gumb bo še vedno prikazal samo ikono, če je postavljen na ploščo glavnega menija ali imate samo eno skupino.">
+<!ENTITY opt.quickAccessButton.label "Klik za odpiranje plošče za hitri odstop">
+<!ENTITY opt.quickAccessButton.tooltip1 "Plošča za hitri dostop omogoča hiter preklop med skupinami in zavihki brez vstopanja v pogled skupin.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Onemogočite to za vstop v pogled skupin ob kliku na gumb.">
+<!ENTITY cat.keyboardshortcuts.label "Tipkovne bližnjice">
+<!ENTITY cat.backup.label "Varnostno kopiraj moje skupine zavihkov">
+<!ENTITY cat.restore.label "Obnovi skupine zavihkov">
+<!ENTITY cat.clear.label "Počisti skupine zavihkov">
+<!ENTITY opt.tabViewKeyset.label "Vstopi in izstopi iz pogleda skupin">
+<!ENTITY opt.quickAccessKeyset.label "Plošča za hitri dostop">
+<!ENTITY opt.nextGroupKeyset.label "Preklopi na naslednjo skupino">
+<!ENTITY opt.previousGroupKeyset.label "Preklopi na prejšnjo skupino">
+<!ENTITY sessionRestore.caption "Ohrani skupine zavihkov med ponovnimi zagoni">
+<!ENTITY sessionRestore.description "Da si Firefox zapomni skupine zavihkov, mora med ponovnimi zagoni obnoviti okna in zavihke. Drugače boste morali skupine ponovno ustvariti ob vsakem odpiranju brskalnika.">
+<!ENTITY sessionRestore.button.label "Ob zagonu Firefoxa prikaži okna in zavihke od zadnjič">
+<!ENTITY sessionRestore.button.tooltip.a "To je enako kot spreminjanje &quot;Ko se Firefox zažene:&quot; na &quot;prikaži nazadnje odrta okna in zavihke&quot; v Firefoxovih možnostih.">
+<!ENTITY sessionRestore.button.tooltip.b "Če potem spet spremenite to možnost, boste ponovno izgubili skupine zavihkov ob ponovnem zagonu Firefoxa, dokler je ne spremenite nazaj ali pritisnete tega gumba.">
+<!ENTITY opt.noWarningsAboutSession.label "Ne opozarjaj me o tem v pogledu skupin">
+<!ENTITY opt.noWarningsAboutSession.tooltip "Opomniki vas opomnijo, da ne zapirajte okno brskalnika, če želite ohraniti zavihke in skupine. Onemogočite jih samo, če ste v to prepričani.">
+<!ENTITY session.backup.button "Ustvari varnostno kopijo">
+<!ENTITY session.backup.description "Izvozite skupne zavihkov v varnostno kopijo, da jih lahko kasneje po potrebi obnovite.">
+<!ENTITY session.backup.description2 "Predlog: uporabite privzeto ime datoteke in mesto za shranjevanje; ob kliku na spodnji gumb 'Naloži skupine in zavihke iz …' se bo varnostna kopija pojavila neposredno v meniju za hitri dostop.">
+<!ENTITY session.backup.autoloaded "Shranjena datoteka je bila spodaj naložena. Potrdite, da so bile skupine in zavihki uspešno obnovljeni.">
+<!ENTITY session.backup.alldata.checkbox.label "Varnostno kopiraj podatke seje">
+<!ENTITY session.backup.alldata.checkbox.tooltip.a "To je lahko uporabno med obnavljanjem skupin iz varnostne kopije. Drugače boste lahko obnovili samo skupine in njihove odprte zavihke.">
+<!ENTITY session.backup.alldata.checkbox.tooltip.b "Če vam za ohranjanje zgodovine zavihkov, obrazcev ali drugih podatkov ni mar, potem tega ne potrebujte.">
+<!ENTITY session.backup.alldata.caution.a "Opozorilo! To bo izvozilo tudi podatke trenutne seje.">
+<!ENTITY session.backup.alldata.caution.b "Bodite pazljivi, komu daste dostop do te datoteke. Vsebovala bo podatke iz vseh vaših zavihkov vključno z zgodovino strani, podatki obrazcev in druge zasebne in po možnosti občutljive podatke.">
+<!ENTITY session.restore.button "Naloži skupine in zavihke iz …">
+<!ENTITY session.restore.from.file "datoteke …">
+<!ENTITY session.restore.import.button "Uvozi izbrane predmete v to okno">
+<!ENTITY session.restore.import.tooltip.a "Po kliku na gumb lahko vstopite v skupine zavihkov in uredite na novo uvožene skupine.">
+<!ENTITY session.restore.import.tooltip.b "Upoštevajte, da lahko uvozite samo nove skupine, ne pa zavihkov v obstoječe skupine. To pomeni, da lahko dobite podvojene skupine, če isto skupino uvozite dvakrat. V tem primeru pojdite v skupine zavihkov in zaprite tiste, ki jih ne želite prikazati.">
+<!ENTITY session.restore.description "Naložite varnostno kopijo, ki vsebuje skupine zavihkov za obnovitev. Potem izberite želene skupine in zavihke. Naložene bodo v to okno za dostop, ureditev in prilagoditev, kot vse druge.">
+<!ENTITY session.restore.invalid "Izbrana datoteka je neveljavna, poškodovana ali ne vsebuje podatkov o skupinah zavihkov.">
+<!ENTITY session.restore.finished "Izbrane skupine so bile uvožene v to okno. Vstopite v način zavihkov za dostop do njih.">
+<!ENTITY session.restore.list.check "Uvozi">
+<!ENTITY session.restore.list.items "Skupine in zavihki">
+<!ENTITY session.clear.button "Počisti podatke skupin">
+<!ENTITY session.clear.tooltip "Tega vam običajno ni treba storiti. To je samo preprostejši in varnejši način za vstop v skupine zavihkov in zapiranje želenih skupin.">
+<!ENTITY session.clear.description.a "Počisti podatke vseh skupin iz trenutne seje.">
+<!ENTITY session.clear.description.f "To naredite samo, če veste, kaj delate!">
+<!ENTITY session.clear.description.b "Pred nadaljevanjem naredite varnostno kopijo skupin in zavihkov.">
+<!ENTITY session.clear.description.c "To bo ponovno naložilo vsa okna brskalnika in njihove vidne zavihke">
+<!ENTITY session.clear.description.g ", in odstranilo vse zavihke v nedejavnih skupinah.">
+<!ENTITY session.clear.description.d "Opozorilo: tega dejanja ni mogoče razveljaviti!">
+<!ENTITY session.clear.description.e "Ali res želite nadaljevati?">

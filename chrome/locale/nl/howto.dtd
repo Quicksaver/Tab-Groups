@@ -1,31 +1,42 @@
 <!ENTITY howto.pane.label "Tabbladgroepen gebruiken">
 <!ENTITY howto.overview.a "Tabbladgroepen zijn geweldig voor het groeperen van tabbladen op taak. Zo kunt u bijvoorbeeld een groep tabbladen hebben die aan het zoeken naar een cadeau zijn gerelateerd, en een andere groep voor het online betalen van uw rekeningen. Probeer groepen te maken voor dingen die u normaal gesproken online doet en gebruik tabbladgroepen om hiertussen te wisselen. Het is een eenvoudige manier om georganiseerd te blijven.">
+<!ENTITY howto.mode.caption "Hoe werk ik in groepenweergave?">
+<!ENTITY howto.mode.description "Om de groepenweergave te openen, klikt u op de werkbalkknop of gebruikt u de sneltoets. Daar hebt u drie mogelijke modi; schakel hiertussen om wanneer u wilt via de bedieningsknoppen aan de rechterkant:">
+<!ENTITY howto.single.description "Enkele weergave is de standaardmodus. Deze is het makkelijkst te gebruiken en ideaal om aparte groepen te hebben die weggestopt, maar altijd in de buurt zijn.">
+<!ENTITY howto.grid.description "In rasterindeling wordt de grootte van uw groepen automatisch aangepast volgens het aantal dat u hebt en de hoeveelheid vrije ruimte die er is.">
+<!ENTITY howto.classic.description "In de modus Vrij schikken kunt u uw groepen naar wens binnen de werkruimte positioneren en hun grootte aanpassen. U kunt deze visuele ordening in uw voordeel gebruiken als u met veel verschillende groepen werkt.">
 <!ENTITY howto.create.caption "Hoe maak ik een tabbladgroep aan?">
-<!ENTITY howto.create.step1 "Wissel naar de tabbladgroepenweergave via de werkbalkknop, of via de sneltoets.">
-<!ENTITY howto.create.step2a "Als u de tabbladgroepenweergave voor het eerst gebruikt, ziet u miniatuurweergaven van al uw tabbladen in één groep. Om een nieuwe groep te maken, sleept u een tabblad eenvoudig uit de groep; er wordt dan een kader omheen getekend.">
+<!ENTITY howto.create.step0 "Als u de groepenweergave voor de eerste keer opent, ziet u miniatuurvoorbeelden van al uw tabbladen in één groep.">
+<!ENTITY howto.create.step1a "In enkele weergave of rasterindeling klikt u eenvoudig op de knop Nieuwe groep maken aan de onderkant. Deze is niet te missen.">
+<!ENTITY howto.create.step1b "In de modus Vrij schikken sleept u eenvoudig een tabblad uit de groep om een nieuwe groep te maken; er wordt een rand omheen getekend. U kunt ook direct in de vrije ruimte klikken en slepen om zelf een nieuwe groep met de gewenste afmetingen te maken.">
 <!ENTITY howto.create.step2b "U kunt verdergaan met het toevoegen van tabbladen aan de nieuwe groep en meer groepen aanmaken.">
-<!ENTITY howto.create.step3 "Als u klaar bent, klikt u op een tabblad om de weergave te verlaten. U keert terug naar Firefox, het aangeklikte tabblad wordt actief en alleen de tabbladen in die groep worden zichtbaar.">
+<!ENTITY howto.create.step3 "Als u klaar bent, klikt u op een tabblad om de weergave te verlaten. U keert terug naar Firefox, het aangeklikte tabblad wordt actief, en alleen de tabbladen in die groep worden zichtbaar.">
 <!ENTITY howto.switch.caption "Hoe wissel ik tussen tabbladgroepen?">
-<!ENTITY howto.switch.description "Wisselen tussen tabbladgroepen is eenvoudig. Ga hiervoor naar de tabbladgroepenweergave, en klik op de tabbladgroep die u wilt weergeven. Het tabblad waarop u hebt geklikt wordt actief, en alleen de tabbladen in die groep worden zichtbaar.">
+<!ENTITY howto.switch.description2 "Het kan niet eenvoudiger. Open gewoon de groepenweergave, en klik daarna op het tabblad dat u wilt bekijken. Het tabblad waarop u hebt geklikt wordt actief, en alleen de tabbladen in die groep worden zichtbaar. U kunt ook op een leeg gebied van een groep klikken, waarna u naar het laatst geselecteerde tabblad in die groep wordt gebracht.">
+<!ENTITY howto.overflow.caption "Wat is het verschil tussen het stapelen en het scrollen van groepen?">
+<!ENTITY howto.overflow.description "Tabbladminiaturen nemen ruimte in beslag. Als een groep niet groot genoeg is om alle tabbladen ervan weer te geven, kan deze worden gestapeld of gescrold.">
+<!ENTITY howto.stack.description "Tabbladen in een gestapelde groep worden boven op elkaar getoond. U kunt alleen met het actieve tabblad op de voorgrond werken. Onder deze stapel bevindt zich een voorbeeldknop waarop u kunt klikken om alle andere tabbladen te benaderen zonder de grootte van de groep te wijzigen.">
+<!ENTITY howto.list.description "In plaats daarvan kunt u ervoor kiezen alle tabbladen normaal weer te geven zonder ze te stapelen. Sommige ervan zullen worden verborgen, en u dient omlaag te scrollen om ze te benaderen.">
+<!ENTITY howto.thumbs.description "U kunt ook bepaalde groepen kiezen waarvoor geen tabbladminiaturen worden getoond. De tabbladen worden dan alleen met hun titels vermeld, en optioneel hun adressen. Dit gebeurt ook in gescrolde groepen die niet groot genoeg zijn om in minstens drie tabbladkolommen te passen, ongeacht of miniaturen zijn ingeschakeld.">
 <!ENTITY howto.search.caption "Hoe doorzoek ik mijn tabbladen?">
 <!ENTITY howto.search.step1 "Ga naar de tabbladgroepenweergave.">
 <!ENTITY howto.search.step2a "Klik op de zoekknop aan de rechterkant van het venster om het zoekveld zichtbaar te maken, en begin dan met het typen van de naam van het tabblad dat u probeert te vinden.">
 <!ENTITY howto.search.step2b "Of begin eenvoudig met typen, en er zal automatisch worden gezocht.">
-<!ENTITY howto.search.step3 "Terwijl u typt, worden de tabbladen die met uw zoektermen overeenkomen gemarkeerd. Klik dan op een tabblad om het te selecteren en naar Firefox terug te keren.">
-<!ENTITY howto.search.final "Als u meerdere Firefox-vensters hebt geopend, kunt u onder in het venster tabbladen van andere vensters zien die met uw zoektermen overeenkomen. Op een van deze resultaten klikken brengt u naar dat Firefox-venster, tabblad en die groep.">
+<!ENTITY howto.search.step4 "Terwijl u typt, worden de tabbladen die met uw zoekopdracht overeenkomen geaccentueerd. Klik eenvoudig op een tabblad om het te selecteren; u verlaat de groepenweergave en wordt naar dat tabblad gebracht.">
 <!ENTITY howto.organize.caption "Hoe orden ik mijn tabbladgroepen?">
-<!ENTITY howto.organize.description1 "Tabbladgroepen kunnen eenvoudig van grootte worden gewijzigd, herschikt en benoemd. Zodra u klaar bent met een groep, kunt u deze sluiten en direct alle tabbladen ervan verlaten.">
-<!ENTITY howto.organize.description2 "Open de tabbladgroepenweergave.">
+<!ENTITY howto.organize.description1 "Tabbladgroepen kunnen eenvoudig van grootte worden gewijzigd, herschikt en benoemd. Zodra u met een groep klaar bent, kunt u deze sluiten en direct alle tabbladen ervan verlaten.">
 <!ENTITY howto.resize.caption "Grootte van tabbladgroepen wijzigen">
-<!ENTITY howto.resize.description1 "Klik en versleep de vergrotingsgreep in de rechteronderhoek van een groep om deze groter of kleiner te maken. Tijdens het aanpassen van de groep zullen de tabbladen evenredig groter of kleiner worden.">
-<!ENTITY howto.resize.description2 "Als u de groep klein genoeg maakt, zullen de tabbladen op elkaar worden gestapeld. Onder deze stapel zal een knop voor een voorbeeldweergave verschijnen. Klik op deze knop om te zien welke tabbladen er in de stapel zitten, zonder de grootte van de groep te wijzigen.">
+<!ENTITY howto.resize.description3 "In de modus Vrij schikken klikt u op de vergrotingsgreep in de rechteronderhoek en versleept u deze om de groep groter of kleiner te maken. Terwijl u de grootte van de groep aanpast, worden de tabbladen ervan respectievelijk groter en kleiner.">
+<!ENTITY howto.resize.description4 "In rasterindeling wordt dit allemaal voor u gedaan; de groepen worden uitgestrekt, zodat uw tabbladen in zo veel mogelijk ruimte worden weergegeven.">
 <!ENTITY howto.rearrange.caption "Tabbladgroepen herschikken">
 <!ENTITY howto.rearrange.description "Klik en sleep op een leeg gebied langs de randen of onderkant van een groep om deze over het scherm te bewegen.">
+<!ENTITY howto.rearrange.description2 "In rasterindeling sleept u een groep boven een andere om ze van plaats te laten wisselen. Plaats uw meest belangrijke groepen (of die met de meeste tabbladen) bovenaan, aangezien deze doorgaans groter zijn dan die aan de onderkant.">
 <!ENTITY howto.name.caption "Tabbladgroepen een naam geven">
 <!ENTITY howto.name.description "Klik naast het potloodpictogram boven in een groep en typ hiervoor een naam in. Druk daarna op Enter, of klik op een ander gebied in het venster.">
 <!ENTITY howto.close.caption "Tabbladgroepen sluiten">
 <!ENTITY howto.close.description1 "Elke tabbladgroep heeft een sluitknop in de rechterbovenhoek. Door hierop te klikken, worden de groep en alle tabbladen erin gesloten.">
 <!ENTITY howto.close.description2 "Als u per ongeluk een tabbladgroep hebt gesloten, kunt u op de knop Groep sluiten ongedaan maken klikken om deze te herstellen voordat u de weergave verlaat.">
 <!ENTITY howto.pinned.caption "Vastgemaakte tabbladen in tabbladgroepen">
-<!ENTITY howto.pinned.description "Als u vastgemaakte tabbladen met tabbladgroepen gebruikt, zullen deze aan de rechterkant van elke tabbladgroep worden voorgesteld door het pictogram van hun website.">
+<!ENTITY howto.pinned.description2 "Vastgemaakte tabbladen horen bij geen enkele groep. Ze worden in de groepenmodus voorgesteld door het pictogram van hun website aan de rechterkant, en zijn zichtbaar ongeacht welke groep u actief hebt.">
+<!ENTITY howto.pinned.description3 "U kunt een tabblad vastmaken terwijl de groepenweergave is geopend door het naar dit gebied te slepen. Op dezelfde manier kunt u een tabblad uit dit gebied naar een willekeurige groep slepen om het los te maken.">
 <!ENTITY howto.credits "Dit paneel is gebaseerd op een oorspronkelijk artikel op support.mozilla.org, geschreven door deze fijne mensen:">

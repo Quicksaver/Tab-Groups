@@ -1,0 +1,26 @@
+<!ENTITY about.paneTitle "Sobre">
+<!ENTITY about.version "Versão {v}">
+<!ENTITY about.uptodate "actualizado, parabéns!">
+<!ENTITY about.needsupdate "actualização disponível!">
+<!ENTITY about.description "Vê abaixo as &quot;Notas de Lançamento&quot; e os &quot;Problemas Conhecidos&quot; para esta versão. Avisa-me de quaisquer problemas que encontres, ou de qualquer sugestão que tenhas para uma versão futura.">
+<!ENTITY about.descriptionB "O extra é gratuito, mas solucionar problemas, adicionar novas funcionalidades e assegurar que tudo funciona em cada nova versão do Fierfox é trabalhoso e pode por vezes até ser difícil. Se aprecias o extra, por favor suporta o seu desenvolvimento contínuo. Como a ligação diz, &quot;Tu Podes Ajudar&quot;!">
+<!ENTITY about.descriptionC "Vê também o último episódio da minha websérie sobre a vida com um Firefox, feita para todos vós, os melhores utilizadores que um desenvolvedor poderia pedir! Basta apontar para o ícone a balançar no canto inferior desta página. Adora-o. Odeia-o. Partilha-o.">
+<!ENTITY about.allVersions "Mostrar notas de todas as versões anteriores">
+<!ENTITY about.notifyOnUpdates "Mostrar-me este separador na próxima actualização">
+<!ENTITY about.development "Estado do Desenvolvimento">
+<!ENTITY about.helpdevelopment "TU PODES AJUDAR">
+<!ENTITY about.information "Mais informações">
+<!ENTITY about.home "Página Principal do Extra">
+<!ENTITY about.fullchangelog "Lista Completa de Alterações">
+<!ENTITY about.problems "Com Problemas?">
+<!ENTITY about.tech "Abre um tópico na página de suporte a descrever o problema">
+<!ENTITY about.email "Ou envia-me um e-mail">
+<!ENTITY about.author "Mais do autor">
+<!ENTITY about.trymore "Tenta um dos meus outros extras para uma experiência firefox ainda melhor!">
+<!ENTITY about.profile "Encontra-os no meu perfil">
+<!ENTITY about.share "Partilha!">
+<!ENTITY about.friends "Não sejas o único com um navegador espectacular. Mostra aos teus amigos!">
+<!ENTITY about.hidePromo "X">
+<!ENTITY about.hideThisPromo "mostrar de novo quando houver um novo episódio">
+<!ENTITY about.hideAllPromos "nunca me mostrar estas promoções">
+<!ENTITY about.clicktowatch "vêr no YouTube">

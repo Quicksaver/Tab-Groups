@@ -1,0 +1,46 @@
+<!ENTITY moveToGroup.label "Premakni v skupino">
+<!ENTITY moveToGroup.accesskey "P">
+<!ENTITY moveToNewGroup.label "Nova skupna">
+<!ENTITY viewTabGroups.label "Skupine zavihkov">
+<!ENTITY viewTabGroups.accesskey "Z">
+<!ENTITY searchForTab.label "Poišči zavihek …">
+<!ENTITY manageTabGroups.label "Upravljaj s skupinami">
+<!ENTITY manageTabGroups.tooltip "Vstopite v pogled skupin za organiziranje zavihkov in ustvarjanje novih skupin">
+<!ENTITY buttonSearchTabs.label "Išči po skupinah zavihkov">
+<!ENTITY buttonExitTabGroups.label "Izhod iz skupin zavhkov">
+<!ENTITY buttonOptionsTabGroups.label "Spremeni možnosti skupin zavihov">
+<!ENTITY buttonHelpTabGroups.label "Kako uporabljati skupine zavihov">
+<!ENTITY buttonClassic.label "Prosta razporeditev">
+<!ENTITY buttonGrid.label "Mrežni prikaz">
+<!ENTITY buttonSingle.label "Enojni pogled">
+<!ENTITY buttonNewGroup.label "Ustvari novo skupino">
+<!ENTITY options.close.tooltip "Shrani in se vrni">
+<!ENTITY options.notapplicable.single "(ni na veljo v enojnem pogledu)">
+<!ENTITY options.title.tooltip "Poimenujte to skupino zavihkov">
+<!ENTITY options.showThumbs.label "Prikaži sličice zavihkov">
+<!ENTITY options.showUrls.label "Prikaži naslov poleg nazivov strani">
+<!ENTITY options.catchOnce.caption "Pravila za lovljenje zavihkov v to skupino">
+<!ENTITY options.catchOnce.label "Ulovi samo nove zavihke">
+<!ENTITY options.catchRules.placeholder1 "Sem vstavite običajne izraz za spletne naslove. Ujemajoči se zavihki bodo samodejno premaknjeni v to skupino.">
+<!ENTITY options.catchRules.placeholder2 "Uporabite eno vrstico na pravilo. Lahko jih ustvarite poljubno število.">
+<!ENTITY options.catchRules.placeholder3 "Primeri:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - ulovi vse strani skladišča dodatka">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - ulovi poročila o hroščih za Firefox">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - ulovi moje družbene strani">
+<!ENTITY options.stackTabs.caption "Ko ma ta skupina preveč zavihkov, …">
+<!ENTITY options.stackTabs.stack.label "zloži skupino">
+<!ENTITY options.stackTabs.list.label "naredi zavihke pomične">
+<!ENTITY sessionRestoreNotice.label "Ob naslednjem zagonu brskalnika zavihki in skupine ne bodo obnovljene! Kliknite tukaj za popravilo.">
+<!ENTITY sessionRestoreNotice.dismiss.tooltip "Opusti opozorilo dokler ponovno ne zaženem brskalnika">
+<!ENTITY sessionRestoreAutoChanged.label "Zavihki in skupine bodo samodejno obnovljene on naslednjem zagonu brskalnika.">
+<!ENTITY sessionRestorePrivate.label "To je zasebno okno; po zapiranju vaših zavihkov in skupin ne bo mogoče obnoviti.">
+<!ENTITY message.close "Zapri to sporočilo">
+<!ENTITY message.later.label "opomni me kasneje">
+<!ENTITY message.later.tooltip "Ponovno prikaži to poročilo">
+<!ENTITY message.1 "Do sedaj ste verjetno opazili veliko obsežnih sprememb v dodatku  Tab Groups 2. Upam, da vse deluje v redu in uživate v izboljšani izkušnji.">
+<!ENTITY message.2 "Ali ste vedeli, da se je moj računalnik v začetku leta pokvaril?">
+<!ENTITY message.3 "Prav ste imeli. Večina tega, kar vidite, je bilo napisanega na starem pomožnem računalniku, ki ga po naključju še imam in je slišati kot kosilnica. Zelo, zelo počasna kosilnica …">
+<!ENTITY message.4 "Če vam je dodatek všeč in uživate v novih značilnostih, razmislite o pomoči pri nakupu nove delovne postaje s prispevkom za dejavni razvoj dodatka.">
+<!ENTITY message.5 "Kliknite tukaj, da izveste, kako vsak majhen prispevek pomaga pri razvoju.">
+<!ENTITY message.6 "Seveda, če ne morete, bi bil zelo hvaležen lepe ocene na domači strani dodatka ali njegovim deljenjem s prijatelji. :)">
+<!ENTITY message.7 "Hvala za branje. Upam, da uživate v dodatku Tab Groups in kot običajno, če imate težave, mi to sporočite.">

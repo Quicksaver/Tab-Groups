@@ -1,0 +1,46 @@
+<!ENTITY moveToGroup.label "Mover al grupo">
+<!ENTITY moveToGroup.accesskey "M">
+<!ENTITY moveToNewGroup.label "Nuevo grupo">
+<!ENTITY viewTabGroups.label "Grupos de pestañas">
+<!ENTITY viewTabGroups.accesskey "G">
+<!ENTITY searchForTab.label "Buscar una pestaña...">
+<!ENTITY manageTabGroups.label "Administrar mis grupos">
+<!ENTITY manageTabGroups.tooltip "Entre en la vista de grupos para organizar sus pestañas y crear nuevos grupos">
+<!ENTITY buttonSearchTabs.label "Buscar grupos de pestañas">
+<!ENTITY buttonExitTabGroups.label "Salir de grupos de pestañas">
+<!ENTITY buttonOptionsTabGroups.label "Cambiar preferencias de grupos de pestañas">
+<!ENTITY buttonHelpTabGroups.label "Cómo usar los grupos de pestañas">
+<!ENTITY buttonClassic.label "Organización libre">
+<!ENTITY buttonGrid.label "Disposición de parrilla">
+<!ENTITY buttonSingle.label "Vista única">
+<!ENTITY buttonNewGroup.label "Crear nuevo grupo">
+<!ENTITY options.close.tooltip "Guarda y regresa">
+<!ENTITY options.notapplicable.single "(no aplicable en la vista única)">
+<!ENTITY options.title.tooltip "Dar nombre a este grupo de pestañas">
+<!ENTITY options.showThumbs.label "Mostrar miniaturas de pestañas">
+<!ENTITY options.showUrls.label "Mostrar direcciones junto a los títulos de las páginas">
+<!ENTITY options.catchOnce.caption "Reglas para captar pestañas hacia este grupo">
+<!ENTITY options.catchOnce.label "Captar sólo nuevas pestañas">
+<!ENTITY options.catchRules.placeholder1 "Inserte aquí expresiones regulares (regexp) para direcciones web. Las pestañas coincidentes se moverán automáticamente a este grupo.">
+<!ENTITY options.catchRules.placeholder2 "Use una línea por regla, puede haber tantas como quiera.">
+<!ENTITY options.catchRules.placeholder3 "Ejemplos:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - capta todas las páginas del repositorio del complemento">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - capta todas las páginas de informes de fallos de Firefox">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - capta todas las páginas de redes sociales más habituales">
+<!ENTITY options.stackTabs.caption "Cuando este grupo tenga demasiadas pestañas...">
+<!ENTITY options.stackTabs.stack.label "Apilar el grupo">
+<!ENTITY options.stackTabs.list.label "Desplazar el grupo">
+<!ENTITY sessionRestoreNotice.label "¡Sus pestañas y grupos no se restaurarán la próxima vez que inicie el navegador! Haga clic aquí para corregirlo.">
+<!ENTITY sessionRestoreNotice.dismiss.tooltip "Descartar esta advertencia hasta que reinicie el navegador">
+<!ENTITY sessionRestoreAutoChanged.label "Sus pestañas y grupos serán restaurados automáticamente la próxima vez que inicie el navegador.">
+<!ENTITY sessionRestorePrivate.label "Esta es una ventana privada, sus pestañas y grupos no se pueden restaurar una vez la cierre.">
+<!ENTITY message.close "Cerrar este mensaje">
+<!ENTITY message.later.label "Recordármelo más tarde">
+<!ENTITY message.later.tooltip "Mostrar de nuevo este mensaje en otro momento">
+<!ENTITY message.1 "Hasta ahora, estoy seguro de que habrá observado muchos de los extensos cambios en Tab Groups 2. Espero que todo esté funcionando bien y que esté disfrutando de la experiencia mejorada.">
+<!ENTITY message.2 "Pero, ¿sabía que mi computadora falló a comienzos de este año?">
+<!ENTITY message.3 "Así es. La mayoría de lo que ve fue escrito en una vieja máquina de respaldo que por casualidad aún tenía, una que suena como un cortacésped. Un cortacésped muy, muy lento...">
+<!ENTITY message.4 "Si le gusta el complemento y disfruta con alguna de sus nuevas características, por favor, considere ayudarme a comprar un nuevo equipo de trabajo, haciendo una contribución en interés del desarrollo activo del complemento.">
+<!ENTITY message.5 "Haga clic aquí para conocer cómo cada aportación, por pequeña que sea, mantiene vivo el desarrollo.">
+<!ENTITY message.6 "Por supuesto, si descarta esta opción, también apreciaría una buena revisión del complemento en su página principal, o que lo dé a conocer a sus amigos. :)">
+<!ENTITY message.7 "Gracias por llegar hasta aquí. Espero que disfrute de Tab Groups, y como es habitual, si tiene cualquier problema simplemente hágamelo saber.">

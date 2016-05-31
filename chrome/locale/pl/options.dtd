@@ -1,0 +1,76 @@
+<!ENTITY pane.tabGroups.label "Grupy kart">
+<!ENTITY pane.session.label "Kopia zapasowa">
+<!ENTITY opt.showGroupThumbs.label "Pokaż miniaturki grup w widoku pojedynczym">
+<!ENTITY opt.showGroupThumbs.tooltip "Ukrycie miniaturek grup pozostawi więcej miejsca na pokazanie twoich kart, kosztem polegania na nazwach grup, w celu odróżnienia i przełączania się między nimi.">
+<!ENTITY opt.gridDynamicSize.label "Użyj dynamicznej zmiany rozmiaru grup w układzie siatki">
+<!ENTITY opt.gridDynamicSize.tooltip1 "Dynamiczny rozmiar powoduje pełne wykorzystanie rozmiaru okna. Grupy ku górze będą większe niż te ku dołowi.">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Użyj tego na swoją korzyść przenosząc grupy ważniejsze, lub mające więcej kart, w kierunku góry.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "Mając to wyłączone, wszystkie grupy będą miały podobne wymiary, z wyjątkiem niezbędnych różnic, aby zmieścić je wszystkie na ekranie.">
+<!ENTITY opt.closeIfEmpty.label "Automatycznie zamykaj puste grupy">
+<!ENTITY opt.closeIfEmpty.tooltip "Grupa jest zamykana natychmiast, gdy zostanie zamknięta ostatnia karta. Możesz zachować pustą grupę wyłączając to ustawienie, lub po prostu nazywając grupę, lub zmieniając niektóre jej opcje.">
+<!ENTITY opt.showTabCounter.label "Pokaż liczbę kart obok nazwy grupy">
+<!ENTITY opt.showTabCounter.tooltip "Wskaźnik jest wyświetlany w górnej części grupy, dzięki czemu możesz łatwo się dowiedzieć, ile kart masz w każdej grupie.">
+<!ENTITY cat.defaults.label "Domyślnie grupy powinny...">
+<!ENTITY opt.showThumbs.label "Pokaż miniaturki kart">
+<!ENTITY opt.showThumbs.tooltip "Miniaturki pokazują treść każdej karty bezpośrednio w grupie. Wyłączenie tego zmienia grupę w listę kart reprezentowaną tylko przez ich tytuł i ikonę.">
+<!ENTITY opt.showUrls.label "Pokaż adresy obok tytułów stron">
+<!ENTITY opt.showUrls.tooltip "Aby w pełni wykorzystać przestrzeń zachowaną przez nie pokazywanie miniaturek kart, obok tytułu karty może być wyświetlany jej adres.">
+<!ENTITY cat.stackTabs.label "Kiedy grupy mają zbyt wiele kart...">
+<!ENTITY cat.stackTabs.tooltip "Miniaturki kart zajmują miejsce. Jeśli grupa nie może pokazać wszystkich swoich kart, ponieważ nie ma go wystarczająco dużo, możesz...">
+<!ENTITY opt.stackTabs.label "Utwórz stos">
+<!ENTITY opt.stackTabs.tooltip "Pokazana będzie tylko aktywna karta, ułożona na wierzchu innych. Nadal możesz mieć dostęp do wszystkich kart, klikając przycisk rozszerzenia grupy.">
+<!ENTITY opt.listTabs.label "Przewijaj grupę">
+<!ENTITY opt.listTabs.tooltip "Niektóre karty będą ukryte i będziesz musiał przewinąć grupę, aby uzyskać do nich dostęp. Należy pamiętać, że grupy zawsze będą się tak zachowywać w widoku pojedynczym, niezależnie co tutaj ustawisz.">
+<!ENTITY btn.setdefaults.label "Ustaw te opcje dla wszystkich grup">
+<!ENTITY btn.setdefaults.tooltip1 "Ponieważ powyższe opcje są stosowane przez grupy, zmieniając je tutaj dotyczyć będą jedynie nowych grupy utworzonych od tego momentu.">
+<!ENTITY btn.setdefaults.tooltip2 "Kliknij ten przycisk jeśli chcesz zastąpić te opcje dla wszystkich grup. W przeciwnym razie będziesz musiał ręcznie je ustawić lub zmienić dla każdej grupy osobno.">
+<!ENTITY cat.toolbarbutton.label "Przycisk paska narzędzi">
+<!ENTITY opt.groupTitleInButton.label "Pokaż nazwę aktywnej grupy">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Bądź pewny, która grupa jest aktywna, bezpośrednio z głównego okna bez konieczności wykonywania jakichkolwiek czynności.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "Przycisk nadal będzie pokazywał tylko ikonę, jeśli będzie umieszczony w panelu menu, lub jeśli będziesz miał tylko jedną grupę.">
+<!ENTITY opt.quickAccessButton.label "Kliknij, aby otworzyć panel szybkiego dostępu">
+<!ENTITY opt.quickAccessButton.tooltip1 "Panel szybkiego dostępu pozwala ci szybko przełączać się pomiędzy grupami i kartami bez otwierania widoku grup.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Wyłącz to, aby wejść do widoku grup, kiedy klikniesz przycisk.">
+<!ENTITY cat.keyboardshortcuts.label "Skróty klawiaturowe">
+<!ENTITY cat.backup.label "Utwórz kopię zapasową swoich grup kart">
+<!ENTITY cat.restore.label "Przywróć grupy kart">
+<!ENTITY cat.clear.label "Wyczyść grupy kart">
+<!ENTITY opt.tabViewKeyset.label "Wejście i wyjście do widoku grup">
+<!ENTITY opt.quickAccessKeyset.label "Otwórz panel szybkiego dostępu">
+<!ENTITY opt.nextGroupKeyset.label "Przełącz do następnej grupy">
+<!ENTITY opt.previousGroupKeyset.label "Przełącz do poprzedniej grupy">
+<!ENTITY sessionRestore.caption "Zachowanie grup kart po ponownym uruchomieniu">
+<!ENTITY sessionRestore.description "Aby Firefox zapamiętywał grupy kart, musi przywracać okna i karty między sesjami. W przeciwnym razie będziesz musiał ponowienie tworzyć grupy, po każdym zamknięciu i ponownym otwarciu przeglądarki.">
+<!ENTITY sessionRestore.button.label "Wyświetl okna i karty z poprzedniej sesji po uruchomieniu Firefoksa">
+<!ENTITY sessionRestore.button.tooltip.a "To jest taka sama zmiana ustawienia jak 'Po uruchomieniu programu Firefox' na 'wyświetl okna i karty z poprzedniej sesji' w opcjach Firefoksa.">
+<!ENTITY sessionRestore.button.tooltip.b "Jeśli zmienisz tę opcję później, znów będziesz tracił grupy kart, kiedy uruchomisz ponownie przeglądarkę, dopóki nie zmienisz tego z powrotem lub dopóki nie przyciśniesz tego przycisku ponownie.">
+<!ENTITY opt.noWarningsAboutSession.label "Nie ostrzegaj mnie o tym w widoku grup">
+<!ENTITY opt.noWarningsAboutSession.tooltip "Powiadomienie jest tam, aby przypominać, że nie należy zamykać okna przeglądarki, jeśli nie chce się stracić swoich kart i grup. Wyłącz je tylko wtedy, gdy jesteś pewien, że tego chcesz.">
+<!ENTITY session.backup.button "Utwórz plik kopii zapasowej">
+<!ENTITY session.backup.description "Eksportuj swoje grupy kart do pliku kopii zapasowej, w celu ich przechowania, dzięki czemu możesz je, w razie potrzeby, przywrócić w późniejszym czasie.">
+<!ENTITY session.backup.description2 "Wskazówka: użyj domyślnej nazwy pliku i lokalizacji zapisu; kiedy klikniesz poniżej 'Załaduj grupy i karty z...', kopia zapasowa pojawi się bezpośrednio w menu szybkiego dostępu.">
+<!ENTITY session.backup.autoloaded "Zapisany plik został załadowany poniżej. Proszę potwierdzić, że grupy i karty zostały zapisane poprawnie.">
+<!ENTITY session.backup.alldata.checkbox.label "Zapisz dane sesji">
+<!ENTITY session.backup.alldata.checkbox.tooltip.a "Może to być przydatne później, podczas przywracania grup z pliku kopii zapasowej. W przeciwnym razie będziesz w stanie przywrócić same grupy i karty jakie są obecnie w nich otwarte.">
+<!ENTITY session.backup.alldata.checkbox.tooltip.b "Jeśli nie dbasz o zachowanie historii kart, formularzy oraz innych danych z twoich kart, to nie potrzebujesz tego.">
+<!ENTITY session.backup.alldata.caution.a "Ostrzeżenie! Spowoduje to także eksport wszystkich danych obecnej sesji.">
+<!ENTITY session.backup.alldata.caution.b "Należy uważać na to, kto ma dostęp do tego pliku, będzie on zawierał informacje ze wszystkich kart, włącznie z historią stron, danymi formularzy oraz innymi prywatnymi i potencjalnie wrażliwymi informacjami.">
+<!ENTITY session.restore.button "Załaduj grupy i karty z...">
+<!ENTITY session.restore.from.file "Pliku...">
+<!ENTITY session.restore.import.button "Importuj zaznaczone pozycje do tego okna">
+<!ENTITY session.restore.import.tooltip.a "Po naciśnięciu tego przycisku możesz wejść w tryb grupowania kart i zorganizować nowo zaimportowane grupy tak jak zwykle.">
+<!ENTITY session.restore.import.tooltip.b "Zauważ, że możesz zaimportować tylko nowe grupy, nie możesz importować kart do istniejących grup. Oznacza to, że bardzo łatwo możesz skończyć z duplikatami grup, jeśli zaimportowałeś tę samą grupę dwa razy. W tym przypadku przejdź do trybu grupowania kart i zamknij te, których nie chcesz.">
+<!ENTITY session.restore.description "Załaduj plik kopii zapasowej zawierający grupy kart, który chcesz przywrócić. Następnie wybierz grupy i karty, które chcesz. Zostaną one załadowane do tego okna, dzięki czemu możesz uzyskać do nich dostęp, zorganizować i dostosować je tak jak inne.">
+<!ENTITY session.restore.invalid "Wybrany plik jest nieprawidłowy, uszkodzony lub nie zawiera żadnych informacji o grupach kart.">
+<!ENTITY session.restore.finished "Zaznaczone grupy zostały zaimportowane do tego okna. Wejdź teraz do trybu grupowania kart, aby uzyskać do nich dostęp, tak jak do innych grup.">
+<!ENTITY session.restore.list.check "Importuj">
+<!ENTITY session.restore.list.items "Grupy i karty">
+<!ENTITY session.clear.button "Wyczyść dane grup">
+<!ENTITY session.clear.tooltip "Nigdy nie powinieneś potrzebować tego robić, po prostu łatwiejsze i bezpieczniejsze jest wejście do trybu grupowania kart i zamknięcie dowolnych grup, których nie potrzebujesz.">
+<!ENTITY session.clear.description.a "Wyczyść dane wszystkich grup z obecnej sesji.">
+<!ENTITY session.clear.description.f "Zrób to tylko, jeśli wiesz co robisz!">
+<!ENTITY session.clear.description.b "Przed przystąpieniem zrób kopię zapasową swoich grup i kart.">
+<!ENTITY session.clear.description.c "Odświeży to wszystkie twoje okna przeglądarki i ich widoczne karty">
+<!ENTITY session.clear.description.g ", i usunie wszystkie karty w nieaktywnych grupach.">
+<!ENTITY session.clear.description.d "Ostrzeżenie: tej akcji nie można cofnąć!">
+<!ENTITY session.clear.description.e "Czy na pewno chcesz kontynuować?">

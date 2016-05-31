@@ -1,0 +1,76 @@
+<!ENTITY pane.tabGroups.label "Skupiny panelů">
+<!ENTITY pane.session.label "Záloha / Obnova">
+<!ENTITY opt.showGroupThumbs.label "Zobrazit náhledy skupin v jednoskupinovém zobrazení">
+<!ENTITY opt.showGroupThumbs.tooltip "Při skrytí náhledů skupin bude k dispozici více místa pro panely, ovšem za cenu toho, že rozlišit jednotlivé skupiny budete moci jen podle jejich názvu.">
+<!ENTITY opt.gridDynamicSize.label "Použít dynamickou změnu velikosti skupin v tabulkovém rozložení">
+<!ENTITY opt.gridDynamicSize.tooltip1 "Dynamická změna velikosti plně využívá velikosti okna. Skupiny jsoucí výše budou mít větší rozměry než skupiny jsoucí níže.">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Využijte toho tak, že přesunete důležitější skupiny nebo skupiny s velkým počtem panelů do vyšších pozic.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "Při nezaškrtnutí této volby budou mít všechny skupiny stejné rozměry, pouze s případnými rozdíly nutnými k tomu, aby se všechny vešli na obrazovku.">
+<!ENTITY opt.closeIfEmpty.label "Automaticky zavírat prázdné skupiny">
+<!ENTITY opt.closeIfEmpty.tooltip "Skupina bude ihned po zavření jejího posledního panelu zrušena. Prázdnou skupinu lze zachovat nezaškrtnutím této volby, jejím pojmenováním, nebo změnou některé z jejích voleb.">
+<!ENTITY opt.showTabCounter.label "Vedle názvu skupiny zobrazit počet panelů">
+<!ENTITY opt.showTabCounter.tooltip "Údaj se zobrazuje v horní části skupiny, abyste snadno zjistili, kolik panelů se v každé skupině nachází.">
+<!ENTITY cat.defaults.label "Výchozí chování skupin:">
+<!ENTITY opt.showThumbs.label "Zobrazovat náhledy panelů">
+<!ENTITY opt.showThumbs.tooltip "Náhledy ukazují obsah každého panelu přímo ve skupině. Jejich zrušením se skupina změní v seznam panelů reprezentovaných pouze jejich titulkem a ikonou.">
+<!ENTITY opt.showUrls.label "Vedle titulku stránky zobrazovat adresu">
+<!ENTITY opt.showUrls.tooltip "Nejsou-li zobrazovány náhledy panelů, můžete pro plné využití ušetřeného místa zobrazovat vedle titulku panelu jeho adresu.">
+<!ENTITY cat.stackTabs.label "Když mají skupiny příliš mnoho panelů…">
+<!ENTITY cat.stackTabs.tooltip "Náhledy panelů vyžadují místo. Když není ve skupině možné zobrazit všechny panely, protože není dostatečně velká, jsou dvě řešení:">
+<!ENTITY opt.stackTabs.label "Naskládat panely na sebe">
+<!ENTITY opt.stackTabs.tooltip "Panely budou naskládány do štosu s aktivním panelem navrchu. Pro zobrazení všech panelů klikněte na tlačítko pod štosem.">
+<!ENTITY opt.listTabs.label "Rolovat skupinu">
+<!ENTITY opt.listTabs.tooltip "Některé panely nebudou vidět a pro jejich zobrazení budete muset odrolovat dolů. Povšimněte si, že v jednopanelovém zobrazení se takto chovají skupiny vždycky bez ohledu na to, co je zde nastaveno.">
+<!ENTITY btn.setdefaults.label "Použít tato nastavení u všech skupin">
+<!ENTITY btn.setdefaults.tooltip1 "Jelikož se předvolby výše nastavují pro každou skupinu zvlášť, jejich změna zde ovlivní pouze nové skupiny vytvořené od této chvíle.">
+<!ENTITY btn.setdefaults.tooltip2 "Na toto tlačítko klikněte pouze tehdy, když chcete předvolby všech stávajících skupin přenastavit na hodnoty nastavené zde. Jinak je budete muset nastavit či změnit v každé jednotlivé skupině ručně.">
+<!ENTITY cat.toolbarbutton.label "Tlačítko na nástrojové liště">
+<!ENTITY opt.groupTitleInButton.label "Uvést název aktivní skupiny">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Mějte jistotu, jaká skupina je aktivní, přímo z hlavního okna prohlížeče, aniž byste museli cokoli dělat.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "Přesto tlačítko zobrazí ikonu v případě, že je umístěno do nabídky Firefoxu nebo máte jen jednu skupinu.">
+<!ENTITY opt.quickAccessButton.label "Po kliknutí zobrazit rychlou nabídku">
+<!ENTITY opt.quickAccessButton.tooltip1 "Rychlá nabídka vám umožňuje rychle přepínat mezi skupinami a panely bez nutnosti vstoupit do zobrazení skupin panelů.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Nezaškrtávejte tuto předvolbu, chcete-li po kliknutí na tlačítko na nástrojové liště ihned vstoupit do zobrazení skupin panelů.">
+<!ENTITY cat.keyboardshortcuts.label "Klávesové zkratky">
+<!ENTITY cat.backup.label "Zálohování skupin panelů">
+<!ENTITY cat.restore.label "Obnovení skupin panelů">
+<!ENTITY cat.clear.label "Vymazat skupiny panelů">
+<!ENTITY opt.tabViewKeyset.label "Zobrazení a opuštění skupin panelů">
+<!ENTITY opt.quickAccessKeyset.label "Otevření rychlé nabídky">
+<!ENTITY opt.nextGroupKeyset.label "Přepnutí na další skupinu">
+<!ENTITY opt.previousGroupKeyset.label "Přepnutí na předchozí skupinu">
+<!ENTITY sessionRestore.caption "Zachování skupin panelů po restartu prohlížeče">
+<!ENTITY sessionRestore.description "Aby si Firefox pamatoval vaše skupiny panelů, musí obnovovat vaše okna a panely mezi relacemi. Jinak budete muset po každém restartu prohlížeče vytvořit své skupiny panelů znovu.">
+<!ENTITY sessionRestore.button.label "Při startu Firefoxu zobrazit okna a panely z minula">
+<!ENTITY sessionRestore.button.tooltip.a "Toto je stejné jako změna volby &quot;Při startu aplikace Firefox&quot; v nastavení Firefoxu na hodnotu &quot;Zobrazit okna a panely z minula&quot;.">
+<!ENTITY sessionRestore.button.tooltip.b "Pokud zmíněnou volbu později změníte, nebudete mít po restartu prohlížeče své skupiny panelů k dispozici do doby, než ji nevrátíte zpět nebo nekliknete na toto tlačítko.">
+<!ENTITY opt.noWarningsAboutSession.label "Neupozorňovat mě na toto v zobrazení skupin panelů">
+<!ENTITY opt.noWarningsAboutSession.tooltip "Upozornění jsou tu proto, aby vás upomenuly, že byste neměli zavírat okno prohlížeče, pokud nechcete o své panely a skupiny přijít. Zakažte je pouze v případě, že jste si jisti, že to je to, co chcete.">
+<!ENTITY session.backup.button "Vytvořit soubor zálohy">
+<!ENTITY session.backup.description "Vyexportujte své skupiny panelů do souboru zálohy, abyste je mohli později v případě potřeby obnovit.">
+<!ENTITY session.backup.description2 "Doporučení: použijte výchozí název souboru a zachovejte nabízené umístění. Při kliknutí na tlačítko &quot;Načíst skupiny a panely z…&quot; níže se tak tato záloha objeví přímo v nabídce záloh.">
+<!ENTITY session.backup.autoloaded "Uložený soubor byl níže načten. Potvrďte prosím, že byly vaše skupiny a panely zazálohovány správně.">
+<!ENTITY session.backup.alldata.checkbox.label "Zálohovat data relace">
+<!ENTITY session.backup.alldata.checkbox.tooltip.a "Toto může být užitečné při pozdějším obnovování skupin z tohoto souboru zálohy. Jinak budou zazálohovány pouze informace o tom, jaké máte skupiny a jaké panely jsou v nich aktuálně otevřené.">
+<!ENTITY session.backup.alldata.checkbox.tooltip.b "Pokud nemáte zájem o uchování historie panelů, historie formulářů a jiných dat z vašich panelů, pak toto pole ponechte nezaškrtnuté.">
+<!ENTITY session.backup.alldata.caution.a "Pozor! Tímto se vyexportují i všechna data aktuální relace.">
+<!ENTITY session.backup.alldata.caution.b "Dávejte si pozor na to, kdo má přístup k tomuto souboru, protože bude obsahovat informace ze všech vašich panelů, včetně historie stránek, údajů z formulářů a jiných osobních a potenciálně citlivých informací.">
+<!ENTITY session.restore.button "Načíst skupiny a panely z…">
+<!ENTITY session.restore.from.file "Soubor…">
+<!ENTITY session.restore.import.button "Importovat vybrané položky do tohoto okna">
+<!ENTITY session.restore.import.tooltip.a "Po kliknutí na toto tlačítko můžete vstoupit do zobrazení skupin panelů a uspořádat si nově naimportované skupiny.">
+<!ENTITY session.restore.import.tooltip.b "Upozorňujeme, že naimportovat můžete pouze nové skupiny. Importovat panely do již existujících skupin možné není. To znamená, že se může velice snadno stát, že budete mít duplicitní skupiny, jestliže nějakou skupinu naimportujete dvakrát. V takovém případě jednoduše vstupte do zobrazení skupin panelů a zavřete skupiny, které nechcete.">
+<!ENTITY session.restore.description "Načtěte soubor zálohy obsahující skupiny panelů, které chcete obnovit. Poté vyberte konkrétní skupiny a panely. Načteny budou do toho okna, takže k nim budete moci přistoupit, uspořádat je a přizpůsobit si je jako každé jiné.">
+<!ENTITY session.restore.invalid "Vybraný soubor je buď neplatný, poškozený, nebo neobsahuje žádné informace o skupinách panelů.">
+<!ENTITY session.restore.finished "Vybrané skupiny byly importovány do tohoto okna. Pro přístup k nim vstupte do zobrazení skupin panelů.">
+<!ENTITY session.restore.list.check "Importovat">
+<!ENTITY session.restore.list.items "Skupiny a panely">
+<!ENTITY session.clear.button "Vymazat data skupin">
+<!ENTITY session.clear.tooltip "Tohle byste nikdy neměli potřebovat, je jednodušší a bezpečnější vstoupit do zobrazení skupin panelů a tam zavřít každou skupinu, kterou nechcete.">
+<!ENTITY session.clear.description.a "Vymažte data všech skupin z aktuální relace.">
+<!ENTITY session.clear.description.f "Toto proveďte pouze pokud víte, co děláte!">
+<!ENTITY session.clear.description.b "Než budete pokračovat, vytvořte zálohu svých skupin a panelů.">
+<!ENTITY session.clear.description.c "Toto znovunačte všechna okna prohlížeče a jejich viditelné panely">
+<!ENTITY session.clear.description.g ", a odstraní všechny panely v neaktivních skupinách.">
+<!ENTITY session.clear.description.d "Upozornění: tuto akci nelze vrátit zpět!">
+<!ENTITY session.clear.description.e "Opravdu si přejete pokračovat?">

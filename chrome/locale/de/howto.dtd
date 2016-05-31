@@ -1,31 +1,42 @@
 <!ENTITY howto.pane.label "Anleitung">
 <!ENTITY howto.overview.a "Tabgruppen sind gut dafür geeignet, Tabs nach Aufgaben zu sortieren. Zum Beispiel können Sie eine Tabgruppe für die Suche nach einem Geschenk und eine andere für das Bezahlen Ihrer Rechnungen haben. Erstellen Sie Gruppen für Dinge, die Sie häufig im Internet tun und verwenden Sie die Tabgruppen, um zwischen verschiedenen Aufgaben zu wechseln. So können Sie leicht den Überblick behalten.">
+<!ENTITY howto.mode.caption "How do I work in groups view?">
+<!ENTITY howto.mode.description "To enter groups view, either click on the toolbar button, or use the keyboard shortcut. There, you have three possible modes, toggle between them at any time through the controllers on the right:">
+<!ENTITY howto.single.description "Single view is the default mode. It is the simplest to use, and it is perfect for keeping separate groups stored away but always at hand.">
+<!ENTITY howto.grid.description "In grid layout, your groups are automatically sized according to how many you have and how much free space there is.">
+<!ENTITY howto.classic.description "In free arrange mode, you can position and resize your groups at will within the work space. You can use this visual organization to your advantage when working many different groups.">
 <!ENTITY howto.create.caption "Wie erstelle ich eine Tabgruppe?">
-<!ENTITY howto.create.step1 "Wechseln Sie über die Schaltfläche in der Symbolleiste oder das Tastaturkürzel in die Tabgruppen-Ansicht.">
-<!ENTITY howto.create.step2a "Wenn Sie zum ersten Mal in die Tabgruppen-Ansicht wechseln, sehen Sie Vorschaubilder von allen Tabs in einer Gruppe. Um eine neue Gruppe zu erstellen, können Sie einfach einen Tab aus der Gruppe ziehen, woraufhin ein Feld um diesen entsteht.">
+<!ENTITY howto.create.step0 "When you enter groups view for the first time, you'll see thumbnail previews of all of your tabs in one group.">
+<!ENTITY howto.create.step1a "In single view or grid layout, just click the Create New Group button at the bottom. You can't miss it.">
+<!ENTITY howto.create.step1b "In free arrange mode, to make a new group, simply drag one tab out of the group, a box will be drawn around it. Or you can click and drag directly in the free space to draw a new group yourself with the dimensions you want.">
 <!ENTITY howto.create.step2b "Sie können weitere Tabs zu dieser neuen Gruppe hinzufügen oder weitere Gruppen erstellen.">
 <!ENTITY howto.create.step3 "Wenn Sie fertig sind, klicken Sie einfach auf einen Tab, um die Ansicht zu verlassen. Sie kehren nun zu Firefox zurück, wobei der Tab, auf den Sie geklickt haben, aktiv ist und nur die Tabs der entsprechenden Gruppe sichtbar sind.">
 <!ENTITY howto.switch.caption "Wie wechsle ich zwischen verschiedenen Tabgruppen?">
-<!ENTITY howto.switch.description "Sie können leicht zwischen den verschiedenen Tabgruppen wechseln. Gehen Sie dazu in die Tabgruppen-Ansicht und klicken Sie auf die gewünschte Tabgruppe. Der Tab, auf den Sie geklickt haben, ist daraufhin aktiv und nur die Tabs dieser Gruppe sind sichtbar.">
+<!ENTITY howto.switch.description2 "It couldn't be simpler. Just enter the tab groups view, then click on the tab want to view. The tab you clicked on will be active and only the tabs in that group will be visible. You can also double-click on an empty area of any group, you will be taken to the last selected tab in that group.">
+<!ENTITY howto.overflow.caption "What's the difference between stacking and scrolling groups?">
+<!ENTITY howto.overflow.description "Tab thumbnails take up space. If a group isn't large enough for all its tabs to be shown, it can either be stacked or scrolled.">
+<!ENTITY howto.stack.description "Tabs in a stacked group are shown on top of one another. You can only interact with the active tab on top. Below this stack, there is a preview button, which you can click to access all the other tabs without changing the size of the group.">
+<!ENTITY howto.list.description "Instead, you can choose to display all tabs normally without stacking. Some of them will be hidden and you will have to scroll down to access them.">
+<!ENTITY howto.thumbs.description "You can also choose specific groups in which to not show tab thumbnails. The tabs will be listed with only their titles and optionally their addresses. This will happen as well in scrolled groups that aren't large enough to fit at least three columns of tabs, regardless of thumbnails being enabled or not.">
 <!ENTITY howto.search.caption "Wie durchsuche ich meine Tabs?">
 <!ENTITY howto.search.step1 "Wechseln Sie in die Tabgruppenansicht.">
 <!ENTITY howto.search.step2a "Klicken Sie auf die Suchschaltfläche am rechten Rand des Fensters, um das Suchfeld einzublenden und beginnen Sie dann damit, den Namen des gesuchten Tabs einzugeben.">
 <!ENTITY howto.search.step2b "Sie können auch einfach mit dem Tippen beginnen, um die Suche automatisch zu starten.">
-<!ENTITY howto.search.step3 "Während des Tippens werden die am Besten zu Ihrer Suchanfrage passenden Tabs hervorgehoben. Klicken Sie einfach auf einen Tab, um diesen auszuwählen und in Firefox anzuzeigen.">
-<!ENTITY howto.search.final "Wenn Sie mehr als ein Firefox-Fenster geöffnet haben, sehen Sie an der Unterseite des Fensters möglicherweise Tabs aus anderen Fenstern, die zu Ihrer Suchanfrage passen. Wenn Sie darauf klicken werden Sie zum entsprechenden Tab in der entsprechenden Gruppe im entsprechenden Fenster weitergeleitet.">
+<!ENTITY howto.search.step4 "As you type, the tabs that match your search will be highlighted. Just click on a tab to select it, you will leave groups view and be taken to that tab.">
 <!ENTITY howto.organize.caption "Wie verwalte ich meine Tabgruppen?">
 <!ENTITY howto.organize.description1 "Tabgruppen können leicht vergrößert, verkleinert, neu angeorgnet und umbenannt werden. Wenn Sie eine Tabgruppe nicht mehr benötigen, können Sie diese schließen und dadurch alle enthaltenen Tabs auf einmal loswerden.">
-<!ENTITY howto.organize.description2 "Wechseln Sie in die Tabgruppenansicht.">
 <!ENTITY howto.resize.caption "Die Größe von Tabgruppen ändern">
-<!ENTITY howto.resize.description1 "Klicken Sie auf das Vergrößerungs-/Verkleinerungs-Symbol in der rechten unteren Ecke einer Tabgruppe und ziehen Sie daran, um die Größe der Gruppe zu ändern. Die Tabs werden dann auch entsprechend größer oder kleiner dargestellt.">
-<!ENTITY howto.resize.description2 "Wenn Sie die Tabgruppe klein genug machen, werden die Tabs übereinander gestapelt. Darunter ist dann eine Vorschau-Schaltfläche zu sehen. Klicken Sie auf diese, um einen Überblick über die Tabs in dieser Gruppe zu erhalten, ohne die Größe ändern zu müssen.">
+<!ENTITY howto.resize.description3 "In free arrange mode, click and drag the resize handle at the bottom-right corner of a group to make it bigger or smaller. As you resize the group, its tabs will get bigger and smaller accordingly.">
+<!ENTITY howto.resize.description4 "In grid layout, this is all done for you, the groups will be stretched to show your tabs in as much space as they can.">
 <!ENTITY howto.rearrange.caption "Tabgruppen neu anordnen">
 <!ENTITY howto.rearrange.description "Klicken Sie auf einen freien Bereich an den Seiten oder an der Unterseite einer Gruppe und ziehen Sie sie herum, um sie an eine andere Stelle auf dem Bildschirm zu befördern.">
+<!ENTITY howto.rearrange.description2 "In grid layout, drop a group over another to have them exchange places. Place your most important groups, or the ones with the most tabs, at the top as they are usually larger than the ones at the bottom.">
 <!ENTITY howto.name.caption "Tabgruppen benennen">
 <!ENTITY howto.name.description "Klicken Sie oben in einer Tabgruppe neben das Stiftsymbol und geben Sie einen Namen für die Gruppe ein. Drücken Sie anschließend einfach die Eingabetaste oder klicken Sie in einen anderen Bereich des Fensters.">
 <!ENTITY howto.close.caption "Tabgruppen schließen">
 <!ENTITY howto.close.description1 "Jede Tabgruppe hat in der rechten oberen Ecke eine Schaltfläche zum Schließen. Durch Klicken auf diese wird die Tabgruppe mit all ihren Tabs geschlossen.">
 <!ENTITY howto.close.description2 "Wenn Sie eine Tabgruppe aus Versehen geschlossen haben, können Sie vor dem Verlassen dieser Ansicht auf die Schaltfläche zum Rückgängigmachen des Schließvorgangs einer Tabgruppe klicken, um diese wiederherzustellen.">
 <!ENTITY howto.pinned.caption "Angeheftete Tabs in Tabgruppen">
-<!ENTITY howto.pinned.description "Wenn Sie angeheftete Tabs in Tabgruppen verwenden, werden diese rechts von der entsprechenden Tabgruppe durch das Symbol der jeweiligen Website gekennzeichnet.">
+<!ENTITY howto.pinned.description2 "Pinned Tabs don't belong to any group. They are represented by their site's icon on the right side in groups mode, and will be visible regardless of what group you have active.">
+<!ENTITY howto.pinned.description3 "You can pin a tab while in groups view, by dragging it into this area. Likewise, drag a tab out of this area into any group to unpin it.">
 <!ENTITY howto.credits "Diese Seite basiert auf einem Artikel, der ursprünglich auf support.mozilla.org von diesen netten Menschen verfasst wurde:">

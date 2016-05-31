@@ -1,0 +1,42 @@
+<!ENTITY howto.pane.label "Cómo usarlo">
+<!ENTITY howto.overview.a "Los grupos de pestañas de Tab Groups son estupendos para agrupar pestañas por tareas. Por ejemplo, podría tener un grupo de pestañas relacionado con la búsqueda de un regalo, y otro grupo para pagar sus facturas en línea. Pruebe a crear grupos para cosas que hace en línea normalmente, y a use Tab Groups para cambiar entre ellos. Es una forma fácil de mantener la organización.">
+<!ENTITY howto.mode.caption "¿Cómo trabajo en la vista de grupos?">
+<!ENTITY howto.mode.description "Para entrar en la vista de grupos pulse el botón de barra de herramientas, o bien use el atajo de teclado. Allí tiene tres modos posibles, alterne entre ellos en cualquier momento mediante los controles de la derecha:">
+<!ENTITY howto.single.description "La vista única es el modo predeterminado. Es la más sencilla de usar, y es perfecta para mantener grupos separados almacenados aparte pero siempre a mano.">
+<!ENTITY howto.grid.description "En la disposición de parrilla, sus grupos se redimensionan automáticamente en función de cuántos tiene y cuánto espacio libre hay.">
+<!ENTITY howto.classic.description "En el modo de organización libre, puede posicionar y redimensionar sus grupos a voluntad dentro del espacio de trabajo. Puede usar esta organización de forma visual para su provecho al trabajar con muchos grupos distintos.">
+<!ENTITY howto.create.caption "¿Cómo creo un grupo de pestañas?">
+<!ENTITY howto.create.step0 "Cuando entre en la vista de grupos por primera vez, verá miniaturas de previsualización de todas sus pestañas en un grupo.">
+<!ENTITY howto.create.step1a "En la vista única o la disposición de parrilla, simplemente haga clic en el botón 'Crear nuevo grupo' en la parte inferior. No tiene pérdida.">
+<!ENTITY howto.create.step1b "En el modo de organización libre, para crear un nuevo grupo simplemente arrastre una pestaña fuera del grupo, se dibujará un recuadro alrededor de ella. O puede hacer clic y arrastrarla directamente hacia espacio libre para trazar un nuevo grupo usted mismo con las dimensiones que quiera.">
+<!ENTITY howto.create.step2b "Puede continuar añadiendo pestañas a ese nuevo grupo y puede crear más grupos.">
+<!ENTITY howto.create.step3 "Cuando haya acabado, simplemente pulse sobre una pestaña para salir de la vista de grupos. Volverá a Firefox y estará activa la pestaña sobre la que pulsó, sólo serán visibles las pestañas en ese grupo.">
+<!ENTITY howto.switch.caption "¿Cómo cambio entre grupos de pestañas?">
+<!ENTITY howto.switch.description2 "No podría ser más simple. Tan solo entre en la vista de grupos de pestañas, luego haga clic en la pestaña que quiera ver. La pestaña que pulsó estará activa, y sólo las pestañas de ese grupo serán visibles. También puede hacer doble-clic en un área vacía de cualquier grupo, y se le llevará a la última pestaña seleccionada de ese grupo.">
+<!ENTITY howto.overflow.caption "¿Cuál es la diferencia entre grupos apilados y desplazables?">
+<!ENTITY howto.overflow.description "Las miniaturas de pestañas ocupan espacio. Si un grupo no es suficientemente grande para que se muestren todas sus pestañas, se pueden o bien apilar o desplazar.">
+<!ENTITY howto.stack.description "Las pestañas en un grupo apilado se muestran una sobre otra. Sólo puede interactuar con la pestaña activa que esté en cabeza. A continuación de la pila, hay un botón de previsualización que puede pulsar para acceder a todas las demás pestañas sin cambiar el tamaño del grupo.">
+<!ENTITY howto.list.description "En su lugar, puede escoger mostrar todas las pestañas con normalidad, sin apilamiento. Algunas de ellas estarán ocultas y tendrá que desplazarse hacia abajo para acceder a ellas.">
+<!ENTITY howto.thumbs.description "También puede escoger grupos específicos en los que no mostrar miniaturas de pestañas. Las pestañas serán listadas sólo con sus títulos y opcionalmente con sus direcciones. Esto también ocurrirá en grupos desplazables que no sean suficientemente grandes para acomodar al menos tres columnas de pestañas, al margen de si las miniaturas están habilitadas o no.">
+<!ENTITY howto.search.caption "¿Cómo busco entre mis pestañas?">
+<!ENTITY howto.search.step1 "Entre en la vista de grupos de pestañas.">
+<!ENTITY howto.search.step2a "Pulse el botón buscar en el lado derecho de la pantalla para sacar el recuadro de búsqueda, y luego simplemente comience a escribir el nombre de la pestaña que está tratando de encontrar.">
+<!ENTITY howto.search.step2b "O simplemente comience a escribir y automáticamente se iniciará una búsqueda">
+<!ENTITY howto.search.step4 "Según escribe, las pestañas que coincidan con su criterio de búsqueda serán resaltadas. Simplemente haga clic en una pestaña para seleccionarla, y abandonará la vista de grupos y se le llevará a esa pestaña.">
+<!ENTITY howto.organize.caption "¿Cómo organizo mis grupos de pestañas?">
+<!ENTITY howto.organize.description1 "Los grupos de pestañas se pueden redimensionar, reorganizar y nombrar fácilmente. Cuando acabe con un grupo puede cerrarlo y librarse de todas sus pestañas de una vez.">
+<!ENTITY howto.resize.caption "Redimensionar grupos de pestañas">
+<!ENTITY howto.resize.description3 "En el modo de organización libre, haga clic y arrastre el regulador de redimensionamiento en la esquina inferior derecha de un grupo, para hacerlo más grande o más pequeño. Según redimensiona el grupo, sus pestañas se agrandarán y reducirán en consonancia.">
+<!ENTITY howto.resize.description4 "En la disposición de parrilla se hace todo esto de forma automática, los grupos se estirarán para mostrar sus pestañas aprovechando tanto espacio como sea posible.">
+<!ENTITY howto.rearrange.caption "Reorganizar grupos de pestañas">
+<!ENTITY howto.rearrange.description "Pulse y arrastre sobre un área vacía por los laterales o la parte inferior de un grupo, para moverlo por la pantalla.">
+<!ENTITY howto.rearrange.description2 "En la disposición de parrilla, suelte un grupo sobre otro para que intercambien sus posiciones. Sitúe sus grupos más importantes o aquellos con más pestañas en la parte superior, ya que habitualmente son más grandes que los de la parte inferior.">
+<!ENTITY howto.name.caption "Nombrar grupos de pestañas">
+<!ENTITY howto.name.description "Pulse junto al icono del lápiz, en la parte superior de un grupo, y escriba un nombre para él. Luego pulse Intro o haga clic sobre algún otro área de la ventana.">
+<!ENTITY howto.close.caption "Cerrar grupos de ventanas">
+<!ENTITY howto.close.description1 "Cada grupo de ventanas tiene un botón de cierre en la esquina superior derecha. Haciendo clic sobre él cerrará ese grupo y todas sus pestañas.">
+<!ENTITY howto.close.description2 "Si ha cerrado un grupo de pestañas por error, puede hacer clic en el botón 'Deshacer cierre de grupo' para restaurarlo antes de salir.">
+<!ENTITY howto.pinned.caption "Pestañas fijadas en grupos de pestañas">
+<!ENTITY howto.pinned.description2 "Las pestañas fijadas no pertenecen a ningún grupo. Están representadas por el icono de su sitio web en el lado derecho del modo de grupos, y serán visibles al margen de qué grupo tenga activo.">
+<!ENTITY howto.pinned.description3 "Puede fijar una pestaña mientras está en la vista de grupos arrastrándola hacia este área. De modo similar, arrastre una pestaña fuera de este área hacia cualquier grupo para liberarla.">
+<!ENTITY howto.credits "Este panel está basado en un artículo publicado originalmente en support.mozilla.org, escrito por estas excelentes personas:">

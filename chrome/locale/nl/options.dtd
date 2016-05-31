@@ -1,13 +1,42 @@
 <!ENTITY pane.tabGroups.label "Tabbladgroepen">
 <!ENTITY pane.session.label "Back-up maken / herstellen">
-<!ENTITY cat.general.label "Algemeen">
+<!ENTITY opt.showGroupThumbs.label "Groepminiaturen tonen in enkele weergave">
+<!ENTITY opt.showGroupThumbs.tooltip "Verbergen van de groepminiaturen zorgt voor meer ruimte waarin u uw tabbladen kunt zien, waarbij u niet op de groepsnamen hoeft te vertrouwen om groepen te onderscheiden en ertussen te wisselen.">
+<!ENTITY opt.gridDynamicSize.label "Dynamisch groepsgrootte aanpassen in rasterweergave">
+<!ENTITY opt.gridDynamicSize.tooltip1 "Dynamische grootte maakt volledig gebruik van uw schermgrootte. De groepen aan de bovenkant hebben dan grotere dimensies dan die aan de onderkant.">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Gebruik dit in uw voordeel door belangrijkere groepen, of die met meer tabbladen, naar de bovenste posities te verplaatsen.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "Als dit is uitgeschakeld, hebben alle groepen dezelfde afmetingen, met alleen de nodige verschillen om ze allemaal op het scherm te laten passen.">
+<!ENTITY opt.closeIfEmpty.label "Lege groepen automatisch sluiten">
+<!ENTITY opt.closeIfEmpty.tooltip "Een groep wordt meteen verwijderd zodra het laatste tabblad ervan is gesloten. U kunt een lege groep behouden door deze voorkeur uit te schakelen, of door de groep eenvoudig te benoemen of enkele opties ervan te wijzigen.">
+<!ENTITY opt.showTabCounter.label "Aantal tabbladen naast groepstitel tonen">
+<!ENTITY opt.showTabCounter.tooltip "Boven in de groep wordt een indicator getoond, zodat u makkelijk weet hoeveel tabbladen u in elke groep hebt.">
+<!ENTITY cat.defaults.label "Standaard moeten groepen…">
+<!ENTITY opt.showThumbs.label "Tabbladminiaturen tonen">
+<!ENTITY opt.showThumbs.tooltip "De miniaturen tonen de inhoud van elk tabblad direct in de groep. Uitschakelen hiervan wijzigt de groep naar een lijst met tabbladen die alleen door hun titel en pictogram worden voorgesteld.">
+<!ENTITY opt.showUrls.label "Adressen naast paginatitels tonen">
+<!ENTITY opt.showUrls.tooltip "Om volledig van de bespaarde ruimte gebruik te maken wanneer geen tabbladminiaturen worden getoond, kunt u de locatie van het tabblad naast de titel ervan laten tonen.">
+<!ENTITY cat.stackTabs.label "Als groepen te veel tabbladen bevatten…">
+<!ENTITY cat.stackTabs.tooltip "Tabbladminiaturen nemen ruimte in beslag. Als de groep niet alle tabbladen ervan kan tonen omdat deze niet groot genoeg is, kunt u…">
+<!ENTITY opt.stackTabs.label "De groep stapelen">
+<!ENTITY opt.stackTabs.tooltip "Alleen het actieve tabblad wordt getoond, boven op de andere gestapeld. U kunt de andere tabbladen nog steeds benaderen door op de uitvouwknop van de groep te klikken.">
+<!ENTITY opt.listTabs.label "De groep scrollen">
+<!ENTITY opt.listTabs.tooltip "Sommige tabbladen zullen worden verborgen, en u dient de groep te scrollen om ze te benaderen. Houd er rekening mee dat groepen zich in enkele weergave altijd zo gedragen, ongeacht wat u hier instelt.">
+<!ENTITY btn.setdefaults.label "Deze opties voor alle groepen instellen">
+<!ENTITY btn.setdefaults.tooltip1 "Omdat de bovenstaande opties per groep worden toegepast, is het wijzigen ervan op deze plek alleen van invloed op nieuwe groepen die u vanaf nu aanmaakt.">
+<!ENTITY btn.setdefaults.tooltip2 "Klik alleen op deze knop als u de hier ingestelde waarden voorrang wilt geven op de opties van bestaande groepen. Zo niet, dient u deze opties handmatig in elke individuele groep in te stellen of te wijzigen.">
+<!ENTITY cat.toolbarbutton.label "Werkbalkknop">
+<!ENTITY opt.groupTitleInButton.label "De naam van de actieve groep tonen">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Hiermee weet u zeker welke groep actief is, direct vanuit het hoofdvenster en zonder een actie uit te voeren.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "De knop toont nog steeds alleen het pictogram als deze in het hoofdmenupaneel wordt geplaatst, of als u maar één groep hebt.">
+<!ENTITY opt.quickAccessButton.label "Klikken voor openen van paneel voor snelle toegang">
+<!ENTITY opt.quickAccessButton.tooltip1 "Met het paneel voor snelle toegang kunt u snel tussen groepen en tabbladen wisselen zonder hiervoor de groepenweergave te openen.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Schakel dit uit om de groepenweergave te openen als u op de knop klikt.">
 <!ENTITY cat.keyboardshortcuts.label "Sneltoetsen">
 <!ENTITY cat.backup.label "Back-up van tabbladgroepen maken">
 <!ENTITY cat.restore.label "Tabbladgroepen herstellen">
 <!ENTITY cat.clear.label "Tabbladgroepen wissen">
-<!ENTITY opt.animateZoom.label2 "Vloeiende overgangen">
-<!ENTITY opt.animateZoom.tooltip "Vloeiende overgangen bij betreden en verlaten van de tabbladgroepenmodus, door van het huidige tabblad naar de groepenmodus uit te zoomen, en bij verlaten van de groepenmodus weer naar het tabblad in te zoomen.">
 <!ENTITY opt.tabViewKeyset.label "Groepenmodus betreden en verlaten">
+<!ENTITY opt.quickAccessKeyset.label "Paneel voor snelle toegang openen">
 <!ENTITY opt.nextGroupKeyset.label "Wisselen naar de volgende groep">
 <!ENTITY opt.previousGroupKeyset.label "Wisselen naar de vorige groep">
 <!ENTITY sessionRestore.caption "Tabbladgroepen behouden bij herstarten">
@@ -15,27 +44,29 @@
 <!ENTITY sessionRestore.button.label "Mijn tabbladen en vensters van de vorige keer tonen als Firefox start">
 <!ENTITY sessionRestore.button.tooltip.a "Dit is hetzelfde als het wijzigen van de voorkeur ‘Als Firefox start’ naar ‘Mijn vensters en tabbladen van de vorige keer tonen’ in de opties van Firefox.">
 <!ENTITY sessionRestore.button.tooltip.b "Als u die optie daar later wijzigt, verliest u opnieuw uw tabbladgroepen bij het herstarten van de browser, totdat u dit terugzet of opnieuw op deze knop klikt.">
+<!ENTITY opt.noWarningsAboutSession.label "Hiervoor niet waarschuwen in groepenweergave">
+<!ENTITY opt.noWarningsAboutSession.tooltip "De meldingen zijn er om u eraan te herinneren dat u het browservenster niet moet sluiten als u uw tabbladen en groepen niet wilt kwijtraken. Schakel ze alleen uit als u zeker weet dat u dit wilt.">
 <!ENTITY session.backup.button "Back-upbestand maken">
 <!ENTITY session.backup.description "Exporteer uw tabbladgroepen naar een back-upbestand voor bewaring, zodat u ze wanneer nodig op een later tijdstip kunt herstellen.">
+<!ENTITY session.backup.description2 "Suggestie: gebruik de standaard bestandsnaam en opslaglocatie; als u hieronder op ‘Groepen en tabbladen laden vanaf…’ klikt, verschijnt de back-up direct in het menu voor snelle toegang.">
 <!ENTITY session.backup.autoloaded "Het opgeslagen bestand is hieronder geladen. Bevestig dat de back-up van uw groepen en tabbladen is gelukt.">
 <!ENTITY session.backup.alldata.checkbox.label "Back-up van sessiegegevens maken">
 <!ENTITY session.backup.alldata.checkbox.tooltip.a "Dit kan handig zijn voor later bij het herstellen van groepen vanuit dit back-upbestand. Anders zult u alleen de groepen zelf kunnen herstellen, en de tabbladen die er momenteel in zijn geopend.">
 <!ENTITY session.backup.alldata.checkbox.tooltip.b "Als u geen belang hecht aan het behouden van geschiedenis, formulieren of andere gegevens van uw tabbladen, hebt u dit niet nodig.">
 <!ENTITY session.backup.alldata.caution.a "Waarschuwing! Hierdoor worden ook alle gegevens van de huidige sessie geëxporteerd.">
-<!ENTITY session.backup.alldata.caution.b "Wees voorzitchtig met wie er toegang heeft tot dit bestand; het bevat gegevens van al uw tabbladen, waaronder paginageschiedenis, formuliergegevens en andere persoonlijke en mogelijk gevoelige gegevens.">
-<!ENTITY session.restore.load.button "Back-upbestand laden">
-<!ENTITY session.restore.migrated.button "Migratieback-up laden">
-<!ENTITY session.restore.migrated.tooltip "Dit is de back-up die door Firefox werd aangemaakt toen het werd bijgewerkt, volgend op de verwijdering van de ingebouwde Tabbladgroepen. Deze zou al uw groepen en tabbladen van voor de update moeten bevatten.">
+<!ENTITY session.backup.alldata.caution.b "Wees voorzichtig met wie er toegang heeft tot dit bestand; het bevat gegevens van al uw tabbladen, waaronder paginageschiedenis, formuliergegevens en andere persoonlijke en mogelijk gevoelige gegevens.">
+<!ENTITY session.restore.button "Groepen en tabbladen laden vanaf…">
+<!ENTITY session.restore.from.file "Bestand…">
 <!ENTITY session.restore.import.button "Geselecteerde items naar dit venster importeren">
 <!ENTITY session.restore.import.tooltip.a "Nadat u op deze knop klikt, kunt u naar de tabbladgroepenmodus wisselen en de nieuw geïmporteerde groepen ordenen zoals gebruikelijk.">
 <!ENTITY session.restore.import.tooltip.b "Houd er rekening mee dat u alleen nieuwe groepen kunt importeren; u kunt geen tabbladen in bestaande groepen importeren. Dit houdt in dat u vrij eenvoudig dubbele groepen kunt overhouden als u dezelfde groep twee keer importeert. Ga in dat geval naar de tabbladgroepenmodus en sluit de niet-gewenste groepen.">
-<!ENTITY session.restore.description "Laad een back-upbestand dat de tabbladgroepen die u wilt herstellen bevat. Kies daarna de gewenste groepen en tabbladen. Deze worden in dit venster geladen, zodat u ze net als alle andere kunt benaderen, schikken en aanpassen.">
+<!ENTITY session.restore.description "Laad een back-upbestand dat de tabbladgroepen bevat die u wilt herstellen. Kies daarna de gewenste groepen en tabbladen. Deze worden in dit venster geladen, zodat u ze net als alle andere kunt benaderen, schikken en aanpassen.">
 <!ENTITY session.restore.invalid "Het geselecteerde bestand is ongeldig, beschadigd, of bevat geen tabbladgroepengegevens.">
 <!ENTITY session.restore.finished "De geselecteerde groepen zijn naar dit venster geïmporteerd. Ga nu naar de tabbladgroepenmodus om ze net als alle andere groepen te benaderen.">
 <!ENTITY session.restore.list.check "Importeren">
 <!ENTITY session.restore.list.items "Groepen en tabbladen">
 <!ENTITY session.clear.button "Groepengegevens wissen">
-<!ENTITY session.clear.tooltip "Dit zou nooit nodig hoeven te zijn; het is eenvoudiger en veiliger om de tabbladgroepenmodus te openen en niet-gewenste groepen te sluiten.">
+<!ENTITY session.clear.tooltip "Dit zou nooit nodig hoeven zijn; het is eenvoudiger en veiliger om de tabbladgroepenmodus te openen en niet-gewenste groepen te sluiten.">
 <!ENTITY session.clear.description.a "Alle groepengegevens van de huidige sessie wissen.">
 <!ENTITY session.clear.description.f "Doe dit alleen als u weet wat u doet!">
 <!ENTITY session.clear.description.b "Maak een back-up van uw groepen en tabbladen voordat u verdergaat.">

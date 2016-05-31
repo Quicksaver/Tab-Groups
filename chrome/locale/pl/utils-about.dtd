@@ -1,0 +1,26 @@
+<!ENTITY about.paneTitle "O rozszerzeniu">
+<!ENTITY about.version "Wersja {v}">
+<!ENTITY about.uptodate "aktualna, gratulacje!">
+<!ENTITY about.needsupdate "aktualizacja dostępna!">
+<!ENTITY about.description "Sprawdź poniżej &quot;Informacje o wydaniu&quot; i &quot;Znane problemy&quot; dla tej wersji. Daj mi znać o wszystkich problemach jakie znalazłeś, lub jeśli masz jakąś sugestię dla przyszłych wydań.">
+<!ENTITY about.descriptionB "Dodatek jest darmowy, ale rozwiązywanie problemów, dodawanie nowych funkcji i zapewnienie, że wszystko będzie działało z każdym nowym wydaniem Firefoksa jest pracochłonne i może być czasami trudne. Jeśli korzystasz z dodatku, proszę wesprzyj jego dalszy rozwój. Tak jak mówi link, &quot;Możesz Pomóć&quot;!">
+<!ENTITY about.descriptionC "Obejrzyj również najnowszy odcinek mojej internetowej serii o życiu z Firefoksem, zrobiony dla was wszystkich, najbardziej wspierających użytkowników, o jakich deweloper może prosić! Po prostu wskaż podskakującą ikonę w dolnym rogu tej strony. Kochaj to. Nienawidź tego. Udostępnij to.">
+<!ENTITY about.allVersions "Pokaż informacje o wszystkich poprzednich wersjach">
+<!ENTITY about.notifyOnUpdates "Pokaż mi tę kartę po kolejnej aktualizacji">
+<!ENTITY about.development "Status rozwoju">
+<!ENTITY about.helpdevelopment "MOŻESZ POMÓĆ">
+<!ENTITY about.information "Więcej informacji">
+<!ENTITY about.home "Strona główna dodatku">
+<!ENTITY about.fullchangelog "Pełna historia zmian">
+<!ENTITY about.problems "Masz problemy?">
+<!ENTITY about.tech "Otwórz problem na stronie wsparcia opisując swój problem">
+<!ENTITY about.email "Lub wyślij mi e-mail o tym">
+<!ENTITY about.author "Więcej od autora">
+<!ENTITY about.trymore "Wypróbuj jeden z moich dodatków dla jeszcze lepszych doświadczeń Firefoksa!">
+<!ENTITY about.profile "Znajdziesz je w moim profilu">
+<!ENTITY about.share "Podziel się!">
+<!ENTITY about.friends "Nie bądź jedyny ze świetną przeglądarką. Ciesz się nią ze znajomymi.">
+<!ENTITY about.hidePromo "X">
+<!ENTITY about.hideThisPromo "pokaż ponownie, gdy pojawi się nowy odcinek">
+<!ENTITY about.hideAllPromos "nigdy nie pokazuj mi materiałów promocyjnych takich jak ten">
+<!ENTITY about.clicktowatch "oglądaj na YouTube">

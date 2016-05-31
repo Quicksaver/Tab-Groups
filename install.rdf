@@ -33,10 +33,26 @@
 		</em:localized>
 		<em:localized>
 			<Description>
+				<em:locale>cs</em:locale>
+				<em:name>Tab Groups</em:name>
+				<em:description>Doplněk Tab Groups (Skupiny panelů) usnadňuje organizaci velkého počtu panelů. Pomocí grafického rozhraní je možné seskupovat související panely, přepínat mezi skupinami, a rychle vyhledat a přejít na konkrétní panel.</em:description>
+				<em:translator>v.ovcacik @ Babelzilla</em:translator>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
 				<em:locale>de</em:locale>
 				<em:name>Tabgruppen</em:name>
 				<em:description>Tabgruppen sind eine einfache Möglichkeit viele Tabs zu organisieren. Sie können verwandte Tabs visuell gruppieren, zwischen Gruppen wechseln, und in allen Tabs suchen, um zu einem bestimmten zu wechseln.</em:description>
 				<em:translator>poke @ Babelzilla, pollti</em:translator>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
+				<em:locale>es</em:locale>
+				<em:name>Tab Groups</em:name>
+				<em:description>Los grupos de pestañas de Tab Groups son una forma fácil de organizar muchas pestañas. Puede agrupar visualmente pestañas relacionadas, alternar entre grupos, y buscar rápidamente por todas sus pestañas para cambiar a una específica.</em:description>
+				<em:translator>strel</em:translator>
 			</Description>
 		</em:localized>
 		<em:localized>
@@ -49,10 +65,34 @@
 		</em:localized>
 		<em:localized>
 			<Description>
+				<em:locale>ja-JP</em:locale>
+				<em:name>Tab Groups</em:name>
+				<em:description>タブグループで多くのタブを簡単に整理できます。タブを視覚的にまとめたり、グループを切り替えたり、すべてのタブからすばやく検索して特定のタブを開けます。</em:description>
+				<em:translator>Masahiko Imanaka, Norah @ Babelzilla</em:translator>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
+				<em:locale>ja-JP-mac</em:locale>
+				<em:name>Tab Groups</em:name>
+				<em:description>タブグループで多くのタブを簡単に整理できます。タブを視覚的にまとめたり、グループを切り替えたり、すべてのタブからすばやく検索して特定のタブを開けます。</em:description>
+				<em:translator>Masahiko Imanaka</em:translator>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
 				<em:locale>nl</em:locale>
-				<em:name>Tabbladgroepen</em:name>
+				<em:name>Tab Groups</em:name>
 				<em:description>Tabbladgroepen bieden een eenvoudige manier om veel tabbladen te ordenen. U kunt gerelateerde tabbladen visueel groeperen, wisselen tussen groepen, en snel al uw tabbladen doorzoeken om naar een bepaald tabblad te wisselen.</em:description>
-				<em:translator>Tonnes @ Babelzilla</em:translator>
+				<em:translator>markh van BabelZilla.org, Tonnes @ Babelzilla</em:translator>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
+				<em:locale>pl</em:locale>
+				<em:name>Tab Groups</em:name>
+				<em:description>Grupy kart to prosty sposób, aby zorganizować wiele kart. Możesz wizualnie pogrupować powiązane karty, przełączać się pomiędzy grupami i szybko przeszukiwać wszystkie swoje karty, aby przełączyć się do konkretnej.</em:description>
+				<em:translator>fx4waldi @ Babelzilla</em:translator>
 			</Description>
 		</em:localized>
 		<em:localized>
@@ -65,10 +105,18 @@
 		</em:localized>
 		<em:localized>
 			<Description>
+				<em:locale>sl</em:locale>
+				<em:name>Tab Groups</em:name>
+				<em:description>Tab Groups je dodatek za enostavno organiziranje velikega števila zavihkov. Povezane zavihke lahko združite, preklapljate med skupinami in hitro iščete po njih za preklop na želenega.</em:description>
+				<em:translator>Peter Klofutar</em:translator>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
 				<em:locale>zh-CN</em:locale>
 				<em:name>Tab Groups</em:name>
-				<em:description>Tab Groups 可以轻松组织管理海量标签页。你可以可视化为相关标签页分组，在不同分组之间切换，以及通过快速搜索所有标签页切换到指定的分组。</em:description>
-				<em:translator>fang5566 @ Babelzilla</em:translator>
+				<em:description>Tab Groups 可以助您轻松管理海量标签页。你可以可视化分组相关的标签页，在不同分组之间切换，以及快速搜索所有标签页并切换到指定的分组。</em:description>
+				<em:translator>fang5566 @ Babelzilla, YFdyh000</em:translator>
 			</Description>
 		</em:localized>
 		<em:localized>

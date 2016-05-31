@@ -1,0 +1,42 @@
+<!ENTITY howto.pane.label "Kako uporabljati">
+<!ENTITY howto.overview.a "Skupine zavihkov so odlične za združevnje zavihkov po opravilih. Na primer lahko imate skupino zavihkov povezano z iskanjem darila ali s spletnim plačevanjem računov. Poskusite ustvariti skupine za stvari, ki jih običajno izvajate na spletu in uporabite skupine zavihkov za preklop med njimi. To je enostaven način, da ostanete organizirani.">
+<!ENTITY howto.mode.caption "Kako delam v pogledu skupin?">
+<!ENTITY howto.mode.description "Za vstop v pogled skupin kliknite na gumb orodne vrstice ali uporabite tipkovno bližnjico. Tam imate tri možne načine, med katerimi preklapljate z nadzornimi gumbi na desni:">
+<!ENTITY howto.single.description "Privzeti način je enojni pogled. Je najpreprostejši za uporabo in popoln za ločene skupine, ki so vedno na voljo.">
+<!ENTITY howto.grid.description "V mrežni razporeditvi se velikost vaših skupin samodejno spreminja glede na njihovo število in količino nezasedenega prostora.">
+<!ENTITY howto.classic.description "V načinu proste razporeditve lahko skupine v delovnem prostoru postavljate in spreminjate njihovo velikost po svoji želji. To ureditev lahko uporabite v svojo korist, ko delate z različnimi skupinami.">
+<!ENTITY howto.create.caption "Kako ustvarim skupino zavihov?">
+<!ENTITY howto.create.step0 "Ko prvič vstopite v pogled skupin, boste videli sličice vseh zavihkov v eni skupini.">
+<!ENTITY howto.create.step1a "V enojnem ali mrežnem pogledu na dnu kliknite na gumb Ustvari novo skupino. Ne morete ga zgrešiti.">
+<!ENTITY howto.create.step1b "V načinu proste razporeditve za ustvarjanje nove skupine preprosto povlecite en zavihek izven skupine, nakar se bo okoli njega narisalo polje, ali v nezasedenem prostoru kliknite in povlecite, da narišete novo skupino z želenimi merami.">
+<!ENTITY howto.create.step2b "Zavihke lahko še naprej dodajate v novo skupino ali ustvarite več skupin.">
+<!ENTITY howto.create.step3 "Ko končate, kliknite na zavihek za izhod iz pogleda. Vrnili se boste v Firefox, zavihek, na katerega ste kliknili bo dejaven in samo zavihki iz te skupine bodo vidni.">
+<!ENTITY howto.switch.caption "Kako preklapljam med skupinami zavihkov?">
+<!ENTITY howto.switch.description2 "Nič preprostejšega. Vstopite v pogled skupin zavihkov in kliknite na zavihek, ki si ga želite ogledati. Ta zavihek bo dejaven in vidni bodo samo zavihke te skupine. Če dvokliknete na prazen prostor skupine, bo prikazan zadnje izbrani zavihek te skupine.">
+<!ENTITY howto.overflow.caption "Kaj je razlika med skladi skupin in pomičnimi skupinami?">
+<!ENTITY howto.overflow.description "Sličice zavihkov zasedajo prostor. Če skupina ni dovolj velika za prikaz vseh njenih zavihkov, jo lahko postavite v sklad ali naredite pomično.">
+<!ENTITY howto.stack.description "Zavihki v skladu skupine so prikazani eden vrh drugega. Delate lahko samo z dejanim zavihkom na vrhu. Pod tem skladom je gumb za predogled, katerega lahko kliknete za dostop do vseh drugih zavihkov brez spreminjanja velikosti skupine.">
+<!ENTITY howto.list.description "Lahko pa tudi izberete običajni prikaz zavihkov brez sklada. Nekateri bodo skriti in za dostop do njih se boste morali pomakniti.">
+<!ENTITY howto.thumbs.description "Izberete lahko tudi določene skupine, katere ne prikazujejo sličic zavihkov. Zavihki bodo navedeni samo s svojimi nazivi in izbirno z naslovi. To se bo zgodilo v pomičnih skupinah, ki niso dovolj velike za vsaj tri stolpce zavihkov ne glede na to, ali so sličice omogočene ali ne.">
+<!ENTITY howto.search.caption "Kako iščem po zavihkih?">
+<!ENTITY howto.search.step1 "Vstopite v pogled skupin zavihkov.">
+<!ENTITY howto.search.step2a "Kliknite na gumb za iskanje na desni strani okna, da prikažete iskalno polje in začnite tipkati ime zavihka.">
+<!ENTITY howto.search.step2b "Ali pa samo začnite tipkati in iskanje se bo samodejno izvedlo.">
+<!ENTITY howto.search.step4 "Med tipkanjem bodo zavihki, ki se ujemajo z iskanjem, poudarjeni. Kliknite na zavihek, da ga izberete. Zapustili boste pogled skupin in prikazal se bo izbrani zavihek.">
+<!ENTITY howto.organize.caption "Kako organiziram skupine zavihkov?">
+<!ENTITY howto.organize.description1 "Velikost skupin zavihov lahko enostavno spremenite in skupine zavihkov preimenujete ali preuredite. Ko s skupino končate, jo lahko zaprete in se naenkrat znebite vseh njenih zavihkov.">
+<!ENTITY howto.resize.caption "Spreminjanje velikosti skupin zavihkov">
+<!ENTITY howto.resize.description3 "V načinu proste razporeditve kliknite in povlecite ročnik za spreminjanje velikosti v spodnjem desnem kotu skupine za povečavo ali pomanjšavo skupine. Med spreminjanjem velikosti se bo velikost zavihkov ustrezno povečala ali pomanjšala.">
+<!ENTITY howto.resize.description4 "V mrežni razporeditvi se to zgodi samodejno. Skupine bodo raztegnjene, da se zavihki prikažejo na največji možni površini.">
+<!ENTITY howto.rearrange.caption "Preurejanje skupin zavihkov">
+<!ENTITY howto.rearrange.description "Kliknite in povlecite na prazno področje vzdolž leve, desne ali spodnje strani skupine, da jo premaknete po zaslonu.">
+<!ENTITY howto.rearrange.description2 "V mrežni razporeditvi spustite skupino v drugo, da si zamenjata mesti. Postavite najpomembnejše skupine ali tiste z največ zavihki na vrh, ker so običajno večje od tistih na dnu.">
+<!ENTITY howto.name.caption "Poimenovanje skupin zavihkov">
+<!ENTITY howto.name.description "Kliknite poleg ikone svinčnika na vrhu skupine in zanjo vtipkajte ime. Pritisnite Enter ali kliknite na drugo področje okna.">
+<!ENTITY howto.close.caption "Zapiranje skupin zavihkov">
+<!ENTITY howto.close.description1 "Vsaka skupina zavihkov ima v zgornjem desnem kotu gumb za zapiranje. Klik na njega bo zaprl to skupino in vse njene zavihke.">
+<!ENTITY howto.close.description2 "Če ste skupino zavihkov po nesreči zaprli, lahko kliknite na gumb za razveljavitev zapiranja, da jih pred izstopom obnovite.">
+<!ENTITY howto.pinned.caption "Pripeti zavihki v skupinah zavihov">
+<!ENTITY howto.pinned.description2 "Pripeti zavihki ne pripadajo nobeni skupini. Predstavljajo jih ikone njihovih strani na desni strani načina skupin in bodo vidni ne glede na to, katero skupino imate dejavno.">
+<!ENTITY howto.pinned.description3 "Zavihek lahko pripnete v pogledu skupin z vlečenjem na to področje. Za odpenjanje ga povlecite ven iz tega področja.">
+<!ENTITY howto.credits "To podokno je osnovano na izvirnem članku s strani support.mozilla.org, ki so ga napisali ti dobri ljudje:">

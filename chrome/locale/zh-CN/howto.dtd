@@ -1,31 +1,42 @@
 <!ENTITY howto.pane.label "使用指南">
-<!ENTITY howto.overview.a "Tab Groups 特别适合根据不同任务为标签页分组。例如，你可以有一组和搜寻礼物有关的标签页，也可以有另一组和在线支付账单的标签页。试着为你日常在线做所的事创建分组并使用 Tab Groups 在这些群组之间切换。在保持事情有条理方面，它着实很方便。">
-<!ENTITY howto.create.caption "如何新建标签页群组？">
-<!ENTITY howto.create.step1 "点击工具栏按钮或使用键盘快捷键进入标签页群组查看模式。">
-<!ENTITY howto.create.step2a "当你首次进入了标签页群组视图后，你会看到所有的标签页的缩略图都在一个分组里。要创建一个新的分组，只要将这个分组中的任意一个标签拖到分组外面，这时 Firefox 会自动在这两个标签周围形成盒子。">
-<!ENTITY howto.create.step2b "然后你就可以继续向这个新的分组添加标签页，还能创建更多的分组。">
-<!ENTITY howto.create.step3 "在这些都完成后，你可以在任意一个标签页上点击一下就可以退出标签页群组视图。然后返回到了 Firefox 时，你点击的那个标签页会处于激活状态，并且只有这个标签页所在的分组才是可见的。">
-<!ENTITY howto.switch.caption "如何在组与组之间切换？">
-<!ENTITY howto.switch.description "在组与组之间切换很简单，只需进入标签页群组查看模式，点击你要查看的标签页群组。这时你点击的那个标签页会处于激活状态，并且只有这个标签页所在的分组才是可见的。">
-<!ENTITY howto.search.caption "如何进行标签页搜索？">
-<!ENTITY howto.search.step1 "进入标签页群组查看模式。">
-<!ENTITY howto.search.step2a "点击窗口右边的搜索按钮打开搜索框，然后开始输入你想要查找的标签页的名字。">
-<!ENTITY howto.search.step2b "或者你可以在标签页群组视图开始键盘输入，搜索会自动生成。">
-<!ENTITY howto.search.step3 "随着你的键入，符合你搜索条件的标签页会被高亮显示。然后点击对应的标签页，并返回到 Firefox。">
-<!ENTITY howto.search.final "如果你打开了不止一个 Firefox 窗口，你可能还会看到其他窗口中符合搜索条件的标签页被列出在了当前窗口的底部。点击其中的一个会切换到该标签页所在的窗口，以及对应的标签页和分组。">
-<!ENTITY howto.organize.caption "如何组织标签页群组？">
-<!ENTITY howto.organize.description1 "你可以轻松的调整分组的大小，重新排列，对其进行命名，甚至一次关闭所有的分组。">
-<!ENTITY howto.organize.description2 "进入标签页群组查看模式。">
+<!ENTITY howto.overview.a "Tab Groups 特别适合根据不同任务为标签页分组。例如，你可以有一组与搜寻礼物有关的标签页，并有另一组与在线支付账单相关的标签页。试着为你的日常活动创建分组，并使用 Tab Groups 在这些分组之间切换。在保持事情有条有理方面，它肯定方便。">
+<!ENTITY howto.mode.caption "如何使用分组管理界面？">
+<!ENTITY howto.mode.description "进入分组管理界面：只需点击工具栏按钮，或者使用键盘快捷键。管理界面目前有三种模式，你可以用右侧的控件随时切换它们：">
+<!ENTITY howto.single.description "单组视图：这是默认模式。它易于使用，最适合经常使用单个分组，将其他分组隐藏在身后。">
+<!ENTITY howto.grid.description "网格视图：你的分组会自动根据当前状况和可用空间调整尺寸。">
+<!ENTITY howto.classic.description "自由放置：你可以随意调整和放置空间内的分组。在有许多、各类分组时，用它布局可以形成一些视觉设计。">
+<!ENTITY howto.create.caption "如何创建标签页分组？">
+<!ENTITY howto.create.step0 "在您首次进入分组管理界面时，您会看到您的所有标签页在单个分组内的缩略图预览。">
+<!ENTITY howto.create.step1a "在单组视图或网格视图中，点击末尾的创建新分组按钮即可，很容易找到它。">
+<!ENTITY howto.create.step1b "在自由放置模式中，创建一个新分组只需将一个标签页拖放到分组外，一个分组就会围绕它创建。你也可以在空白位置单击并拖拽出一个分组轮廓来创建分组，位置和尺寸随你所想。">
+<!ENTITY howto.create.step2b "然后你就可以继续向这个新的分组中添加标签页，或者创建更多的分组。">
+<!ENTITY howto.create.step3 "以上操作都完成后，你可以在任意一个标签页上点击一下，这样就能退出标签页分组查看模式。在返回 Firefox 时，你刚刚点击的那个标签页就会处于激活状态，并且只有这个标签页所在的分组是可见的。">
+<!ENTITY howto.switch.caption "如何在分组之间切换？">
+<!ENTITY howto.switch.description2 "这不能再简单。只需进入分组管理界面，然后点击想要查看的标签页。您点击的标签页将被激活，并且将只显示其所在分组的标签页。您也可以双击任何分组的空白区域，您将自动到达那个分组最后一次使用的标签页。">
+<!ENTITY howto.overflow.caption "组中堆叠与滚动有什么区别？">
+<!ENTITY howto.overflow.description "标签页缩略图会占用很多空间。如果一个分组的空间不足以展示其所有标签页，它可以变为堆叠或滚动模式。">
+<!ENTITY howto.stack.description "堆叠模式中的分组会一层一层的叠放显示标签页。您只能看到和与在最上面的活动标签页互动。在堆叠下方还有一个预览按钮，您可以点击它以查看和访问里面的其他标签页，此时不会改变该分组的尺寸。">
+<!ENTITY howto.list.description "与此不同，您可以选择不堆叠并显示所有标签页。其中一部分将被隐藏，您必须向下滚动才能访问它们。">
+<!ENTITY howto.thumbs.description "您还可以选择特定分组不显示标签页缩略图。里面的标签页将只显示其标题（并可选显示其地址）。如果滚动的分组不足以显示最少的3个标签页，此模式也会出现，那时将无视缩略图选项的启用与否。">
+<!ENTITY howto.search.caption "如何检索我的标签页？">
+<!ENTITY howto.search.step1 "进入标签页分组查看模式。">
+<!ENTITY howto.search.step2a "点击窗口右侧的搜索按钮打开搜索框，然后开始输入你想要查找的标签页的名称。">
+<!ENTITY howto.search.step2b "或者，你可以在标签页分组界面中直接输入，搜索会自动开始。">
+<!ENTITY howto.search.step4 "在您键入时，与您的搜索匹配的标签页会被高亮显示。点击一个标签页即可选择它，您将离开分组管理界面并自动到达那个标签页。">
+<!ENTITY howto.organize.caption "如何管理标签页分组？">
+<!ENTITY howto.organize.description1 "你可以轻松调整分组的大小、重新排列、对其进行命名，以及一次关闭一整个分组（及里面的标签页）。">
 <!ENTITY howto.resize.caption "调整标签页分组的大小">
-<!ENTITY howto.resize.description1 "点击并拖动分组右下角的大小调整手柄，使分组变大或者变小。当你调整分组的大小时，分组里标签的大小也会相应变大或变小。">
-<!ENTITY howto.resize.description2 "如果分组被调整到小于特定大小时，标签会相互堆叠在一起。在堆叠的下方，会出现一个预览按钮。单击预览按钮就可以在不改变分组大小的情况下查看堆叠中包含的标签。">
-<!ENTITY howto.rearrange.caption "重新排列分组">
+<!ENTITY howto.resize.description3 "在自由放置模式中，单击并拖动分组右下角的调整手柄即可调整它的大小。在您调整分组大小时，里面的标签页也会随之更大或更小。">
+<!ENTITY howto.resize.description4 "在网格视图中，一切都会自动为您完成，所有分组将自动拉伸，以尽可能使用所有空间，展示您的所有标签页。">
+<!ENTITY howto.rearrange.caption "重新排列标签页分组">
 <!ENTITY howto.rearrange.description "在分组两侧或者底部的空白区域单击并拖动可以让分组在屏幕上移动。">
+<!ENTITY howto.rearrange.description2 "在网格视图中，拖放一个分组到另一个上面将交换两者的位置。将您最重要或具有最多标签页的分组放在顶部吧，通常那里比底部具有更多的可用空间。">
 <!ENTITY howto.name.caption "命名标签页分组">
-<!ENTITY howto.name.description "在标签页分组顶部的铅笔图标旁点击，并为其键入一个名字。然后单击回车键或在窗口的其他区域单击即可。">
+<!ENTITY howto.name.description "在标签页分组顶部的铅笔图标旁点击，然后为其输入一个名字。随后按下回车键或者在窗口外的其他区域单击即可。">
 <!ENTITY howto.close.caption "关闭标签页分组">
-<!ENTITY howto.close.description1 "每个标签页分组在右上角都有一个关闭按钮。单击就可以关闭此分组以及其中的所有标签页。">
-<!ENTITY howto.close.description2 "如果不你小心关闭了标签页分组，可以在离开标签页群组视图之前单击撤销关闭分组按钮来恢复这些标签页。">
-<!ENTITY howto.pinned.caption "分组里的固定标签页">
-<!ENTITY howto.pinned.description "如果你在使用分组里固定的标签页功能，在分组的右侧它们会以站点图标的形式显示出来。">
-<!ENTITY howto.credits "本版面基于 support.mozilla.org 的这篇文章，它是由以下好心人编写的：">
+<!ENTITY howto.close.description1 "每个标签页分组的右上角都有一个关闭按钮，单击即可以关闭该分组以及其中的所有标签页。">
+<!ENTITY howto.close.description2 "如果你不小心关闭了一个标签页分组，在离开标签页分组界面前，你可以单击“撤销关闭分组”按钮恢复它。">
+<!ENTITY howto.pinned.caption "分组内的固定标签页">
+<!ENTITY howto.pinned.description2 "已固定标签页不属于任何分组。它们会以网站图标形式显示在右侧的分组模式后面，并且无论哪个分组处于活动状态时都保持可见。">
+<!ENTITY howto.pinned.description3 "您可以在分组管理界面中固定一个标签页，只需拖放它到此区域。同样，将一个标签页拖出此区域会取消固定它。">
+<!ENTITY howto.credits "本面板基于 support.mozilla.org 上的一篇文章，它是由以下好心人编写：">

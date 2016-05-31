@@ -2,13 +2,45 @@
 <!ENTITY moveToGroup.accesskey "r">
 <!ENTITY moveToNewGroup.label "Nije groep">
 <!ENTITY viewTabGroups.label "Ljepblêdgroepen">
-<!ENTITY viewTabGroups.tooltip "Jo ljepblêden groepearje">
 <!ENTITY viewTabGroups.accesskey "L">
+<!ENTITY searchForTab.label "Sykje in ljepblêd…">
+<!ENTITY manageTabGroups.label "Myn groepen beheare">
+<!ENTITY manageTabGroups.tooltip "Brûk groepsbyld om jo ljepblêden te organisearjen en nije groepen te meitsjen">
 <!ENTITY buttonSearchTabs.label "Ljepblêdgroepen trochsykje">
 <!ENTITY buttonExitTabGroups.label "Ljepblêdgroepen slute">
 <!ENTITY buttonOptionsTabGroups.label "Foarkarren fan ljepblêdgroepen wizigje">
 <!ENTITY buttonHelpTabGroups.label "Ljepblêdgroepen brûke">
+<!ENTITY buttonClassic.label "Frij organisearje">
+<!ENTITY buttonGrid.label "Rasterbyld">
+<!ENTITY buttonSingle.label "Inkeld byld">
+<!ENTITY buttonNewGroup.label "Nije groep meitsje">
+<!ENTITY options.close.tooltip "Bewarje en werom">
+<!ENTITY options.notapplicable.single "(net beskikber yn inkeld byld">
+<!ENTITY options.title.tooltip "Ljepblêdgroep namme jaan">
+<!ENTITY options.showThumbs.label "Ljepblêdfoarbylden toane">
+<!ENTITY options.showUrls.label "Adressen neist sidetitels toane">
+<!ENTITY options.catchOnce.caption "Rigels om ljepblêden yn dizze groep te fangen">
+<!ENTITY options.catchOnce.label "Allinnich nije ljepblêden fange">
+<!ENTITY options.catchRules.placeholder1 "Reguliere ekspresjes foar webadressen hjir ynfoegje. Likense ljepblêden sille automatysk nei dizze groep ferpleatst wurde.">
+<!ENTITY options.catchRules.placeholder2 "Brûk ien rigel per rigel, der kinne sa folle wêze as jo wolle.">
+<!ENTITY options.catchRules.placeholder3 "Foarbylden:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - fyn alle siden yn de add-on's-repository">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - fyn Firefox-bugrapporten">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - fyn al jo sosjale siden">
+<!ENTITY options.stackTabs.caption "As dizze groep te folle ljepblêden hat…">
+<!ENTITY options.stackTabs.stack.label "Steapelje de groep">
+<!ENTITY options.stackTabs.list.label "Skow de groep">
 <!ENTITY sessionRestoreNotice.label "Jo ljepblêden en groepen sille de folgjende kear dat jo de browser starte net wersteld wurde! Klik hjir om dit yn oarder te meitsjen.">
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Dizze warskôging fuortsmite oant ik de browser werstart">
 <!ENTITY sessionRestoreAutoChanged.label "Jo ljepblêden en groepen sille de folgjende kear dat jo de browser starte automatys wersteld wurde.">
 <!ENTITY sessionRestorePrivate.label "Dit is in priveefinster; jo ljepblêden en groepen kinne net wersteld wurde sa gau as jo it slute.">
+<!ENTITY message.close "Slút dit berjocht">
+<!ENTITY message.later.label "werinner my letter">
+<!ENTITY message.later.tooltip "Toan dit berjocht nochris in oare kear">
+<!ENTITY message.1 "By now, I'm sure you've noticed many of the extensive changes in Tab Groups 2. I hope everything is working well and that you're enjoying the enhanced experience.">
+<!ENTITY message.2 "But did you know that my computer failed earlier this year?">
+<!ENTITY message.3 "That's right. Most of what you see was written on an old backup machine I happened to still have, one that sounds a lot like a lawn mower. A very, very slow lawn mower...">
+<!ENTITY message.4 "If you like the add-on and enjoy any of the new features, please consider helping me purchase a new workstation, by making a contribution towards the add-on's active development.">
+<!ENTITY message.5 "Click here to learn how every single bit keeps development alive.">
+<!ENTITY message.6 "Of course, if you can't, I would also appreciate a nice review in the add-on's homepage, or sharing it with all your friends. :)">
+<!ENTITY message.7 "Thank you for reading. I hope you enjoy Tab Groups, and as usual if you have any problems just let me know.">

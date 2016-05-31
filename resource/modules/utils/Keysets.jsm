@@ -1,4 +1,4 @@
-// VERSION 1.7.2
+// VERSION 1.7.3
 Modules.UTILS = true;
 
 // Keysets - handles editable keysets for the add-on
@@ -119,17 +119,17 @@ this.Keysets = {
 
 	// all the codes to be filled into selection menus, in the order they should be shown
 	fillCodes: [
-		['none', Strings.get('utils/keys', 'none')],
+		['none', Strings.get('utils-keys', 'none')],
 		['A'],['B'],['C'],['D'],['E'],['F'],['G'],['H'],['I'],['J'],['K'],['L'],['M'],['N'],['O'],['P'],['Q'],['R'],['S'],['T'],['U'],['V'],['W'],['X'],['Y'],['Z'],
-		[' ', Strings.get('utils/keys', 'spacebar')],
-		['PageUp', Strings.get('utils/keys', 'pageup')],
-		['PageDown', Strings.get('utils/keys', 'pagedown')],
-		['Home', Strings.get('utils/keys', 'home')],
-		['End', Strings.get('utils/keys', 'end')],
-		['ArrowUp', Strings.get('utils/keys', 'up')],
-		['ArrowDown', Strings.get('utils/keys', 'down')],
-		['ArrowLeft', Strings.get('utils/keys', 'left')],
-		['ArrowRight', Strings.get('utils/keys', 'right')],
+		[' ', Strings.get('utils-keys', 'spacebar')],
+		['PageUp', Strings.get('utils-keys', 'pageup')],
+		['PageDown', Strings.get('utils-keys', 'pagedown')],
+		['Home', Strings.get('utils-keys', 'home')],
+		['End', Strings.get('utils-keys', 'end')],
+		['ArrowUp', Strings.get('utils-keys', 'up')],
+		['ArrowDown', Strings.get('utils-keys', 'down')],
+		['ArrowLeft', Strings.get('utils-keys', 'left')],
+		['ArrowRight', Strings.get('utils-keys', 'right')],
 		['.'],[','],[';'],['/'],['\\'],['='],['+'],['-'],['*'],['<'],['>'],
 		[String.fromCharCode(180)/*'´'*/],['`'],['~'],['^'],
 		['F1'],['F2'],['F3'],['F4'],['F5'],['F6'],['F7'],['F8'],['F9'],['F10'],['F11'],['F12'],
@@ -138,10 +138,10 @@ this.Keysets = {
 
 	// for the preferences tab, to auto-fill all the key options and labels
 	fillKeyStrings: function(key) {
-		setAttribute(key.accelBox, 'label', Strings.get('utils/keys', DARWIN ? 'command' : 'control'));
-		setAttribute(key.shiftBox, 'label', Strings.get('utils/keys', 'shift'));
-		setAttribute(key.altBox, 'label', Strings.get('utils/keys', DARWIN ? 'option' : 'alt'));
-		setAttribute(key.ctrlBox, 'label', Strings.get('utils/keys', 'control'));
+		setAttribute(key.accelBox, 'label', Strings.get('utils-keys', DARWIN ? 'command' : 'control'));
+		setAttribute(key.shiftBox, 'label', Strings.get('utils-keys', 'shift'));
+		setAttribute(key.altBox, 'label', Strings.get('utils-keys', DARWIN ? 'option' : 'alt'));
+		setAttribute(key.ctrlBox, 'label', Strings.get('utils-keys', 'control'));
 
 		// A separate checkbox for Control is shown in OSX, because "accel" == "ctrl" only on Windows and Linux, and it's == "command" in OSX.
 		key.ctrlBox.hidden = !DARWIN;

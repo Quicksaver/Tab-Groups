@@ -1,0 +1,26 @@
+<!ENTITY about.paneTitle "Acerca de">
+<!ENTITY about.version "Versión {v}">
+<!ENTITY about.uptodate "¡actualizado, felicidades!">
+<!ENTITY about.needsupdate "¡actualización disponible!">
+<!ENTITY about.description "Revise debajo las &quot;Notas de la versión&quot; y los &quot;Problemas conocidos&quot; para esta versión. Hágame saber cualquier problema que encuentre, o si tiene alguna sugerencia para futuras versiones.">
+<!ENTITY about.descriptionB "El complemento es gratuito, pero corregir problemas, añadir nuevas características y asegurarse de que todo funciona con cada nueva versión de Firefox, es laborioso y en ocasiones puede ser difícil. Si disfruta del complemento, por favor, apoye su desarrollo continuado. Tal como dice el enlace, &quot;¡Usted puede ayudar!&quot;">
+<!ENTITY about.descriptionC "Vea también el último episodio de mi serie web sobre la vida con Firefox, realizada para todos ustedes, ¡los usuarios más entusiastas que un desarrollador podría pedir! Simplemente señale el icono saltarín en la esquina inferior de su página. Ámelo. Ódielo. Compártalo.">
+<!ENTITY about.allVersions "Mostrar notas de todas las versiones anteriores">
+<!ENTITY about.notifyOnUpdates "Mostrarme esta pestaña en la próxima actualización">
+<!ENTITY about.development "Estado del desarrollo">
+<!ENTITY about.helpdevelopment "USTED PUEDE AYUDAR">
+<!ENTITY about.information "Más información">
+<!ENTITY about.home "Página principal del complemento">
+<!ENTITY about.fullchangelog "Registro completo de cambios">
+<!ENTITY about.problems "¿Está teniendo problemas?">
+<!ENTITY about.tech "Abra un asunto (issue) en la página de soporte describiendo su problema">
+<!ENTITY about.email "O envíeme un correo electrónico acerca de ello">
+<!ENTITY about.author "Más sobre el autor">
+<!ENTITY about.trymore "¡Pruebe uno de mis otros complementos para una experiencia con Firefox aún mejor!">
+<!ENTITY about.profile "Los encontrará en mi perfil">
+<!ENTITY about.share "¡Compártalo!">
+<!ENTITY about.friends "No sea el único con un gran navegador. ¡Introduzca a sus amigos en algo estupendo!">
+<!ENTITY about.hidePromo "X">
+<!ENTITY about.hideThisPromo "mostrar de nuevo cuando haya un nuevo episodio">
+<!ENTITY about.hideAllPromos "no mostrarme nunca promociones como esta">
+<!ENTITY about.clicktowatch "ver en YouTube">

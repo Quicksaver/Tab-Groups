@@ -1,13 +1,42 @@
 <!ENTITY pane.tabGroups.label "Grupos de Separadores">
 <!ENTITY pane.session.label "Cópia e Restauro">
-<!ENTITY cat.general.label "Geral">
+<!ENTITY opt.showGroupThumbs.label "Mostrar previsualizações dos grupos na vista única">
+<!ENTITY opt.showGroupThumbs.tooltip "Esconder as previsualizações dos grupos vai criar mais espaço para mostrar os teus separadores, em troca de teres de disinguir e alternar entre grupos apenas através dos seus nomes.">
+<!ENTITY opt.gridDynamicSize.label "Usar dimensionamento dinâmico na vista em grelha">
+<!ENTITY opt.gridDynamicSize.tooltip1 "O dimensionamento dinâmico tira partido do tamanho da janela. Os grupos no topo terão maiores dimensões do que aqueles ao fundo.">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Tira partido disso ao mover grupos mais importantes, ou os que têm mais separadores, para as posições no topo.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "Sem esta opção, todos os grupos terão dimensões semelhantes, apenas com as diferenças necessárias para que encaixem todos no ecrã.">
+<!ENTITY opt.closeIfEmpty.label "Fechar automaticamente grupos vazios">
+<!ENTITY opt.closeIfEmpty.tooltip "Um grupo é imediatamente descartado quando o seu último separador é fechado. Podes manter grupos vazios ao desactivar esta opção, ou simplesmente ao dar um nome ao grupo ou mudar alguma das suas opções.">
+<!ENTITY opt.showTabCounter.label "Mostrar número de separadores junto ao título do grupo">
+<!ENTITY opt.showTabCounter.tooltip "É mostrado um indicador ao topo do grupo, para que possas facilmente saber quantos separadores estão em cada grupo.">
+<!ENTITY cat.defaults.label "Por defeito, os grupos devem...">
+<!ENTITY opt.showThumbs.label "Mostrar previsualizações dos separadores">
+<!ENTITY opt.showThumbs.tooltip "As previsualizações mostram o conteúdo de cada separador directamente no grupo. Ao desactivá-las, o grupo torna-se numa lista de separadores representados apenas pelo seu título e ícone.">
+<!ENTITY opt.showUrls.label "Mostrar endereços junto aos títulos das páginas">
+<!ENTITY opt.showUrls.tooltip "Para aproveitar o espaço ganho ao não mostrar previsualizações, podes mostrar o endereço de cada separador junto ao seu título.">
+<!ENTITY cat.stackTabs.label "Quando os grupos têm demasiados separadores...">
+<!ENTITY cat.stackTabs.tooltip "As previsualizações dos separadores ocupam espaço. Se o grupo não consegue mostrar todos os seus separadores por não ser largo o suficiente, podes...">
+<!ENTITY opt.stackTabs.label "Empilhar o grupo">
+<!ENTITY opt.stackTabs.tooltip "Só é mostrado o separador ativo, empilhado sobre os outros. Podes aceder na mesma a todos os separadores ao clicar no botão de expandir o grupo.">
+<!ENTITY opt.listTabs.label "Rolar o grupo">
+<!ENTITY opt.listTabs.tooltip "Alguns dos separadores estarão escondidos e terás de rolar o grupo para lhes aceder. Nota que os grupos se irão comportar sempre desta maneira na vista única, independentemente do que definas aqui.">
+<!ENTITY btn.setdefaults.label "Definir estas opções para todos os grupos">
+<!ENTITY btn.setdefaults.tooltip1 "Uma vez que as opções acima são aplicadas por cada grupo, alterá-las aqui irá afectar apenas grupos novos que cries daqui em diante.">
+<!ENTITY btn.setdefaults.tooltip2 "Carrega neste botão apenas se quiseres definir estas opções para todos os grupos já existentes. Caso contrário, terás de o fazer manualmente em cada grupo individual.">
+<!ENTITY cat.toolbarbutton.label "Botão da Barra de Ferramentas">
+<!ENTITY opt.groupTitleInButton.label "Mostrar o nome do grupo ativo">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Tem sempre a certeza de qual grupo está ativo, directamente na janela principal, sem teres de fazer nada.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "O botão só irá mostrar o ícone se estiver colocado no menu principal, ou se só existir um grupo.">
+<!ENTITY opt.quickAccessButton.label "Clicar para abrir o painel de acesso rápido">
+<!ENTITY opt.quickAccessButton.tooltip1 "O painel de acesso rápido permite-te alternar rapidamente entre grupos e separadores sem teres de entrar na vista de grupos.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Desactiva esta opção para entrar na vista de grupos ao clicar no botão.">
 <!ENTITY cat.keyboardshortcuts.label "Atalhos do Teclado">
 <!ENTITY cat.backup.label "Cópia de segurança dos Grupos de Separadores">
 <!ENTITY cat.restore.label "Restaurar Grupos de Separadores">
 <!ENTITY cat.clear.label "Limpar Grupos de Separadores">
-<!ENTITY opt.animateZoom.label2 "Animar transições">
-<!ENTITY opt.animateZoom.tooltip "Transições suaves ao entrar e sair do modo Grupos de Separadores, ao fazer zoom para do separador atual para o modo de grupos, e fazer novamente zoom ao sair do modo de grupos e voltar ao separador.">
-<!ENTITY opt.tabViewKeyset.label "Entrar e sair do modo de grupos">
+<!ENTITY opt.tabViewKeyset.label "Entrar e sair da vista de grupos">
+<!ENTITY opt.quickAccessKeyset.label "Abrir o painel de acesso rápido">
 <!ENTITY opt.nextGroupKeyset.label "Ir para o próximo gropo">
 <!ENTITY opt.previousGroupKeyset.label "Ir para o grupo anterior">
 <!ENTITY sessionRestore.caption "Manter os grupos de separadores entre reinícios">
@@ -15,17 +44,19 @@
 <!ENTITY sessionRestore.button.label "Mostrar as minhas janelas e separadores anteriores quando o Firefox inicia">
 <!ENTITY sessionRestore.button.tooltip.a "Isto é o mesmo que alterar a opção &quot;Quando o Firefox inicia&quot; para &quot;Mostrar as minhas janelas e separadores anteriores&quot; nas opções do Firefox.">
 <!ENTITY sessionRestore.button.tooltip.b "Se mais tarde alterares essa opção, irás perder novamente os teus grupos de separadores quando reiniciares o navegador, até que voltes a alterá-la novamente ou até premires este botão outra vez.">
+<!ENTITY opt.noWarningsAboutSession.label "Não me avisar sobre isto na vista de grupos">
+<!ENTITY opt.noWarningsAboutSession.tooltip "As noticicações aparecem para te lembrar que não deves fechar a janela do navegador se não quiseres perder os teus separadores e grupos. Desactiva-as apenas se tiveres a certeza de que é isso que queres.">
 <!ENTITY session.backup.button "Criar Ficheiro de Cópia de Segurança">
 <!ENTITY session.backup.description "Exporta os teus grupos de separadores para um ficheiro de cópia de segurança, para que possas restaurá-los posteriormente se for necessário.">
+<!ENTITY session.backup.description2 "Sugestão: não alteres o nome ou a localização do ficheiro; ao clicar em 'Restaurar Grupos e Separadores de...' abaixo, esta cópia de segurança irá aparecer directamente no menu de acesso rápido.">
 <!ENTITY session.backup.autoloaded "O ficheiro gravado foi carregado em baixo. Por favor confirma que os teus grupos e separadores foram exportados correctamente.">
 <!ENTITY session.backup.alldata.checkbox.label "Copiar dados da sessão">
 <!ENTITY session.backup.alldata.checkbox.tooltip.a "Isto pode ser útil quando restaurares grupos deste ficheiro mais tarde. Caso contrário, só poderás restaurar os grupos em si e quais os separadores que estão agora abertos neles.">
 <!ENTITY session.backup.alldata.checkbox.tooltip.b "Se não necessitas de preservar o históricoo de navegação dos separadores, formulários ou quaisquer outros dados dos teus separadores, então não precisas disto.">
 <!ENTITY session.backup.alldata.caution.a "Atenção! Isto também vai exportar todos os dados da sessão atual.">
 <!ENTITY session.backup.alldata.caution.b "Tem cuidado com quem tem acesso a este ficheiro, ele irá conter informação de todos os teus separadores, incluindo o histórico de navegação, dados de formulário, e outras informações privadas e potencialmente sensíveis.">
-<!ENTITY session.restore.load.button "Carregar Ficheiro de Cópia de Segurança">
-<!ENTITY session.restore.migrated.button "Carregar Cópia de Segurança de Migração">
-<!ENTITY session.restore.migrated.tooltip "Esta cópia de segurança foi criada pelo Firefox ao ser atualizado, a seguir à remoção dos Grupos de Separadores nativos. Deve conter todos os teus grupos e separadores antes da atualização.">
+<!ENTITY session.restore.button "Restaurar Grupos e Separadores de...">
+<!ENTITY session.restore.from.file "Ficheiro...">
 <!ENTITY session.restore.import.button "Importar or itens selecionados para esta janela">
 <!ENTITY session.restore.import.tooltip.a "Após premir este botão, podes entrar no modo de Grupos de Separadores para arranjares os grupos importados como de costume.">
 <!ENTITY session.restore.import.tooltip.b "Repara que só podes importar grupos novos, não podes importar separadores para grupos já existentes. Isto significa que podes facilmente ficar com grupos em duplicado se importares o mesmo grupo duas vezes. Neste caso, basta ires ao modo de Grupos de Separadores e removeres os grupos que não queres.">

@@ -1,13 +1,42 @@
 <!ENTITY pane.tabGroups.label "Tabgruppen">
 <!ENTITY pane.session.label "Sichern / Wiederherstellen">
-<!ENTITY cat.general.label "Allgemein">
+<!ENTITY opt.showGroupThumbs.label "Show group thumbnails in single view">
+<!ENTITY opt.showGroupThumbs.tooltip "Hiding the group thumbnails will leave more room in which to show your tabs, at the expense of having to rely on the groups names to distinguish and switch between them.">
+<!ENTITY opt.gridDynamicSize.label "Use dynamic sizing of groups in grid layout">
+<!ENTITY opt.gridDynamicSize.tooltip1 "Dynamic size makes full use of your window size. The groups towards the top will have higher dimensions than those towards the bottom.">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Use this to your advantage by moving more important groups, or those with more tabs, towards the top slots.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "With this disabled, all groups will have similar dimensions, with only the necessary differences in order for them all to fit on screen.">
+<!ENTITY opt.closeIfEmpty.label "Automatically close empty groups">
+<!ENTITY opt.closeIfEmpty.tooltip "A group is discarded immediately when its last tab is closed. You can keep an empty group by disabling this preference, or by simply giving it a name or changing some of its options.">
+<!ENTITY opt.showTabCounter.label "Show number of tabs next to group title">
+<!ENTITY opt.showTabCounter.tooltip "An indicator is shown at the top of the group, so you can easily know how many tabs you have in each group.">
+<!ENTITY cat.defaults.label "By default, groups should...">
+<!ENTITY opt.showThumbs.label "Show tab thumbnails">
+<!ENTITY opt.showThumbs.tooltip "The thumbnails show the contents of each tab directly in the group. Disabling them turns the group into a list of tabs represented only by their title and icon.">
+<!ENTITY opt.showUrls.label "Show addresses next to page titles">
+<!ENTITY opt.showUrls.tooltip "To make full use of the space saved when not showing tab thumbnails, you can show the tab's location next to its title.">
+<!ENTITY cat.stackTabs.label "When groups have too many tabs...">
+<!ENTITY cat.stackTabs.tooltip "Tab thumbnails take up space. If the group can't show all of its tabs because it isn't large enough, you can...">
+<!ENTITY opt.stackTabs.label "Stack the group">
+<!ENTITY opt.stackTabs.tooltip "Only the active tab will be shown, stacked on top of the others. You can still access all the tabs by clicking the group's expand button.">
+<!ENTITY opt.listTabs.label "Scroll the group">
+<!ENTITY opt.listTabs.tooltip "Some of the tabs will be hidden and you will have to scroll the group to access them. Note that groups will always behave like this in single view, regardless of what you set here.">
+<!ENTITY btn.setdefaults.label "Set these options for all groups">
+<!ENTITY btn.setdefaults.tooltip1 "Because the options above are applied per-group, changing them here will only affect new groups you create from this point onward.">
+<!ENTITY btn.setdefaults.tooltip2 "Only click this button if you want to override the options of all existing groups with the values set here. Otherwise you'll have to manually set or change them in each individual group.">
+<!ENTITY cat.toolbarbutton.label "Toolbar Button">
+<!ENTITY opt.groupTitleInButton.label "Show the name of the active group">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Be sure of which group is active, directly from the main window without having to perform any action.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "The button will still only show the icon if it's placed in the main menu panel, or if you have only one group.">
+<!ENTITY opt.quickAccessButton.label "Click to open the quick access panel">
+<!ENTITY opt.quickAccessButton.tooltip1 "The quick access panel lets you quickly switch between groups and tabs without having to enter groups view.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Disable this to enter groups view when clicking the button.">
 <!ENTITY cat.keyboardshortcuts.label "Tastaturkürzel">
 <!ENTITY cat.backup.label "Tabgruppen sichern">
 <!ENTITY cat.restore.label "Tabgruppen wiederherstellen">
 <!ENTITY cat.clear.label "Tabgruppen entfernen">
-<!ENTITY opt.animateZoom.label2 "Übergänge animieren">
-<!ENTITY opt.animateZoom.tooltip "Weiche Übergänge beim Betreten oder Verlassen des Tabgruppen-Modus', indem aus dem aktuellen Tab beim Betreten des Modus' herausgezoomt und beim verlassen des Modus' wieder wieder hineingezoomen wird.">
-<!ENTITY opt.tabViewKeyset.label "Gruppen-Modus starten oder beenden">
+<!ENTITY opt.tabViewKeyset.label "Enter and exit groups view">
+<!ENTITY opt.quickAccessKeyset.label "Open quick access panel">
 <!ENTITY opt.nextGroupKeyset.label "Zur nächsten Gruppe wechseln">
 <!ENTITY opt.previousGroupKeyset.label "Zur vorherigen Gruppe wechseln">
 <!ENTITY sessionRestore.caption "Tabgruppen beim Neustart des Browsers behalten">
@@ -15,17 +44,19 @@
 <!ENTITY sessionRestore.button.label "Fenster und Tabs der letzten Sitzung anzeigen, wenn Firefox startet">
 <!ENTITY sessionRestore.button.tooltip.a "Dies macht das gleiche, als wenn Sie die Option „Wenn Firefox gestartet wird”  in den Firefox-Einstellungen auf „Fenster und Tabs der letzten Sitzung anzeigen“ stellen.">
 <!ENTITY sessionRestore.button.tooltip.b "Wenn Sie diese Einstellung dort nachträglich ändern, verlieren Sie Ihre Tabgruppen beim Neustarten des Browsers erneut, bis Sie sie zurückändern oder wieder auf diese Schaltfläche klicken.">
+<!ENTITY opt.noWarningsAboutSession.label "Don't warn me about this in groups view">
+<!ENTITY opt.noWarningsAboutSession.tooltip "The notifications are there to remind you that you shouldn't close the browser window if you don't want to lose your tabs and groups. Disable them only if you're sure that's what you want.">
 <!ENTITY session.backup.button "Backup-Datei erstellen">
 <!ENTITY session.backup.description "Exportieren Sie Ihre Tabgruppen sicherheitshalber in eine Sicherungsdatei, damit Sie sie später gegebenenfalls wiederherstellen können.">
+<!ENTITY session.backup.description2 "Suggestion: use the default file name and save location; when clicking 'Load Groups and Tabs from...' below, the backup will appear directly in the quick access menu.">
 <!ENTITY session.backup.autoloaded "Die gespeicherte Datei wurde unten geladen. Bestätigen Sie bitte, dass Ihre Gruppen und Tabs korrekt gesichert wurden.">
 <!ENTITY session.backup.alldata.checkbox.label "Sitzungsdaten sichern">
 <!ENTITY session.backup.alldata.checkbox.tooltip.a "Dies kann später nützlich sein, wenn Sie Gruppen aus dieser Sicherungsdatei wiederherstellen. Andernfalls können Sie ausschließlich die Gruppen selbst und die darin geöffneten Tabs wiederherstellen.">
 <!ENTITY session.backup.alldata.checkbox.tooltip.b "Wenn es Sie nicht stört, dass Tabverlauf, Formulare und andere Daten von Ihren Tabs gespeichert werden, müssen Sie dies nicht tun.">
 <!ENTITY session.backup.alldata.caution.a "Warnung! Dies exportiert alle Daten der aktuellen Sitzung.">
 <!ENTITY session.backup.alldata.caution.b "Achten Sie darauf, wer Zugriff auf diese Datei hat. Sie enthält Daten Ihrer Tabs wie die Surf-Chronik, Formulardaten und andere pivate, potentiell sensible Daten.">
-<!ENTITY session.restore.load.button "Sicherungsdatei laden">
-<!ENTITY session.restore.migrated.button "Migrationssicherung laden">
-<!ENTITY session.restore.migrated.tooltip "Dies ist die Sicherungsdatei, die von Firefox beim Aktualisieren aufgrund der Entfernung der alten Tabgruppen-Funktion erstellt wurde. Sie sollte alle Ihre Gruppen und Tabs von vor der Aktualisierung beinhalten.">
+<!ENTITY session.restore.button "Load Groups and Tabs From...">
+<!ENTITY session.restore.from.file "File...">
 <!ENTITY session.restore.import.button "Ausgewählte Elemente in dieses Fenster kopieren">
 <!ENTITY session.restore.import.tooltip.a "Nachdem Sie auf diese Schaltfläche geklickt haben, können Sie in den Tabgruppen-Modus wechseln und die neu importierten Gruppen wie gewohnt anordnen.">
 <!ENTITY session.restore.import.tooltip.b "Bitte beachten Sie, dass Sie nur neue Gruppen importieren können. Wenn Sie die gleiche Gruppe zweimal importieren, existiert diese anschließend entsprechend doppelt. In diesem Fall können Sie in den Tabgruppen-Modus wechseln und die nicht benötigten Gruppen schließen.">

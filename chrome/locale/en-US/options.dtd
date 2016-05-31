@@ -40,7 +40,7 @@
 <!ENTITY cat.restore.label "Restore Tab Groups">
 <!ENTITY cat.clear.label "Clear Tab Groups">
 
-<!ENTITY opt.tabViewKeyset.label "Enter and exit groups mode">
+<!ENTITY opt.tabViewKeyset.label "Enter and exit groups view">
 <!ENTITY opt.quickAccessKeyset.label "Open quick access panel">
 <!ENTITY opt.nextGroupKeyset.label "Switch to the next group">
 <!ENTITY opt.previousGroupKeyset.label "Switch to the previous group">

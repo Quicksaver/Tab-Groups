@@ -8,7 +8,7 @@
 <!DOCTYPE prefs [
   <!ENTITY % defaults SYSTEM "chrome://tabgroups/locale/defaults.dtd" >
   %defaults;
-  <!ENTITY % preferences SYSTEM "chrome://tabgroups/locale/utils/preferences.dtd" >
+  <!ENTITY % preferences SYSTEM "chrome://tabgroups/locale/utils-preferences.dtd" >
   %preferences;
 ]>
 <page	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"

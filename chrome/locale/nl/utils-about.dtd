@@ -1,0 +1,26 @@
+<!ENTITY about.paneTitle "Over">
+<!ENTITY about.version "Versie {v}">
+<!ENTITY about.uptodate "up-to-date, gefeliciteerd!">
+<!ENTITY about.needsupdate "update beschikbaar!">
+<!ENTITY about.description "Bekijk hieronder de ‘Uitgaveopmerkingen’ en ‘Bekende problemen’ voor deze versie. Laat het me weten als u problemen vindt, of als u eventuele suggesties voor toekomstige versies hebt.">
+<!ENTITY about.descriptionB "De add-on is gratis, maar het verhelpen van problemen, toevoegen van nieuwe functies en verzekeren dat alles in elke nieuwe Firefox-versie werkt, is arbeidsintensief en kan soms moeilijk zijn. Als u plezier aan de add-on beleeft, steun dan de verdere ontwikkeling ervan. Zoals de koppeling zegt, “u kunt helpen”!">
+<!ENTITY about.descriptionC "Bekijk ook de laatste aflevering in mijn webserie over leven met een rode panda, gemaakt voor iedereen, de meest ondersteunende gebruikers die een ontwikkelaars zich kan wensen! Wijs gewoon naar het springende pictogram aan de onderkant van deze pagina. Hou ervan. Haat het. Deel het.">
+<!ENTITY about.allVersions "Opmerkingen van alle eerdere versies tonen">
+<!ENTITY about.notifyOnUpdates "Dit tabblad tonen bij de volgende update">
+<!ENTITY about.development "Ontwikkelingsstatus">
+<!ENTITY about.helpdevelopment "U KUNT HELPEN">
+<!ENTITY about.information "Meer informatie">
+<!ENTITY about.home "Add-on-startpagina">
+<!ENTITY about.fullchangelog "Volledige changelog">
+<!ENTITY about.problems "Hebt u problemen?">
+<!ENTITY about.tech "Open een actiepunt op de ondersteuningspagina dat uw probleem beschrijft">
+<!ENTITY about.email "Of stuur me een e-mail hierover">
+<!ENTITY about.author "Meer over de schrijver">
+<!ENTITY about.trymore "Probeer een van mijn andere add-ons voor een nog betere Firefox-ervaring!">
+<!ENTITY about.profile "U kunt ze vinden in mijn profiel">
+<!ENTITY about.share "Delen!">
+<!ENTITY about.friends "Wees niet de enige met een geweldige browser. Laat uw vrienden meegenieten!">
+<!ENTITY about.hidePromo "X">
+<!ENTITY about.hideThisPromo "opnieuw tonen bij een nieuwe aflevering">
+<!ENTITY about.hideAllPromos "nooit promo’s als deze tonen">
+<!ENTITY about.clicktowatch "bekijken op YouTube">

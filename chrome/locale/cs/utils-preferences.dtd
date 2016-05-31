@@ -1,0 +1,13 @@
+<!ENTITY preferences.button "Předvolby">
+<!ENTITY preferences.undo.label "Zpět">
+<!ENTITY preferences.redo.label "Znovu">
+<!ENTITY preferences.undoredo.tooltip "Okamžitě vrátí všechny změny provedené v předvolbách doplňku, včetně importu ze souboru a obnovení výchozích hodnot.">
+<!ENTITY preferences.import.label "Importovat ze souboru…">
+<!ENTITY preferences.import.tooltip "Načte předvolby doplňku z dříve vyexportovaného souboru ve vašem počítači.">
+<!ENTITY preferences.export.label "Exportovat do souboru…">
+<!ENTITY preferences.export.tooltip "Uloží vaše předvolby doplňku do externího souboru.">
+<!ENTITY preferences.reset.label "Obnovit výchozí">
+<!ENTITY preferences.reset.tooltip.a "Všechny předvolby budou vráceny na jejich výchozí hodnoty, jako by byl doplněk právě nainstalován.">
+<!ENTITY preferences.reset.tooltip.b "Umístění tlačítka na nástrojové liště zůstane nedotčeno. Pro jeho výchozí umístění použijte tlačítko &quot;Obnovit výchozí&quot; v panelu &quot;Přizpůsobení aplikace Firefox&quot;.">
+<!ENTITY preferences.jumpto.label "Přejít na předvolbu…">
+<!ENTITY preferences.jumpto.tooltip "Zapište slovo a přejdete na první předvolbu, která ho obsahuje.">

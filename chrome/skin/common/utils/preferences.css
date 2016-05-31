@@ -18,7 +18,7 @@ caption {
 .smallindent {
 	-moz-margin-end: 14px;
 }
-groupbox label.smallindent {
+groupbox label:not(.menu-accel):not(.menu-text).smallindent {
 	-moz-margin-end: 14px !important;
 }
 

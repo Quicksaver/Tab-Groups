@@ -2,13 +2,45 @@
 <!ENTITY moveToGroup.accesskey "V">
 <!ENTITY moveToNewGroup.label "Neue Gruppe">
 <!ENTITY viewTabGroups.label "Tabgruppen">
-<!ENTITY viewTabGroups.tooltip "Tabs gruppieren">
 <!ENTITY viewTabGroups.accesskey "G">
+<!ENTITY searchForTab.label "Search for a tab...">
+<!ENTITY manageTabGroups.label "Manage my groups">
+<!ENTITY manageTabGroups.tooltip "Enter groups view to organize your tabs and create new groups">
 <!ENTITY buttonSearchTabs.label "Nach Tabgruppen suchen">
 <!ENTITY buttonExitTabGroups.label "Tabgruppen schließen">
 <!ENTITY buttonOptionsTabGroups.label "Tabgruppen-Einstellungen ändern">
 <!ENTITY buttonHelpTabGroups.label "Wie man Tabgruppen verwendet">
+<!ENTITY buttonClassic.label "Free arrange">
+<!ENTITY buttonGrid.label "Grid display">
+<!ENTITY buttonSingle.label "Single view">
+<!ENTITY buttonNewGroup.label "Create new group">
+<!ENTITY options.close.tooltip "Save and go back">
+<!ENTITY options.notapplicable.single "(not applicable in single view)">
+<!ENTITY options.title.tooltip "Name this tab group">
+<!ENTITY options.showThumbs.label "Show tab thumbnails">
+<!ENTITY options.showUrls.label "Show addresses next to page titles">
+<!ENTITY options.catchOnce.caption "Rules to catch tabs into this group">
+<!ENTITY options.catchOnce.label "Catch only new tabs">
+<!ENTITY options.catchRules.placeholder1 "Insert regular expressions for web addresses here. Matching tabs will be moved automatically to this group.">
+<!ENTITY options.catchRules.placeholder2 "Use one line per rule, there can be as many as you want.">
+<!ENTITY options.catchRules.placeholder3 "Examples:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - catch all pages in the add-on's repository">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - catch Firefox bug reports">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - catch all your social pages">
+<!ENTITY options.stackTabs.caption "When this group has too many tabs...">
+<!ENTITY options.stackTabs.stack.label "Stack the group">
+<!ENTITY options.stackTabs.list.label "Scroll the group">
 <!ENTITY sessionRestoreNotice.label "Ihre Tabs und Gruppen werden beim nächsten Browserstart nicht wiederhergestellt! Klicken Sie hier, um das zu ändern.">
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Diese Warnung bis zum nächsten Neustart des Browsers unterdrücken">
 <!ENTITY sessionRestoreAutoChanged.label "Ihre Tabs und Gruppen werden automatisch beim nächsten Browserstart wiederhergestellt.">
 <!ENTITY sessionRestorePrivate.label "Die Tabs und Gruppen dieses privaten Fensters können nach dem Schließen nicht wiederhergestellt werden.">
+<!ENTITY message.close "Close this message">
+<!ENTITY message.later.label "remind me later">
+<!ENTITY message.later.tooltip "Show this message again at another time">
+<!ENTITY message.1 "By now, I'm sure you've noticed many of the extensive changes in Tab Groups 2. I hope everything is working well and that you're enjoying the enhanced experience.">
+<!ENTITY message.2 "But did you know that my computer failed earlier this year?">
+<!ENTITY message.3 "That's right. Most of what you see was written on an old backup machine I happened to still have, one that sounds a lot like a lawn mower. A very, very slow lawn mower...">
+<!ENTITY message.4 "If you like the add-on and enjoy any of the new features, please consider helping me purchase a new workstation, by making a contribution towards the add-on's active development.">
+<!ENTITY message.5 "Click here to learn how every single bit keeps development alive.">
+<!ENTITY message.6 "Of course, if you can't, I would also appreciate a nice review in the add-on's homepage, or sharing it with all your friends. :)">
+<!ENTITY message.7 "Thank you for reading. I hope you enjoy Tab Groups, and as usual if you have any problems just let me know.">

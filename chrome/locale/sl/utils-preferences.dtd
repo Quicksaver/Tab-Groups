@@ -1,0 +1,13 @@
+<!ENTITY preferences.button "Možnosti">
+<!ENTITY preferences.undo.label "Razveljavi">
+<!ENTITY preferences.redo.label "Uveljavi">
+<!ENTITY preferences.undoredo.tooltip "Hitro povrni spremembe možnosti dodatka vključno z uvozom iz datoteke in obnovitvijo privzetih.">
+<!ENTITY preferences.import.label "Uvozi iz datoteke …">
+<!ENTITY preferences.import.tooltip "Naloži možnosti dodatka iz datoteke na računalniku.">
+<!ENTITY preferences.export.label "Izvozi v datoteko …">
+<!ENTITY preferences.export.tooltip "Shrani možnosti dodatka v zunanjo datoteko.">
+<!ENTITY preferences.reset.label "Obnovi privzete">
+<!ENTITY preferences.reset.tooltip.a "Vse možnosti se povrnejo na privzete vrednosti.">
+<!ENTITY preferences.reset.tooltip.b "To ne vpliva na postavitve gumbov orodne vrstice; za obnovitev teh uporabite gumb Ponastavi privzeto v pogledu za prilagajanje.">
+<!ENTITY preferences.jumpto.label "Skoči na možnost …">
+<!ENTITY preferences.jumpto.tooltip "Vtipkajte besedo in prestavljeni boste na prvo možnost, ki jo vsebuje.">

@@ -2,13 +2,45 @@
 <!ENTITY moveToGroup.accesskey "M">
 <!ENTITY moveToNewGroup.label "Novo Grupo">
 <!ENTITY viewTabGroups.label "Grupos de Separadores">
-<!ENTITY viewTabGroups.tooltip "Agrupa os teus separadores">
 <!ENTITY viewTabGroups.accesskey "G">
+<!ENTITY searchForTab.label "Procurar um separador...">
+<!ENTITY manageTabGroups.label "Gerir os meus grupos">
+<!ENTITY manageTabGroups.tooltip "Entra na vista de grupos para organizar os teus separadores e criar grupos novos">
 <!ENTITY buttonSearchTabs.label "Procurar nos grupos de separadores">
 <!ENTITY buttonExitTabGroups.label "Sair dos grupos de separadores">
 <!ENTITY buttonOptionsTabGroups.label "Alterar as opções dos grupos de separadores">
 <!ENTITY buttonHelpTabGroups.label "Como usar os grupos de separadores">
+<!ENTITY buttonClassic.label "Arranjo live">
+<!ENTITY buttonGrid.label "Vista em grelha">
+<!ENTITY buttonSingle.label "Vista única">
+<!ENTITY buttonNewGroup.label "Criar grupo novo">
+<!ENTITY options.close.tooltip "Guardar e voltar atrás">
+<!ENTITY options.notapplicable.single "(não aplicável na vista única)">
+<!ENTITY options.title.tooltip "Dar nome a este grupo de separadores">
+<!ENTITY options.showThumbs.label "Mostrar previsualizações dos separadores">
+<!ENTITY options.showUrls.label "Mostrar endereços junto aos títulos das páginas">
+<!ENTITY options.catchOnce.caption "Regras para capturar separadores para este grupo">
+<!ENTITY options.catchOnce.label "Capturar só separadores novos">
+<!ENTITY options.catchRules.placeholder1 "Insere aqui expressões regulares para endereços web. Os separadores que correspondem serão movidos automaticamente para este grupo.">
+<!ENTITY options.catchRules.placeholder2 "Usa uma linha por regra, podes ter tantas quantas queiras.">
+<!ENTITY options.catchRules.placeholder3 "Exemplos:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - captura todas as páginas no repositório do extra">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - captura relatos de erro do Firefox">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - captura as páginas das tuas redes sociais">
+<!ENTITY options.stackTabs.caption "Quando este grupo tem demasiados separadores...">
+<!ENTITY options.stackTabs.stack.label "Empilhar o grupo">
+<!ENTITY options.stackTabs.list.label "Rolar o grupo">
 <!ENTITY sessionRestoreNotice.label "Os teus separadores e grupos não serão restaurados da próxima vez que iniciares o navegador! Carrega aqui para alterar isso.">
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Fechar este aviso até reiniciar o navegador.">
 <!ENTITY sessionRestoreAutoChanged.label "Os teus separadores e grupos serão restaurados automaticamente da próxima vez que iniciares o navegador.">
 <!ENTITY sessionRestorePrivate.label "Esta é uma janela privada, os teus separadores e grupos não podem ser restaurados depois de ser fechada.">
+<!ENTITY message.close "Fechar esta mensagem">
+<!ENTITY message.later.label "lembrar-me mais tarde">
+<!ENTITY message.later.tooltip "Mostrar esta mensagem novamente noutra altura">
+<!ENTITY message.1 "Por agora, já deves ter reparado em muitas das alterações extensas nos Grupos de Separadores 2. Espero que esteja tudo a funcionar correctamente, e que estejas a apreciar a experiência melhorada.">
+<!ENTITY message.2 "Mas sabias que o meu computador falhou no início do ano?">
+<!ENTITY message.3 "É verdade. Quase tudo do que vês foi escrito numa máquina antiga que por acaso ainda tinha guardada, uma que tem um som muito semelhante ao de um corta-relva. Um corta-relva muito, muito lento...">
+<!ENTITY message.4 "Se gostas do extra e aprecias alguma das novas funcionalidades, por favor considera ajudar-me a comprar uma nova estação de trabalho, ao fazer uma contribuição para o desenvolvimento activo do extra.">
+<!ENTITY message.5 "Clica aqui para saberes como cada bocadinho ajuda a manter vivo o desenvolvimento.">
+<!ENTITY message.6 "Claro que, se não puderes, também podes escrever uma boa avaliação na página principal do extra, ou até partilhá-lo com os teus amigos. :)">
+<!ENTITY message.7 "Obrigado por leres. Espero que aprecies os Grupos de Separadores, e como de costume se tiveres algum problema diz-me.">

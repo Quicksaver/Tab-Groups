@@ -1,0 +1,26 @@
+<!ENTITY about.paneTitle "O dodatku">
+<!ENTITY about.version "Različica (v)">
+<!ENTITY about.uptodate "posodobljeno, čestitke!">
+<!ENTITY about.needsupdate "na voljo je posodobitev!">
+<!ENTITY about.description "Spodaj si oglejte &quot;Opombe ob izdaji&quot; in &quot;Znane težave&quot; za to različico. Sporočite mi morebitne težave ali predloge za prihodnje izdaje.">
+<!ENTITY about.descriptionB "Dodatek je brezplačen, vendar je popravljanje težav, dodajanje novih značilnosti in zagotavljanje, da vse deluje z vsako novo različico Firefoxa obsežno in včasih tudi težavno. Če vam je dodatek všeč, prosim podprite njegov nadaljnji razvoj. Kot pravi povezava, &quot;Lahko pomagate&quot;!">
+<!ENTITY about.descriptionC "Oglejte si tudi najnovejšo epizodo moje spletne serije življenja s Firefoxom, narejeno prav za vas, najpodpornejše uporabnike, ki si jih razvijalec lahko želi! Pomaknite se na skakajočo ikono v spodnjem kotu te strani. Ljubite, sovražite, delite jo.">
+<!ENTITY about.allVersions "Prikaži opombe iz vseh prejšnjih različic">
+<!ENTITY about.notifyOnUpdates "Prikaži ta zavihek ob naslednji posodobitvi">
+<!ENTITY about.development "Stanje razvoja">
+<!ENTITY about.helpdevelopment "LAHKO POMAGATE">
+<!ENTITY about.information "Več podatkov">
+<!ENTITY about.home "Domača stran dodatka">
+<!ENTITY about.fullchangelog "Celoten dnevnik sprememb">
+<!ENTITY about.problems "Imate težave?">
+<!ENTITY about.tech "Odprite vprašanje na strani za podporo z opisom težave">
+<!ENTITY about.email "Ali mi o tem pošljite e-pošto">
+<!ENTITY about.author "Več od avtorja">
+<!ENTITY about.trymore "Poskusite kakšnega od mojih ostalih dodatkov za boljšo izkušnjo v Firefoxu!">
+<!ENTITY about.profile "Poiščite jih v mojem profilu">
+<!ENTITY about.share "Deli!">
+<!ENTITY about.friends "Ne bodite edini z odličnim brskalnikom. Povabite prijatelje v čudoviti svet brskanja!">
+<!ENTITY about.hidePromo "P">
+<!ENTITY about.hideThisPromo "Ponovno prikaži, ko je na voljo nova epizoda">
+<!ENTITY about.hideAllPromos "Ne prikazuj takih oglasov">
+<!ENTITY about.clicktowatch "Oglej si na YouTubu">

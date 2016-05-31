@@ -1,0 +1,26 @@
+<!ENTITY about.paneTitle "O doplňku">
+<!ENTITY about.version "Verze {v}">
+<!ENTITY about.uptodate "aktuální, blahopřejeme!">
+<!ENTITY about.needsupdate "je dostupná aktualizace!">
+<!ENTITY about.description "Prohlédněte si poznámky k vydání této verze a podrobnosti o problémech, o kterých víme. Pokud objevíte nový problém nebo pokud máte nějaké návrhy pro příští verzi, dejte mi vědět.">
+<!ENTITY about.descriptionB "Tento doplněk je poskytnut zdarma, ale oprava problémů, nové funkce a údržba doplňku po vydání každé nové verze Firefoxu je pracné. Pokud se vám doplněk líbí, podpořte prosím jeho následný vývoj. Jak praví odkaz, &quot;Můžete pomoci&quot;!">
+<!ENTITY about.descriptionC "Také se podívejte na nejnovější epizodu z mé webové série o životě s Firefoxem, vytvořenou pro vás všechny nejvíce podporující uživatele, které by si mohl vývojář přát! Stačí umístit myš nad poskakující ikonku v dolním rohu této stránky. Milujte ji. Nenáviďte ji. Sdílejte ji.">
+<!ENTITY about.allVersions "Ukázat poznámky ke všem předchozím verzím">
+<!ENTITY about.notifyOnUpdates "Zobrazit tento panel při příští aktualizaci">
+<!ENTITY about.development "Stav vývoje">
+<!ENTITY about.helpdevelopment "MŮŽETE POMOCI">
+<!ENTITY about.information "Více informací">
+<!ENTITY about.home "Domovská stránka doplňku">
+<!ENTITY about.fullchangelog "Úplný seznam změn">
+<!ENTITY about.problems "Máte potíže?">
+<!ENTITY about.tech "Popište svůj problém na stránkách podpory">
+<!ENTITY about.email "Nebo mi jej pošlete emailem">
+<!ENTITY about.author "Více od tohoto autora">
+<!ENTITY about.trymore "Vyzkoušejte některý z mých dalších doplňků pro ještě lepší Firefox!">
+<!ENTITY about.profile "Naleznete je v mém profilu">
+<!ENTITY about.share "Podělte se!">
+<!ENTITY about.friends "Nebuďte jediní se skvělým prohlížečem. Pochlubte se přátelům!">
+<!ENTITY about.hidePromo "X">
+<!ENTITY about.hideThisPromo "zobrazit znovu až bude nová epizoda">
+<!ENTITY about.hideAllPromos "nikdy nezobrazovat takovéto reklamy">
+<!ENTITY about.clicktowatch "sledovat na YouTube">

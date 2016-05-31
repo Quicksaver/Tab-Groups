@@ -1,4 +1,4 @@
-// VERSION 2.3.3
+// VERSION 2.4.0
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -10,42 +10,28 @@ Modules.BASEUTILS = true;
 //	(optional) aNumber - 	(int) if set will choose the corresponding Plural Form from the string returned based on it;
 //				expects string "PluralRule" defined in the same bundle representing a number.
 //				See https://developer.mozilla.org/en-US/docs/Localization_and_Plurals
-//	(dont set) alt - don't set this variable, it is for internal use so the method know it needs to look in a special location for en locales, like in the case of
-//			 untranslated strings, this should be set in chrome.manifest as objPathString-en to the en-US locale.
 this.Strings = {
 	bundles: {},
 
-	getPath: function(aPath, alt) {
+	getPath: function(aPath) {
 		let cacheBuster = (AddonData) ? '?'+AddonData.initTime : '';
-		return "chrome://"+objPathString+((alt) ? '-en' : '')+"/locale/"+aPath+".properties"+cacheBuster;
+		return "chrome://"+objPathString+"/locale/"+aPath+".properties"+cacheBuster;
 	},
 
-	get: function(bundle, string, replace, aNumber, alt) {
+	get: function(bundle, string, replace, aNumber) {
 		var bundleObj = bundle;
-		if(alt) { bundleObj += '-en'; }
 
 		if(!this.bundles[bundleObj]) {
-			this.bundles[bundleObj] = Services.strings.createBundle(this.getPath(bundle, alt));
+			this.bundles[bundleObj] = Services.strings.createBundle(this.getPath(bundle));
 		}
 
-		try { string = this.bundles[bundleObj].GetStringFromName(string); }
+		try {
+			string = this.bundles[bundleObj].GetStringFromName(string);
+		}
 		catch(ex) {
-			if(!alt) {
-				var myex = 'Failed to load string from properties file. [Addon: '+objPathString+'] [File: '+bundle+'] [String: '+string+']';
-				try {
-					string = this.get(bundle, string, replace, aNumber, true);
-					if(string === null) {
-						Cu.reportError(myex + ' [Failed to load en backup]');
-						string = '';
-					}
-					return string;
-				}
-				catch(exx) {
-					Cu.reportError(myex + ' [Failed to load en backup]');
-					return '';
-				}
-			}
-			else { return null; }
+			Cu.reportError('Failed to load string from properties file. [Addon: '+objPathString+'] [File: '+bundle+'] [String: '+string+']');
+			Cu.reportError(ex);
+			return '';
 		}
 
 		// This means we are dealing with a possible Plural Form, so we need to make sure we treat it accordingly

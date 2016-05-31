@@ -1,0 +1,26 @@
+<!ENTITY about.paneTitle "バージョン情報">
+<!ENTITY about.version "バージョン {v}">
+<!ENTITY about.uptodate "最新版です。おめでとうございます！">
+<!ENTITY about.needsupdate "更新してください！">
+<!ENTITY about.description "このバージョンの &quot;リリースノート&quot; と &quot;既知の問題&quot; を確認してください。この他に問題を見つけたら報告してください。また、将来のリリースのための提案も受け付けています。">
+<!ENTITY about.descriptionB "このアドオンは無料で提供されますが、問題の修正や新機能の追加、そして Firefox のリリースに合わせて動作確認をすることは困難が伴う事があります。このアドオンを気に入っていただけたら、継続的な開発のための支援をお願いします。&quot;開発を支援する&quot; をクリックしてください！">
+<!ENTITY about.descriptionC "あなたのために作成した Firefox で送る Web ライフについての最新のエピソードもご覧ください。このページ下部のアイコンをクリックするだけです。煮るなり焼くなり共有するなり、好きにしてください。">
+<!ENTITY about.allVersions "過去バージョンの更新履歴を表示する">
+<!ENTITY about.notifyOnUpdates "次回の更新時にこのタブを表示する">
+<!ENTITY about.development "開発状況">
+<!ENTITY about.helpdevelopment "開発を支援する">
+<!ENTITY about.information "その他の情報">
+<!ENTITY about.home "アドオンのホームページ">
+<!ENTITY about.fullchangelog "すべての更新履歴">
+<!ENTITY about.problems "問題を見つけたら？">
+<!ENTITY about.tech "サポートページで issue を開いて問題を報告してください">
+<!ENTITY about.email "開発者にメールして問題を報告することもできます">
+<!ENTITY about.author "作者より">
+<!ENTITY about.trymore "私の作ったその他のアドオンを試して Firefox での体験をより良い物にしましょう！">
+<!ENTITY about.profile "プロフィールページで他のアドオンを見つけられます">
+<!ENTITY about.share "おすすめする！">
+<!ENTITY about.friends "すばらしいブラウザを独り占めるのは良くありません。友達にも教えてあげましょう！">
+<!ENTITY about.hidePromo "X">
+<!ENTITY about.hideThisPromo "新しいエピソードを表示する">
+<!ENTITY about.hideAllPromos "このような宣伝を表示しない">
+<!ENTITY about.clicktowatch "YouTube で見る">

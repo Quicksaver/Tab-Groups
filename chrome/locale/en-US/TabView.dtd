@@ -28,9 +28,9 @@
 <!ENTITY options.catchRules.placeholder1 "Insert regular expressions for web addresses here. Matching tabs will be moved automatically to this group.">
 <!ENTITY options.catchRules.placeholder2 "Use one line per rule, there can be as many as you want.">
 <!ENTITY options.catchRules.placeholder3 "Examples:">
-<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups > catch all pages in the add-on's repository">
-<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org > catch Firefox bug reports">
-<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com > catch all your social pages">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - catch all pages in the add-on's repository">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - catch Firefox bug reports">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - catch all your social pages">
 <!ENTITY options.stackTabs.caption "When this group has too many tabs...">
 <!ENTITY options.stackTabs.stack.label "Stack the group">
 <!ENTITY options.stackTabs.list.label "Scroll the group">

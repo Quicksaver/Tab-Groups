@@ -1,0 +1,42 @@
+<!ENTITY howto.pane.label "Jak używać">
+<!ENTITY howto.overview.a "Grupy kart są świetne do grupowania kart według zadania. Na przykład, możesz mieć grupę kart związaną z szukaniem prezentu oraz grupę do płacenia rachunków przez internet. Spróbuj utworzyć grupy dla rzeczy, które normalnie robisz w internecie i użyj Grup Kart, aby przełączać się między nimi. Jest to łatwy sposób, aby utrzymać porządek.">
+<!ENTITY howto.mode.caption "Jak mogę pracować w widoku grup?">
+<!ENTITY howto.mode.description "Aby wejść do widoku grup, kliknij przycisk na pasku narzędzi lub użyj skrótu klawiaturowego. Tam masz trzy możliwe tryby, przełączaj się między nimi w dowolnym momencie przez kontrolery z prawej strony.">
+<!ENTITY howto.single.description "Widok pojedynczy jest domyślnym trybem. Jest on najprostszy w obsłudze, i jest doskonały do utrzymywania oddzielnych grup z dala od siebie, ale zawsze pod ręką.">
+<!ENTITY howto.grid.description "W układzie siatki rozmiar grup jest ustawiany automatycznie, w zależności od tego ile ich jest oraz ile jest wolnego miejsca.">
+<!ENTITY howto.classic.description "W trybie dowolnego rozmieszczenia możesz dowolnie ustawiać i zmieniać rozmiar grup w przestrzeni roboczej. Możesz użyć tej wizualnej organizacji na swoją korzyść, kiedy pracujesz z wieloma rożnymi grupami.">
+<!ENTITY howto.create.caption "Jak mogę utworzyć grupę kart?">
+<!ENTITY howto.create.step0 "kiedy wejdziesz do widoku grup po raz pierwszy, zobaczysz podgląd miniatur wszystkich kart w jednej grupie.">
+<!ENTITY howto.create.step1a "W widoku pojedynczym lub układzie siatki, po prostu kliknij przycisk Utwórz nową grupę. Nie możesz tego przegapić.">
+<!ENTITY howto.create.step1b "W trybie dowolnego rozmieszczenia, aby utworzyć nową grupę, wystarczy przeciągnąć jedną kartę poza grupę, pudełko zostanie narysowane wokół niej. Możesz też kliknąć i przeciągnąć bezpośrednio w wolnej przestrzenie, aby narysować nową grupę z wymiarami jakie chcesz.">
+<!ENTITY howto.create.step2b "Możesz kontynuować dodawanie kart do tej nowej grupy oraz możesz tworzyć więcej grup.">
+<!ENTITY howto.create.step3 "Kiedy skończysz, po prostu kliknij na kartę, aby wyjść z tego widoku. Powrócisz do Firefoksa, karta którą kliknąłeś będzie aktywna, i tylko karty z tej grupy będą widoczne.">
+<!ENTITY howto.switch.caption "Jak mogę przełączać się pomiędzy grupami kart?">
+<!ENTITY howto.switch.description2 "To nie może być prostsze. Wystarczy wejść do widoku grup kar, a następnie kliknąć kartę, którą chcesz zobaczyć. Karta którą kliknąłeś będzie aktywna, i tylko karty z tej grupy będą widoczne. Możesz też podwójnie kliknąć na pustym obszarze jakiejkolwiek grupy, zostaniesz przeniesiony do ostatniej wybranej karty w tej grupie.">
+<!ENTITY howto.overflow.caption "Jaka jest różnica pomiędzy stosem i przewijaniem grup?">
+<!ENTITY howto.overflow.description "Miniaturki kart zajmują miejsce. Jeśli grupa nie jest wystarczająco duża, aby pokazać wszystkie karty, mogą być one zarówno ułożone w stos lub przewijane.">
+<!ENTITY howto.stack.description "Karty ułożone w stos wyświetlane są jedna na drugiej. Możesz wchodzić w interakcje tylko z aktywną kartą na górze. Poniżej tego stosu, znajduje się przycisk podglądu, który możesz kliknąć, aby uzyskać dostęp do wszystkich innych kart bez zmiany wielkości grupy.">
+<!ENTITY howto.list.description "Zamiast tego możesz wybrać wyświetlanie wszystkich kart normalnie, bez układania. Niektóre z nich zostaną ukryte i będziesz musiał przewinąć w dół, aby uzyskać do nich dostęp.">
+<!ENTITY howto.thumbs.description "Możesz również wybrać określone grupy, w których nie będą pokazywane miniatury kart. Karty zostaną wyświetlone w liście, tylko z ich tytułami i ewentualnie adresami. Stanie się tak również w przewijanych grupach, gdy nie będą wystarczająco duże, aby zmieścić co najmniej trzy kolumny kart, niezależnie od tego czy miniaturki będą włączone czy nie.">
+<!ENTITY howto.search.caption "Jak mogę przeszukiwać moje karty?">
+<!ENTITY howto.search.step1 "Wejdź do widoku Grup kart.">
+<!ENTITY howto.search.step2a "Kliknij przycisk wyszukiwania po prawej stronie okna, aby otworzyć pole wyszukiwania, a następnie zacznij wpisywać nazwę karty, którą próbujesz znaleźć.">
+<!ENTITY howto.search.step2b "Lub po prostu zacznij pisać, a wyszukiwanie nastąpi automatycznie.">
+<!ENTITY howto.search.step4 "Podczas wpisywania karty pasujące do twojego wyszukiwania zostaną podświetlone. Wystarczy kliknąć na karcie, aby ją zaznaczyć, spowoduje to opuszczenie widoku grup i przeniesienie do tej karty.">
+<!ENTITY howto.organize.caption "Jak mogę organizować moje grupy kart?">
+<!ENTITY howto.organize.description1 "Grupy kart łatwo mogę być skalowane, rozmieszczane i nazywane. Kiedy skończysz z grupą można je zamknąć i pozbyć się wszystkich swoich kart na raz.">
+<!ENTITY howto.resize.caption "Zmiana rozmiaru grup kart">
+<!ENTITY howto.resize.description3 "W trybie dowolnego rozmieszczenia, kliknij i przeciągnij uchwyt zmiany rozmiaru w dolnym prawym rogu grupy, aby zrobić ją większą lub mniejszą. Jeśli zmienisz rozmiar grupy, to jej karty będą odpowiednio większe lub mniejsze.">
+<!ENTITY howto.resize.description4 "W układzie siatki, to wszystko jest robione za ciebie, grupy będą rozciągnięte tak jak to możliwe, aby pokazać twoje karty.">
+<!ENTITY howto.rearrange.caption "Rozmieszczanie grup kart">
+<!ENTITY howto.rearrange.description "Kliknij i przeciągnij na pustym obszarze wzdłuż boków lub spodu grupy, aby przenosić ją po całym ekranie.">
+<!ENTITY howto.rearrange.description2 "W układzie siatki, upuść grupę nad inną, aby zamienić je miejscami. Umieść ważniejsze grupy, lub te z większą ilością kart u góry, ponieważ są one zazwyczaj większe niż te na dole.">
+<!ENTITY howto.name.caption "Nazywanie grup kart">
+<!ENTITY howto.name.description "Kliknij obok ikony ołówka u góry grupy i wpisz nazwę dla niej. Następnie wystarczy nacisnąć Enter lub kliknąć w innym miejscu okna.">
+<!ENTITY howto.close.caption "Zamykanie grup kart">
+<!ENTITY howto.close.description1 "Każda grupa kart ma przycisk zamykania w górnym prawym rogu. Kliknięcie go zamknie tę grupę i wszystkie jej karty.">
+<!ENTITY howto.close.description2 "Jeśli przypadkiem zamkniesz grupę kart, możesz kliknąć Cofnij zamknięcie grupy, aby ją przywrócić z powrotem.">
+<!ENTITY howto.pinned.caption "Przypięte karty w grupach kart">
+<!ENTITY howto.pinned.description2 "Przypięte karty nie należą do żadnej grupy. Są one reprezentowane przez ikony stron po prawej stronie w trybie grupowania, i są widoczne niezależnie od tego, jaką grupę masz aktywną.">
+<!ENTITY howto.pinned.description3 "Możesz przypiąć kartę w widoku grup poprzez przeciągnięcie jej w to miejsce. Podobnie przeciągnij kartę z tego miejsca do jakiejś grupy, aby ją odpiąć.">
+<!ENTITY howto.credits "Ten panel oparty  jest na artykule pierwotnie znajdującym się na support.mozilla.org, napisanym przez tych wspaniałych ludzi:">

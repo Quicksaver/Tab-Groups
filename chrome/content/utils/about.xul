@@ -6,7 +6,7 @@
     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "DTD/xhtml1-strict.dtd">
   %htmlDTD;
-  <!ENTITY % about SYSTEM "chrome://tabgroups/locale/utils/about.dtd" >
+  <!ENTITY % about SYSTEM "chrome://tabgroups/locale/utils-about.dtd" >
   %about;
   <!ENTITY % addon SYSTEM "chrome://tabgroups/locale/defaults.dtd" >
   %addon;
@@ -39,8 +39,8 @@
 				<label class="header-name">&about.name;</label>
 				<hbox id="version" invisible="true">
 					<label id="currentVersion">&about.version;</label>
-					<label id="uptodate" hidden="true">&nbsp;&about.versionDivider;&nbsp;&about.uptodate;</label>
-					<label id="needsupdate" hidden="true">&about.versionDivider;<html:a href="javascript:objName.about.openAddonsMgr();">&about.needsupdate;</html:a></label>
+					<label id="uptodate" hidden="true">&nbsp;-&nbsp;&about.uptodate;</label>
+					<label id="needsupdate" hidden="true">&nbsp;-&nbsp;<html:a href="javascript:objName.about.openAddonsMgr();">&about.needsupdate;</html:a></label>
 				</hbox>
 			</vbox>
 		</hbox>

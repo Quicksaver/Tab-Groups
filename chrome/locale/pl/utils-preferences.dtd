@@ -1,0 +1,13 @@
+<!ENTITY preferences.button "Ustawienia">
+<!ENTITY preferences.undo.label "Cofnij">
+<!ENTITY preferences.redo.label "Ponów">
+<!ENTITY preferences.undoredo.tooltip "Szybko cofnij wszelkie zmiany ustawień dodatku, w tym importowanie z pliku i przywrócenie wartości domyślnych.">
+<!ENTITY preferences.import.label "Importuj z pliku...">
+<!ENTITY preferences.import.tooltip "Załaduj ustawienia dodatku z wcześniej wyeksportowanego pliku na twoim komputerze.">
+<!ENTITY preferences.export.label "Eksportuj do pliku...">
+<!ENTITY preferences.export.tooltip "Zapisz swoje ustawienia dodatku w zewnętrznym pliku, aby je przechowywać.">
+<!ENTITY preferences.reset.label "Przywróć domyślne">
+<!ENTITY preferences.reset.tooltip.a "Wszystkie ustawienia zostaną przywrócone do wartości domyślnych, tak jakby dodatek był świeżo zainstalowany.">
+<!ENTITY preferences.reset.tooltip.b "Położenie przycisku na pasku narzędzi się nie zmieni, aby je przywrócić użyj przycisku Przywróć Domyślne w trybie dostosowywania.">
+<!ENTITY preferences.jumpto.label "Skocz do ustawienia...">
+<!ENTITY preferences.jumpto.tooltip "Wpisz słowo i zostaniesz przeniesiony do pierwszego ustawienia, które go zawiera.">

@@ -2,13 +2,45 @@
 <!ENTITY moveToGroup.accesskey "M">
 <!ENTITY moveToNewGroup.label "新建分组">
 <!ENTITY viewTabGroups.label "Tab Groups">
-<!ENTITY viewTabGroups.tooltip "为你的标签页分组">
 <!ENTITY viewTabGroups.accesskey "G">
-<!ENTITY buttonSearchTabs.label "搜索标签页群组">
-<!ENTITY buttonExitTabGroups.label "离开标签页群组">
-<!ENTITY buttonOptionsTabGroups.label "修改标签页群组首选项">
-<!ENTITY buttonHelpTabGroups.label "如何使用标签页群组">
-<!ENTITY sessionRestoreNotice.label "浏览器在下次启动时才能恢复你的标签页及分组！点击这里修复该问题。">
-<!ENTITY sessionRestoreNotice.dismiss.tooltip "在重新启动浏览器之前忽略此警告">
-<!ENTITY sessionRestoreAutoChanged.label "你的标签页和分组将在浏览器下次启动时自动恢复。">
-<!ENTITY sessionRestorePrivate.label "你打开的是隐私窗口，在关闭前你无法恢复标签页和分组。">
+<!ENTITY searchForTab.label "搜索一个标签页...">
+<!ENTITY manageTabGroups.label "管理我的分组">
+<!ENTITY manageTabGroups.tooltip "进入分组视图管理您的标签页与创建新分组">
+<!ENTITY buttonSearchTabs.label "搜索标签页分组">
+<!ENTITY buttonExitTabGroups.label "离开标签页分组">
+<!ENTITY buttonOptionsTabGroups.label "更改标签页分组首选项">
+<!ENTITY buttonHelpTabGroups.label "如何使用标签页分组">
+<!ENTITY buttonClassic.label "自由放置">
+<!ENTITY buttonGrid.label "网格视图">
+<!ENTITY buttonSingle.label "单组视图">
+<!ENTITY buttonNewGroup.label "创建新分组">
+<!ENTITY options.close.tooltip "保存并返回">
+<!ENTITY options.notapplicable.single "(不适用单组视图)">
+<!ENTITY options.title.tooltip "命名此标签页分组">
+<!ENTITY options.showThumbs.label "显示标签页缩略图">
+<!ENTITY options.showUrls.label "在页面标题旁显示地址">
+<!ENTITY options.catchOnce.caption "捕获标签页到此分组的规则">
+<!ENTITY options.catchOnce.label "只捕获新的标签页">
+<!ENTITY options.catchRules.placeholder1 "在这里插入匹配网页地址的正则表达式。匹配的标签页将自动移动到此分组。">
+<!ENTITY options.catchRules.placeholder2 "每行一条规则，数量无限制。">
+<!ENTITY options.catchRules.placeholder3 "例子：">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - 捕获本附加组件的所有代码库页面">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - 捕获Firefox的bug报告">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - 捕获你的社交网页">
+<!ENTITY options.stackTabs.caption "当此组有太多标签页...">
+<!ENTITY options.stackTabs.stack.label "堆叠放置">
+<!ENTITY options.stackTabs.list.label "组中滚动">
+<!ENTITY sessionRestoreNotice.label "您的标签页和分组不会在浏览器下次启动时恢复！点击这里修复该问题。">
+<!ENTITY sessionRestoreNotice.dismiss.tooltip "在重启浏览器之前忽略此警告">
+<!ENTITY sessionRestoreAutoChanged.label "您的标签页和分组将在浏览器下次启动时自动恢复。">
+<!ENTITY sessionRestorePrivate.label "这是一个隐私窗口，在关闭它之前，您的标签页和分组不能被恢复。">
+<!ENTITY message.close "关闭此消息">
+<!ENTITY message.later.label "稍后提醒我">
+<!ENTITY message.later.tooltip "下一次仍显示此消息">
+<!ENTITY message.1 "到了现在，我很确定你已经注意到了 Tab Groups 2 中发生的显著变化。我希望一切都运转良好并且你喜欢增强的体验。">
+<!ENTITY message.2 "但你是否知道，我的电脑在今年早些时候坏掉了呢？">
+<!ENTITY message.3 "没错，你所见到的大多数体验都是我在一台老旧的备用机器上编写，还好我仍然有它。但它的声音像是一台割草机，还是一台很慢、很慢的割草机……">
+<!ENTITY message.4 "如果您喜欢这个附加组件的任何新功能，请考虑帮助我购买一台新的工作站，捐助一点，帮助附加组件保持继续开发。">
+<!ENTITY message.5 "点击这里了解维持继续开发的每一点滴。">
+<!ENTITY message.6 "当然，即便您无法帮忙，我也非常感谢。如果您能在附加组件的首页上留一条精彩评论，或者与你的所有朋友分享它，那也不错。:)">
+<!ENTITY message.7 "感谢您阅读这个，希望你喜欢 Tab Groups。如往常一样，如果你有或遇到任何问题，不妨告诉我。">

@@ -1,0 +1,46 @@
+<!ENTITY moveToGroup.label "Přesunout do skupiny">
+<!ENTITY moveToGroup.accesskey "S">
+<!ENTITY moveToNewGroup.label "Nová skupina">
+<!ENTITY viewTabGroups.label "Skupiny panelů">
+<!ENTITY viewTabGroups.accesskey "S">
+<!ENTITY searchForTab.label "Vyhledat panel…">
+<!ENTITY manageTabGroups.label "Spravovat skupiny">
+<!ENTITY manageTabGroups.tooltip "Vstoupit do zobrazení skupin panelů">
+<!ENTITY buttonSearchTabs.label "Prohledat skupiny panelů">
+<!ENTITY buttonExitTabGroups.label "Opustit skupiny panelů">
+<!ENTITY buttonOptionsTabGroups.label "Změnit předvolby skupin panelů">
+<!ENTITY buttonHelpTabGroups.label "Jak používat skupiny panelů">
+<!ENTITY buttonClassic.label "Volné uspořádání">
+<!ENTITY buttonGrid.label "Tabulkové rozložení">
+<!ENTITY buttonSingle.label "Jednopanelové zobrazení">
+<!ENTITY buttonNewGroup.label "Vytvořit novou skupinu">
+<!ENTITY options.close.tooltip "Uložit a vrátit se zpět">
+<!ENTITY options.notapplicable.single "(nelze použít v jednopanelovém zobrazení)">
+<!ENTITY options.title.tooltip "Pojmenovat tuto skupinu panelů">
+<!ENTITY options.showThumbs.label "Zobrazit náhledy panelů">
+<!ENTITY options.showUrls.label "Vedle titulku stránky zobrazit její adresu">
+<!ENTITY options.catchOnce.caption "Pravidla pro přichytávání panelů do této skupiny">
+<!ENTITY options.catchOnce.label "Přichytávat pouze nové panely">
+<!ENTITY options.catchRules.placeholder1 "Sem vložte regulární výrazy pro webové adresy. Vyhovující panely budou automaticky přesunuty do této skupiny.">
+<!ENTITY options.catchRules.placeholder2 "Každé pravidlo uveďte na samostatném řádku, může jich být kolik chcete.">
+<!ENTITY options.catchRules.placeholder3 "Příklady:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - přichytne všechny stránky v repozitáři tohoto doplňku">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - přichytne hlášení o chybách Firefoxu">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - přichytne všechny vaše sociální stránky">
+<!ENTITY options.stackTabs.caption "Když má tato skupina příliš mnoho panelů…">
+<!ENTITY options.stackTabs.stack.label "Naskládat panely na sebe">
+<!ENTITY options.stackTabs.list.label "Rolovat skupinu">
+<!ENTITY sessionRestoreNotice.label "Vaše panely a skupiny nebudou při příštím spuštění prohlížeče obnoveny! Klikněte pro nápravu.">
+<!ENTITY sessionRestoreNotice.dismiss.tooltip "Nezobrazovat toto varování do restartu prohlížeče">
+<!ENTITY sessionRestoreAutoChanged.label "Vaše panely a skupiny budou při příštím spuštění prohlížeče automaticky obnoveny.">
+<!ENTITY sessionRestorePrivate.label "Toto je anonymní okno, vaše panely a skupiny nemohou být po jeho zavření obnoveny.">
+<!ENTITY message.close "Zavřít tuto zprávu">
+<!ENTITY message.later.label "připomenout později">
+<!ENTITY message.later.tooltip "Zobrazit tuto zprávu jindy">
+<!ENTITY message.1 "Už jste si určitě povšimli řady rozsáhlých změn v Tab Groups 2. Snad všechno dobře funguje a vylepšené možnosti správy panelů vás těší.">
+<!ENTITY message.2 "Věděli jste ale, že se mi začátkem tohoto roku odporoučel počítač?">
+<!ENTITY message.3 "Je to tak. Většina toho, co vidíte, byla napsána na starém záložním stroji, který jsem náhodou pořád ještě měl - stroji, který zní daleko spíše jako sekačka na trávu. Hodně, hodně pomalá sekačka.">
+<!ENTITY message.4 "Pokud se vám doplněk líbí a máte radost z nových funkcí, zvažte prosím, zda mně, vývojáři tohoto doplňku, neposlat malý finanční příspěvek, kterýžto mi pomůže s nákupem nové pracovní stanice.">
+<!ENTITY message.5 "Klikněte sem a dozvíte se, jak každý čtvrťák udržuje vývoj v chodu.">
+<!ENTITY message.6 "Pokud samozřejmě nemůžete, byl bych vděčný i za milou recenzi na domovské stránce doplňku, nebo za její sdílení se všemi vašimi přáteli. :)">
+<!ENTITY message.7 "Děkuji za přečtení. Doufám, že se vám doplněk Tab Groups líbí. A jako obvykle, máte-li jakékoli potíže, dejte mi prosím vědět.">

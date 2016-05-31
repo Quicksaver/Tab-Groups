@@ -1,0 +1,76 @@
+<!ENTITY pane.tabGroups.label "Tab Groups">
+<!ENTITY pane.session.label "バックアップと復元">
+<!ENTITY opt.showGroupThumbs.label "シングルビューでグループのサムネイル画像を表示する">
+<!ENTITY opt.showGroupThumbs.tooltip "グループのサムネイル画像を隠すと、タブを表示するスペースを確保できますが、グループの名前によって切り替えることになります。">
+<!ENTITY opt.gridDynamicSize.label "グリッドレイアウトでグループのサイズを動的に変更する">
+<!ENTITY opt.gridDynamicSize.tooltip1 "動的サイズ変更により、ウインドウ全体を使えます。上部にあるグループは、下部のグループよりもサイズが大きくなります。">
+<!ENTITY opt.gridDynamicSize.tooltip2 "タブの優先度に応じて、より重要なグループや多くのタブを持つグループを上部へ移動してください。">
+<!ENTITY opt.gridDynamicSize.tooltip3 "これを無効にすると、すべてのグループは同様のサイズになり、画面にフィットするサイズに変更されるだけになります。">
+<!ENTITY opt.closeIfEmpty.label "空のグループは自動的に閉じる">
+<!ENTITY opt.closeIfEmpty.tooltip "最後のタブが閉じられると、そのグループはすぐに破棄されます。この設定を無効にするか、単にグループに別名を付けるかオプションを変更することで、空のグループを維持できます。">
+<!ENTITY opt.showTabCounter.label "グループ名の隣にタブの個数を表示する">
+<!ENTITY opt.showTabCounter.tooltip "グループ上部にインジケータが表示され、各グループに含まれるタブの個数を簡単に知ることができます。">
+<!ENTITY cat.defaults.label "デフォルトでグループに表示...">
+<!ENTITY opt.showThumbs.label "タブのサムネイル画像を表示する">
+<!ENTITY opt.showThumbs.tooltip "グループ内の各タブの内容を直接サムネイル画像で表示します。この設定を無効にすると、タブのタイトルとアイコンのみのリスト表示になります。">
+<!ENTITY opt.showUrls.label "ページタイトルの隣にアドレスを表示する">
+<!ENTITY opt.showUrls.tooltip "タブのサムネイル画像を表示しないで画面全体を有効に使うため、タブのアドレスをタイトルの隣に表示します。">
+<!ENTITY cat.stackTabs.label "グループ内にタブが多い場合...">
+<!ENTITY cat.stackTabs.tooltip "タブのサムネイル画像は場所を取ります。グループ内にすべてのタブを表示できない場合の表示方法を指定します...">
+<!ENTITY opt.stackTabs.label "グループをスタック表示にする">
+<!ENTITY opt.stackTabs.tooltip "アクティブなタブのみが、積み重なった他のタブの最も手前に表示されます。グループの展開ボタンをクリックすると、他のタブにアクセスできます。">
+<!ENTITY opt.listTabs.label "グループをスクロール表示にする">
+<!ENTITY opt.listTabs.tooltip "一部の隠されたタブにアクセスするには、グループをスクロールします。この設定に関わらず、グループは常にシングルビューのように振る舞うので注意してください。">
+<!ENTITY btn.setdefaults.label "このオプションをすべてのグループに適用する">
+<!ENTITY btn.setdefaults.tooltip1 "上記のオプションはグループごとに設定されるため、この変更は新規作成したグループにのみ適用されます。">
+<!ENTITY btn.setdefaults.tooltip2 "既存のすべてのグループのオプションをこの設定で上書きしたい場合のみ、このボタンをクリックしてください。すべてのグループに適用しない場合は、各グループを個別に設定する必要があります。">
+<!ENTITY cat.toolbarbutton.label "ツールバーボタン">
+<!ENTITY opt.groupTitleInButton.label "アクティブなグループの名前を表示する">
+<!ENTITY opt.groupTitleInButton.tooltip1 "メインウィンドウから、アクティブなグループを操作なしで直接確認できます。">
+<!ENTITY opt.groupTitleInButton.tooltip2 "このボタンをメインメニューパネルに配置しているかグループが 1 個しかない場合、アイコンのみが表示されます。">
+<!ENTITY opt.quickAccessButton.label "クリックしてクイックアクセスパネルを開く">
+<!ENTITY opt.quickAccessButton.tooltip1 "クイックアクセスパネルは、グループビューを開かずに、グループとタブをすばやく切り替えます。">
+<!ENTITY opt.quickAccessButton.tooltip2 "このオプションを無効にした場合、ボタンをクリックするとグループビューを開きます。">
+<!ENTITY cat.keyboardshortcuts.label "キーボードショートカット">
+<!ENTITY cat.backup.label "タブグループのバックアップ">
+<!ENTITY cat.restore.label "タブグループの復元">
+<!ENTITY cat.clear.label "タブグループの消去">
+<!ENTITY opt.tabViewKeyset.label "グループビューの開閉">
+<!ENTITY opt.quickAccessKeyset.label "クイックアクセスパネルを開く">
+<!ENTITY opt.nextGroupKeyset.label "次のグループへ切り替える">
+<!ENTITY opt.previousGroupKeyset.label "前のグループへ切り替える">
+<!ENTITY sessionRestore.caption "再起動時にタブのグループを保持する">
+<!ENTITY sessionRestore.description "Firefox にタブグループを記憶させるため、セッション間のウインドウとタブを復元する必要があります。そうしなければ、ブラウザを再起動するたびにグループを手動で元に戻さなければなりません。">
+<!ENTITY sessionRestore.button.label "Firefox 起動時に前回のウインドウとタブを表示する">
+<!ENTITY sessionRestore.button.tooltip.a "これは、Firefox の設定で [Firefox の起動するとき] のオプションを [前回終了時のウインドウとタブを表示する] に変更することと同じです。">
+<!ENTITY sessionRestore.button.tooltip.b "このオプションを変更すると、変更を元に戻すかこのボタンを再び押すまで、ブラウザを再起動したときにタブが再び失われます。">
+<!ENTITY opt.noWarningsAboutSession.label "グループビューではこの警告を表示しない">
+<!ENTITY opt.noWarningsAboutSession.tooltip "通知は、タブやグループを失いたくない場合、ブラウザウインドウを閉じてはいけないことを知らせます。この動作を理解している場合のみ、このオプションを無効にしてください。">
+<!ENTITY session.backup.button "バックアップファイルを作成">
+<!ENTITY session.backup.description "タブグループをバックアップファイルに書き出します。必要になった時に、このファイルからタブグループを復元できます。">
+<!ENTITY session.backup.description2 "提案: 既定のファイル名と保存場所を使用してください。下の「グループとタブを読み込む...」をクリックすると、バックアップがクイックアクセスメニューに直接表示されます。">
+<!ENTITY session.backup.autoloaded "保存したファイルを以下に読み込みました。あなたのグループとタブが正しくバックアップされているか確認してください。">
+<!ENTITY session.backup.alldata.checkbox.label "セッションデータをバックアップする">
+<!ENTITY session.backup.alldata.checkbox.tooltip.a "これは、後でこのバックアップファイルからグループを復元した時に役立ちます。そうしなければ、現在開いているタブのグループしか復元できません。">
+<!ENTITY session.backup.alldata.checkbox.tooltip.b "タブ履歴やフォーム、タブからの他のデータの維持を気にしないなら、これは必要ありません。">
+<!ENTITY session.backup.alldata.caution.a "警告！ 現在のすべてのセッションデータを書き出します。">
+<!ENTITY session.backup.alldata.caution.b "書き出されたファイルの取り扱いには注意してください。このファイルには、タブの情報をはじめ、ページの閲覧履歴やフォームデータなど、あなたのプライバシーに関する取り扱いに注意が必要な情報が含まれている可能性があります。">
+<!ENTITY session.restore.button "グループとタブを読み込む...">
+<!ENTITY session.restore.from.file "ファイル...">
+<!ENTITY session.restore.import.button "選択したページをこのウインドウに読み込む">
+<!ENTITY session.restore.import.tooltip.a "このボタンを押すと、タブグループモードになり、新たに読み込まれたグループを整理できます。">
+<!ENTITY session.restore.import.tooltip.b "新しいグループだけが読み込めます。既存のグループにタブを読み込むことはできません。同じグループを 2 回読み込むと、グループが重複してしまいます。この場合は、タブグループモードで不要なグループを閉じてください。">
+<!ENTITY session.restore.description "バックアップファイルを読み込み、それに含まれるタブグループを復元します。復元したいグループやタブを選んでください。選択したものは、このウインドウに読み込まれます。他のグループと同様に、アクセス、並べ替え、カスタマイズができます。">
+<!ENTITY session.restore.invalid "選択したファイルは不正なデータか、壊れているか、タブグループ情報が含まれていません。">
+<!ENTITY session.restore.finished "選択したグループがこのウィンドウにインポートされました。タブグループモードから開いてください。">
+<!ENTITY session.restore.list.check "読み込む">
+<!ENTITY session.restore.list.items "グループとタブ">
+<!ENTITY session.clear.button "グループデータを消去">
+<!ENTITY session.clear.tooltip "これをする必要はないでしょう。これは、単純に、安全にタブグループモードにし、不要なグループを閉じるための機能です。">
+<!ENTITY session.clear.description.a "現在のセッションからグループに関するすべてのデータを消去します。">
+<!ENTITY session.clear.description.f "この機能の影響を理解している場合のみ使用してください！">
+<!ENTITY session.clear.description.b "実行する前に、必ずグループとタブのバックアップを作成してください。">
+<!ENTITY session.clear.description.c "これは、すべてのブラウザウインドウと開いているタブを再読み込みします。">
+<!ENTITY session.clear.description.g "そして、アクティブでないグループをすべて削除します。">
+<!ENTITY session.clear.description.d "警告: この操作は取り消せません！">
+<!ENTITY session.clear.description.e "本当に実行してもよろしいですか？">
