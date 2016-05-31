@@ -1,4 +1,4 @@
-// VERSION 1.4.15
+// VERSION 1.4.16
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -52,6 +52,9 @@ prefList = {
 	previousGroupCtrl: DARWIN,
 
 	noWarningsAboutSession: false,
+
+	// flags
+	message: 5,
 
 	// for internal use
 	pageAutoChanged: false,

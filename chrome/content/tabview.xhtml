@@ -6,6 +6,8 @@
   %htmlDTD;
   <!ENTITY % TabView SYSTEM "chrome://tabgroups/locale/TabView.dtd" >
   %TabView;
+  <!ENTITY % defaults SYSTEM "chrome://tabgroups/locale/defaults.dtd" >
+  %defaults;
 ]>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
 	<head>
@@ -113,5 +115,21 @@
 		</div>
 		<div id="sessionRestoreAutoChanged" class="banner" hidden="true">&sessionRestoreAutoChanged.label;</div>
 		<div id="sessionRestorePrivate" class="banner" hidden="true">&sessionRestorePrivate.label;</div>
+
+		<div id="message-shade" class="shade"/>
+		<div id="message">
+			<p>&message.1;</p>
+			<p>&message.2;</p>
+			<p>&message.3;</p>
+			<p>&message.4;</p>
+			<p><a id="message-link" href="#" title="http://fasezero.com/addons/"><div>&message.5;</div></a></p>
+			<p>&message.6;</p>
+			<p>&message.7;</p>
+			<p>&about.signature;</p>
+			<div id="message-controls">
+				<a id="message-later" href="#" title="&message.later.tooltip;">&message.later.label;</a>
+				<div id="message-close" class="close" title="&message.close;"/>
+			</div>
+		</div>
 	</body>
 </html>

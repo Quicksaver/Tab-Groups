@@ -1,4 +1,4 @@
-// VERSION 2.0.2
+// VERSION 2.0.3
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -284,6 +284,9 @@ this.Search = {
 
 		// Don't start a search if a group's options dialog is already shown.
 		if(GroupOptionsUI.activeGroup) { return; }
+
+		// Also don't start searching if the message is shown.
+		if(document.body.classList.contains('contributions-message')) { return; }
 
 		// / is used to activate the search feature so the key shouldn't be entered into the search box.
 		if(e.key == "\\") {

@@ -1,4 +1,4 @@
-// VERSION 1.3.26
+// VERSION 1.3.27
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -99,6 +99,12 @@ this.UI = {
 	get single() { return Prefs.displayMode == 'single'; },
 
 	get groupSelector() { return $('groupSelector'); },
+
+	get messageShade() { return $('message-shade'); },
+	get messageClose() { return $('message-close'); },
+	get messageLink() { return $('message-link'); },
+	get messageLater() { return $('message-later'); },
+	get messageBody() { return $('message'); },
 
 	get sessionRestoreNotice() { return $('sessionRestoreNotice'); },
 	get sessionRestoreNoticeClose() { return $('sessionRestoreNoticeClose'); },
@@ -237,6 +243,19 @@ this.UI = {
 					case this.singleNewGroupBtn:
 					case this.gridNewGroupBtn:
 						this.setActive(GroupItems.newGroup());
+						break;
+
+					case this.messageShade:
+					case this.messageClose:
+						this.hideMessage();
+						break;
+
+					case this.messageLater:
+						this.hideMessage(true);
+						break;
+
+					case this.messageLink:
+						gBrowser.selectedTab = gTabView.openTab(addonUris.development);
 						break;
 				}
 				break;
@@ -1022,6 +1041,8 @@ this.UI = {
 			Timers.init('showTabView', () => {
 				this._contextMenusEnabled = true;
 			}, 50);
+
+			this.countMessage();
 		}
 		catch(ex) {
 			Cu.reportError(ex);
@@ -1060,6 +1081,8 @@ this.UI = {
 		this._isChangingVisibility = true;
 
 		try {
+			this.hideMessage();
+
 			GroupItems.pauseArrange();
 			TabItems.pausePainting();
 
@@ -1559,6 +1582,8 @@ this.UI = {
 		let preventDefault = true;
 		switch(e.key) {
 			case "Escape":
+				if(this.hideMessage()) { break; }
+
 				activeGroupItem = GroupItems.getActiveGroupItem();
 				if(activeGroupItem && activeGroupItem.expanded) {
 					activeGroupItem.collapse();
@@ -1922,6 +1947,79 @@ this.UI = {
 		this._save();
 		GroupItems.saveAll();
 		TabItems.saveAll();
+	},
+
+	countMessage: function() {
+		// How did this happen?... Prevent showing message on every showing if this is triggered for some reason.
+		if(Prefs.message < 0) {
+			Prefs.message = 0;
+		}
+
+		// The message was already shown, don't show again.
+		if(Prefs.message == 0) { return; }
+
+		// Count the times we've opened TabView, we don't want to show the message on the very first show,
+		// let the user discover the add-on's new features first, that's what's important after all.
+		if(Prefs.message > 1) {
+			Prefs.message--;
+			return;
+		}
+
+		// We've opened TabView a few times now, try to show it now.
+		this.showMessage();
+	},
+
+	showMessage: function() {
+		Timers.init('contributionsMessage', () => {
+			// Try again later.
+			if(Search.inSearch || GroupOptionsUI.activeOptions) {
+				this.showMessage();
+				return;
+			}
+
+			// Don't let group thumbing continue, so that the message doesn't appear in the thumbs.
+			TabItems.pausePainting();
+
+			Listeners.add(this.messageShade, 'click', this);
+			Listeners.add(this.messageClose, 'click', this);
+			Listeners.add(this.messageLink, 'click', this);
+			Listeners.add(this.messageLater, 'click', this);
+			document.body.classList.add('contributions-message');
+			this.messageLater.focus();
+
+			// Sometimes it won't show the scrollbar right after the message is shown, which makes for a very weird effect of course.
+			// So we try and force it if necessary.
+			if(this.messageBody.scrollTopMax > 0) {
+				this.messageBody.style.overflowY = 'scroll';
+				aSync(() => {
+					this.messageBody.style.overflowY = '';
+				}, 1000);
+			}
+
+			// We're showing the message, make sure it's not shown again anymore.
+			Prefs.message--;
+		}, 5000);
+	},
+
+	hideMessage: function(later) {
+		if(later) {
+			// Since the user asked us to remind them later, restart the counter with a higher number,
+			// so that the message is hidden now but still shown at a later time.
+			Prefs.message = 10;
+		}
+
+		Timers.cancel('contributionsMessage');
+		if(document.body.classList.contains('contributions-message')) {
+			Listeners.remove(this.messageShade, 'click', this);
+			Listeners.remove(this.messageClose, 'click', this);
+			Listeners.remove(this.messageLink, 'click', this);
+			Listeners.remove(this.messageLater, 'click', this);
+			document.body.classList.remove('contributions-message');
+
+			TabItems.resumePainting();
+			return true;
+		}
+		return false;
 	},
 
 	checkSessionRestore: function() {

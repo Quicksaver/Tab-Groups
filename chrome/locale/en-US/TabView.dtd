@@ -39,3 +39,14 @@
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Dismiss this warning until I restart the browser">
 <!ENTITY sessionRestoreAutoChanged.label "Your tabs and groups will be restored automatically the next time you start the browser.">
 <!ENTITY sessionRestorePrivate.label "This is a private window, your tabs and groups cannot be restored once you close it.">
+
+<!ENTITY message.close "Close this message">
+<!ENTITY message.later.label "remind me later">
+<!ENTITY message.later.tooltip "Show this message again at another time">
+<!ENTITY message.1 "By now, I'm sure you've noticed many of the extensive changes in Tab Groups 2. I hope everything is working well and that you're enjoying the enhanced experience.">
+<!ENTITY message.2 "But did you know that my computer failed earlier this year?">
+<!ENTITY message.3 "That's right. Most of what you see was written on an old backup machine I happened to still have, one that sounds a lot like a lawn mower. A very, very slow lawn mower...">
+<!ENTITY message.4 "If you like the add-on and enjoy any of the new features, please consider helping me purchase a new workstation, by making a contribution towards the add-on's active development.">
+<!ENTITY message.5 "Click here to learn how every single bit keeps development alive.">
+<!ENTITY message.6 "Of course, if you can't, I would also appreciate a nice review in the add-on's homepage, or sharing it with all your friends. :)">
+<!ENTITY message.7 "Thank you for reading. I hope you enjoy Tab Groups, and as usual if you have any problems just let me know.">
