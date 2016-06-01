@@ -1,4 +1,4 @@
-// VERSION 1.3.27
+// VERSION 1.3.28
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -255,6 +255,7 @@ this.UI = {
 						break;
 
 					case this.messageLink:
+					case this.messageLink.childNodes[0]:
 						gBrowser.selectedTab = gTabView.openTab(addonUris.development);
 						break;
 				}
