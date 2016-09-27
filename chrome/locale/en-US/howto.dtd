@@ -39,7 +39,7 @@
 
 <!ENTITY howto.rearrange.caption "Rearranging Tab Groups">
 <!ENTITY howto.rearrange.description "Click and drag on an empty area along the sides or bottom of a group to move it around the screen.">
-<!ENTITY howto.rearrange.description2 "In grid layout, drop a group over another to have them exchange places. Place your most important groups, or the ones with the most tabs, at the top as they are usually larger than the ones at the bottom.">
+<!ENTITY howto.rearrange.description3 "In grid layout, place your most important groups, or the ones with the most tabs, at the top as they are usually larger than the ones at the bottom.">
 
 <!ENTITY howto.name.caption "Naming Tab Groups">
 <!ENTITY howto.name.description "Click next to the pencil icon at the top of a group and type in a name for it. Then just hit Enter or click on some other area of the window.">
