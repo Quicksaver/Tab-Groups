@@ -1,4 +1,4 @@
-// VERSION 2.3.5
+// VERSION 2.4.0
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -421,22 +421,64 @@ this.GroupDrag.prototype = {
 			return;
 		}
 
-		// If we have a valid drop target (group), switch slots with it
-		// There's no need to recalc the grid dimensions, they should stay the same, only the groups should switch with one-another.
-		let targetSlot = this.dropTarget.slot;
-		let targetRow = this.dropTarget.row;
-		let targetBounds = this.dropTarget._gridBounds;
+		// Move the dragged group to the slot and shift everything in between
+		// There's no need to recalc the grid dimensions, they should
+		// stay the same, only the groups that change row change size
 
-		this.dropTarget.slot = this.item.slot;
-		this.dropTarget.row = this.item.row;
-		this.dropTarget._gridBounds = this.item._gridBounds;
-		this.item.slot = targetSlot;
-		this.item.row = targetRow;
-		this.item._gridBounds = targetBounds;
-		this.dropTarget.save();
-		this.dropTarget.arrange();
-		this.item.save();
-		this.item.arrange();
+		let groups = GroupItems.sortBySlot();
+		let itemBounds = this.item._gridBounds;
+		let itemRow = this.item.row;
+		let carry = null;
+
+		// Start at the end of the groups and work your way up
+		let direction = -1;
+		let i = groups.length - 1;
+
+		// Unless you're dragging upwards, then work your way down
+		if(this.item.slot > this.dropTarget.slot) {
+			direction = 1;
+			i = 0;
+		}
+
+		while(i < groups.length && i >= 0) {
+			let nextElement = groups[i];
+
+			// If the element is the drop target, start the carry
+			if(nextElement === this.dropTarget) {
+				carry = this.item;
+			}
+
+			// If we're carrying a group, swap the group with the next one
+			if(carry !== null) {
+				let elem = nextElement;
+				nextElement = carry;
+				carry = elem;
+
+				// Store the bounds and row in case we need to change the next element
+				let lastBounds = carry._gridBounds;
+				let lastRow = carry.row;
+
+				// If the carry is the item we're dragging, end the carry and
+				// set the bounds the item originally had
+				if(carry === this.item) {
+					carry = null;
+					lastBounds = itemBounds;
+					lastRow = itemRow;
+				}
+
+				// Rearrange if this element changed row
+				if(lastRow != nextElement.row) {
+					nextElement._gridBounds = lastBounds;
+					nextElement.row = lastRow;
+					nextElement.arrange();
+				}
+			}
+
+			// Set the slot and save
+			nextElement.slot = i + 1;
+			nextElement.save();
+			i += direction;
+		}
 
 		this.end();
 	},
