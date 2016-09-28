@@ -108,7 +108,7 @@
 					<caption label="&howto.rearrange.caption;"/>
 					<html:p>&nbsp;</html:p>
 					<html:p>&howto.rearrange.description;</html:p>
-					<html:p>&howto.rearrange.description2;</html:p>
+					<html:p>&howto.rearrange.description3;</html:p>
 				</html:li>
 				<html:li>
 					<caption label="&howto.name.caption;"/>
