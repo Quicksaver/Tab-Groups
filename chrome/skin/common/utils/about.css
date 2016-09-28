@@ -35,6 +35,12 @@ page[currentcategory="paneAbout"] #header-about {
 	margin: 0 26px 30px;
 }
 
+.header > vbox {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+}
+
 #version label {
 	-moz-margin-start: 3px;
 	-moz-margin-end: 0;
