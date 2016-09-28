@@ -1,4 +1,4 @@
-// VERSION 1.3.28
+// VERSION 1.3.29
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1349,8 +1349,11 @@ this.UI = {
 			"newNavigator", "closeWindow", "undoCloseWindow",
 			"newNavigatorTab", "close", "undoCloseTab",
 			"undo", "redo", "cut", "copy", "paste",
-			"selectAll", "find", "browserConsole"
+			"selectAll", "find"
 		];
+		if(gWindow.gDevTools) {
+			keyArray.push("browserConsole");
+		}
 		if(!WINNT) {
 			keyArray.push("quitApplication");
 			if(DARWIN) {
