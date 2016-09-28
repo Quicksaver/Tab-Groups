@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
 <?xml-stylesheet href="chrome://tabgroups/skin/TabView.css" type="text/css"?>
 <?xml-stylesheet href="chrome://tabgroups-os/skin/TabView.css" type="text/css"?>
 <!DOCTYPE overlay [
@@ -7,6 +11,7 @@
   <!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd">
   %browserDTD;
 ]>
+
 <overlay id="TabView_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 	<broadcasterset id="mainBroadcasterSet">

@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 #categories .category image { list-style-image: url("chrome://tabgroups/skin/panes.png"); }
 #categories .category[value="paneAbout"] image { -moz-image-region: rect(0px 24px 24px 0px); }
 #categories .category[value="paneTabGroups"] image { -moz-image-region: rect(0px 48px 24px 24px); }
