@@ -58,6 +58,10 @@ body.classic .groupItem,
 
 /* Side buttons */
 
+body:-moz-any(.classic,[lwtheme]) #actions {
+	border-top-color: ThreeDHighlight;
+}
+
 body.classic #actions {
 	border-radius: var(--item-border-radius) 0 0 var(--item-border-radius);
 }

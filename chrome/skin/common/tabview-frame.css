@@ -7,12 +7,16 @@
 	--control-icons-2x: url("chrome://tabgroups/skin/group-controls@2x.png");
 	--actions-icons: url("chrome://tabgroups/skin/actions.png");
 	--actions-icons-2x: url("chrome://tabgroups/skin/actions@2x.png");
+
 	--actions-width: 35px;
 	--actions-button-height: 28px;
+
 	--hover-color: rgba(128,128,128,0.4);
+	--lwtheme-bgcolor: transparent;
 	--item-normal-shadow: 0 1px 5px rgba(60, 60, 60, 0.6);
 	--item-active-shadow-ltr: 2px 2px 8px rgba(0, 0, 0, 0.8);
 	--item-active-shadow-rtl: -2px 2px 8px rgba(0, 0, 0, 0.8);
+
 	--scrollbar-width: 10px;
 	--thumbs-tab-padding: 10px;
 	--list-tab-height: 37px;
@@ -36,6 +40,18 @@
 	--group-selector-title-height: 14px;
 	--shade-background: rgba(0,0,0,.42);
 	--drag-animation: margin 150ms linear;
+
+	--z-shield: 10;
+	--z-actions: 30;
+	--z-workspace: 40;
+	--z-expanded-tray: 50;
+	--z-drag-group: 100;
+	--z-shade: 150;
+	--z-overlay: 175;
+	--z-trench-visible: 200;
+	--z-trench-active: 201;
+	--z-trench-guide: 202;
+	--z-banner: 500;
 }
 
 body {
@@ -50,16 +66,14 @@ body.grid.groups-overflowing {
 }
 
 body.single {
-	/* in single mode we need to exclude the borders from the groups/groupSelector themselves as well */
-	--workspace-width: calc(100% - var(--actions-width) - (var(--group-border-width) * 2));
 	/* for single view, we need to exclude the group selector at the top and its borders */
-	--workspace-height: calc(100% - var(--group-selector-size) - (var(--group-border-width) * 2));
+	--workspace-height: calc(100% - var(--group-selector-size) - var(--group-border-width));
 	/* it's kind of silly that I have to exclude borders here as well... am I missing something? */
-	--group-single-height: calc(100% - (var(--group-border-width) * 2));
+	--group-single-height: calc(100% - var(--group-border-width));
 }
 
 body.single:not(.showGroupThumbs) {
-	--workspace-height: calc(100% - (var(--group-selector-size) / 4) - (var(--group-border-width) * 2));
+	--workspace-height: calc(100% - (var(--group-selector-size) / 4) - var(--group-border-width));
 }
 
 html {
@@ -71,6 +85,11 @@ body {
 	padding: 0;
 	margin: 0;
 	color: -moz-DialogText;
+}
+
+body.classic[lwtheme] {
+	background-image: linear-gradient(transparent 100px, var(--lwtheme-bgcolor) 178px, var(--lwtheme-bgcolor));
+	background-attachment: fixed;
 }
 
 #content {
@@ -86,6 +105,7 @@ html, body, #content {
 	position: relative;
 	height: var(--workspace-height);
 	width: var(--workspace-width);
+	z-index: var(--z-workspace);
 }
 
 body.grid #groups {
@@ -479,7 +499,6 @@ body[FF48] .appTabIcon[busy][progress] {
 	overflow: hidden;
 }
 
-#groupSelector,
 .groupItem,
 .expandedTray,
 .undo:not(.inGroupSelector) {
@@ -490,7 +509,6 @@ body[FF48] .appTabIcon[busy][progress] {
 	-moz-border-end: var(--group-border-width) solid ThreeDLightShadow;
 }
 
-#groupSelector,
 body:not(.classic) .groupItem {
 	border-bottom-color: ThreeDShadow;
 	-moz-border-end-color: ThreeDShadow;
@@ -545,6 +563,8 @@ body.single .groupItem {
 	left: 0;
 	width: 100%;
 	height: var(--group-single-height);
+	border-bottom: none;
+	-moz-border-start: none;
 }
 
 body.single .groupItem:not(.activeGroupItem):not(.thumbing) {
@@ -771,14 +791,21 @@ body.single:not(.showGroupThumbs) #singleNewGroup .create-new-border,
 	position: relative;
 	width: var(--workspace-width);
 	height: var(--group-selector-size);
+	z-index: var(--z-workspace);
 	display: flex;
 	overflow-x: auto;
 	overflow-y: hidden;
 	background-color: rgba(255,255,255,0.6);
+	border-bottom: var(--group-border-width) solid ThreeDShadow;
+	-moz-border-end: var(--group-border-width) solid ThreeDShadow;
 }
 
 body:not(.single) #groupSelector {
 	display: none;
+}
+
+body[lwtheme] #groupSelector {
+	background-color: transparent;
 }
 
 .groupSelector {
@@ -789,6 +816,10 @@ body:not(.single) #groupSelector {
 	flex: 0 0 auto;
 	width: var(--group-selector-size);
 	height: var(--group-selector-size);
+}
+
+#groupSelector[brighttext] .groupSelector {
+	color: #FFFFFF;
 }
 
 body.single:not(.showGroupThumbs) #groupSelector,
@@ -888,7 +919,7 @@ body.DraggingGroupSelector #singleNewGroup {
 }
 
 .guideTrench {
-	z-index: 202;
+	z-index: var(--z-trench-guide);
 	opacity: 0.9;
 	border: 1px dashed ThreeDHighlight;
 	border-bottom: none;
@@ -901,12 +932,12 @@ body.DraggingGroupSelector #singleNewGroup {
 }
 
 .visibleTrench {
-	z-index: 200;
+	z-index: var(--z-trench-visible);
 	opacity: 0.05;
 }
 
 .activeVisibleTrench {
-	z-index: 201;
+	z-index: var(--z-trench-active);
 	opacity: 0;
 }
 
@@ -928,7 +959,7 @@ body.DraggingGroupSelector #singleNewGroup {
 
 body.classic .groupItem.dragging,
 .groupItem.resizing {
-	z-index: 100;
+	z-index: var(--z-drag-group);
 }
 
 body.classic .groupItem.dragging,
@@ -1010,7 +1041,7 @@ input.name:focus::-moz-placeholder {
 	top: 0;
 	width: -moz-available;
 	height: 100%;
-	z-index: 10;
+	z-index: var(--z-shield);
 	cursor: text;
 }
 
@@ -1047,11 +1078,11 @@ body.single .tab-counter {
 	bottom: var(--stack-expander-bottom-margin);
 	left: 50%;
 	transform: translateX(-50%);
-	z-index: 10;
+	z-index: var(--z-shield);
 }
 
 .expandedTray {
-	z-index: 50;
+	z-index: var(--z-expanded-tray);
 }
 
 .expandedTray .tab-container {
@@ -1060,7 +1091,7 @@ body.single .tab-counter {
 }
 
 .shield {
-	z-index: 10;
+	z-index: var(--z-shield);
 }
 
 .shade {
@@ -1078,7 +1109,7 @@ body.single .tab-counter {
 	right: 0;
 	padding: 10px 0;
 	position: absolute;
-	z-index: 500;
+	z-index: var(--z-banner);
 	background: #000;
 	color: #fff;
 	opacity: 0;
@@ -1132,12 +1163,11 @@ body.single .tab-counter {
 	top: 0;
 	overflow: hidden;
 	align-self: start;
-	z-index: 30;
+	z-index: var(--z-actions);
 	width: var(--actions-width);
 	text-align: center;
-	border: var(--group-border-width) solid transparent;
-	border-top-color: ThreeDHighlight;
-	-moz-border-end-width: 0;
+	background-color: var(--item-background);
+	border-top: var(--group-border-width) solid var(--item-background);
 }
 
 #actions:-moz-locale-dir(ltr) {
@@ -1149,16 +1179,18 @@ body.single .tab-counter {
 }
 
 body.classic #actions {
-	background-color: var(--item-background);
-	-moz-border-start-color: ThreeDHighlight;
-	border-bottom-color: ThreeDHighlight;
+	-moz-border-start: var(--group-border-width) solid ThreeDHighlight;
+	border-bottom: var(--group-border-width) solid ThreeDHighlight;
 	box-shadow: var(--item-normal-shadow);
 }
 
+body.grid #actions {
+	border-top: var(--group-border-width) solid ThreeDHighlight;
+}
+
 body:not(.classic) #actions {
-	border-bottom-color: ThreeDShadow;
 	/* account for its own borders */
-	height: calc(100% - var(--group-border-width) - var(--group-border-width));
+	height: calc(100% - var(--group-border-width));
 }
 
 #actions input {
@@ -1321,12 +1353,12 @@ body:not(.searching) #search,
 }
 
 #searchshade {
-	z-index: 100;
+	z-index: var(--z-shade);
 }
 
 #search {
 	position: absolute;
-	z-index: 175;
+	z-index: var(--z-overlay);
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%,-50%);
@@ -1427,11 +1459,11 @@ body:not(.single) .notapplicable-single {
 }
 
 #groupOptions-shade {
-	z-index: 100;
+	z-index: var(--z-shade);
 }
 
 #groupOptions {
-	z-index: 175;
+	z-index: var(--z-overlay);
 	position: absolute;
 	top: 50%;
 	left: 50%;

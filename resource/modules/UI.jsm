@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.30
+// VERSION 1.3.31
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -463,6 +463,12 @@ this.UI = {
 		}
 	},
 
+	attrWatcher(obj, attr) {
+		let lwtheme = (!gWindow.DevEdition || !gWindow.DevEdition.isThemeCurrentlyApplied) && trueAttribute(gWindow.document.documentElement, 'lwtheme');
+		toggleAttribute(document.body, 'lwtheme', lwtheme);
+		toggleAttribute(this.groupSelector, 'brighttext', lwtheme && trueAttribute(gWindow[objName].$('nav-bar'), 'brighttext'));
+	},
+
 	// Must be called after the object is created.
 	init: function() {
 		try {
@@ -476,6 +482,11 @@ this.UI = {
 
 			// Some things depend on the different FF versions.
 			toggleAttribute(document.body, 'FF48', Services.vc.compare(Services.appinfo.version, "48.0a1") >= 0);
+
+			// Try to adapt to different lwthemes.
+			Watchers.addAttributeWatcher(gWindow.document.documentElement, 'lwtheme', this, false, false);
+			Watchers.addAttributeWatcher(gWindow[objName].$('nav-bar'), 'brighttext', this, false, false);
+			this.attrWatcher();
 
 			// ___ search
 			Search.init();
@@ -611,6 +622,9 @@ this.UI = {
 
 		Messenger.unlistenWindow(gWindow, "DOMWillOpenModalDialog", this);
 		Messenger.unloadFromWindow(gWindow, 'TabView');
+
+		Watchers.removeAttributeWatcher(gWindow.document.documentElement, 'lwtheme', this, false, false);
+		Watchers.removeAttributeWatcher(gWindow[objName].$('nav-bar'), 'brighttext', this, false, false);
 
 		// additional clean up
 		GroupOptionsUI.hide();
@@ -898,7 +912,7 @@ this.UI = {
 		let left = 0;
 		let width = window.innerWidth;
 		let height = window.innerHeight;
-		width -= (UICache.actionsWidth + UICache.groupBorderWidth);
+		width -= UICache.actionsWidth;
 		if(UI.single) {
 			let offset = UICache.groupSelectorSize + UICache.groupBorderWidth;
 			height -= offset;
@@ -2054,7 +2068,7 @@ this.UICache = {
 		});
 
 		this.ghost('groupBorderWidth', function() {
-			return parseInt(style.getPropertyValue('--group-border-width')) *2;
+			return parseInt(style.getPropertyValue('--group-border-width'));
 		});
 
 		this.ghost('groupContentsMargin', function() {

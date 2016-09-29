@@ -4,13 +4,6 @@
 
 @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
 
-@media (-moz-windows-compositor) {
-	#tabGroups-tab-view:-moz-lwtheme {
-		background-image: url("chrome://tabgroups-os/skin/grain.png"), linear-gradient(rgba(255,255,255,0), #CCD9EA 200px, #C7D5E7);
-		background-attachment: fixed;
-	}
-}
-
 /* tabview menu item */
 
 #tabGroups-menu_tabview {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.6.41
+// VERSION 1.6.42
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1957,10 +1957,10 @@ this.GroupItem.prototype = {
 		}
 
 		// Don't include the borders or the titlebar in the thumb, only the tabs area.
-		let inset = UICache.groupBorderWidth /2;
-		bounds.inset(inset, inset);
-		bounds.realTop += inset;
-		bounds.realLeft += inset;
+		bounds.top += UICache.groupBorderWidth;
+		bounds.height -= UICache.groupBorderWidth;
+		bounds.width -= UICache.groupBorderWidth;
+		bounds.realTop += UICache.groupBorderWidth;
 		bounds.realTop += UICache.groupTitlebarHeight;
 		bounds.top += UICache.groupTitlebarHeight;
 		bounds.height -= UICache.groupTitlebarHeight;
@@ -3193,8 +3193,8 @@ this.GroupItems = {
 		let style = (type, items) => {
 			if(!items) { return; }
 
-			let width = items.width - UICache.groupBorderWidth;
-			let height = items.height - UICache.groupBorderWidth;
+			let width = items.width - (UICache.groupBorderWidth *2);
+			let height = items.height - (UICache.groupBorderWidth *2);
 
 			sscode += '\
 				html['+objName+'_UUID="'+_UUID+'"] body.grid .groupItem[row="'+type+'"] {\n\

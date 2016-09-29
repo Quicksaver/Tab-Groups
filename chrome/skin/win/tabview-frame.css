@@ -28,7 +28,8 @@ body:not(:-moz-system-metric(windows-compositor)) {
 	background: url("chrome://tabgroups-os/skin/grain.png") repeat scroll center top, linear-gradient(#CCD9EA, #C7D5E7) repeat scroll 0 0;
 }
 
-body:not(.classic) {
+body.grid,
+body.single:not([lwtheme]) {
 	background-color: var(--item-background);
 }
 
@@ -72,11 +73,11 @@ body:not(.classic) {
 		(-moz-os-version: windows-win7) {
 
 		body.classic #actions {
-			border-radius: var(--item-border-radius) 0 0 var(--item-border-radius);
+			border-radius: 0 0 0 var(--item-border-radius);
 		}
 
 		body.classic #actions:-moz-locale-dir(rtl) {
-			border-radius: 0 var(--item-border-radius) var(--item-border-radius) 0;
+			border-radius: 0 0 var(--item-border-radius) 0;
 		}
 	}
 }

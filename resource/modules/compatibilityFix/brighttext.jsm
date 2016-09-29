@@ -2,12 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.0
+// VERSION 1.1.0
 
 // TODO: create/adapt an actual native dark style, rather than reuse FT DeepDark's one.
 
 this.brightText = {
 	permanent: false,
+
+	observe: function(aSubject, aTopic, aData) {
+		// Only possibilities are forceBrightText pref changed or the lwtheme changed.
+		aSync(() => {
+			Windows.callOnMostRecent((aWindow) => {
+				this.check(aWindow.document);
+			}, 'navigator:browser');
+		}, 100);
+	},
 
 	_parseRGB: /^rgba?\((\d+), (\d+), (\d+)/,
 
@@ -21,16 +30,48 @@ this.brightText = {
 		return 0.2125 * rgb.r + 0.7154 * rgb.g + 0.0721 * rgb.b;
 	},
 
-	check: function(aElement) {
+	check: function(aDocument) {
 		if(this.permanent) { return; }
 
-		let style = getComputedStyle(aElement);
-		let rgb = this.parseRGB(style.color);
-		let luminance = this.parseLuminance(rgb);
-		if(luminance > 110) {
-			this.load();
-		} else {
-			this.unload();
+		// We only need to listen for changes when a(ny) window opens up the groups view.
+		Prefs.listen('forceBrightText', brightText);
+		Observers.add(brightText, "lightweight-theme-styling-update");
+
+		// The user can choose to force a theme on the frame.
+		switch(Prefs.forceBrightText) {
+			case 1:
+				this.unload();
+				break;
+
+			case 2:
+				this.load();
+				break;
+
+			case 0:
+			default:
+				let style = getComputedStyle(aDocument.documentElement);
+
+				// When using a lwtheme, we try to show it in the background of TabView as well.
+				if(trueAttribute(aDocument.documentElement, 'lwtheme')) {
+					let sscode = '\
+						@-moz-document url("chrome://tabgroups/content/tabview.xhtml") {\n\
+							:root {\n\
+								--lwtheme-bgcolor: '+style.backgroundColor+';\n\
+							}\n\
+						}';
+					Styles.load('brightText', sscode, true);
+					break;
+				}
+				Styles.unload('brightText');
+
+				let rgb = this.parseRGB(style.color);
+				let luminance = this.parseLuminance(rgb);
+				if(luminance > 110) {
+					this.load();
+				} else {
+					this.unload();
+				}
+				break;
 		}
 	},
 
@@ -55,7 +96,10 @@ Modules.LOADMODULE = function() {
 };
 
 Modules.UNLOADMODULE = function() {
+	Prefs.unlisten('forceBrightText', brightText);
+	Observers.remove(brightText, "lightweight-theme-styling-update");
+
 	Modules.unload('compatibilityFix/FTDeepDark');
-	Styles.unload('FTDeepDark');
-	Styles.unload('FTDeepDark-scrollbars');
+	brightText.unload();
+	Styles.unload('brightText');
 };

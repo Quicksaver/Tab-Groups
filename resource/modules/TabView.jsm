@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.9
+// VERSION 1.1.10
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -205,7 +205,7 @@ this.TabView = {
 		catch(ex) {}
 
 		// Try to adapt to dark themes, even OS ones.
-		brightText.check(document.documentElement);
+		brightText.check(document);
 
 		Listeners.add(this.tooltip, "popupshowing", this, true);
 		Listeners.add(this.tabMenuPopup, "popupshowing", this);
