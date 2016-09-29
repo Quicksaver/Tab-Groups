@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.4.16
+// VERSION 1.4.17
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -56,9 +56,6 @@ prefList = {
 	previousGroupCtrl: DARWIN,
 
 	noWarningsAboutSession: false,
-
-	// flags
-	message: 5,
 
 	// for internal use
 	pageAutoChanged: false,
