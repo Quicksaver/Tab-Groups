@@ -41,9 +41,9 @@
 	--shade-background: rgba(0,0,0,.42);
 	--drag-animation: margin 150ms linear;
 
-	--z-shield: 10;
-	--z-actions: 30;
-	--z-workspace: 40;
+	--z-actions: 10;
+	--z-workspace: 20;
+	--z-shield: 30;
 	--z-expanded-tray: 50;
 	--z-drag-group: 100;
 	--z-shade: 150;
