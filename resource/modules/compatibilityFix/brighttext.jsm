@@ -2,9 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 // TODO: create/adapt an actual native dark style, rather than reuse FT DeepDark's one.
+
+this.__defineGetter__('LightweightThemeManager', function() {
+	delete this.LightweightThemeManager;
+	Cu.import("resource://gre/modules/LightweightThemeManager.jsm", this);
+	return this.LightweightThemeManager;
+});
 
 this.brightText = {
 	permanent: false,
@@ -49,14 +55,14 @@ this.brightText = {
 
 			case 0:
 			default:
-				let style = getComputedStyle(aDocument.documentElement);
-
 				// When using a lwtheme, we try to show it in the background of TabView as well.
-				if(trueAttribute(aDocument.documentElement, 'lwtheme')) {
+				let theme = LightweightThemeManager.currentTheme;
+				if(theme && theme.id != 'firefox-devedition@mozilla.org') {
+					// this only applies if the accentcolor value supplied by the theme is valid, otherwise it defaults to the gradient using white in the stylesheet
 					let sscode = '\
 						@-moz-document url("chrome://tabgroups/content/tabview.xhtml") {\n\
-							:root {\n\
-								--lwtheme-bgcolor: '+style.backgroundColor+';\n\
+							body.classic[lwtheme] {\n\
+								background-image: linear-gradient(transparent 100px, '+theme.accentcolor+' 178px, '+theme.accentcolor+');\n\
 							}\n\
 						}';
 					Styles.load('brightText', sscode, true);
@@ -64,6 +70,7 @@ this.brightText = {
 				}
 				Styles.unload('brightText');
 
+				let style = getComputedStyle(aDocument.documentElement);
 				let rgb = this.parseRGB(style.color);
 				let luminance = this.parseLuminance(rgb);
 				if(luminance > 110) {

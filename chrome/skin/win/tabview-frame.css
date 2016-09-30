@@ -3,8 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 :root {
-	--item-background: -moz-dialog;
-	--item-border: var(--canvas-border-width) solid rgba(73, 99, 119, 0.3);
 	--item-border-radius: 5px;
 }
 
@@ -14,7 +12,11 @@
 
 		:root {
 			--item-background: hsl(210,75%,92%);
-			--hover-color: rgba(98,127,134,0.4);
+			--hover-color: rgba(98,127,134,0.2);
+		}
+
+		body.classic:not([lwtheme]) {
+			background-color: transparent;
 		}
 	}
 }
@@ -28,9 +30,8 @@ body:not(:-moz-system-metric(windows-compositor)) {
 	background: url("chrome://tabgroups-os/skin/grain.png") repeat scroll center top, linear-gradient(#CCD9EA, #C7D5E7) repeat scroll 0 0;
 }
 
-body.grid,
-body.single:not([lwtheme]) {
-	background-color: var(--item-background);
+body.classic:not([lwtheme]) {
+	background-color: window;
 }
 
 /* Tab Item */
@@ -80,15 +81,4 @@ body.single:not([lwtheme]) {
 			border-radius: 0 0 var(--item-border-radius) 0;
 		}
 	}
-}
-
-#actions .grouped {
-	border-top: 1px solid rgba(4, 38, 60, 0.3);
-}
-
-/* Search */
-
-#searchbox,
-#searchresults {
-	box-shadow: 0px 1px 0px rgba(255,255,255,.5), 0px -1px 0px rgba(0,0,0,1), 0px 0px 9px rgba(0,0,0,.8);
 }

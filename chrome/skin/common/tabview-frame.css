@@ -10,12 +10,13 @@
 
 	--actions-width: 35px;
 	--actions-button-height: 28px;
+	--canvas-border-width: 1px;
+	--group-border-width: 1px;
 
-	--hover-color: rgba(128,128,128,0.4);
-	--lwtheme-bgcolor: transparent;
-	--item-normal-shadow: 0 1px 5px rgba(60, 60, 60, 0.6);
-	--item-active-shadow-ltr: 2px 2px 8px rgba(0, 0, 0, 0.8);
-	--item-active-shadow-rtl: -2px 2px 8px rgba(0, 0, 0, 0.8);
+	--item-background: rgb(252,252,252);
+	--hover-color: rgba(128,128,128,0.2);
+	--item-shadow: 0 1px 7px rgba(60, 60, 60, 0.3);
+	--item-border: var(--group-border-width) solid rgba(73, 99, 119, 0.3);
 
 	--scrollbar-width: 10px;
 	--thumbs-tab-padding: 10px;
@@ -23,18 +24,19 @@
 	--list-tab-padding: 6px;
 	--favicon-size: 16px;
 	--favicon-radius: 0.4em;
-	--canvas-border-width: 1px;
+
 	--group-min-width: 150px;
 	--group-min-height: 145px;
-	--group-border-width: 1px;
 	--group-titlebar-height: 24px;
 	--group-titlebar-edit-icon: url("chrome://tabgroups/skin/edit-light.png");
 	--group-contents-margin: 0;
 	--group-contents-top-margin: 2px;
-	--group-classic-active-shadow-ltr: 2px 2px 8px rgba(0, 0, 0, 0.8), inset 0 0 3px 2px var(--hover-color);
-	--group-classic-active-shadow-rtl: -2px 2px 8px rgba(0, 0, 0, 0.8), inset 0 0 3px 2px var(--hover-color);
-	--group-grid-active-shadow: inset 0 0 3px 2px var(--hover-color);
+	--group-classic-border-color: rgba(60,60,60,0.4);
+	--group-active-shadow: 0 0 0 1px rgba(252,252,252,0.8), 0 0 1px 2px rgba(0,147,224,0.3), 0 1px 7px rgba(0,147,224,0.3);
+	--group-active-border-color: rgb(0,147,224);
+	--group-active-stacked-color: rgba(128,128,128,0.15);
 	--stack-expander-bottom-margin: 8px;
+
 	--group-selector-size: 160px;
 	--group-selector-padding: 15px;
 	--group-selector-title-height: 14px;
@@ -87,8 +89,13 @@ body {
 	color: -moz-DialogText;
 }
 
+body.grid,
+body.single:not([lwtheme]) {
+	background-color: var(--item-background);
+}
+
 body.classic[lwtheme] {
-	background-image: linear-gradient(transparent 100px, var(--lwtheme-bgcolor) 178px, var(--lwtheme-bgcolor));
+	background-image: linear-gradient(transparent 100px, white 178px, white);
 	background-attachment: fixed;
 }
 
@@ -503,41 +510,30 @@ body[FF48] .appTabIcon[busy][progress] {
 .expandedTray,
 .undo:not(.inGroupSelector) {
 	background-color: var(--item-background);
-	border-top: var(--group-border-width) solid ThreeDHighlight;
-	border-bottom: var(--group-border-width) solid ThreeDLightShadow;
-	-moz-border-start: var(--group-border-width) solid ThreeDHighlight;
-	-moz-border-end: var(--group-border-width) solid ThreeDLightShadow;
+	border: var(--group-border-width) solid var(--group-classic-border-color);
 }
 
 body:not(.classic) .groupItem {
+	border-top-color: ThreeDHighlight;
 	border-bottom-color: ThreeDShadow;
+	-moz-border-start-color: ThreeDHighlight;
 	-moz-border-end-color: ThreeDShadow;
 }
 
 body.classic .groupItem,
-.expandedTray {
+.expandedTray,
+.undo:not(.inGroupSelector) {
 	position: absolute;
-	box-shadow: var(--item-normal-shadow);
+	box-shadow: var(--item-shadow);
 }
 
-.expandedTray:-moz-locale-dir(ltr) {
-	box-shadow: var(--item-active-shadow-ltr);
+body:not(.single) .groupItem.activeGroupItem {
+	border-color: var(--group-active-border-color);
+	box-shadow: var(--group-active-shadow);
 }
 
-.expandedTray:-moz-locale-dir(rtl) {
-	box-shadow: var(--item-active-shadow-rtl);
-}
-
-body.grid .groupItem.activeGroupItem {
-	box-shadow: var(--group-grid-active-shadow);
-}
-
-body.classic .groupItem.activeGroupItem:-moz-locale-dir(ltr) {
-	box-shadow: var(--group-classic-active-shadow-ltr);
-}
-
-body.classic .groupItem.activeGroupItem:-moz-locale-dir(rtl) {
-	box-shadow: var(--group-classic-active-shadow-rtl);
+body:not(.single) .groupItem.stackedGroup.activeGroupItem:not(:hover) {
+	background-image: linear-gradient(to bottom, var(--group-active-stacked-color), var(--group-active-stacked-color));
 }
 
 .groupItem:not(.closed).stackedGroup {
@@ -555,6 +551,10 @@ body.classic:not(.searching) .groupItem:not(.phantom) {
 body.grid .groupItem {
 	position: relative;
 	flex: 1 1 auto;
+}
+
+body.grid .groupItem.activeGroupItem {
+	z-index: 2;
 }
 
 body.single .groupItem {
@@ -625,10 +625,6 @@ body:not(.grid) .groupItem:not(.phantom) {
 	align-content: stretch;
 	cursor: pointer;
 	opacity: 0.75;
-}
-
-.undo:not(.inGroupSelector) {
-	box-shadow: var(--item-normal-shadow);
 }
 
 body:not(.classic) .undo {
@@ -1179,9 +1175,9 @@ body.single .tab-counter {
 }
 
 body.classic #actions {
-	-moz-border-start: var(--group-border-width) solid ThreeDHighlight;
-	border-bottom: var(--group-border-width) solid ThreeDHighlight;
-	box-shadow: var(--item-normal-shadow);
+	-moz-border-start: var(--item-border);
+	border-bottom: var(--item-border);
+	box-shadow: var(--item-shadow);
 }
 
 body.grid #actions {
@@ -1267,6 +1263,7 @@ body:not(.classic) #actions {
 #actions .grouped {
 	margin-top: 1px;
 	padding-top: 1px;
+	border-top: 1px solid rgba(4, 38, 60, 0.3);
 }
 
 /* Pinned Tabs group */
@@ -1322,6 +1319,11 @@ body.DraggingGroup .groupItem.dragOver .tab:not(.stacked) .favicon-container,
 #gridNewGroup:hover,
 #gridNewGroup.dragOver {
 	background-image: linear-gradient(to bottom, var(--hover-color), var(--hover-color));
+}
+
+.groupItem:not(.thumbing) .tab:not(.stacked).focus,
+.expandedTray .tab.focus {
+	box-shadow: inset 0 0 0 1px var(--group-active-border-color);
 }
 
 body.DraggingGroup .groupItem > * {
@@ -1382,6 +1384,7 @@ body:not(.searching) #search,
 	border-bottom: var(--group-border-width) solid ThreeDLightShadow;
 	-moz-border-start: var(--group-border-width) solid ThreeDHighlight;
 	-moz-border-end: var(--group-border-width) solid ThreeDLightShadow;
+	box-shadow: var(--item-shadow);
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -1399,6 +1402,7 @@ body:not(.searching) #search,
 	padding: 0 5px;
 	font-size: 14px;
 	text-align: center;
+	box-shadow: var(--item-shadow);
 }
 
 .search-result-group {
@@ -1478,6 +1482,7 @@ body:not(.single) .notapplicable-single {
 	padding: 26px;
 	background: white;
 	font-size: 20px;
+	box-shadow: var(--item-shadow);
 }
 
 #groupOptions-close {

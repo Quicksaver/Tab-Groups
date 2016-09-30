@@ -2,31 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-:root {
-	--item-background: -moz-dialog;
-	--item-border: var(--canvas-border-width) solid rgba(0, 0, 0, 0.3);
-}
-
 body {
 	font: -moz-window;
 	font-size: 12px;
-}
-
-/* Tab GroupItem */
-
-.phantom {
-	border: 1px solid rgba(190,190,190,1);
-}
-
-/* Side buttons */
-
-#actions .grouped {
-	border-top: 1px solid rgba(230,230,230,1);
-}
-
-/* Search */
-
-#searchbox,
-#searchresults {
-	box-shadow: 0px 1px 0px rgba(255,255,255,.5), 0px -1px 0px rgba(0,0,0,1), 0px 0px 9px rgba(0,0,0,.8);
 }
