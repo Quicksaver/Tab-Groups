@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.19
+// VERSION 1.2.20
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PageThumbUtils", "resource://gre/modules/PageThumbUtils.jsm");
 Cu.importGlobalProperties(['FileReader']);
 this.__defineGetter__('URL', function() { return window.URL; });
 
@@ -1406,32 +1407,57 @@ this.TabCanvas.prototype = {
 					// It's not pretty, but it works, and has the added bonus of not having to recapture the webpage onto a new canvas.
 					if(!PageThumbs._prefEnabled()) { return; }
 
-					try {
-						let originalURL = url;
-						let channelError = false;
+					let originalURL = url;
+					let channelError = false;
+					let canvas = this.canvas;
 
-						if(!aBrowser.isRemoteBrowser) {
-							let channel = aBrowser.docShell.currentDocumentChannel;
-							originalURL = channel.originalURI.spec;
-							// see if this was an error response.
-							channelError = PageThumbs._isChannelErrorResponse(channel);
-						}
-
-						this.canvas.toBlob((blob) => {
-							let reader = new FileReader();
-							reader.onloadend = function() {
-								if(reader.readyState == FileReader.DONE) {
-									let buffer = reader.result;
-									PageThumbs._store(originalURL, url, buffer, channelError);
+					Task.spawn(function* () {
+						try {
+							if(Services.vc.compare(Services.appinfo.version, "51.0a1") < 0) {
+								if(!aBrowser.isRemoteBrowser) {
+									let channel = aBrowser.docShell.currentDocumentChannel;
+									originalURL = channel.originalURI.spec;
+									// see if this was an error response.
+									channelError = PageThumbs._isChannelErrorResponse(channel);
 								}
-							};
-							reader.readAsArrayBuffer(blob);
-						});
-					}
-					catch(ex) {
-						Cu.reportError("Tab Groups: exception thrown during thumbnail capture.");
-						Cu.reportError(ex);
-					}
+							}
+							else {
+								if(!aBrowser.isRemoteBrowser) {
+									let channel = aBrowser.docShell.currentDocumentChannel;
+									originalURL = channel.originalURI.spec;
+									// see if this was an error response.
+									channelError = PageThumbUtils.isChannelErrorResponse(channel);
+								} else {
+									let resp = yield new Promise(resolve => {
+										let mm = aBrowser.messageManager;
+										let respName = "Browser:Thumbnail:GetOriginalURL:Response";
+										mm.addMessageListener(respName, function onResp(msg) {
+											mm.removeMessageListener(respName, onResp);
+											resolve(msg.data);
+										});
+										mm.sendAsyncMessage("Browser:Thumbnail:GetOriginalURL");
+									});
+									originalURL = resp.originalURL || url;
+									channelError = resp.channelError;
+								}
+							}
+
+							canvas.toBlob((blob) => {
+								let reader = new FileReader();
+								reader.onloadend = function() {
+									if(reader.readyState == FileReader.DONE) {
+										let buffer = reader.result;
+										PageThumbs._store(originalURL, url, buffer, channelError);
+									}
+								};
+								reader.readAsArrayBuffer(blob);
+							});
+						}
+						catch(ex) {
+							Cu.reportError("Tab Groups: exception thrown during thumbnail capture.");
+							Cu.reportError(ex);
+						}
+					});
 				}
 			});
 		});
@@ -1494,8 +1520,8 @@ this.TabCanvas.prototype = {
 				// Force persist the first thumb we get, to avoid showing stored black thumbs.
 				// Even though we don't actually persist those, browser-ctrlTab.js always persists the first thumb of a tab when it is first restored,
 				// which, lucky us, can be black if it happens while we're in TabView.
-				// See http://mxr.mozilla.org/mozilla-central/source/browser/base/content/browser-ctrlTab.js#51.
-				let forceStale = !hasHadThumb && !browser.isRemoteBrowser;
+				// See https://dxr.mozilla.org/mozilla-central/source/browser/base/content/browser-ctrlTab.js#51.
+				let forceStale = !hasHadThumb;
 				this.persist(browser, forceStale);
 			}
 			if(callback) {
