@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.6.42
+// VERSION 1.6.43
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2961,6 +2961,40 @@ this.GroupItems = {
 			}
 			slot++;
 		}
+	},
+
+	// Returns an array of all group items sorted by their defined title.
+	sortByName: function() {
+		let groups = [];
+		for(let groupItem of this) {
+			groupItem._title = groupItem.getTitle(true).trim().toLowerCase();
+			groups.push(groupItem);
+		}
+
+		// adapted from an answer found at http://stackoverflow.com/questions/15478954/sort-array-elements-string-with-numbers-natural-sort
+		groups.sort(function(a, b) {
+			let ax = [];
+			let bx = [];
+
+			a._title.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || ""]) });
+			b._title.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || ""]) });
+
+			while(ax.length && bx.length) {
+				let an = ax.shift();
+				let bn = bx.shift();
+				let nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
+				if(nn) {
+					return nn;
+				}
+			}
+
+			return ax.length - bx.length;
+		});
+
+		for(let groupItem of this) {
+			delete groupItem._title;
+		}
+		return groups;
 	},
 
 	// Arranges the groups in grid mode, based on the available workspace dimensions.

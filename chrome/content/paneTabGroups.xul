@@ -30,6 +30,7 @@
 			<preference id="pref-gridDynamicSize" name="extensions.tabgroups.gridDynamicSize" type="bool"/>
 			<preference id="pref-closeIfEmpty" name="extensions.tabgroups.closeIfEmpty" type="bool"/>
 			<preference id="pref-showTabCounter" name="extensions.tabgroups.showTabCounter" type="bool"/>
+			<preference id="pref-sortGroupsByName" name="extensions.tabgroups.sortGroupsByName" type="bool"/>
 			<preference id="pref-stackTabs" name="extensions.tabgroups.stackTabs" type="bool"/>
 			<preference id="pref-showThumbs" name="extensions.tabgroups.showThumbs" type="bool"/>
 			<preference id="pref-showUrls" name="extensions.tabgroups.showUrls" type="bool"/>
@@ -76,6 +77,10 @@
 				helptext="&opt.showTabCounter.tooltip;"
 				jump="showTabCounter"
 				delayPreference="pref-showTabCounter"/>
+			<checkbox label="&opt.sortGroupsByName.label;"
+				helptext="&opt.sortGroupsByName.tooltip;"
+				jump="sortGroupsByName"
+				delayPreference="pref-sortGroupsByName"/>
 			<vbox id="paneTabGroups-gridDynamicSize-helptext" collapsed="true">
 				<description>&opt.gridDynamicSize.tooltip1;</description>
 				<description>&opt.gridDynamicSize.tooltip2;</description>

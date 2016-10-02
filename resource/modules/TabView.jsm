@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.10
+// VERSION 1.1.11
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -481,7 +481,7 @@ this.TabView = {
 			this.emptyContextMenu(popup, separator);
 
 			let activeGroup = tab._tabViewTabItem.parent;
-			let groupItems = this._window[objName].GroupItems;
+			let groupItems = (Prefs.sortGroupsByName) ? this._window[objName].GroupItems.sortByName() : this._window[objName].GroupItems.sortBySlot();
 			let menuItems = [];
 
 			for(let groupItem of groupItems) {
@@ -494,11 +494,6 @@ this.TabView = {
 			}
 
 			if(menuItems.length) {
-				menuItems.sort(function(a, b) {
-					if(a.groupTitle < b.groupTitle) { return -1; }
-					if(a.groupTitle > b.groupTitle) { return 1; }
-					return 0;
-				});
 				for(let menuItem of menuItems) {
 					popup.insertBefore(menuItem, separator);
 				}

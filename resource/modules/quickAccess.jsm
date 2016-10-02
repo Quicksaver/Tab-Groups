@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -204,7 +204,7 @@ this.quickAccess = {
 				this.contents.classList.remove('loading');
 
 				let activeGroupItem = TabView._window[objName].GroupItems.getActiveGroupItem();
-				let groupItems = TabView._window[objName].GroupItems.sortBySlot();
+				let groupItems = (Prefs.sortGroupsByName) ? TabView._window[objName].GroupItems.sortByName() : TabView._window[objName].GroupItems.sortBySlot();
 				for(let groupItem of groupItems) {
 					this._createGroupItem(groupItem, activeGroupItem == groupItem);
 				}
