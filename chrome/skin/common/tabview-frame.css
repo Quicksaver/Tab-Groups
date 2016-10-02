@@ -1427,7 +1427,7 @@ body:not(.searching) #search,
 	height: auto;
 }
 
-.search-result-group .tab > *:not(.tab-setactive) {
+.search-result-group .tab > *:not(.tab-result-buttons) {
 	pointer-events: none;
 }
 
@@ -1435,21 +1435,22 @@ body:not(.searching) #search,
 	font-weight: bold;
 }
 
-.search-result-group .tab .tab-setactive {
+.search-result-group .tab .tab-result-buttons {
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
+	display: flex;
 }
 
-.search-result-group .tab .tab-setactive:-moz-locale-dir(ltr) {
+.search-result-group .tab .tab-result-buttons:-moz-locale-dir(ltr) {
 	right: 10px;
 }
-.search-result-group .tab .tab-setactive:-moz-locale-dir(rtl) {
+.search-result-group .tab .tab-result-buttons:-moz-locale-dir(rtl) {
 	left: 10px;
 }
 
-.search-result-group .tab .tab-label {
-	-moz-margin-end: 34px;
+.search-result-group .tab-container .tab .tab-label {
+	-moz-margin-end: 56px;
 }
 
 /* Per-group options sub-dialog */

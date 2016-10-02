@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.0.4
+// VERSION 2.0.5
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -492,10 +492,19 @@ this.Search = {
 			url.classList.add('tab-url');
 			label.appendChild(url);
 
+			let controls = document.createElement('div');
+			controls.classList.add('tab-result-buttons');
+			div.appendChild(controls);
+
 			let showBtn = document.createElement('div');
 			showBtn.classList.add('tab-setactive');
 			showBtn.setAttribute('title', Strings.get('TabView', 'showItemInGroupTooltip'));
-			div.appendChild(showBtn);
+			controls.appendChild(showBtn);
+
+			let close = document.createElement('div');
+			close.classList.add('close');
+			setAttribute(close, "title", Strings.get("TabView", "closeTab"));
+			controls.appendChild(close);
 
 			this._fragmentResult = div;
 		}
@@ -504,9 +513,10 @@ this.Search = {
 		let favicon = container.firstChild.firstChild;
 		let title = container.firstChild.nextSibling.firstChild;
 		let url = title.nextSibling.nextSibling;
-		let showBtn = container.lastChild;
+		let showBtn = container.lastChild.firstChild;
+		let closeBtn = showBtn.nextSibling;
 
-		return { container, favicon, title, url, showBtn };
+		return { container, favicon, title, url, showBtn, closeBtn };
 	},
 
 	// Following comes the part that handles the search results and operations.
@@ -517,6 +527,14 @@ this.Search = {
 	lastGroup: null,
 	currentItem: null,
 	ordered: [],
+
+	handleSubscription: function(eventName, eventInfo) {
+		switch(eventName) {
+			case 'tabRemoved':
+				this.onUnmatch(eventInfo);
+				break;
+		}
+	},
 
 	focusItem: function(item) {
 		if(this.currentItem == item) { return; }
@@ -555,6 +573,7 @@ this.Search = {
 		if(!item) {
 			item = this.fragmentResult();
 			item.container._item = item;
+			item._parent = tab.parent;
 			item.zoomIn = (e) => {
 				this.hide(e);
 				tab.zoomIn();
@@ -570,17 +589,22 @@ this.Search = {
 			};
 			item.handleEvent = function(e) {
 				switch(e.target) {
-					case item.container:
-						this.zoomIn();
-						break;
-
 					case item.showBtn:
 						this.setActive();
+						break;
+
+					case item.closeBtn: {
+						tab.close();
+						break;
+					}
+
+					case item.container:
+					default:
+						this.zoomIn();
 						break;
 				}
 			};
 			item.container.addEventListener('click', item);
-			item.showBtn.addEventListener('click', item);
 
 			let title = TabUtils.nameOf(tab);
 			let url = TabUtils.URLOf(tab);
@@ -606,6 +630,7 @@ this.Search = {
 			}
 
 			this.matches.set(tab, item);
+			tab.addSubscriber('tabRemoved', this);
 		}
 
 		if(group.tabContainer != item.container.parentNode) {
@@ -627,18 +652,25 @@ this.Search = {
 
 	// Removes styles and event listeners from the unmatched tab items.
 	onUnmatch: function(tab) {
+		let parent = tab.parent;
+
 		if(this.matches.has(tab)) {
 			let item = this.matches.get(tab);
 			item.container.remove();
 			this.matches.delete(tab);
+			tab.removeSubscriber('tabRemoved', this);
+
+			if(!parent) {
+				parent = item._parent;
+			}
 		}
 
-		if(this.groupsWithMatches.has(tab.parent)) {
-			let group = this.groupsWithMatches.get(tab.parent);
+		if(this.groupsWithMatches.has(parent)) {
+			let group = this.groupsWithMatches.get(parent);
 			group.tabs.delete(tab);
 			if(!group.tabs.size) {
 				group.container.remove();
-				this.groupsWithMatches.delete(tab.parent);
+				this.groupsWithMatches.delete(parent);
 				if(!this.groupsWithMatches.size) {
 					this.results.setAttribute('empty', 'true');
 				}

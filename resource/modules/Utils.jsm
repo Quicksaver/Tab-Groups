@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.0
+// VERSION 1.3.1
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -283,6 +283,9 @@ this.Subscribable = function(obj) {
 
 		let subscribers = this.subscribers.get(eventName);
 		subscribers.delete(callback);
+		if(!subscribers.size) {
+			this.subscribers.delete(eventName);
+		}
 	};
 
 	// Internal routine. Used by the Subscribable to fire events.

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.20
+// VERSION 1.2.21
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -501,7 +501,7 @@ this.TabItem.prototype = {
 		let tabClosed = !this.tab;
 
 		if(tabClosed) {
-			this._sendToSubscribers("tabRemoved");
+			this._sendToSubscribers("tabRemoved", this);
 		}
 
 		// No need to explicitly delete the tab data, becasue sessionstore data associated with the tab will automatically go away
