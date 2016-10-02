@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.31
+// VERSION 1.3.32
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1001,7 +1001,6 @@ this.UI = {
 			window.focus();
 
 			gBrowser.updateTitlebar();
-			this.setTitlebarColors(true);
 
 			// Trick to make Ctrl+F4 and Ctrl+Shift+PageUp/PageDown shortcuts behave as expected in TabView,
 			// we need to remove the gBrowser as a listener for these, otherwise it would consume these events and they would never reach our handler.
@@ -1093,7 +1092,6 @@ this.UI = {
 
 			gBrowser.updateTitlebar();
 			gBrowser.tabContainer.mTabstrip.smoothScroll = this._originalSmoothScroll;
-			this.setTitlebarColors(false);
 
 			this._els.addSystemEventListener(gWindow.document, "keydown", gBrowser, false);
 		}
@@ -1118,26 +1116,6 @@ this.UI = {
 			}
 		}
 		this._reorderTabsOnHide = new Set();
-	},
-
-	// Used on the Mac to make the title bar match the gradient in the rest of the TabView UI.
-	// Parameters:
-	//   colors - (bool or object) true for the special TabView color, false for the normal color, and an object with "active" and "inactive" properties to specify directly.
-	setTitlebarColors: function(colors) {
-		// Mac Only
-		if(!DARWIN) { return; }
-
-		let mainWindow = gWindow.document.documentElement;
-		if(colors === true) {
-			mainWindow.setAttribute("activetitlebarcolor", "#C4C4C4");
-			mainWindow.setAttribute("inactivetitlebarcolor", "#EDEDED");
-		} else if(colors && "active" in colors && "inactive" in colors) {
-			mainWindow.setAttribute("activetitlebarcolor", colors.active);
-			mainWindow.setAttribute("inactivetitlebarcolor", colors.inactive);
-		} else {
-			mainWindow.removeAttribute("activetitlebarcolor");
-			mainWindow.removeAttribute("inactivetitlebarcolor");
-		}
 	},
 
 	storageClosing: function() {

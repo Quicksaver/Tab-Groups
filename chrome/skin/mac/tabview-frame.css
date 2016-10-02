@@ -6,24 +6,9 @@
 	--item-border-radius: 7px;
 }
 
-:root:-moz-window-inactive {
-	--shade-background: linear-gradient(rgba(237,237,237,0.42), rgba(216,216,216,0.42));
-}
-
 body {
 	font: message-box;
 	font-size: 12px;
-}
-
-/* yosemite uses vibrant background on parent iframe */
-@media not all and (-moz-mac-yosemite-theme) {
-	body:not([lwtheme]) {
-		background-image: linear-gradient(#C4C4C4, #9E9E9E);
-	}
-
-	body:not([lwtheme]):-moz-window-inactive {
-		background-image: linear-gradient(#EDEDED, #D8D8D8);
-	}
 }
 
 /* Tab Item */

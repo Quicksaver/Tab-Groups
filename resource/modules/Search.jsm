@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.0.5
+// VERSION 2.0.6
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -377,8 +377,6 @@ this.Search = {
 		document.body.classList.remove('searching');
 
 		this.searchbox.value = "";
-
-		UI.setTitlebarColors(true);
 		this.clearSearch(true);
 
 		if(e) {
@@ -415,7 +413,6 @@ this.Search = {
 		if(!this.inSearch) {
 			this.inSearch = true;
 			document.body.classList.add('searching');
-			UI.setTitlebarColors({ active: "#717171", inactive: "#EDEDED" });
 
 			if(activatedByKeypress) {
 				// set the focus so key strokes are entered into the textbox.
