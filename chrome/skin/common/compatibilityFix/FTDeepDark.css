@@ -38,6 +38,7 @@
 		--hover-color: rgba(165,165,165,.4);
 		--group-titlebar-edit-icon: url("chrome://tabgroups/skin/compatibilityFix/edit-dark.png");
 		--shade-background: rgba(24,24,24,.42);
+		--highlighter-background: rgb(68, 212, 255);
 	}
 
 	body.classic:not([lwtheme]) {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.6.43
+// VERSION 1.6.44
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1603,25 +1603,42 @@ this.GroupItem.prototype = {
 		this.overflowing = false;
 		removeAttribute(this.tabContainer, 'columns');
 
-		let childrenToArrange = this.children.concat();
-		let count = childrenToArrange.length;
-
-		// ensure topChild is the first item in childrenToArrange
-		let topChild = this.getTopChild();
-		let topChildPos = childrenToArrange.indexOf(topChild);
-		if(topChildPos > 0) {
-			childrenToArrange = childrenToArrange.concat(childrenToArrange.splice(0, topChildPos));
-		}
-
 		let numInPile = 6;
-		let zIndex = numInPile;
 		let children = [];
-		for(let child of childrenToArrange) {
-			if(numInPile > 0) {
+
+		// If a search is active, stack only the highlighted tabs in this group...
+		if(Search.inSearch && Search.groupsWithMatches.has(this)) {
+			let toStack = Search.groupsWithMatches.get(this).tabs;
+			for(let child of toStack) {
 				children.push(child);
 				numInPile--;
-			} else {
-				child.inVisibleStack(false);
+				if(!numInPile) { break; }
+			}
+			for(let child of this.children) {
+				if(children.indexOf(child) == -1) {
+					child.inVisibleStack(false);
+				}
+			}
+		}
+
+		// ... otherwise stack all tabs counting from the active one in this group.
+		else {
+			let childrenToArrange = this.children.concat();
+
+			// ensure topChild is the first item in childrenToArrange
+			let topChild = this.getTopChild();
+			let topChildPos = childrenToArrange.indexOf(topChild);
+			if(topChildPos > 0) {
+				childrenToArrange = childrenToArrange.concat(childrenToArrange.splice(0, topChildPos));
+			}
+
+			for(let child of childrenToArrange) {
+				if(numInPile > 0) {
+					children.push(child);
+					numInPile--;
+				} else {
+					child.inVisibleStack(false);
+				}
 			}
 		}
 
@@ -1680,6 +1697,7 @@ this.GroupItem.prototype = {
 		let angleDelta = 3.5; // degrees
 		let angleAccum = 0;
 		let angleMultiplier = RTL ? -1 : 1;
+		let zIndex = children.length;
 		for(let child of children) {
 			child.inVisibleStack(true, angleMultiplier * angleAccum, zIndex);
 			zIndex--;

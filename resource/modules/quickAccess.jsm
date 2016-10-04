@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -408,7 +408,7 @@ this.quickAccess = {
 			|| (this.activePanel == this.panel && this.panel.state != 'open') || (this.activePanel == this.view && PanelUI.panel.state != 'open')) { return; }
 
 			let term = this.searchbox.value;
-			if(term.length < 2) {
+			if(!term.length) {
 				if(this._lastSearch) {
 					this.populateGroups();
 				}

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.21
+// VERSION 1.2.22
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -1244,6 +1244,11 @@ this.TabItems = {
 		this._tabsNeedingLabelsUpdate.delete(item);
 		this._staleTabs.remove(item);
 		this._queuedCachedThumbs.delete(item);
+
+		// The Search module needs a little help with this.
+		if(Search._activeTab == item) {
+			Search._activeTab = null;
+		}
 	},
 
 	// Saves all open <TabItem>s.

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.1
+// VERSION 1.2.2
 
 // Returns an iQClass object which represents an individual element. selector can only be a DOM node.
 // I'm keeping this only because I don't feel like rewritting all the bounds/animation/fadein/out code.
@@ -65,7 +65,14 @@ this.iQClass.prototype = {
 				width: a.width,
 				height: a.height
 			};
-		} else {
+		}
+		else if(a instanceof Point) {
+			properties = {
+				left: a.x,
+				top: a.y
+			}
+		}
+		else {
 			properties = a;
 		}
 

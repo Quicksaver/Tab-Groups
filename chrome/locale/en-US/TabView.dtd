@@ -10,6 +10,8 @@
 <!ENTITY manageTabGroups.tooltip "Enter groups view to organize your tabs and create new groups">
 
 <!ENTITY buttonSearchTabs.label "Search tab groups">
+<!ENTITY buttonSearchMode.label "Toggle list mode">
+<!ENTITY buttonSearchClose.label "Close this search term">
 <!ENTITY buttonExitTabGroups.label "Exit tab groups">
 <!ENTITY buttonOptionsTabGroups.label "Change tab groups preferences">
 <!ENTITY buttonHelpTabGroups.label "How to use tab groups">

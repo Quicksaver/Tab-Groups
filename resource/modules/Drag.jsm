@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.4.0
+// VERSION 2.5.0
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -10,7 +10,7 @@ this.DraggingGroup = null;
 // Called to create a Drag in response to a <GroupItem> draggable "start" event.
 // Parameters:
 //   item - The <Item> being dragged
-//   event - The DOM event that kicks off the drag
+//   e - The DOM event that kicks off the drag
 //   resizing - whether the groupitem is being resized rather than repositioned
 //   callback - a method that will be called when the drag operation ends
 this.GroupDrag = function(item, e, resizing, callback) {
@@ -1044,5 +1044,93 @@ this.TabDrag.prototype = {
 		document.body.classList.remove('DraggingTab');
 
 		DraggingTab = null;
+	}
+};
+
+// This will be the HighlighterDrag object created when a group is dragged or resized.
+this.DraggingHighlighter = null;
+
+// Called to create a Drag in response to dragging the search box when in highlight mode.
+// Parameters:
+//   e - The DOM event that kicks off the drag
+this.HighlighterDrag = function(e, callback) {
+	DraggingHighlighter = this;
+	this.item = Search.searchbox;
+	this.$item = iQ(this.item);
+	this.callback = callback;
+	this.started = false;
+
+	Listeners.add(gWindow, 'mousemove', this);
+	Listeners.add(gWindow, 'mouseup', this);
+
+	this.startBounds = this.$item.bounds();
+	this.startMouse = new Point(e.clientX, e.clientY);
+};
+
+this.HighlighterDrag.prototype = {
+	minDragDistance: 3,
+	_stoppedMoving: null,
+
+	check: function() {
+		return DraggingHighlighter == this;
+	},
+
+	start: function(isAuto) {
+		if(!this.check()) { return; }
+
+		this.started = true;
+	},
+
+	handleEvent: function(e) {
+		if(!this.check()) { return; }
+
+		switch(e.type) {
+			case 'mousemove':
+				// global drag tracking
+				UI.lastMoveTime = Date.now();
+
+				let mouse = new Point(e.clientX, e.clientY);
+
+				// positioning
+				if(!this.started) {
+					if(Math.abs(mouse.x - this.startMouse.x) > this.minDragDistance
+					|| Math.abs(mouse.y - this.startMouse.y) > this.minDragDistance) {
+						this.start();
+					}
+				}
+
+				this.drag(e);
+
+				e.preventDefault();
+				break;
+
+			case 'mouseup':
+				this.stop();
+				break;
+		}
+	},
+
+	drag: function(e) {
+		if(!this.check() || !this.started) { return; }
+
+		let mouse = new Point(e.clientX, e.clientY);
+		let css = {
+			left: this.startBounds.left + (mouse.x - this.startMouse.x),
+			top: this.startBounds.top + (mouse.y - this.startMouse.y)
+		};
+		this.$item.css(css);
+	},
+
+	stop: function(immediately) {
+		if(!this.check()) { return; }
+
+		Listeners.remove(gWindow, 'mousemove', this);
+		Listeners.remove(gWindow, 'mouseup', this);
+
+		if(this.callback) {
+			this.callback();
+		}
+
+		DraggingHighlighter = null;
 	}
 };

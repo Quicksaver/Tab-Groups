@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.32
+// VERSION 1.3.33
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -479,6 +479,9 @@ this.UI = {
 			let data = Storage.readUIData(gWindow) || {};
 			this.storageSanity(data);
 			this._pageBounds = data.pageBounds;
+
+			// In case we end up saving UI data before a Search is run, we shouldn't just lose the save search position.
+			Search._position = data.searchPosition;
 
 			// Some things depend on the different FF versions.
 			toggleAttribute(document.body, 'FF48', Services.vc.compare(Services.appinfo.version, "48.0a1") >= 0);
@@ -1488,24 +1491,27 @@ this.UI = {
 			}
 		};
 
-		let inTextField = this.isTextField($$(":focus")[0]);
-		if(inTextField || Search.inSearch || GroupOptionsUI.activeOptions) {
+		let focusedNode = $$(":focus")[0];
+		let inTextField = this.isTextField(focusedNode) && focusedNode != Search.searchquery;
+		if(inTextField || (Search.inSearch && Prefs.searchMode == 'list') || GroupOptionsUI.activeOptions) {
 			processBrowserKeys(e, inTextField);
 			return;
 		}
 
 		let getClosestTabBy = (norm) => {
-			if(!this.getActiveTab()) {
+			let activeTab = this.getActiveTab();
+			if(!activeTab) {
 				return null;
 			}
 
-			let activeTab = this.getActiveTab();
 			let activeTabGroup = activeTab.parent;
 			let myCenter = activeTab.getBounds().center();
 			let match;
 
 			for(let item of TabItems) {
-				if(!item.parent.hidden && (!activeTabGroup.expanded || activeTabGroup.id == item.parent.id)) {
+				if(!item.parent.hidden
+				&& (!Search.inSearch || Search.matches.has(item))
+				&& (!activeTabGroup.expanded || activeTabGroup.id == item.parent.id)) {
 					let itemCenter = item.getBounds().center();
 
 					if(norm(itemCenter, myCenter)) {
@@ -1558,6 +1564,8 @@ this.UI = {
 		let preventDefault = true;
 		switch(e.key) {
 			case "Escape":
+				if(Search.inSearch) { break; }
+
 				activeGroupItem = GroupItems.getActiveGroupItem();
 				if(activeGroupItem && activeGroupItem.expanded) {
 					activeGroupItem.collapse();
@@ -1900,6 +1908,11 @@ this.UI = {
 			return false;
 		}
 
+		// Don't block when this isn't valid, just reset it and let the Search module take care of itself.
+		if(!Utils.isPoint(data.searchPosition)) {
+			data.searchPosition = null;
+		}
+
 		return true;
 	},
 
@@ -1908,7 +1921,8 @@ this.UI = {
 		if(!this._frameInitialized) { return; }
 
 		let data = {
-			pageBounds: this._pageBounds
+			pageBounds: this._pageBounds,
+			searchPosition: Search._position
 		};
 
 		if(this.storageSanity(data)) {
