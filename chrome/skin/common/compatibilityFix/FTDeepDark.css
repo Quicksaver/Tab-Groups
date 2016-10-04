@@ -40,6 +40,10 @@
 		--shade-background: rgba(24,24,24,.42);
 	}
 
+	body.classic:not([lwtheme]) {
+		background-color: rgb(24,24,24);
+	}
+
 	.titlebar .name,
 	.tab-label {
 		color: rgb(166,166,166);
