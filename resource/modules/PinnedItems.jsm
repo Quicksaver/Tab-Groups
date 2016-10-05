@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 this.PinnedItems = {
 	get actions() { return $('actions'); },
@@ -71,7 +71,7 @@ this.PinnedItems = {
 
 	// Watching "busy" and "progress" attributes in tabs, at least "progress" doesn't fire TabAttrModified events, and "busy" seems a bit unreliable.
 	attrWatcher: function(tab) {
-		if(!!this.icons.has(tab)) { return; }
+		if(!this.icons.has(tab)) { return; }
 		let icon = this.icons.get(tab);
 
 		if(tab.hasAttribute("busy") != icon.hasAttribute("busy") || tab.hasAttribute("progress") != icon.hasAttribute("progress")) {
@@ -230,7 +230,7 @@ this.PinnedItems = {
 
 			this.icons.set(tab, icon);
 			tab._tabViewAppItem = icon;
-			Watchers.addAttributeWatcher(tab, [ "busy", "progress" ], this);
+			Watchers.addAttributeWatcher(tab, [ "busy", "progress" ], this, false, false);
 		}
 
 		if(sibling && sibling.isAnAppItem) {
@@ -262,7 +262,7 @@ this.PinnedItems = {
 
 	destroy: function(icon) {
 		icon.remove();
-		Watchers.removeAttributeWatcher(icon.tab, [ "busy", "progress" ], this);
+		Watchers.removeAttributeWatcher(icon.tab, [ "busy", "progress" ], this, false, false);
 		delete icon.tab._tabViewAppItem;
 	},
 
