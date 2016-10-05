@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.7.5
+// VERSION 2.7.6
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -30,18 +30,31 @@ this.xmlHttpRequest = function(url, callback, method = "GET") {
 	return xmlhttp;
 };
 
-// aSync(aFunc, aDelay) - lets me run aFunc asynchronously, basically it's a one shot timer with a delay of aDelay msec
-//	aFunc - (function) to be called asynchronously
+// A collection of timers created by the aSync method below. Sometimes these timers "forget" to fire if their instances aren't held anywhere.
+// So we keep a collection here to make sure they always fire as necessary.
+this._aSyncTimers = new Set();
+
+// aSync(aCallback, aDelay) - runs aCallback asynchronously, basically it's a one shot timer with a delay of aDelay msec
+//	aCallback - (function) to be called asynchronously
 //	(optional) aDelay - (int) msec to set the timer, defaults to 0msec
-this.aSync = function(aFunc, aDelay) {
-	var newTimer = {
+this.aSync = function(aCallback, aDelay) {
+	let newTimer = {
 		timer: Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer),
-		handler: aFunc,
+		callback: aCallback,
+		clean: function() {
+			_aSyncTimers.delete(this);
+		},
+		handler: function() {
+			this.clean();
+			this.callback();
+		},
 		cancel: function() {
 			this.timer.cancel();
+			this.clean();
 		}
 	};
-	newTimer.timer.init(newTimer.handler, (!aDelay) ? 0 : aDelay, Ci.nsITimer.TYPE_ONE_SHOT);
+	_aSyncTimers.add(newTimer);
+	newTimer.timer.init(function() { newTimer.handler(); }, (!aDelay) ? 0 : aDelay, Ci.nsITimer.TYPE_ONE_SHOT);
 	return newTimer;
 };
 
