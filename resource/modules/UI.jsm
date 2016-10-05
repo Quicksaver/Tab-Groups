@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.33
+// VERSION 1.3.34
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1493,33 +1493,92 @@ this.UI = {
 
 		let focusedNode = $$(":focus")[0];
 		let inTextField = this.isTextField(focusedNode) && focusedNode != Search.searchquery;
-		if(inTextField || (Search.inSearch && Prefs.searchMode == 'list') || GroupOptionsUI.activeOptions) {
-			processBrowserKeys(e, inTextField);
+		if(inTextField || (Search.inSearch && (Prefs.searchMode == 'list' || e.key != "Enter")) || GroupOptionsUI.activeOptions) {
+			processBrowserKeys(e, focusedNode);
 			return;
 		}
 
-		let getClosestTabBy = (norm) => {
+		// Finds what tab is closest to the active tab in the direction provided by the pressed arrow key.
+		let getClosestBy = (norm) => {
+			// The starting point is of course the active tab if it exists.
 			let activeTab = this.getActiveTab();
+
 			if(!activeTab) {
+				// If there's no active tab, check if there's an expanded stacked group. If there is, return its first tab.
+				for(let groupItem of GroupItems) {
+					if(!groupItem.hidden && groupItem.expanded) {
+						let topChild = groupItem.getTopChild();
+						return topChild;
+					}
+				}
+
+				// No group was expanded, so get the first tab/group in the list, because we have to start from somwehere.
+				for(let groupItem of GroupItems) {
+					if(!groupItem.hidden) {
+						// If this group is stacked, return the group itself.
+						if(groupItem.isStacked) {
+							return groupItem;
+						}
+
+						// Otherwise return its first child if it has one.
+						let topChild = groupItem.getTopChild();
+						if(topChild) {
+							return topChild;
+						}
+					}
+				}
+
+				// We have no active or available tabs to select.
 				return null;
 			}
 
-			let activeTabGroup = activeTab.parent;
+			// Alright, we have an active tab, use the distance from its center point to another item's center point as a reference.
+			// Don't forget to only check highlighted tabs if a search is active.
 			let myCenter = activeTab.getBounds().center();
-			let match;
+			let activeGroup = activeTab.parent;
+			let siblings = new Map();
 
-			for(let item of TabItems) {
-				if(!item.parent.hidden
-				&& (!Search.inSearch || Search.matches.has(item))
-				&& (!activeTabGroup.expanded || activeTabGroup.id == item.parent.id)) {
-					let itemCenter = item.getBounds().center();
-
-					if(norm(itemCenter, myCenter)) {
-						let itemDist = myCenter.distance(itemCenter);
-						if(!match || match[0] > itemDist) {
-							match = [itemDist, item];
+			// If we're in a stacked group and it's expanded, or if we're in single view, we only need to check tabs in this group.
+			if(activeGroup.expanded || this.single) {
+				for(let child of activeGroup.children) {
+					if(!Search.inSearch || Search.matches.has(child)) {
+						let itemCenter = child.getBounds().center();
+						if(norm(itemCenter, myCenter)) {
+							siblings.set(child, itemCenter);
 						}
 					}
+				}
+			}
+
+			// Otherwise, we need to compare with every tab item visible, or with every stacked group.
+			else {
+				for(let groupItem of GroupItems) {
+					if(groupItem.hidden) { continue; }
+					if(Search.inSearch && !Search.groupsWithMatches.has(groupItem)) { continue; }
+
+					if(groupItem.isStacked) {
+						let itemCenter = groupItem.getBounds().center();
+						if(norm(itemCenter, myCenter)) {
+							siblings.set(groupItem, itemCenter);
+						}
+						continue;
+					}
+
+					for(let child of groupItem.children) {
+						let itemCenter = child.getBounds().center();
+						if(norm(itemCenter, myCenter)) {
+							siblings.set(child, itemCenter);
+						}
+					}
+				}
+			}
+
+			// Now that we have a list a distances, find the shortest one.
+			let match;
+			for(let [item, center] of siblings) {
+				let distance = myCenter.distance(center);
+				if(!match || match[0] > distance) {
+					match = [distance, item];
 				}
 			}
 
@@ -1551,12 +1610,9 @@ this.UI = {
 		}
 
 		if(norm != null) {
-			let nextTab = getClosestTabBy(norm);
-			if(nextTab) {
-				if(nextTab.isStacked && !nextTab.parent.expanded) {
-					nextTab = nextTab.parent.children[0];
-				}
-				this.setActive(nextTab);
+			let nextTabOrGroup = getClosestBy(norm);
+			if(nextTabOrGroup) {
+				this.setActive(nextTabOrGroup);
 			}
 			return;
 		}
@@ -1564,8 +1620,6 @@ this.UI = {
 		let preventDefault = true;
 		switch(e.key) {
 			case "Escape":
-				if(Search.inSearch) { break; }
-
 				activeGroupItem = GroupItems.getActiveGroupItem();
 				if(activeGroupItem && activeGroupItem.expanded) {
 					activeGroupItem.collapse();
@@ -1592,7 +1646,17 @@ this.UI = {
 				break;
 
 			case "Tab":
-				// tab/shift + tab to go to the next tab.
+				// ctrl+(shift+)tab to go to the next group.
+				let accel = (DARWIN && e.metaKey) || (!DARWIN && e.ctrlKey);
+				if(accel) {
+					let nextGroupTab = GroupItems.getNextGroupItemTab(e.shiftKey);
+					if(nextGroupTab) {
+						UI.setActive(nextGroupTab);
+					}
+					break;
+				}
+
+				// (shift+)tab to go to the next tab.
 				activeTab = this.getActiveTab();
 				if(activeTab) {
 					let tabItems = (activeTab.parent ? activeTab.parent.children : [activeTab]);
@@ -1616,6 +1680,14 @@ this.UI = {
 						}
 						this.setActive(tabItems[newIndex]);
 					}
+				}
+				break;
+
+			case " ":
+				// Spacebar should expanded the active group if it's stacked.
+				activeGroupItem = GroupItems.getActiveGroupItem();
+				if(activeGroupItem && activeGroupItem.isStacked) {
+					activeGroupItem.expand();
 				}
 				break;
 

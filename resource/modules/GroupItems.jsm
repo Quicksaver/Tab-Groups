@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.6.44
+// VERSION 1.6.45
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2670,16 +2670,10 @@ this.GroupItems = {
 		for(let groupItem of groupItems) {
 			if(groupItem.hidden) { continue; }
 
-			// restore the last active tab in the group
+			// restore the last active tab, or the first one, in the group
 			let activeTab = groupItem.getActiveTab();
 			if(activeTab) {
 				return activeTab;
-			}
-
-			// if no tab is active, use the first one
-			let child = groupItem.children[0];
-			if(child) {
-				return child;
 			}
 
 			// There's no easy way to open a new tab in another group and switch to it, because window.BrowserOpenTab doesn't return the new tab.
