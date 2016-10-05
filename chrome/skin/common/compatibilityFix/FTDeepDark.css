@@ -41,12 +41,17 @@
 		--highlighter-background: rgb(68, 212, 255);
 	}
 
-	body.classic:not([lwtheme]) {
-		background-color: rgb(24,24,24);
+	body.classic:not([lwtheme]),
+	#groupSelector,
+	#groupOptions-catchRules {
+		background-color: rgb(36,36,36);
 	}
 
 	.titlebar .name,
-	.tab-label {
+	.tab-label,
+	#groupOptions,
+	#groupOptions-title,
+	#groupOptions-catchRules {
 		color: rgb(166,166,166);
 	}
 
@@ -59,16 +64,12 @@
 		border-color: rgb(77,77,77);
 	}
 
-	#groupSelector {
-		background-color: rgb(24,24,24);
+	.undo {
+		color: var(--hover-color);
 	}
 
 	#groupOptions {
-		color: -moz-DialogText;
-	}
-
-	.undo {
-		color: var(--hover-color);
+		border: 1px solid rgb(77,77,77);
 	}
 
 	.undo:hover,

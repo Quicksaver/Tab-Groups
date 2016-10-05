@@ -1600,7 +1600,7 @@ body:not(.single) .notapplicable-single {
 	flex-direction: column;
 	overflow: auto;
 	padding: 26px;
-	background: white;
+	background: var(--item-background);
 	font-size: 20px;
 	box-shadow: var(--item-shadow);
 }
@@ -1684,6 +1684,7 @@ body:not(.single) .notapplicable-single {
 	resize: none;
 	width: 100%;
 	height: 100%;
+	padding: 2px;
 	white-space: pre;
 }
 
@@ -1697,7 +1698,7 @@ body:not(.single) .notapplicable-single {
 	pointer-events: none;
 	font-size: 14px;
 	font-style: italic;
-	padding: 0 4px;
+	padding: 1px 4px;
 	opacity: 0.85;
 	background: none;
 }
