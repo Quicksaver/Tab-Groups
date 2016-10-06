@@ -13,11 +13,12 @@
 	--actions-button-height: 28px;
 	--canvas-border-width: 1px;
 	--group-border-width: 1px;
+	--group-border-color: rgba(73, 99, 119, 0.3);
 
 	--item-background: rgb(252,252,252);
 	--hover-color: rgba(128,128,128,0.2);
 	--item-shadow: 0 1px 7px rgba(60, 60, 60, 0.3);
-	--item-border: var(--group-border-width) solid rgba(73, 99, 119, 0.3);
+	--item-border: var(--group-border-width) solid var(--group-border-color);
 
 	--scrollbar-width: 10px;
 	--thumbs-tab-padding: 10px;
@@ -412,18 +413,17 @@ body.DraggingTab .tab * {
 }
 
 .tab.stacked .favicon-container {
-	top: 1px;
 	width: 27px;
 	height: 27px;
+	border-top-color: var(--group-border-color);
+	-moz-border-start-color: var(--group-border-color);
 }
 
 .tab.stacked .favicon-container:-moz-locale-dir(ltr) {
-	left: 1px;
 	border-bottom-right-radius: var(--favicon-radius);
 }
 
 .tab.stacked .favicon-container:-moz-locale-dir(rtl) {
-	right: 1px;
 	border-bottom-left-radius: var(--favicon-radius);
 }
 

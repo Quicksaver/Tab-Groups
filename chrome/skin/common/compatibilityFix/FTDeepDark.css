@@ -32,7 +32,8 @@
 		--actions-icons: url("chrome://tabgroups/skin/compatibilityFix/actions-dark.png");
 		--actions-icons-2x: url("chrome://tabgroups/skin/compatibilityFix/actions-dark@2x.png");
 		--item-background: rgb(12,12,12);
-		--item-border: var(--canvas-border-width) solid rgb(0,0,0);
+		--group-border-color: rgb(0,0,0);
+		--item-border: var(--group-border-width) solid var(--group-border-color);
 		--item-border-radius: 2px;
 		--favicon-radius: 2px;
 		--hover-color: rgba(165,165,165,.4);
