@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.6.45
+// VERSION 1.6.46
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -443,16 +443,21 @@ this.GroupItem.prototype = {
 			bounds.height -= UICache.groupBorderWidth;
 		} else {
 			bounds = new Rect((UI.classic) ? this.bounds : this._gridBounds);
+			bounds.width -= UICache.groupBorderWidth *2;
+			bounds.height -= UICache.groupBorderWidth *2;
 		}
+
 		// The following line takes 100ms longer on the first iniitalization in grid layout.
 		// Because it's the first call to getting values from the stylesheet? I dunno...
 		bounds.width -= UICache.groupContentsMargin.x;
 		bounds.height -= UICache.groupContentsMargin.y;
 		bounds.height -= UICache.groupTitlebarHeight;
+
 		if(justTabs && this.isStacked) {
 			// We're just trying to better center the stacked tabs in the group.
 			bounds.height -= UICache.groupTitlebarHeight;
 		}
+
 		return bounds;
 	},
 
@@ -1678,13 +1683,10 @@ this.GroupItem.prototype = {
 			size = TabItems.calcValidSize(size);
 		}
 
-		let tabWidth = size.x -UICache.tabItemPadding;
-		let tabHeight = size.y -UICache.tabItemPadding;
-		this._lastTabSize = {
-			tabWidth,
-			tabHeight,
-			lineHeight: 0
-		};
+		let tabPadding = TabItems.getTabPaddingFromWidth(size.x);
+		let tabWidth = size.x - (tabPadding *2);
+		let tabHeight = size.y - (tabPadding *2);
+		this._lastTabSize = { tabWidth, tabHeight, tabPadding, lineHeight: 0 };
 
 		let sscode = '\
 			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab {\n\
@@ -1756,11 +1758,10 @@ this.GroupItem.prototype = {
 			child.inVisibleStack();
 		}
 
-		this._lastTabSize = TabItems.arrange(count, bounds, cols);
-		let { tabWidth, tabHeight, columns, overflowing } = this._lastTabSize;
-		let fontSize = TabItems.getFontSizeFromWidth(tabWidth);
-		let spaceWidth = tabWidth + UICache.tabItemPadding;
-		let spaceHeight = tabHeight + UICache.tabItemPadding;
+		this._lastTabSize = TabItems.arrange(count, bounds, this.tileIcons, cols);
+		let { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, favIconOffset, columns, overflowing } = this._lastTabSize;
+		let spaceWidth = tabWidth + (tabPadding *2);
+		let spaceHeight = tabHeight + (tabPadding *2);
 
 		// Tab title heights vary according to fonts... I wish I could use flexbox here, but the more flexboxes the more it lags.
 		let lineHeight = TabItems.fontSizeRange.max;
@@ -1787,6 +1788,7 @@ this.GroupItem.prototype = {
 			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab {\n\
 				width: '+tabWidth+'px;\n\
 				height: '+tabHeight+'px;\n\
+				padding: '+tabPadding+'px;\n\
 				font-size: '+fontSize+'px;\n\
 			}\n\
 			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab:not(.stacked) .thumb,\n\
@@ -1809,6 +1811,25 @@ this.GroupItem.prototype = {
 			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container[columns="1"] .tab.space-after {\n\
 				margin-bottom: '+spaceHeight+'px;\n\
 			}';
+
+			sscode += '\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-controls,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-controls {\n\
+					top: '+controlsOffset+'px;\n\
+				}\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-controls:-moz-locale-dir(ltr),\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-controls:-moz-locale-dir(ltr) {\n\
+					right: '+controlsOffset+'px;\n\
+				}\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-controls:-moz-locale-dir(rtl),\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-controls:-moz-locale-dir(rtl) {\n\
+					left: '+controlsOffset+'px;\n\
+				}\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .favicon,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .favicon {\n\
+					top: -'+favIconOffset+'px;\n\
+					left: -'+favIconOffset+'px;\n\
+				}';
 
 		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);
 

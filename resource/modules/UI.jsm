@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.34
+// VERSION 1.3.35
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -937,6 +937,9 @@ this.UI = {
 		let viewportRatio = gBrowser.mCurrentBrowser.clientWidth / gBrowser.mCurrentBrowser.clientHeight;
 		if(viewportRatio != this._viewportRatio) {
 			this._viewportRatio = viewportRatio;
+
+			// Update TabItems sizes and ratios.
+			TabItems._updateRatios();
 
 			if(arrangeGroups) {
 				for(let groupItem of GroupItems) {
@@ -2100,10 +2103,6 @@ this.UICache = {
 
 	init: function() {
 		let style = getComputedStyle(document.documentElement);
-
-		this.ghost('tabItemPadding', function() {
-			return parseInt(style.getPropertyValue('--thumbs-tab-padding')) *2;
-		});
 
 		this.ghost('tabCanvasOffset', function() {
 			return parseInt(style.getPropertyValue('--canvas-border-width')) *2;

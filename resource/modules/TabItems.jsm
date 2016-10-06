@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.22
+// VERSION 1.2.23
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -704,6 +704,8 @@ this.TabItems = {
 	minTabWidth: 90,
 	tabWidth: 160,
 	fontSizeRange: new Range(8,15),
+	tabPaddingRange: new Range(3,10),
+	faviconOffsetRange: new Range(3,5.5),
 	_fragment: null,
 	_cachedThumbFragment: null,
 	_canvasFragment: null,
@@ -789,10 +791,8 @@ this.TabItems = {
 			return (!parent.isStacked || parent.isTopOfStack(item) || parent.expanded);
 		});
 
-		this.tabHeight = this._getHeightForWidth(this.tabWidth);
-		this.tabAspect = this.tabWidth / this.tabHeight;
-		this.invTabAspect = 1 / this.tabAspect;
-		this.minTabHeight = Math.floor(this.minTabWidth / this.tabAspect);
+		// Call this once just so that no errors are thrown during startup. It will be called again once UI initializes to fill this with proper values.
+		this._updateRatios();
 
 		Messenger.listenWindow(gWindow, "MozAfterPaint", this);
 
@@ -1263,32 +1263,65 @@ this.TabItems = {
 		return data && typeof(data) == 'object' && typeof(data.groupID) == 'number';
 	},
 
+	// Called each time the viewport ratio is changed, so that tab thumbs (and items) always represent the actual screen dimensions.
+	_updateRatios: function() {
+		this.widthFontRange = new Range(this.minTabWidth +10, Math.round(this.tabWidth *1.5));
+		this.widthPaddingRange = new Range(this.minTabWidth +10, Math.round(this.tabWidth *1.5));
+		this.widthFaviconOffsetRange = new Range(this.minTabWidth +10, Math.round(this.tabWidth *1.5));
+
+		this.tabHeight = this._getHeightForWidth(this.tabWidth);
+		this.minTabHeight = this._getHeightForWidth(this.minTabWidth);
+		this.tabAspect = this.tabWidth / this.tabHeight;
+		this.invTabAspect = 1 / this.tabAspect;
+
+		this.heightPaddingRange = new Range(this.minTabHeight +10, this.tabHeight -10);
+	},
+
 	// Private method that returns the fontsize to use given the tab's width
 	getFontSizeFromWidth: function(width) {
-		let widthRange = new Range(0, this.tabWidth);
-		let proportion = widthRange.proportion(width - UICache.tabItemPadding, true);
-		// proportion is in [0,1]
-		return Math.max(this.fontSizeRange.scale(proportion), this.fontSizeRange.min);
+		let proportion = this.widthFontRange.proportion(width - this.getTabPaddingFromWidth(width), true);
+		return this.fontSizeRange.scale(proportion);
+	},
+
+	getTabPaddingFromWidth: function(width) {
+		let proportion = this.widthPaddingRange.proportion(width, true);
+		return Math.ceil(this.tabPaddingRange.scale(proportion));
+	},
+
+	getTabPaddingFromHeight: function(height) {
+		let proportion = this.heightPaddingRange.proportion(height, true);
+		return Math.ceil(this.tabPaddingRange.scale(proportion));
 	},
 
 	// Private method that returns the tabitem width given a height.
 	_getWidthForHeight: function(height, stacked) {
-		let thumbHeight = height - UICache.tabItemPadding;
+		let padding = this.getTabPaddingFromHeight(height) *2;
+		let thumbHeight = height - padding;
 		if(!stacked) {
 			thumbHeight -= this.fontSizeRange.max +2; // +2 comes from max line height calculated in GroupItem._gridArrange()
 		}
 		let thumbWidth = thumbHeight * UI._viewportRatio;
-		return Math.floor(thumbWidth + UICache.tabItemPadding);
+		return Math.floor(thumbWidth + padding);
 	},
 
 	// Private method that returns the tabitem height given a width.
 	_getHeightForWidth: function(width, stacked) {
-		let thumbWidth = width - UICache.tabItemPadding;
+		let padding = this.getTabPaddingFromWidth(width) *2;
+		let thumbWidth = width - padding;
 		let thumbHeight = thumbWidth / UI._viewportRatio;
 		if(!stacked) {
 			thumbHeight += this.fontSizeRange.max +2; // +2 comes from max line height calculated in GroupItem._gridArrange()
 		}
-		return Math.floor(thumbHeight + UICache.tabItemPadding);
+		return Math.floor(thumbHeight + padding);
+	},
+
+	getControlsOffsetForPadding: function(padding) {
+		return padding -2;
+	},
+
+	getFavIconOffsetForWidth: function(width) {
+		let proportion = this.widthFaviconOffsetRange.proportion(width, true);
+		return Math.ceil(this.faviconOffsetRange.scale(proportion));
 	},
 
 	// Arranges the given items in a grid within the given bounds, maximizing item size but maintaining standard tab aspect ratio for each
@@ -1341,10 +1374,15 @@ this.TabItems = {
 			totalHeight = tabHeight;
 		}
 
-		tabWidth = Math.floor(tabWidth) -UICache.tabItemPadding;
-		tabHeight = Math.floor(tabHeight) -UICache.tabItemPadding;
+		let tabPadding = this.getTabPaddingFromWidth(tabWidth);
+		let controlsOffset = this.getControlsOffsetForPadding(tabPadding);
+		let favIconOffset = this.getFavIconOffsetForWidth(tabWidth);
+		let fontSize = this.getFontSizeFromWidth(tabWidth);
 
-		return { tabWidth, tabHeight, columns, rows, overflowing };
+		tabWidth = Math.floor(tabWidth) - (tabPadding *2);
+		tabHeight = Math.floor(tabHeight) - (tabPadding *2);
+
+		return { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, favIconOffset, columns, rows, overflowing };
 	},
 
 	// Pass in a desired size, and receive a size based on proper title size and aspect ratio.

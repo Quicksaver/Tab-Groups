@@ -21,7 +21,6 @@
 	--item-border: var(--group-border-width) solid var(--group-border-color);
 
 	--scrollbar-width: 10px;
-	--thumbs-tab-padding: 10px;
 	--list-tab-height: 37px;
 	--list-tab-padding: 6px;
 	--favicon-size: 16px;
@@ -338,7 +337,6 @@ body[searching="list"] #search-mode:not(:hover) {
 .tab {
 	position: relative;
 	overflow: hidden;
-	padding: var(--thumbs-tab-padding);
 	margin: 0;
 	cursor: pointer;
 }
@@ -437,8 +435,6 @@ body.DraggingTab .tab * {
 
 .tab-container:not(.noThumbs) .tab:not(.stacked) .favicon {
 	position: relative;
-	top: -25%;
-	left: -25%;
 }
 
 /* Apply crisp rendering for favicons at exactly 2dppx resolution */
@@ -471,15 +467,6 @@ body[FF48] .appTabIcon[busy][progress] {
 
 .tab-controls {
 	position: absolute;
-	top: 8px;
-}
-
-.tab-controls:-moz-locale-dir(ltr) {
-	right: 8px;
-}
-
-.tab-controls:-moz-locale-dir(rtl) {
-	left: 8px;
 }
 
 .tab-controls > * {
@@ -521,6 +508,18 @@ body[FF48] .appTabIcon[busy][progress] {
 
 .stacked .thumb:-moz-locale-dir(rtl) {
 	box-shadow: rgba(0,0,0,.2) -1px 1px 4px;
+}
+
+.tab.stacked .tab-controls {
+	top: -2px;
+}
+
+.tab.stacked .tab-controls:-moz-locale-dir(ltr) {
+	right: -2px;
+}
+
+.tab.stacked .tab-controls:-moz-locale-dir(rtl) {
+	left: -2px;
 }
 
 .groupItem.thumbing .tab-label,

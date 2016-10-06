@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.5.0
+// VERSION 2.5.1
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -1007,14 +1007,15 @@ this.TabDrag.prototype = {
 			// We wouldn't be creating a new group for pinned tabs of course.
 			this.unpinItem();
 
-			let tabSize = TabItems;
+			let tabWidth = 10;
+			let tabHeight = 50;
 			if(this.item.parent && this.item.parent._lastTabSize) {
-				tabSize = this.item.parent._lastTabSize;
+				tabWidth += this.item.parent._lastTabSize.tabWidth + (this.item.parent._lastTabSize.tabPadding *2);
+				tabHeight += this.item.parent._lastTabSize.tabHeight + (this.item.parent._lastTabSize.tabPadding *2);
+			} else {
+				tabWidth += TabItems.tabWidth;
+				tabHeight += TabItems.tabHeight;
 			}
-
-			let { tabWidth, tabHeight } = tabSize;
-			tabWidth += UICache.tabItemPadding +10;
-			tabHeight += UICache.tabItemPadding +50;
 
 			let options = {
 				focusTitle: true
@@ -1086,9 +1087,6 @@ this.HighlighterDrag.prototype = {
 
 		switch(e.type) {
 			case 'mousemove':
-				// global drag tracking
-				UI.lastMoveTime = Date.now();
-
 				let mouse = new Point(e.clientX, e.clientY);
 
 				// positioning
