@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 // We try to use the styling defined in TMP's prefs in groups view as well.
 
@@ -44,7 +44,7 @@ this.TabMixPlus = {
 
 		let bothSelectors = '';
 		let unloadedSelector = '';
-		let sscode = '@-moz-document url("chrome://tabgroups/content/tabview.xhtml") {\n';
+		let sscode = '@-moz-document url("chrome://'+objPathString+'/content/tabview.xhtml") {\n';
 
 		if(Prefs.unloadedTab) {
 			bothSelectors += '[pending]';

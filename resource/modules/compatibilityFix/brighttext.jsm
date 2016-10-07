@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 // TODO: create/adapt an actual native dark style, rather than reuse FT DeepDark's one.
 
@@ -60,7 +60,7 @@ this.brightText = {
 				if(theme && theme.id != 'firefox-devedition@mozilla.org') {
 					// this only applies if the accentcolor value supplied by the theme is valid, otherwise it defaults to the gradient using white in the stylesheet
 					let sscode = '\
-						@-moz-document url("chrome://tabgroups/content/tabview.xhtml") {\n\
+						@-moz-document url("chrome://'+objPathString+'/content/tabview.xhtml") {\n\
 							body.classic[lwtheme] {\n\
 								background-image: linear-gradient(transparent 100px, '+theme.accentcolor+' 178px, '+theme.accentcolor+');\n\
 							}\n\
