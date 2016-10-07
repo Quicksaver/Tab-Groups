@@ -19,6 +19,8 @@
 <!ENTITY opt.showThumbs.tooltip "The thumbnails show the contents of each tab directly in the group. Disabling them turns the group into a list of tabs represented only by their title and icon.">
 <!ENTITY opt.showUrls.label "Show addresses next to page titles">
 <!ENTITY opt.showUrls.tooltip "To make full use of the space saved when not showing tab thumbnails, you can show the tab's location next to its title.">
+<!ENTITY opt.tileIcons.label "Tile page icons when thumbnail is too small">
+<!ENTITY opt.tileIcons.tooltip "Shows the page icons in a tile instead of the thumbnails when they become too small to be useful. This lets you have a lot more tabs displayed at the same time on a smaller area.">
 <!ENTITY cat.stackTabs.label "When groups have too many tabs...">
 <!ENTITY cat.stackTabs.tooltip "Tab thumbnails take up space. If the group can't show all of its tabs because it isn't large enough, you can...">
 <!ENTITY opt.stackTabs.label "Stack the group">

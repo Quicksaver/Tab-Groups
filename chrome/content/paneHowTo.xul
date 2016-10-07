@@ -92,7 +92,11 @@
 					<html:p><html:img src="chrome://objPathString/skin/howto/list.jpg"/></html:p>
 				</html:li>
 				<html:li>
-					<html:p>&howto.thumbs.description;</html:p>
+					<html:p>&howto.icons.description;</html:p>
+					<!--<html:p><html:img src="chrome://objPathString/skin/howto/icons.jpg"/></html:p>-->
+				</html:li>
+				<html:li>
+					<html:p>&howto.thumbs.description2;</html:p>
 					<html:p><html:img src="chrome://objPathString/skin/howto/thumbs.jpg"/></html:p>
 				</html:li>
 			</html:ul>

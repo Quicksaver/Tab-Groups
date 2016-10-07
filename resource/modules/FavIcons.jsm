@@ -2,10 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.5
+// VERSION 1.1.0
 
 this.FavIcons = {
 	waiting: new Set(),
+	colors: new Map(),
+	_iconsNeedingColor: [],
+
+	get enabled() {
+		return Prefs.site_icons && Prefs.favicons;
+	},
 
 	get defaultFavicon() {
 		return this._favIconService.defaultFavicon.spec;
@@ -13,6 +19,10 @@ this.FavIcons = {
 
 	init: function() {
 		XPCOMUtils.defineLazyServiceGetter(this, "_favIconService", "@mozilla.org/browser/favicon-service;1", "nsIFaviconService");
+	},
+
+	uninit: function() {
+		Styles.unload("FavIcons_"+_UUID);
 	},
 
 	// Gets the "favicon link URI" for the given xul:tab, or null if unavailable.
@@ -60,7 +70,7 @@ this.FavIcons = {
 				let icon = this._favIconService.getFaviconLinkForIcon(uri).spec;
 				callback(icon);
 			} else {
-				callback(this.defaultFavicon);
+				callback(null);
 			}
 		});
 	},
@@ -118,7 +128,7 @@ this.FavIcons = {
 	// Checks whether fav icon should be loaded for a given tab.
 	_shouldLoadFavIcon: function(tab) {
 		// No need to load a favicon if the user doesn't want site or favicons.
-		if(!Prefs.site_icons || !Prefs.favicons) {
+		if(!this.enabled) {
 			return false;
 		}
 
@@ -131,6 +141,162 @@ this.FavIcons = {
 
 		// Load favicons for http(s) pages only.
 		return uri.schemeIs("http") || uri.schemeIs("https");
+	},
+
+	forgetItem: function(item) {
+		if(item._iconUrl && this.colors.has(item._iconUrl)) {
+			let deferred = this.colors.get(item._iconUrl);
+			deferred.hold--;
+		}
+		item._iconUrl = null;
+	},
+
+	// Returns the dominant color for a given favicon url.
+	getDominantColor: function(iconUrl, item) {
+		// Keep track of how many tabs are using each icon, for cleanup purposes later.
+		if(item._iconUrl && item._iconUrl != iconUrl && this.colors.has(item._iconUrl)) {
+			let deferred = this.colors.get(item._iconUrl);
+			deferred.hold--;
+		}
+		item._iconUrl = iconUrl;
+
+		if(this.colors.has(iconUrl)) {
+			let deferred = this.colors.get(iconUrl);
+			deferred.hold++;
+			return deferred.promise;
+		}
+
+		let deferred = {
+			color: null,
+			hold: 1
+		};
+		deferred.promise = new Promise((resolve, reject) => {
+			// Store the resolve and reject methods in the deferred object.
+			deferred.resolve = resolve;
+			deferred.reject = reject;
+		});
+
+		this.colors.set(iconUrl, deferred);
+
+		if(TabItems.shouldDeferPainting()) {
+			this._iconsNeedingColor.push(iconUrl);
+			if(!TabItems.isPaintingPaused()) {
+				TabItems.startHeartbeat();
+			}
+		} else {
+			this._findDominantColor(iconUrl).then(() => {
+				// Make sure the new color is applied.
+				this._loadColorsStylesheet();
+			});
+		}
+
+		return deferred.promise;
+	},
+
+	// Finding the dominant colors is controlled from inside TabItems' heartbeats, so both processes don't stack over one another.
+
+	_findDominantColor: function(iconUrl) {
+		return new Promise((resolve, reject) => {
+			// The following was adapted from Margaret Leibovic's snippet posted at https://gist.github.com/leibovic/1017111
+
+			let icon = document.createElement("img");
+			icon.addEventListener("load", () => {
+				// We don't need to remove this listener, this element isn't attached anywhere
+				// and will be GC'd as soon as this finishes.
+
+				let canvas = document.createElement("canvas");
+				canvas.height = icon.height;
+				canvas.width = icon.width;
+
+				let context = canvas.getContext("2d");
+				context.drawImage(icon, 0, 0);
+
+				// data is an array of a series of 4 one-byte values representing the rgba values of each pixel
+				let data = context.getImageData(0, 0, icon.height, icon.width).data;
+
+				// keep track of how many times a color appears in the image
+				let colorCount = new Map();
+				for(let i = 0; i < data.length; i += 4) {
+					// ignore transparent pixels
+					if(data[i+3] < 32) { continue; }
+
+					// Do some rounding, to get a "feel" of the icons rather than the precise rgb values in the image.
+					// This has the added bonus of having to loop through less entries in the checks below,
+					// so it seems to compensate for the extra calculations here to round the values.
+					let color = this._roundColor(data[i]) + "," + this._roundColor(data[i+1]) + "," + this._roundColor(data[i+2]);
+					// ignore white --- quicksaver: why?
+					//if(color == "255,255,255") { continue; }
+
+					colorCount.set(color, (colorCount.get(color) || 0) + 1);
+				}
+
+				let maxCount = 0;
+				let dominantColor = "";
+				for(let [ color, count ] of colorCount) {
+					if(count > maxCount) {
+						maxCount = count;
+						dominantColor = color;
+					}
+				}
+
+				let deferred = this.colors.get(iconUrl);
+				deferred.color = dominantColor;
+				deferred.resolve(dominantColor);
+				resolve(true);
+			});
+			icon.src = iconUrl;
+		});
+	},
+
+	_roundColor: function(v) {
+		return Math.min(Math.round(v /8) *8, 255);
+	},
+
+	_loadColorsStylesheet: function() {
+		if(!this.colors.size) {
+			Styles.unload("FavIcons_"+_UUID);
+			return;
+		}
+
+		let sscode = '@-moz-document url("'+document.baseURI+'") {\n';
+
+		for(let [ iconUrl, deferred ] of this.colors) {
+			let color = deferred.color;
+
+			sscode += '\
+				html['+objName+'_UUID="'+_UUID+'"] .tab-container.onlyIcons .tab:not([busy]):not([progress]) .favicon-container[iconUrl="'+iconUrl+'"] {\n\
+					border-color: rgb('+color+');\n\
+					background-image: linear-gradient(to bottom, rgba('+color+',0.1), rgba('+color+',0.4));\n\
+					box-shadow: inset 0 0 1px rgba('+color+',0.5), var(--favicon-tile-shadow);\n\
+				}\n';
+		}
+
+		sscode += '}';
+
+		Styles.load("FavIcons_"+_UUID, sscode, true);
+	},
+
+	cleanupStaleColors: function() {
+		let update = false;
+		for(let [ iconUrl, deferred ] of this.colors) {
+			if(!deferred.hold) {
+				if(deferred.color === null) {
+					deferred.reject();
+					for(let i = 0; i < this._iconsNeedingColor.length; i++) {
+						if(this._iconsNeedingColor[i] == iconUrl) { LOG('ok');
+							this._iconsNeedingColor.splice(i, 1);
+							break;
+						}
+					}
+				}
+				this.colors.delete(iconUrl);
+				update = true;
+			}
+		}
+
+		if(update) {
+			this._loadColorsStylesheet();
+		}
 	}
 };
 

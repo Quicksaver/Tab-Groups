@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.35
+// VERSION 1.3.36
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -548,18 +548,13 @@ this.UI = {
 			Tabs.listen("TabPinned", this);
 			Tabs.listen("TabUnpinned", this);
 
-			// ___ groups
+			FavIcons.init();
 			GroupItems.init();
 			GroupItems.pauseArrange();
 			let hasGroupItemsData = GroupItems.load();
 			PinnedItems.init();
-
-			// ___ tabs
 			TabItems.pausePainting();
 			TabItems.init();
-
-			// ___ favicons
-			FavIcons.init();
 
 			if(!hasGroupItemsData) {
 				this.reset();
@@ -635,6 +630,7 @@ this.UI = {
 		PinnedItems.uninit();
 		GroupItems.uninit();
 		Search.uninit();
+		FavIcons.uninit();
 
 		Tabs.unlisten("TabOpen", this);
 		Tabs.unlisten("TabClose", this);

@@ -36,6 +36,7 @@
 		--item-border: var(--group-border-width) solid var(--group-border-color);
 		--item-border-radius: 2px;
 		--favicon-radius: 2px;
+		--favicon-tile-shadow: 0 0 2px rgba(255,255,255,0.5);
 		--hover-color: rgba(165,165,165,.4);
 		--group-titlebar-edit-icon: url("chrome://tabgroups/skin/compatibilityFix/edit-dark.png");
 		--shade-background: rgba(24,24,24,.42);

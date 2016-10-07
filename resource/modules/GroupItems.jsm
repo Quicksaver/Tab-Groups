@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.6.46
+// VERSION 1.7.0
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -28,6 +28,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.overflowing = false;
 	this.expanded = null;
 	this.hidden = false;
+	this.stale = 0;
 	this.childHandling = false;
 	this.fadeAwayUndoButtonDelay = 15000;
 	this.fadeAwayUndoButtonDuration = 300;
@@ -37,7 +38,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this._lastArrange = null;
 	this._lastThumb = null;
 	this._noThumbs = false;
-	this._thumbNeedsUpdate = false;
+	this._onlyIcons = false;
 	this._userBounds = false;
 	this._slot = 0;
 	this._row = '';
@@ -56,6 +57,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.stackTabs = options.stackTabs !== undefined ? options.stackTabs : Prefs.stackTabs;
 	this.showThumbs = options.showThumbs !== undefined ? options.showThumbs : Prefs.showThumbs;
 	this._showUrls = options.showUrls !== undefined ? options.showUrls : Prefs.showUrls;
+	this.tileIcons = options.tileIcons !== undefined ? options.tileIcons : Prefs.tileIcons;
 	this.catchOnce = options.catchOnce !== undefined ? options.catchOnce : true;
 	this.catchRules = options.catchRules !== undefined ? options.catchRules : '';
 	this._savedCatchOnce = this.catchOnce;
@@ -252,6 +254,7 @@ this.GroupItem.prototype = {
 			stackTabs: this.stackTabs,
 			showThumbs: this.showThumbs,
 			showUrls: this.showUrls,
+			tileIcons: this.tileIcons,
 			catchOnce: this.catchOnce,
 			catchRules: this.catchRules,
 			title: this.getTitle(),
@@ -272,6 +275,7 @@ this.GroupItem.prototype = {
 			&& this.stackTabs == Prefs.stackTabs
 			&& this.showThumbs == Prefs.showThumbs
 			&& this.showUrls == Prefs.showUrls
+			&& this.tileIcons == Prefs.tileIcons
 			&& !this.catchRules;
 	},
 
@@ -285,17 +289,34 @@ this.GroupItem.prototype = {
 		return this._noThumbs;
 	},
 	set noThumbs(v) {
-		if(this._noThumbs != v) {
-			this._noThumbs = v;
-			if(!v) {
-				this.tabContainer.classList.remove('noThumbs');
+		return this.staleOrUpdateThumbs('noThumbs', v);
+	},
+
+	get onlyIcons() {
+		return this._onlyIcons;
+	},
+	set onlyIcons(v) {
+		return this.staleOrUpdateThumbs('onlyIcons', v);
+	},
+
+	// Mind the order when setting the above properties! Set the |true| one first if there is one, to avoid
+	// updating a tab's thumb when it should stay staled.
+	staleOrUpdateThumbs: function(attr, stale) {
+		if(this['_'+attr] != stale) {
+			this['_'+attr] = stale;
+			if(!stale) {
+				this.tabContainer.classList.remove(attr);
+				this.stale--;
 
 				// Ensure tabs update their thumbs if necessary, as they will be shown now.
-				for(let tabItem of this.children) {
-					tabItem.checkUpdatedThumb();
+				if(!this.stale) {
+					for(let tabItem of this.children) {
+						tabItem.checkUpdatedThumb();
+					}
 				}
 			} else {
-				this.tabContainer.classList.add('noThumbs');
+				this.tabContainer.classList.add(attr);
+				this.stale++;
 
 				// We don't destroy tab thumbs immediately in groups in no thumbs mode, it will be done in the background after leaving groups view.
 				// This has the added bonus of making switching between thumbs and no thumbs mode back and forth much more smoothly.
@@ -304,7 +325,7 @@ this.GroupItem.prototype = {
 				}
 			}
 		}
-		return this._noThumbs;
+		return this['_'+attr];
 	},
 
 	get slot() {
@@ -1525,7 +1546,7 @@ this.GroupItem.prototype = {
 	isOverflowing: function() {
 		let count = this.count();
 		let box = this.getContentBounds();
-		let arrObj = TabItems.arrange(count, box);
+		let arrObj = TabItems.arrange(count, box, this.tileIcons);
 
 		this._columns = arrObj.overflowing ? null : arrObj.columns;
 
@@ -1604,6 +1625,7 @@ this.GroupItem.prototype = {
 	_stackArrange: function() {
 		this.container.classList.add('stackedGroup');
 		this.noThumbs = false;
+		this.onlyIcons = false;
 		this.isStacked = true;
 		this.overflowing = false;
 		removeAttribute(this.tabContainer, 'columns');
@@ -1689,10 +1711,12 @@ this.GroupItem.prototype = {
 		this._lastTabSize = { tabWidth, tabHeight, tabPadding, lineHeight: 0 };
 
 		let sscode = '\
-			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab {\n\
-				width: '+tabWidth+'px;\n\
-				height: '+tabHeight+'px;\n\
-			}';
+			@-moz-document url("'+document.baseURI+'") {\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab {\n\
+					width: '+tabWidth+'px;\n\
+					height: '+tabHeight+'px;\n\
+				}\n\
+			';
 
 		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);
 
@@ -1732,6 +1756,7 @@ this.GroupItem.prototype = {
 			}
 
 			this.noThumbs = true;
+			this.onlyIcons = false;
 			Styles.unload('group_'+this.id+'_'+_UUID);
 
 			// We don't show the group's thumb in this case either, since there would be nothing to show in it.
@@ -1749,9 +1774,10 @@ this.GroupItem.prototype = {
 			|| lastArrange.isStacked
 			|| !lastArrange.bounds.equals(bounds)
 			|| lastArrange.count != count
+			|| lastArrange.tileIcons != this.tileIcons
 			|| lastArrange.viewportRatio != UI._viewportRatio;
 		if(!arrange) { return; }
-		this._lastArrange = { isStacked: false, bounds, count, viewportRatio: UI._viewportRatio };
+		this._lastArrange = { isStacked: false, bounds, count, tileIcons: this.tileIcons, viewportRatio: UI._viewportRatio };
 
 		// Reset stacked info, as this groups isn't stacked anymore (even when in the expanded tray, the tabs are still not considered stacked).
 		for(let child of this.children) {
@@ -1759,7 +1785,7 @@ this.GroupItem.prototype = {
 		}
 
 		this._lastTabSize = TabItems.arrange(count, bounds, this.tileIcons, cols);
-		let { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, favIconOffset, columns, overflowing } = this._lastTabSize;
+		let { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, favIconSize, favIconOffset, columns, overflowing } = this._lastTabSize;
 		let spaceWidth = tabWidth + (tabPadding *2);
 		let spaceHeight = tabHeight + (tabPadding *2);
 
@@ -1776,42 +1802,55 @@ this.GroupItem.prototype = {
 		this.overflowing = overflowing;
 		setAttribute(this.tabContainer, 'columns', columns);
 
-		if(overflowing && columns < GroupItems.minTabColumns) {
+		// If the group doesn't have enough rows of tiles to be useful (i.e. too much scrolling needed), just list the tabs instead.
+		let minColumns = (this.tileIcons) ? GroupItems.minTabColumnsIcons : GroupItems.minTabColumns;
+		if(overflowing && columns < minColumns) {
 			this.noThumbs = true;
+			this.onlyIcons = false;
 			Styles.unload('group_'+this.id+'_'+_UUID);
 			return;
 		}
+		this.onlyIcons = !!favIconSize;
 		this.noThumbs = false;
 
 		let sscode = '\
-			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab,\n\
-			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab {\n\
-				width: '+tabWidth+'px;\n\
-				height: '+tabHeight+'px;\n\
-				padding: '+tabPadding+'px;\n\
-				font-size: '+fontSize+'px;\n\
-			}\n\
-			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab:not(.stacked) .thumb,\n\
-			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .thumb {\n\
-				height: calc(100% - '+lineHeight+'px);\n\
-			}\n\
-			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container:not([columns="1"]) .tab.space-before,\n\
-			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container:not([columns="1"]) .tab.space-before {\n\
-				-moz-margin-start: '+spaceWidth+'px;\n\
-			}\n\
-			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container:not([columns="1"]) .tab.space-after,\n\
-			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container:not([columns="1"]) .tab.space-after {\n\
-				-moz-margin-end: '+spaceWidth+'px;\n\
-			}\n\
-			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container[columns="1"] .tab.space-before,\n\
-			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container[columns="1"] .tab.space-before {\n\
-				margin-top: '+spaceHeight+'px;\n\
-			}\n\
-			html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container[columns="1"] .tab.space-after,\n\
-			html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container[columns="1"] .tab.space-after {\n\
-				margin-bottom: '+spaceHeight+'px;\n\
-			}';
+			@-moz-document url("'+document.baseURI+'") {\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab {\n\
+					width: '+tabWidth+'px;\n\
+					height: '+tabHeight+'px;\n\
+					padding: '+tabPadding+'px;\n\
+					font-size: '+fontSize+'px;\n\
+				}\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab:not(.stacked) .thumb,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .thumb {\n\
+					height: calc(100% - '+lineHeight+'px);\n\
+				}\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container:not([columns="1"]) .tab.space-before,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container:not([columns="1"]) .tab.space-before {\n\
+					-moz-margin-start: '+spaceWidth+'px;\n\
+				}\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container:not([columns="1"]) .tab.space-after,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container:not([columns="1"]) .tab.space-after {\n\
+					-moz-margin-end: '+spaceWidth+'px;\n\
+				}\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container[columns="1"] .tab.space-before,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container[columns="1"] .tab.space-before {\n\
+					margin-top: '+spaceHeight+'px;\n\
+				}\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container[columns="1"] .tab.space-after,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container[columns="1"] .tab.space-after {\n\
+					margin-bottom: '+spaceHeight+'px;\n\
+				}\n';
 
+		if(favIconSize) {
+			sscode += '\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container.onlyIcons .favicon-container,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container.onlyIcons .favicon-container {\n\
+					width: '+favIconSize+'px;\n\
+					height: '+favIconSize+'px;\n\
+				}\n';
+		} else {
 			sscode += '\
 				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-controls,\n\
 				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-controls {\n\
@@ -1829,7 +1868,11 @@ this.GroupItem.prototype = {
 				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .favicon {\n\
 					top: -'+favIconOffset+'px;\n\
 					left: -'+favIconOffset+'px;\n\
-				}';
+				}\n';
+		}
+
+		sscode += '\
+			}';
 
 		Styles.load('group_'+this.id+'_'+_UUID, sscode, true);
 
@@ -2131,6 +2174,7 @@ this.GroupItems = {
 	// This value gives a rough equivalent of information in the form of shown tabs;
 	// i.e. one row of 3 tabs with thumbnails should have roughly the same height as 3 tabs listed without thumbnails.
 	minTabColumns: 3,
+	minTabColumnsIcons: 2,
 
 	// How far apart Items should be from each other and from bounds
 	defaultGutter: 15,
@@ -2502,6 +2546,11 @@ this.GroupItems = {
 			corrupt = true;
 		}
 
+		if(typeof(groupItemData.tileIcons) != 'boolean') {
+			groupItemData.tileIcons = Prefs.tileIcons;
+			corrupt = true;
+		}
+
 		if(typeof(groupItemData.catchOnce) != 'boolean') {
 			groupItemData.catchOnce = true;
 			corrupt = true;
@@ -2561,6 +2610,7 @@ this.GroupItems = {
 			groupItem.stackTabs = Prefs.stackTabs;
 			groupItem.showThumbs = Prefs.showThumbs;
 			groupItem.showUrls = Prefs.showUrls;
+			groupItem.tileIcons = Prefs.tileIcons;
 			groupItem.save();
 			groupItem.arrange();
 		}
@@ -3264,9 +3314,11 @@ this.GroupItems = {
 			let height = items.height - (UICache.groupBorderWidth *2);
 
 			sscode += '\
-				html['+objName+'_UUID="'+_UUID+'"] body.grid .groupItem[row="'+type+'"] {\n\
-					width: '+width+'px;\n\
-					height: '+height+'px;\n\
+				@-moz-document url("'+document.baseURI+'") {\n\
+					html['+objName+'_UUID="'+_UUID+'"] body.grid .groupItem[row="'+type+'"] {\n\
+						width: '+width+'px;\n\
+						height: '+height+'px;\n\
+					}\n\
 				}';
 
 			for(let r = 0; r < items.rows; r++) {

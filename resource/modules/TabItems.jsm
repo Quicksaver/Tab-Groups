@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.24
+// VERSION 1.3.0
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -43,6 +43,7 @@ this.TabItem = function(tab, options = {}) {
 	this._thumbNeedsUpdate = false;
 	this._hasHadThumb = false;
 	this._soundplaying = false;
+	this._iconUrl = null;
 
 	this.container.addEventListener('mousedown', this);
 	this.container.addEventListener('mouseup', this);
@@ -71,7 +72,7 @@ this.TabItem.prototype = {
 		let thumbnailURL = this._tempCanvasBlobURL || this._cachedThumbURL;
 
 		// If we're in a group where thumbs are not showing, we don't really need to show the cached thumb either.
-		if(this.parent && this.parent.noThumbs) {
+		if(this.parent && this.parent.stale) {
 			if(this.tabCanvas && this.tabCanvas.destroying) {
 				this.tabCanvas.destroying.resolve();
 			}
@@ -330,7 +331,7 @@ this.TabItem.prototype = {
 
 			if(groupItem) {
 				// Show the cached thumb before adding the tabitem to the group (before activating its canvas).
-				if(!groupItem.noThumbs && groupItem.showThumbs) {
+				if(!groupItem.stale && groupItem.showThumbs) {
 					this.showCachedThumb();
 				}
 				groupItem.add(this);
@@ -405,7 +406,7 @@ this.TabItem.prototype = {
 		this.save();
 
 		if(parent) {
-			if(!parent.noThumbs && parent.showThumbs) {
+			if(!parent.stale && parent.showThumbs) {
 				this.checkUpdatedThumb();
 			}
 
@@ -593,21 +594,30 @@ this.TabItem.prototype = {
 			}
 
 			FavIcons.getFavIconUrlForTab(this.tab, (iconUrl) => {
-				// Add-on disabled or window closed in the meantime.
-				if(typeof(TabItems) == 'undefined') {
+				// Add-on disabled or window/tab closed in the meantime.
+				if(typeof(TabItems) == 'undefined' || !this.tab) {
 					reject();
 					return;
 				}
 
+				// Get the dominant color for this favicon, it will only be used if this tab's group tiles icons instead of thumbs.,
+				// but we should still have it hand.
+				// This also sets the _iconUrl property in the tabItem.
+				FavIcons.getDominantColor(iconUrl || FavIcons.defaultFavicon, this).then((color) => {
+					// We don't actually need the color here (for now), it's all done in FavIcons dynamic stylesheet.
+				});
+
+				setAttribute(this.fav.parentNode, 'iconUrl', this._iconUrl);
+				this.fav.style.backgroundImage = 'url("'+this._iconUrl+'")';
+
 				if(iconUrl) {
 					this.fav._iconUrl = iconUrl;
-					this.fav.style.backgroundImage = 'url("'+iconUrl+'")';
 					this.removeClass('noFavicon');
 				} else {
 					this.fav._iconUrl = '';
-					this.fav.style.backgroundImage = '';
 					this.addClass('noFavicon');
 				}
+
 				this._sendToSubscribers("iconUpdated");
 
 				TabItems._tabsNeedingLabelsUpdate.delete(this);
@@ -702,9 +712,11 @@ this.TabItem.prototype = {
 // Singleton for managing <TabItem>s
 this.TabItems = {
 	minTabWidth: 90,
+	minTabWidthIcons: 50,
 	tabWidth: 160,
 	fontSizeRange: new Range(8,15),
 	tabPaddingRange: new Range(3,10),
+	faviconSizeRange: new Range(24,32),
 	faviconOffsetRange: new Range(3,5.5),
 	_fragment: null,
 	_cachedThumbFragment: null,
@@ -980,7 +992,7 @@ this.TabItems = {
 
 			// If we're not taking thumbnails for this tab's group, we don't need to fetch it in the first place.
 			// This will be re-called if and when its thumb becomes necessary.
-			if(!tabItem.parent || tabItem.parent.noThumbs) {
+			if(!tabItem.parent || tabItem.parent.stale) {
 				tabItem._thumbNeedsUpdate = true;
 				return;
 			}
@@ -1101,7 +1113,7 @@ this.TabItems = {
 					let tabItem = this._staleTabs.peek();
 					this._staleTabs.remove(tabItem);
 					yield tabItem.destroyCanvas();
-					if(tabItem.parent && tabItem.parent.noThumbs) {
+					if(tabItem.parent && tabItem.parent.stale) {
 						// It's likely it could have had a cached thumbnail (hidden leftover from disabling thumbs in a group).
 						tabItem.hideCachedThumb();
 					}
@@ -1115,6 +1127,10 @@ this.TabItems = {
 				if(!this._staleTabs.isEmpty()) {
 					this.startHeartbeatHidden();
 				}
+				// Otherwise we finish by removing unused icon colors from FavIcons, to free up a little extra memory.
+				else {
+					FavIcons.cleanupStaleColors();
+				}
 			}
 			return;
 		}
@@ -1125,9 +1141,10 @@ this.TabItems = {
 			return;
 		}
 
-		let accumTime = 0;
-		let items = this._tabsWaitingForUpdate.getItems();
 		// Do as many updates as we can fit into a "perceived" amount of time, which is tunable.
+		let accumTime = 0;
+
+		let items = this._tabsWaitingForUpdate.getItems();
 		while(accumTime < this._maxTimeForUpdating && items.length) {
 			let updateBegin = Date.now();
 
@@ -1140,7 +1157,29 @@ this.TabItems = {
 			accumTime += deltaTime;
 		}
 
-		if(this._tabsWaitingForUpdate.hasItems()) {
+		// Find the dominant colors here, so both processes don't stack over one another
+		// and there's no need for the overhead of a second heartbeat.
+		let newColors = false;
+		items = FavIcons._iconsNeedingColor;
+		while(accumTime < this._maxTimeForUpdating && items.length) {
+			let updateBegin = Date.now();
+
+			yield FavIcons._findDominantColor(items.shift());
+			newColors = true;
+
+			// Maintain a simple average of time for each favicon update
+			// We can use this as a base by which to delay things like tab zooming, so there aren't any hitches.
+			let updateEnd = Date.now();
+			let deltaTime = updateEnd - updateBegin;
+			accumTime += deltaTime;
+		}
+
+		// Make sure new colors are applied.
+		if(newColors) {
+			FavIcons._loadColorsStylesheet();
+		}
+
+		if(this._tabsWaitingForUpdate.hasItems() || FavIcons._iconsNeedingColor.length) {
 			this.startHeartbeat();
 		}
 	}),
@@ -1245,6 +1284,7 @@ this.TabItems = {
 		this._tabsNeedingLabelsUpdate.delete(item);
 		this._staleTabs.remove(item);
 		this._queuedCachedThumbs.delete(item);
+		FavIcons.forgetItem(item);
 
 		// The Search module needs a little help with this.
 		if(Search._activeTab == item) {
@@ -1266,22 +1306,30 @@ this.TabItems = {
 
 	// Called each time the viewport ratio is changed, so that tab thumbs (and items) always represent the actual screen dimensions.
 	_updateRatios: function() {
-		this.widthFontRange = new Range(this.minTabWidth +10, Math.round(this.tabWidth *1.5));
-		this.widthPaddingRange = new Range(this.minTabWidth +10, Math.round(this.tabWidth *1.5));
+		this.widthFontRange = new Range(this.minTabWidthIcons +10, Math.round(this.tabWidth *1.5));
+		this.widthPaddingRange = new Range(this.minTabWidthIcons +10, Math.round(this.tabWidth *1.5));
+		this.widthFaviconSizeRange = new Range(this.minTabWidthIcons +8, this.minTabWidth -8);
 		this.widthFaviconOffsetRange = new Range(this.minTabWidth +10, Math.round(this.tabWidth *1.5));
 
 		this.tabHeight = this._getHeightForWidth(this.tabWidth);
 		this.minTabHeight = this._getHeightForWidth(this.minTabWidth);
+		this.minTabHeightIcons = this._getHeightForWidth(this.minTabWidthIcons);
 		this.tabAspect = this.tabWidth / this.tabHeight;
 		this.invTabAspect = 1 / this.tabAspect;
 
-		this.heightPaddingRange = new Range(this.minTabHeight +10, this.tabHeight -10);
+		this.heightPaddingRange = new Range(this.minTabHeightIcons +10, this.tabHeight -10);
 	},
 
 	// Private method that returns the fontsize to use given the tab's width
 	getFontSizeFromWidth: function(width) {
 		let proportion = this.widthFontRange.proportion(width - this.getTabPaddingFromWidth(width), true);
 		return this.fontSizeRange.scale(proportion);
+	},
+
+	// Private method that returns the favicon size to use given the tab's width if it's meant to tile icons only.
+	getFaviconSizeFromWidth: function(width) {
+		let proportion = this.widthFaviconSizeRange.proportion(width - this.getTabPaddingFromWidth(width), true);
+		return this.faviconSizeRange.scale(proportion);
 	},
 
 	getTabPaddingFromWidth: function(width) {
@@ -1329,10 +1377,11 @@ this.TabItems = {
 	// Parameters:
 	//   count - number of items to be arranged within bounds.
 	//   bounds - a <Rect> defining the space to arrange within
+	//   tileIcons - (bool) whether tabs can be shrinked down enough to tile only favicons, or if they should be kept large enough for thumbnails
 	//   columns - pass an initial value for the number of columns to assume the items will be displayed in, if not set the loop will start at 1
 	// Returns:
 	//   an object with the width value of the child items (`tabWIdth` and `tabHeight`) and the number of columns (`columns`) and rows (`rows`).
-	arrange: function(count, bounds, columns) {
+	arrange: function(count, bounds, tileIcons, columns) {
 		columns = columns || 1;
 		// We'll assume that all the items have the same styling and that the margin is the same width around.
 		let rows;
@@ -1345,7 +1394,8 @@ this.TabItems = {
 
 		let figure = () => {
 			let specRows = Math.ceil(count / columns);
-			let validSize = this.calcValidSize(new Point(bounds.width / columns, -1));
+			let point = new Point(bounds.width / columns, -1);
+			let validSize = this.calcValidSize(point, tileIcons);
 			totalWidth = validSize.x * columns;
 			overflowing = totalWidth > bounds.width;
 
@@ -1369,34 +1419,39 @@ this.TabItems = {
 		}
 
 		if(rows == 1) {
-			let validSize = this.calcValidSize(new Point(tabWidth, bounds.height));
+			let point = new Point(tabWidth, bounds.height);
+			let validSize = this.calcValidSize(point, tileIcons);
 			tabWidth = validSize.x;
 			tabHeight = validSize.y;
 			totalHeight = tabHeight;
 		}
 
+		let onlyIcons = tileIcons && (tabWidth < TabItems.minTabWidth || tabHeight < TabItems.minTabHeight);
+		let favIconSize = (onlyIcons) ? this.getFaviconSizeFromWidth(tabWidth) : 0;
 		let tabPadding = this.getTabPaddingFromWidth(tabWidth);
 		let controlsOffset = this.getControlsOffsetForPadding(tabPadding);
-		let favIconOffset = this.getFavIconOffsetForWidth(tabWidth);
+		let favIconOffset = (!onlyIcons) ? this.getFavIconOffsetForWidth(tabWidth) : 0;
 		let fontSize = this.getFontSizeFromWidth(tabWidth);
 
 		tabWidth = Math.floor(tabWidth) - (tabPadding *2);
 		tabHeight = Math.floor(tabHeight) - (tabPadding *2);
 
-		return { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, favIconOffset, columns, rows, overflowing };
+		return { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, favIconSize, favIconOffset, columns, rows, overflowing };
 	},
 
 	// Pass in a desired size, and receive a size based on proper title size and aspect ratio.
-	calcValidSize: function(size) {
+	calcValidSize: function(size, tileIcons) {
+		let minWidth = (tileIcons) ? this.minTabWidthIcons : this.minTabWidth;
+		let minHeight = (tileIcons) ? this.minTabHeightIcons : this.minTabHeight;
 		let width = size.x;
 		let height = size.y;
 		if(!size.stacked) {
-			width = Math.max(this.minTabWidth, width);
-			height = Math.max(this.minTabHeight, height);
+			width = Math.max(minWidth, width);
+			height = Math.max(minHeight, height);
 		}
+
 		let w = width;
 		let h = height;
-
 		if(size.x > -1) {
 			height = this._getHeightForWidth(w, size.stacked);
 		}

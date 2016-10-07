@@ -25,6 +25,7 @@
 <!ENTITY options.title.tooltip "Name this tab group">
 <!ENTITY options.showThumbs.label "Show tab thumbnails">
 <!ENTITY options.showUrls.label "Show addresses next to page titles">
+<!ENTITY options.tileIcons.label "Tile page icons when thumbnail is too small">
 <!ENTITY options.catchOnce.caption "Rules to catch tabs into this group">
 <!ENTITY options.catchOnce.label "Catch only new tabs">
 <!ENTITY options.catchRules.placeholder1 "Insert regular expressions for web addresses here. Matching tabs will be moved automatically to this group.">

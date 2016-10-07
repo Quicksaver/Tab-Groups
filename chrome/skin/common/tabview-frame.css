@@ -25,6 +25,7 @@
 	--list-tab-padding: 6px;
 	--favicon-size: 16px;
 	--favicon-radius: 0.4em;
+	--favicon-tile-shadow: 0 0 2px rgba(128,128,128,0.5);
 
 	--group-min-width: 150px;
 	--group-min-height: 145px;
@@ -387,6 +388,9 @@ body.DraggingTab .tab * {
 
 .favicon-container {
 	position: absolute;
+}
+
+.tab-container:not(.onlyIcons) .favicon-container {
 	background-color: var(--item-background);
 	border-top: 1px solid transparent;
 	border-bottom: var(--item-border);
@@ -394,19 +398,28 @@ body.DraggingTab .tab * {
 	-moz-border-end: var(--item-border);
 }
 
-.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container {
-	width: 22px;
-	height: 22px;
+.tab-container:not(.noThumbs):not(.onlyIcons) .favicon-container {
 	top: 0;
 }
 
-.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container:-moz-locale-dir(ltr) {
+.tab-container:not(.noThumbs):not(.onlyIcons) .favicon-container:-moz-locale-dir(ltr) {
 	left: 0;
+}
+
+.tab-container:not(.noThumbs):not(.onlyIcons) .favicon-container:-moz-locale-dir(rtl) {
+	right: 0;
+}
+
+.tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked) .favicon-container {
+	width: 22px;
+	height: 22px;
+}
+
+.tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked) .favicon-container:-moz-locale-dir(ltr) {
 	border-bottom-right-radius: 80%;
 }
 
-.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon-container:-moz-locale-dir(rtl) {
-	right: 0;
+.tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked) .favicon-container:-moz-locale-dir(rtl) {
 	border-bottom-left-radius: 80%;
 }
 
@@ -433,7 +446,7 @@ body.DraggingTab .tab * {
 	background-position: center center;
 }
 
-.tab-container:not(.noThumbs) .tab:not(.stacked) .favicon {
+.tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked) .favicon {
 	position: relative;
 }
 
@@ -444,7 +457,7 @@ body.DraggingTab .tab * {
 	}
 }
 
-.tab.noFavicon:not([busy]):not([progress]) .favicon-container,
+.tab-container:not(.onlyIcons) .tab.noFavicon:not([busy]):not([progress]) .favicon-container,
 .tab:not([busy]):not([progress]) .throbber,
 .tab:-moz-any([busy],[progress]) .favicon:not(.throbber) {
 	display: none;
@@ -808,6 +821,42 @@ body.single:not(.showGroupThumbs) #singleNewGroup .create-new-border,
 	height: 100%;
 	width: 100%;
 	border: none;
+}
+
+/* Tab Items shown without thumbnails, tiling favicons instead */
+
+.tab-container.onlyIcons .tab-thumb {
+	display: none;
+}
+
+.tab-container.onlyIcons .tab-thumb-container {
+	border: none;
+	background: none;
+	box-shadow: none;
+}
+
+.tab-container.onlyIcons .tab-controls {
+	top: 0;
+}
+
+.tab-container.onlyIcons .tab-controls:-moz-locale-dir(ltr) {
+	right: 0;
+}
+
+.tab-container.onlyIcons .tab-controls:-moz-locale-dir(rtl) {
+	left: 0;
+}
+
+.tab-container.onlyIcons .favicon-container {
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.tab-container.onlyIcons .tab:not([busy]):not([progress]) .favicon-container {
+	border-radius: 3px;
+	border: 1px solid var(--group-border-color);
+	box-shadow: var(--favicon-tile-shadow);
 }
 
 /* Group Selector items */
@@ -1336,15 +1385,15 @@ body[searching] #searchbutton {
 	background-color: var(--hover-color);
 }
 
-.groupItem:not(.thumbing) .tab-container:not(.noThumbs) .tab:not(.stacked).focus .favicon-container,
-.groupItem:not(.thumbing) .tab-container:not(.noThumbs) .tab:not(.stacked):hover .favicon-container,
-.expandedTray .tab-container:not(.noThumbs) .tab.focus .favicon-container,
-.expandedTray .tab-container:not(.noThumbs) .tab:hover .favicon-container,
+.groupItem:not(.thumbing) .tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked).focus .favicon-container,
+.groupItem:not(.thumbing) .tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked):hover .favicon-container,
+.expandedTray .tab-container:not(.noThumbs):not(.onlyIcons) .tab.focus .favicon-container,
+.expandedTray .tab-container:not(.noThumbs):not(.onlyIcons) .tab:hover .favicon-container,
 .groupItem.stackedGroup:hover,
 body.DraggingGroup .groupItem.dragging,
-body.DraggingGroup .groupItem.dragging .tab:not(.stacked) .favicon-container,
+body.DraggingGroup .groupItem.dragging .tab:not(.stacked):not(.onlyIcons) .favicon-container,
 body.DraggingGroup .groupItem.dragOver,
-body.DraggingGroup .groupItem.dragOver .tab:not(.stacked) .favicon-container,
+body.DraggingGroup .groupItem.dragOver .tab:not(.stacked):not(.onlyIcons) .favicon-container,
 #gridNewGroup:hover,
 #gridNewGroup.dragOver {
 	background-image: linear-gradient(to bottom, var(--hover-color), var(--hover-color));

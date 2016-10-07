@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.6
+// VERSION 1.0.7
 
 this.GroupOptions = function(groupItem) {
 	this.groupItem = groupItem;
@@ -46,6 +46,14 @@ this.GroupOptions.prototype = {
 		return this.groupItem.showUrls = v;
 	},
 
+	get tileIcons() {
+		return this.groupItem.tileIcons;
+	},
+
+	set tileIcons(v) {
+		return this.groupItem.tileIcons = v;
+	},
+
 	get catchOnce() {
 		return this.groupItem.catchOnce;
 	},
@@ -80,6 +88,8 @@ this.GroupOptionsUI = {
 	showThumbs: $('groupOptions-showThumbs'),
 	showUrls: $('groupOptions-showUrls'),
 	showUrlsLabel: $('groupOptions-showUrls-label'),
+	tileIcons: $('groupOptions-tileIcons'),
+	tileIconsLabel: $('groupOptions-tileIcons-label'),
 	stackTabs: $$('[name="groupOptions-stackTabs"]'),
 	stackTabsBox: $('groupOptions-stackTabs'),
 	catchOnce: $('groupOptions-catchOnce'),
@@ -118,6 +128,8 @@ this.GroupOptionsUI = {
 	toggleThumbs: function() {
 		toggleAttribute(this.showUrls, 'disabled', this.showThumbs.checked);
 		toggleAttribute(this.showUrlsLabel, 'disabled', this.showThumbs.checked);
+		toggleAttribute(this.tileIcons, 'disabled', !this.showThumbs.checked);
+		toggleAttribute(this.tileIconsLabel, 'disabled', !this.showThumbs.checked);
 
 		let disabled = UI.single || !this.showThumbs.checked;
 		toggleAttribute(this.stackTabsBox, 'disabled', disabled);
@@ -145,6 +157,7 @@ this.GroupOptionsUI = {
 		this.title.setAttribute('placeholder', this.activeOptions.placeholder);
 		this.showThumbs.checked = this.activeOptions.showThumbs;
 		this.showUrls.checked = this.activeOptions.showUrls;
+		this.tileIcons.checked = this.activeOptions.tileIcons;
 		for(let radio of this.stackTabs) {
 			radio.checked = (radio.value == 'stack' && this.activeOptions.stackTabs) || (radio.value == 'list' && !this.activeOptions.stackTabs);
 		}
@@ -179,6 +192,7 @@ this.GroupOptionsUI = {
 		}
 		this.activeOptions.showThumbs = this.showThumbs.checked;
 		this.activeOptions.showUrls = this.showUrls.checked;
+		this.activeOptions.tileIcons = this.tileIcons.checked;
 		// The title should be the last thing to be set, as it calls save() for use.
 		this.activeOptions.title = this.title.value;
 

@@ -34,6 +34,7 @@
 			<preference id="pref-stackTabs" name="extensions.tabgroups.stackTabs" type="bool"/>
 			<preference id="pref-showThumbs" name="extensions.tabgroups.showThumbs" type="bool"/>
 			<preference id="pref-showUrls" name="extensions.tabgroups.showUrls" type="bool"/>
+			<preference id="pref-tileIcons" name="extensions.tabgroups.tileIcons" type="bool"/>
 			<preference id="pref-tabViewKeycode" name="extensions.tabgroups.tabViewKeycode" type="string"/>
 			<preference id="pref-tabViewAccel" name="extensions.tabgroups.tabViewAccel" type="bool"/>
 			<preference id="pref-tabViewShift" name="extensions.tabgroups.tabViewShift" type="bool"/>
@@ -94,6 +95,11 @@
 				helpbox="paneTabGroups-showThumbs-helptext"
 				jump="showThumbs"
 				delayPreference="pref-showThumbs"/>
+			<checkbox label="&opt.tileIcons.label;"
+				helpbox="paneTabGroups-showThumbs-helptext"
+				jump="tileIcons"
+				dependson="pref-showThumbs"
+				delayPreference="pref-tileIcons"/>
 			<checkbox label="&opt.showUrls.label;"
 				helpbox="paneTabGroups-showThumbs-helptext"
 				jump="showUrls"
@@ -127,6 +133,8 @@
 			<vbox id="paneTabGroups-showThumbs-helptext" collapsed="true">
 				<description style="font-weight:bold;">&opt.showThumbs.label;</description>
 				<description>&opt.showThumbs.tooltip;</description>
+				<description style="font-weight:bold; margin-top:1em;">&opt.tileIcons.label;</description>
+				<description>&opt.tileIcons.tooltip;</description>
 				<description style="font-weight:bold; margin-top:1em;">&opt.showUrls.label;</description>
 				<description>&opt.showUrls.tooltip;</description>
 			</vbox>
