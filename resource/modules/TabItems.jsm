@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.23
+// VERSION 1.2.24
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -929,18 +929,6 @@ this.TabItems = {
 	// Checks whether the xul:tab has fully loaded and resolves a promise with a boolean that indicates whether the tab is loaded or not.
 	_isComplete: function(tab) {
 		return new Promise(function(resolve, reject) {
-			// A pending tab can't be complete, yet.
-			if(tab.hasAttribute("pending") || tab.hasAttribute("tabmix_pending")) {
-				// If a loaded tab becomes unloaded (through other add-ons), assume the next time it is loaded it may lead to a black canvas again.
-				// See notes about this in TabCanvas.update() below.
-				if(tab._tabViewTabItem) {
-					tab._tabViewTabItem._hasHadThumb = false;
-				}
-
-				resolve(false);
-				return;
-			}
-
 			let receiver = function(m) {
 				Messenger.unlistenBrowser(tab.linkedBrowser, "isDocumentLoaded", receiver);
 				resolve(m.data);
@@ -961,11 +949,7 @@ this.TabItems = {
 
 			this._tabsNeedingLabelsUpdate.add(tabItem);
 
-			let shouldDefer =	this.isPaintingPaused()
-						|| this._tabsWaitingForUpdate.hasItems()
-						|| Date.now() - this._lastUpdateTime < this._heartbeatTiming;
-
-			if(shouldDefer) {
+			if(this.shouldDeferPainting()) {
 				this._tabsWaitingForUpdate.push(tab);
 				if(!this.isPaintingPaused()) {
 					tabItem._updateLabels();
@@ -1003,9 +987,19 @@ this.TabItems = {
 			tabItem._thumbNeedsUpdate = false;
 
 			// ___ Make sure the tab is complete and ready for updating.
-			let isComplete = yield this._isComplete(tab);
 			if(!Utils.isValidXULTab(tab) || tab.pinned) { return; }
 
+			// A pending tab can't be complete, yet. We'll get back to it once it's been loaded.
+			if(tab.hasAttribute("pending") || tab.hasAttribute("tabmix_pending")) {
+				// If a loaded tab becomes unloaded (through other add-ons), assume the next time it is loaded it may lead to a black canvas again.
+				// See notes about this in TabCanvas.update() below.
+				if(tab._tabViewTabItem) {
+					tab._tabViewTabItem._hasHadThumb = false;
+				}
+				return;
+			}
+
+			let isComplete = yield this._isComplete(tab);
 			if(isComplete) {
 				yield tabItem.updateCanvas();
 			} else {
@@ -1016,6 +1010,13 @@ this.TabItems = {
 			Cu.reportError(ex);
 		}
 	}),
+
+	shouldDeferPainting: function() {
+		return	this.isPaintingPaused()
+				|| this._tabsWaitingForUpdate.hasItems()
+				|| FavIcons._iconsNeedingColor.length
+				|| Date.now() - this._lastUpdateTime < this._heartbeatTiming;
+	},
 
 	// Takes in a xul:tab, creates a TabItem for it and adds it to the scene.
 	link: function(tab, options) {
