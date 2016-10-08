@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.5.3
+// VERSION 2.5.4
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -949,6 +949,7 @@ this.TabDrag.prototype = {
 			// See the note below on dropping onto a stacked group case.
 			dropTarget._activeTab = null;
 			dropTarget.add(this.item, { dontArrange: true, dontSetActive: true });
+			dropTarget.reorderTabItemsBasedOnTabOrder(true);
 		}
 		// If we have a valid drop target (group), add the item to it.
 		else if(dropTarget.isAGroupItem) {

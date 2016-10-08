@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.1
+// VERSION 1.7.2
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2688,8 +2688,10 @@ this.GroupItems = {
 		this._activeGroupItem = groupItem;
 		this._save();
 
-		// When changing the current groupItem while in single view, make sure its thumb is up-to-date.
-		groupItem.updateThumb();
+		// When changing the current groupItem while in single view, make sure its thumb is up-to-date and its tabs are properly arranged.
+		if(UI.single) {
+			groupItem.arrange();
+		}
 	},
 
 	// Gets last active group item. Returns the <groupItem>. If nothing is found, return null.
@@ -2833,7 +2835,7 @@ this.GroupItems = {
 		if(groupItemId) {
 			groupItem = this.groupItem(groupItemId);
 			groupItem.add(tabItem, { dontSetActive: true });
-			groupItem.reorderTabsBasedOnTabItemOrder()
+			groupItem.reorderTabsBasedOnTabItemOrder();
 		} else {
 			let pageBounds = this.getSafeWindowBounds();
 			let box = new Rect(pageBounds);
