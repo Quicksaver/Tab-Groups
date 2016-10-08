@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.0
+// VERSION 1.3.1
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -280,6 +280,11 @@ this.TabItem.prototype = {
 			case 'error':
 			case 'abort':
 				this.hideCachedThumb();
+				// If we fail to load a cached thumb, we should make sure we have at least a canvas, so that the thumb isn't just a blank square.
+				// e.g. I'm having trouble loading a cached thumb for about:home...
+				if(!this.tabCanvas && !TabItems._isPending(this.tab)) {
+					TabItems.update(this.tab);
+				}
 				break;
 		}
 	},
@@ -938,6 +943,11 @@ this.TabItems = {
 		return { container, thumb, fav, tabTitle, tabUrl, audioBtn, closeBtn };
 	},
 
+	// Checks wheteher a tab is pending.
+	_isPending: function(tab) {
+		return tab.hasAttribute("pending") || tab.hasAttribute("tabmix_pending");
+	},
+
 	// Checks whether the xul:tab has fully loaded and resolves a promise with a boolean that indicates whether the tab is loaded or not.
 	_isComplete: function(tab) {
 		return new Promise(function(resolve, reject) {
@@ -1002,7 +1012,7 @@ this.TabItems = {
 			if(!Utils.isValidXULTab(tab) || tab.pinned) { return; }
 
 			// A pending tab can't be complete, yet. We'll get back to it once it's been loaded.
-			if(tab.hasAttribute("pending") || tab.hasAttribute("tabmix_pending")) {
+			if(this._isPending(tab)) {
 				// If a loaded tab becomes unloaded (through other add-ons), assume the next time it is loaded it may lead to a black canvas again.
 				// See notes about this in TabCanvas.update() below.
 				if(tab._tabViewTabItem) {
@@ -1582,7 +1592,7 @@ this.TabCanvas.prototype = {
 
 		let browser = this.tab.linkedBrowser;
 		PageThumbs.captureToCanvas(browser, canvas, () => {
-			let hasHadThumb = this.tabItem._hadHadThumb;
+			let hasHadThumb = this.tabItem._hasHadThumb;
 			let painted = !dimsChanged;
 
 			if(dimsChanged) {
