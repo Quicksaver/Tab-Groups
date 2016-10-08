@@ -1520,7 +1520,7 @@ body[searching="list"] #search-close {
 body[searching="highlight"] #searchbox {
 	position: absolute;
 	background: var(--highlighter-background);
-	border-radius: 3px;
+	border-radius: 10px;
 	box-shadow: var(--item-shadow);
 }
 
