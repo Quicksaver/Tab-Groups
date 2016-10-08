@@ -18,6 +18,11 @@ caption {
 	position: relative;
 }
 
+/* to avoid overflowing panes unnecessarily, see https://github.com/Quicksaver/Tab-Groups/issues/263 */
+#mainPrefPane > .header[collapsed="true"] {
+	display: none;
+}
+
 /* for checkboxes displayed horizontally */
 .smallindent {
 	-moz-margin-end: 14px;

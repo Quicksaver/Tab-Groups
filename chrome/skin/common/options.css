@@ -31,6 +31,18 @@
 	color: #424e5a;
 }
 
+groupbox[data-category="paneHowTo"] .img-container {
+	display: flex;
+}
+
+groupbox[data-category="paneHowTo"] img {
+	/* so images shrink down if the preferences tab is too short */
+	flex: 1 1 auto;
+	width: 1px;
+	/* but don't let them extend past their original size */
+	max-width: -moz-max-content;
+}
+
 #paneSession-backup-warning {
 	font-weight: bold;
 }

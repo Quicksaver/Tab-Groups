@@ -44,32 +44,36 @@
 			<html:ul>
 				<html:li>
 					<html:p>&howto.single.description;</html:p>
-					<html:p><html:img src="chrome://objPathString/skin/howto/singleview.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/singleview.jpg"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.grid.description;</html:p>
-					<html:p><html:img src="chrome://objPathString/skin/howto/grid.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/grid.jpg"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.classic.description;</html:p>
-					<html:p><html:img src="chrome://objPathString/skin/howto/freearrange.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/freearrange.jpg"/></html:p>
 				</html:li>
 			</html:ul>
 		</groupbox>
 
 		<groupbox align="start" id="paneHowTo-create" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.create.caption;"/>
-			<html:p>&nbsp;</html:p>
-			<html:p>&howto.create.step0;</html:p>
-			<html:ol>
-				<html:li>
-					<html:p>&howto.create.step1a;</html:p>
-					<html:p>&howto.create.step1b;</html:p>
-				</html:li>
-				<html:li><html:p>&howto.create.step2b;</html:p></html:li>
-				<html:li><html:p>&howto.create.step3;</html:p></html:li>
-			</html:ol>
-			<html:img src="chrome://objPathString/skin/howto/create.jpg"/>
+            <html:div>
+                <html:p>&nbsp;</html:p>
+                <html:p>&howto.create.step0;</html:p>
+                <html:ol>
+                    <html:li>
+                        <html:p>&howto.create.step1a;</html:p>
+                        <html:p>&howto.create.step1b;</html:p>
+                    </html:li>
+                    <html:li>
+                        <html:p>&howto.create.step2b;</html:p>
+                        <html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/create.jpg"/></html:p>
+                    </html:li>
+                    <html:li><html:p>&howto.create.step3;</html:p></html:li>
+                </html:ol>
+            </html:div>
 		</groupbox>
 
 		<groupbox align="start" id="paneHowTo-switch" collapsed="true" data-category="paneHowTo">
@@ -85,19 +89,19 @@
 			<html:ul>
 				<html:li>
 					<html:p>&howto.stack.description;</html:p>
-					<html:p><html:img src="chrome://objPathString/skin/howto/stack.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/stack.jpg"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.list.description;</html:p>
-					<html:p><html:img src="chrome://objPathString/skin/howto/list.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/list.jpg"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.icons.description;</html:p>
-					<!--<html:p><html:img src="chrome://objPathString/skin/howto/icons.jpg"/></html:p>-->
+					<!--<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/icons.jpg"/></html:p>-->
 				</html:li>
 				<html:li>
 					<html:p>&howto.thumbs.description2;</html:p>
-					<html:p><html:img src="chrome://objPathString/skin/howto/thumbs.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/thumbs.jpg"/></html:p>
 				</html:li>
 			</html:ul>
 		</groupbox>
@@ -135,10 +139,12 @@
 
 		<groupbox align="start" id="paneHowTo-pinned" collapsed="true" data-category="paneHowTo">
 			<caption label="&howto.pinned.caption;"/>
-			<html:p>&nbsp;</html:p>
-			<html:p>&howto.pinned.description2;</html:p>
-			<html:p>&howto.pinned.description3;</html:p>
-			<html:img src="chrome://objPathString/skin/howto/pinned.jpg"/>
+            <html:div>
+                <html:p>&nbsp;</html:p>
+                <html:p>&howto.pinned.description2;</html:p>
+                <html:p>&howto.pinned.description3;</html:p>
+                <html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/pinned.jpg"/></html:p>
+            </html:div>
 		</groupbox>
 
 		<groupbox align="start" id="paneHowTo-search" collapsed="true" data-category="paneHowTo">
@@ -150,7 +156,7 @@
 				</html:li>
 				<html:li>
 					<html:p>&howto.search.step4;</html:p>
-					<html:img src="chrome://objPathString/skin/howto/search.jpg"/>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/search.jpg"/></html:p>
 				</html:li>
 			</html:ol>
 		</groupbox>
