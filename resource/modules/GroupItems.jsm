@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.0
+// VERSION 1.7.1
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -970,7 +970,7 @@ this.GroupItem.prototype = {
 				break;
 
 			case 'painted':
-				this.updateThumb();
+				this.updateThumb(true);
 				break;
 		}
 	},
@@ -1431,6 +1431,9 @@ this.GroupItem.prototype = {
 				}
 
 				this.updateTabCount();
+
+				// Make sure the group thumbnail is updated even when it isn't active, to reflect this change, such as when dragging tabs into other groups.
+				this.updateThumb(true);
 			}
 
 			this._unfreezeItemSize(true);
@@ -1474,11 +1477,14 @@ this.GroupItem.prototype = {
 	remove: function(item, options = {}) {
 		try {
 			let index = this.children.indexOf(item);
-			let prevIndex = 0;
-			if(index != -1) {
-				this.children.splice(index, 1);
-				prevIndex = Math.max(0, index -1);
+			if(index == -1) {
+				// this tab is not in this group, why are we trying to remove it from here?
+				return;
 			}
+
+			let prevIndex = 0;
+			this.children.splice(index, 1);
+			prevIndex = Math.max(0, index -1);
 
 			if(item == this._activeTab || !this._activeTab) {
 				if(this.children.length) {
@@ -1512,6 +1518,9 @@ this.GroupItem.prototype = {
 
 			this.updateTabCount();
 			this._sendToSubscribers("childRemoved", { item: item });
+
+			// Make sure the group thumbnail is updated even when it isn't active, to reflect this change, such as when dragging tabs into other groups.
+			this.updateThumb(true);
 		}
 		catch(ex) {
 			Cu.reportError(ex);
@@ -2006,11 +2015,8 @@ this.GroupItem.prototype = {
 			this._lastThumb = null;
 		}
 
-		let shouldStart = !GroupItems._thumbsNeedingUpdate.hasItems();
 		GroupItems._thumbsNeedingUpdate.push(this);
-		if(shouldStart) {
-			GroupItems.startHeartbeat();
-		}
+		GroupItems.startHeartbeat();
 	},
 
 	_updateThumb: function() {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.1
+// VERSION 1.3.2
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -447,7 +447,7 @@ this.PriorityQueue.prototype = {
 			if(i != -1) {
 				this._low.splice(i, 1);
 			}
-			else if(this._high.indexOf(item) == -1) {
+			if(this._high.indexOf(item) == -1) {
 				this._high.push(item);
 			}
 		}
@@ -456,7 +456,7 @@ this.PriorityQueue.prototype = {
 			if(i != -1) {
 				this._high.splice(i, 1);
 			}
-			else if(this._low.indexOf(item) == -1) {
+			if(this._low.indexOf(item) == -1) {
 				this._low.push(item);
 			}
 		}
