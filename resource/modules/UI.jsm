@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.36
+// VERSION 1.3.37
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -930,7 +930,45 @@ this.UI = {
 	// However, it's best to try to have canvases always reflect the latest viewport ratio, so that thumbs are as accurate as possible;
 	// otherwise they could only show a portion of the webpage.
 	updateViewportRatio: function(arrangeGroups) {
-		let viewportRatio = gBrowser.mCurrentBrowser.clientWidth / gBrowser.mCurrentBrowser.clientHeight;
+		let viewportRatio;
+
+		// If the user set a custom viewport ratio, use it.
+		let override = Prefs.overrideViewportRatio;
+		if(override) {
+			try {
+				let override = Prefs.overrideViewportRatio;
+				if(override.indexOf("/") > -1) {
+					let [ w, h ] = override.split("/").map(Number);
+					viewportRatio = w / h;
+				} else {
+					viewportRatio = Number(override);
+				}
+
+				// The stored override value is not valid, so ignore it.
+				if(!Utils.isNumber(viewportRatio)) {
+					viewportRatio = 0;
+				}
+			}
+			catch(ex) {
+				// The stored override value is not valid, so ignore it.
+				viewportRatio = 0;
+			}
+		}
+
+		// Otherwise, find it from the web content area.
+		if(!viewportRatio) {
+			// Assume the dimensions of the currently active tab for the screen ratio. This is what thumbnails will represent after all.
+			viewportRatio = gBrowser.mCurrentBrowser.clientWidth / gBrowser.mCurrentBrowser.clientHeight;
+
+			// Make sure the thumbnails don't become too stretched or too flat, they lose all their value if their contents can't be distinguished properly.
+			// For example, in ultra wide screens, or with the devtools open, the thumbnails would be a very thin stretched image; hardly useful...
+			// Don't use common screen ratios for comparison though, as we have to account for the space used by toolbars and stuff;
+			// a 1:1 content ratio seems a good approximation for a 4:3 screen, and a 7:3 (21:9) content ratio seems a good approximation for a 16:9 screen;
+			// but we should also account for vertical screens (i.e. tablets in portrait mode), a direct reverse 9:16 content ratio seems valid for a common 16:9 screen.
+			// anything in between should adjust perfectly automatically.
+			viewportRatio = Math.min(Math.max(9/16, viewportRatio), 7/3);
+		}
+
 		if(viewportRatio != this._viewportRatio) {
 			this._viewportRatio = viewportRatio;
 

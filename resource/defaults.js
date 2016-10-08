@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.4.21
+// VERSION 1.4.22
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -64,6 +64,7 @@ prefList = {
 
 	// hidden prefs
 	forceBrightText: 0,
+	overrideViewportRatio: "",
 
 	// for internal use
 	pageAutoChanged: false,
