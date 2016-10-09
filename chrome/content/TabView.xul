@@ -61,6 +61,12 @@
 				accesskey="&selectAllCmd.accesskey;"
 				command="cmd_selectAll"/>
 		</menupopup>
+
+        <menupopup id="objName-tabview-context-group">
+            <menuitem id="objName-tabview-context-newtab"
+                label="&menuNewTab.label;"
+                accesskey="&menuNewTab.accesskey;"/>
+        </menupopup>
 	</popupset>
 
 	<menupopup id="alltabs-popup">

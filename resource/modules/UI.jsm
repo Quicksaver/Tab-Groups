@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.37
+// VERSION 1.3.38
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -292,13 +292,18 @@ this.UI = {
 					if(Search.inSearch || GroupOptionsUI.activeOptions) { break; }
 
 					let tab = null;
+					let group = null;
 					let node = null;
 
-					// User could have pressed the context menu button in the keyboard, in which case the tab should be the currently active tab.
+					// User could have pressed the context menu button in the keyboard, in which case the tab should be the currently active tab or group.
 					if(!e.button) {
-						let item = this.getActiveTab() || PinnedItems._activeItem;
+						let item = this.getActiveTab() || PinnedItems._activeItem || GroupItems.getActiveGroupItem();
 						if(item) {
-							tab = item.tab;
+							if(!item.isAGroupItem) {
+								tab = item.tab;
+							} else {
+								group = item;
+							}
 							node = item.container;
 						}
 					}
@@ -308,9 +313,16 @@ this.UI = {
 							if(node.isAnAppItem) {
 								tab = node.tab;
 								break;
-							} else if(node._item) {
-								tab = node._item.tab;
-								break;
+							}
+							else if(node._item) {
+								if(node._item.isATabItem) {
+									tab = node._item.tab;
+									break;
+								}
+								else if(node._item.isAGroupItem) {
+									group = node._item;
+									break;
+								}
 							}
 							node = node.parentNode;
 						}
@@ -329,6 +341,18 @@ this.UI = {
 						// We can continue painting thumbs once this is all done.
 						TabItems.resumePainting();
 					}
+					// We right-clicked a group.
+					else if(group) {
+						gTabView.openGroupContextMenu(e, group);
+					}
+				}
+				break;
+
+			case 'command':
+				switch(e.target) {
+					case gTabView.groupContextNewTab:
+						gTabView.groupContextMenu._anchorItem.newTab();
+						break;
 				}
 				break;
 
@@ -506,6 +530,7 @@ this.UI = {
 			Listeners.add(this.classicBtn, 'click', this);
 			Listeners.add(this.gridNewGroupBtn, 'click', this);
 			Listeners.add(this.singleNewGroupBtn, 'click', this);
+			Listeners.add(gTabView.groupContextNewTab, 'command', this);
 
 			// When you click on the background/empty part of TabView, we create a new groupItem.
 			Listeners.add(GroupItems.workSpace, 'mousedown', this);
@@ -615,6 +640,7 @@ this.UI = {
 		Listeners.remove(this.classicBtn, 'click', this);
 		Listeners.remove(this.gridNewGroupBtn, 'click', this);
 		Listeners.remove(this.singleNewGroupBtn, 'click', this);
+		Listeners.remove(gTabView.groupContextNewTab, 'command', this);
 
 		pageWatch.unregister(this);
 

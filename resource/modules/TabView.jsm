@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.11
+// VERSION 1.1.12
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -28,11 +28,15 @@ this.TabView = {
 	kTabMenuPopupId: objName+'-context_tabViewMenuPopup',
 	kInputContextMenuId: objName+'-tabview-context-input',
 	kTabContextMenuId: 'tabContextMenu',
+	kGroupContextMenu: objName+'-tabview-context-group',
+	kGroupContextNewTab: objName+'-tabview-context-newtab',
 	get button() { return $(this.kButtonId); },
 	get tooltip() { return $(this.kTooltipId); },
 	get tabMenuPopup() { return $(this.kTabMenuPopupId); },
 	get inputContextMenu() { return $(this.kInputContextMenuId); },
 	get tabContextMenu() { return $(this.kTabContextMenuId); },
+	get groupContextMenu() { return $(this.kGroupContextMenu); },
+	get groupContextNewTab() { return $(this.kGroupContextNewTab); },
 
 	// compatibility shims, for other add-ons to interact with this object more closely to the original if needed
 	PREF_BRANCH: "extensions."+objPathString,
@@ -113,6 +117,14 @@ this.TabView = {
 					// Hide "Move to Group" in tabs context menu if it's a pinned tab.
 					case 'tabContextMenu':
 						$(objName+"-context_tabViewMenu").hidden = TabContextMenu.contextTab.pinned;
+						break;
+				}
+				break;
+
+			case 'popuphidden':
+				switch(e.target.id) {
+					case this.kGroupContextMenu:
+						this.groupContextMenu._anchorItem = null;
 						break;
 				}
 				break;
@@ -210,6 +222,7 @@ this.TabView = {
 		Listeners.add(this.tooltip, "popupshowing", this, true);
 		Listeners.add(this.tabMenuPopup, "popupshowing", this);
 		Listeners.add($('tabContextMenu'), "popupshowing", this);
+		Listeners.add(this.groupContextMenu, "popuphidden", this);
 		Tabs.listen("TabClose", this);
 		Observers.add(this, objName+'-set-groups-defaults');
 
@@ -324,6 +337,7 @@ this.TabView = {
 		Listeners.remove(this.tooltip, "popupshowing", this, true);
 		Listeners.remove(this.tabMenuPopup, "popupshowing", this);
 		Listeners.remove($('tabContextMenu'), "popupshowing", this);
+		Listeners.remove(this.groupContextMenu, "popuphidden", this);
 		Tabs.unlisten("TabClose", this);
 		Observers.remove(this, objName+'-set-groups-defaults');
 
@@ -542,6 +556,15 @@ this.TabView = {
 		goUpdateCommand("cmd_delete");
 
 		this.inputContextMenu.openPopupAtScreen(e.screenX, e.screenY, true);
+	},
+
+	openGroupContextMenu: function(e, groupItem) {
+		this.groupContextMenu._anchorItem = groupItem;
+		if(!e.button) {
+			this.groupContextMenu.openPopup(groupItem.container, 'overlap', 0, 0, true);
+		} else {
+			this.groupContextMenu.openPopupAtScreen(e.screenX, e.screenY, true);
+		}
 	},
 
 	openTabContextMenu: function(e, tab, anchor) {
