@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.1
+// VERSION 1.3.2
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -1471,9 +1471,9 @@ this.TabItems = {
 
 		if(size.x > -1 && size.y > -1) {
 			if(width < size.x) {
-				height = this._getHeightForWidth(width, size.stacked);
+				height = h;
 			} else {
-				width = this._getWidthForHeight(height, size.stacked);
+				width = w;
 			}
 		}
 
