@@ -93,4 +93,8 @@
 	.create-new:hover .create-new-border {
 		border-color: rgb(0,173,238);
 	}
+
+	body:not(.single) .activeGroupItem .tab-counter {
+		background-image: linear-gradient(to bottom, rgba(75,175,240,0.5), transparent);
+	}
 }

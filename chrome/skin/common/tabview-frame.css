@@ -1036,7 +1036,6 @@ body.classic .groupItem.dragging * {
 
 .titlebar {
 	display: flex;
-	cursor: move;
 	font-size: 12px;
 	height: var(--group-titlebar-height);
 }
@@ -1121,17 +1120,22 @@ body:not(.showTabCounter) .tab-counter {
 }
 
 .tab-counter {
-	padding-top: 4px;
-	-moz-padding-start: 4px;
-	-moz-padding-end: 2px;
+	padding: 3px 6px;
 	max-width: 40%;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
+	border-radius: 2px 2px 0 0;
+	background-image: linear-gradient(to bottom, rgba(128,128,128,0.3), transparent);
+	cursor: default;
 }
 
 body.single .tab-counter {
-	-moz-padding-end: 4px;
+	-moz-margin-end: 4px;
+}
+
+body:not(.single) .activeGroupItem .tab-counter {
+	background-image: linear-gradient(to bottom, rgba(0,147,224,0.3), transparent);
 }
 
 .groupSelector:not(.soundplaying) .group-audio,
