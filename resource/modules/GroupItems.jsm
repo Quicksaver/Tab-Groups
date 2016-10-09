@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.2
+// VERSION 1.7.3
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -224,11 +224,6 @@ this.GroupItem.prototype = {
 			i = this.children.length +i;
 		}
 		return this.children[i] || null;
-	},
-
-	count: function() {
-		// +1 for new tab item
-		return this.children.length +1;
 	},
 
 	// Sets the active <TabItem> for this groupItem; can be null, but only if there are no children.
@@ -1431,6 +1426,7 @@ this.GroupItem.prototype = {
 				}
 
 				this.updateTabCount();
+				this.container.classList.remove('emptyGroup');
 
 				// Make sure the group thumbnail is updated even when it isn't active, to reflect this change, such as when dragging tabs into other groups.
 				this.updateThumb(true);
@@ -1518,6 +1514,9 @@ this.GroupItem.prototype = {
 
 			this.updateTabCount();
 			this._sendToSubscribers("childRemoved", { item: item });
+			if(!this.children.length) {
+				this.container.classList.add('emptyGroup');
+			}
 
 			// Make sure the group thumbnail is updated even when it isn't active, to reflect this change, such as when dragging tabs into other groups.
 			this.updateThumb(true);
@@ -1553,7 +1552,7 @@ this.GroupItem.prototype = {
 
 	// Returns true if the groupItem should stack (instead of grid).
 	isOverflowing: function() {
-		let count = this.count();
+		let count = this.children.length;
 		let box = this.getContentBounds();
 		let arrObj = TabItems.arrange(count, box, this.tileIcons);
 
@@ -1773,7 +1772,7 @@ this.GroupItem.prototype = {
 			return;
 		}
 
-		let count = this.count();
+		let count = this.children.length;
 		let bounds = this.getContentBounds(true);
 
 		// Check against our cached values if we need to re-calc anything.
@@ -1824,8 +1823,8 @@ this.GroupItem.prototype = {
 
 		let sscode = '\
 			@-moz-document url("'+document.baseURI+'") {\n\
-				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab,\n\
-				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab {\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab:not(.create-new),\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab:not(.create-new) {\n\
 					width: '+tabWidth+'px;\n\
 					height: '+tabHeight+'px;\n\
 					padding: '+tabPadding+'px;\n\
@@ -2027,7 +2026,7 @@ this.GroupItem.prototype = {
 
 		let isActive = GroupItems.getActiveGroupItem() == this && !this.hidden;
 		let bounds = UI.getPageBounds();
-		let count = this.count();
+		let count = this.children.length;
 
 		// Don't update the thumb if nothing has changed in the group.
 		if(this._lastThumb) {
@@ -2218,6 +2217,7 @@ this.GroupItems = {
 		if(!this._fragment) {
 			let container = document.createElement('div');
 			container.classList.add('groupItem');
+			container.classList.add('emptyGroup');
 			container.setAttribute('tabs', '0');
 
 			let titlebar = document.createElement('div');
