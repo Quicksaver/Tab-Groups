@@ -27,8 +27,8 @@
 	--favicon-radius: 0.4em;
 	--favicon-tile-shadow: 0 0 2px rgba(128,128,128,0.5);
 
-	--group-min-width: 150px;
-	--group-min-height: 145px;
+	--group-min-width: 120px;
+	--group-min-height: 110px;
 	--group-titlebar-height: 24px;
 	--group-titlebar-edit-icon: url("chrome://tabgroups/skin/edit-light.png");
 	--group-contents-margin: 0;
