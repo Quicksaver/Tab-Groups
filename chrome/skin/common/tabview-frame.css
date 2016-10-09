@@ -45,6 +45,8 @@
 	--shade-background: rgba(0,0,0,.42);
 	--drag-animation: margin 150ms linear;
 
+	--plus-button-color: #333;
+
 	--highlighter-background: rgb(255, 212, 68);
 
 	--z-actions: 10;
@@ -722,7 +724,7 @@ body:-moz-any(.DraggingTab,.DraggingGroup) .tab.create-new,
 	transform: translate(-50%, -50%);
 	width: 65%;
 	height: 65%;
-	border: 5px dashed #333;
+	border: 5px dashed var(--plus-button-color);
 	opacity: 0.3;
 }
 
@@ -737,8 +739,14 @@ body:-moz-any(.DraggingTab,.DraggingGroup) .tab.create-new,
 	transform: translate(-50%, -50%);
 	width: 75%;
 	height: 75%;
-	max-width: 100px;
-	max-height: 100px;
+	/* mask-* are still only available in Nightly and DevEdition
+	mask-image: url("chrome://tabgroups/skin/newtab.svg");
+	mask-size: cover;
+	background-color: var(--plus-button-color);
+	max-width: 64px;
+	max-height: 64px;*/
+	max-width: 48px;
+	max-height: 48px;
 	background-image: url("chrome://tabgroups/skin/newItem.png");
 	background-size: contain;
 	background-repeat: no-repeat;

@@ -90,8 +90,12 @@
 		color: rgb(0,173,238);
 	}
 
+	.create-new .create-new-border {
+		opacity: 0.75;
+	}
+
 	.create-new:hover .create-new-border {
-		border-color: rgb(0,173,238);
+		--plus-button-color: rgb(0,173,238);
 	}
 
 	body:not(.single) .activeGroupItem .tab-counter {
