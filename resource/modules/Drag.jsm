@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.5.4
+// VERSION 2.5.5
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -330,9 +330,9 @@ this.GroupDrag.prototype = {
 			this.item.setBounds(box);
 
 			if(box.width > GroupItems.minGroupWidth && box.height > GroupItems.minGroupHeight) {
-				this.container.style.opacity = '1';
+				this.container.classList.add("activeGroupItem");
 			} else {
-				this.container.style.opacity = '0.7';
+				this.container.classList.remove("activeGroupItem");
 			}
 		}
 		else {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.38
+// VERSION 1.3.39
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1784,7 +1784,6 @@ this.UI = {
 		let phantom = document.createElement("div");
 		phantom.classList.add("groupItem");
 		phantom.classList.add("phantom");
-		phantom.classList.add("activeGroupItem");
 		GroupItems.workSpace.appendChild(phantom);
 
 		// a faux-Item

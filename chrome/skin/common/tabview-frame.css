@@ -696,6 +696,10 @@ body:not(.classic) .undo {
 	cursor: default;
 }
 
+.phantom:not(.activeGroupItem) {
+	opacity: 0.7;
+}
+
 /* new group/tab items */
 
 .groupItem:not(.emptyGroup) .tab.create-new,
