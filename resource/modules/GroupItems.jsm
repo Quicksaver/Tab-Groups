@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.7
+// VERSION 1.7.8
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2600,8 +2600,11 @@ this.GroupItems = {
 	},
 
 	// Given some sort of identifier, returns the appropriate groupItem. Currently only supports groupItem ids.
-	groupItem: function(a) {
-		return this._items.get(a) || null;
+	groupItem: function(id) {
+		if(!Utils.isNumber(id)) {
+			id = parseInt(id);
+		}
+		return this._items.get(id) || null;
 	},
 
 	// Removes all tabs from all groupItems (which automatically closes all unnamed groupItems).
