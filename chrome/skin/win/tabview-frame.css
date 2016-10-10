@@ -14,10 +14,6 @@
 			--item-background: hsl(210,75%,92%);
 			--hover-color: rgba(98,127,134,0.2);
 		}
-
-		body.classic:not([lwtheme]) {
-			background-color: transparent;
-		}
 	}
 }
 
@@ -32,6 +28,39 @@ body:not(:-moz-system-metric(windows-compositor)) {
 
 body.classic:not([lwtheme]) {
 	background-color: window;
+}
+
+@media (-moz-windows-default-theme) {
+	@media	(-moz-os-version: windows-vista),
+		(-moz-os-version: windows-win7) {
+
+		body.classic:not([lwtheme]):not([darktheme]) {
+			background-color: transparent;
+		}
+
+		body.single:not([lwtheme]):not([darktheme]) {
+			--group-selector-text-color: rgb(255,255,255);
+		}
+
+		body.single:not([lwtheme]):not([darktheme]),
+		body:not([lwtheme]):not([darktheme]) #groupSelector {
+			background-color: transparent;
+		}
+
+		body:not([lwtheme]):not([darktheme]) .groupSelector .group-title {
+			padding: 14px;
+			bottom: calc(var(--group-selector-padding) - 14px);
+		}
+
+		body:not([lwtheme]):not([darktheme]) .groupSelector:not(:hover):not(.dragOver):not(.activeGroupItem) .group-title {
+			color: rgb(0,0,0);
+			text-shadow: 0 0 9px white, 0 0 9px white, 0 0 9px white, 0 0 14px white, 0 0 14px white, 0 0 14px white;
+		}
+
+		body:not([lwtheme]):not([darktheme]) .groupSelector:-moz-any(:hover,.dragOver,.activeGroupItem) .group-title {
+			text-shadow: 0 0 2px rgba(0,0,0,0.5);
+		}
+	}
 }
 
 /* Tab Item */

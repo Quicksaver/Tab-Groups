@@ -38,9 +38,10 @@
 		--favicon-radius: 2px;
 		--favicon-tile-shadow: 0 0 2px rgba(255,255,255,0.5);
 		--hover-color: rgba(165,165,165,.4);
+		--group-selector-hover-color: rgba(165,165,165,.4);
 		--group-titlebar-edit-icon: url("chrome://tabgroups/skin/compatibilityFix/edit-dark.png");
 		--shade-background: rgba(24,24,24,.42);
-		--highlighter-background: rgb(68, 212, 255);
+		--highlighter-background: rgb(68,212,255);
 	}
 
 	body.classic:not([lwtheme]),
@@ -59,11 +60,14 @@
 
 	.expandedTray,
 	.undo:not(.inGroupSelector),
-	#groupSelector,
 	#actions .grouped,
 	body:-moz-any(.single,.grid,.classic) .groupItem,
 	body:-moz-any(.single,.grid,.classic) #actions {
 		border-color: rgb(77,77,77);
+	}
+
+	#groupSelector {
+		-moz-border-end-color: rgb(77,77,77);
 	}
 
 	.undo {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 // TODO: create/adapt an actual native dark style, rather than reuse FT DeepDark's one.
 
@@ -14,6 +14,11 @@ this.__defineGetter__('LightweightThemeManager', function() {
 
 this.brightText = {
 	permanent: false,
+	dark: false,
+
+	useDarkTheme: function() {
+		return this.permanent || this.dark;
+	},
 
 	observe: function(aSubject, aTopic, aData) {
 		// Only possibilities are forceBrightText pref changed or the lwtheme changed.
@@ -66,6 +71,7 @@ this.brightText = {
 							}\n\
 						}';
 					Styles.load('brightText', sscode, true);
+					this.unload();
 					break;
 				}
 				Styles.unload('brightText');
@@ -83,13 +89,21 @@ this.brightText = {
 	},
 
 	load: function() {
-		Styles.load('FTDeepDark', 'compatibilityFix/FTDeepDark');
-		Styles.load('FTDeepDark-scrollbars', 'compatibilityFix/FTDeepDark-scrollbars', false, 'agent');
+		if(!this.dark) {
+			Styles.load('FTDeepDark', 'compatibilityFix/FTDeepDark');
+			Styles.load('FTDeepDark-scrollbars', 'compatibilityFix/FTDeepDark-scrollbars', false, 'agent');
+			this.dark = true;
+			Observers.notify(objName+'-darktheme-changed', null);
+		}
 	},
 
 	unload: function() {
-		Styles.unload('FTDeepDark');
-		Styles.unload('FTDeepDark-scrollbars');
+		if(this.dark) {
+			Styles.unload('FTDeepDark');
+			Styles.unload('FTDeepDark-scrollbars');
+			this.dark = false;
+			Observers.notify(objName+'-darktheme-changed', null);
+		}
 	}
 };
 

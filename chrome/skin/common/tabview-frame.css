@@ -39,13 +39,18 @@
 	--group-active-stacked-color: rgba(128,128,128,0.15);
 	--stack-expander-bottom-margin: 8px;
 
+	--group-selectors-background: rgb(46,41,51);
 	--group-selector-size: 160px;
 	--group-selector-padding: 15px;
 	--group-selector-title-height: 14px;
+	--group-selector-arrow-size: 10px;
+	--group-selector-text-color: rgb(190,190,190);
+	--group-selector-text-color-active: rgb(255,255,255);
+	--group-selector-hover-color: rgba(0,0,0,0.4);
 	--shade-background: rgba(0,0,0,.42);
 	--drag-animation: margin 150ms linear;
 
-	--plus-button-color: #333;
+	--plus-button-color: rgb(128,128,128);
 
 	--highlighter-background: rgb(255, 212, 68);
 
@@ -538,7 +543,7 @@ body[FF48] .appTabIcon[busy][progress] {
 }
 
 .groupItem.thumbing .tab-label,
-.groupItem.thumbing .favicon-container,
+.groupItem.thumbing .tab-container:not(.onlyIcons) .favicon-container,
 .groupItem.thumbing .tab-controls {
 	opacity: 0;
 }
@@ -607,6 +612,7 @@ body.single .groupItem {
 	left: 0;
 	width: 100%;
 	height: var(--group-single-height);
+	border-top: none;
 	border-bottom: none;
 	-moz-border-start: none;
 }
@@ -874,9 +880,10 @@ body.single:not(.showGroupThumbs) #singleNewGroup .create-new-border,
 	display: flex;
 	overflow-x: auto;
 	overflow-y: hidden;
-	background-color: rgba(255,255,255,0.6);
-	border-bottom: var(--group-border-width) solid ThreeDShadow;
+	background-color: var(--group-selectors-background);
+	border-bottom: var(--group-border-width) solid var(--item-background);
 	-moz-border-end: var(--group-border-width) solid ThreeDShadow;
+	color: var(--group-selector-text-color);
 }
 
 body:not(.single) #groupSelector {
@@ -885,6 +892,11 @@ body:not(.single) #groupSelector {
 
 body[lwtheme] #groupSelector {
 	background-color: transparent;
+}
+
+body:not([lwtheme]) #groupSelector .groupSelector.create-new:hover,
+body[lwtheme] #groupSelector[brighttext] .groupSelector.create-new:hover {
+	--plus-button-color: rgb(245,245,245);
 }
 
 .groupSelector {
@@ -897,8 +909,40 @@ body[lwtheme] #groupSelector {
 	height: var(--group-selector-size);
 }
 
-#groupSelector[brighttext] .groupSelector {
-	color: #FFFFFF;
+.groupSelector.activeGroupItem {
+	color: var(--group-selector-text-color-active);
+}
+
+body[lwtheme] #groupSelector:not([brighttext]) .groupSelector {
+	color: rgb(32,32,32);
+}
+
+body[lwtheme] #groupSelector:not([brighttext]) .groupSelector.activeGroupItem {
+	color: rgb(0,0,0);
+}
+
+body:not([lwtheme]) .groupSelector:-moz-any(:hover,.dragOver,.activeGroupItem),
+body[lwtheme] #groupSelector[brighttext] .groupSelector:-moz-any(:hover,.dragOver,.activeGroupItem) {
+  background-color: var(--group-selector-hover-color);
+}
+
+body[lwtheme] #groupSelector:not([brighttext]) .groupSelector:-moz-any(:hover,.dragOver,.activeGroupItem) {
+  background-color: var(--hover-color);
+}
+
+.groupSelector.activeGroupItem:after {
+	content: "";
+	pointer-events: none;
+	position: absolute;
+	width: 0;
+	height: 0;
+	bottom: 0;
+	left: 50%;
+	transform: translate(-50%);
+	border: var(--group-selector-arrow-size) solid var(--item-background);
+	border-top: none;
+	border-left-color: transparent;
+	border-right-color: transparent;
 }
 
 body.single:not(.showGroupThumbs) #groupSelector,
@@ -927,8 +971,8 @@ body.DraggingGroupSelector .groupSelector {
 	left: 50%;
 	/* keeping this aligned correctly with the group title is a bit tricky,
 	   as I'm trying to avoid using flexboxes because its a canvas and those lag there */
-	top: calc(50% - (var(--group-selector-title-height) /2));
-	transform: translate(-50%, calc(0px - 50% - (var(--group-selector-title-height) /4)));
+	top: calc(50% - var(--group-selector-title-height));
+	transform: translate(-50%, calc(0px - 50%));
 	padding: 4px;
 	border: var(--canvas-border-width) solid var(--hover-color);
 	background-color: var(--item-background);
@@ -942,7 +986,7 @@ body:not(.showGroupThumbs) .groupThumb,
 .groupSelector .group-title {
 	display: block;
 	position: absolute;
-	bottom: calc(var(--group-selector-padding) / 2);
+	bottom: var(--group-selector-padding);
 	left: 50%;
 	transform: translateX(-50%);
 	max-width: calc(100% - var(--group-selector-padding));
@@ -955,14 +999,9 @@ body:not(.showGroupThumbs) .groupThumb,
 body:not(.showGroupThumbs) .groupSelector .group-title {
 	bottom: auto;
 	top: 50%;
-	left: calc(50% - 12px);
+	left: 50%;
 	transform: translate(-50%, -50%);
-	max-width: calc(100% - var(--group-selector-padding) - 24px);
-}
-
-body:not(.showGroupThumbs) .groupSelector.soundplaying .group-title {
-	left: calc(50% - 24px);
-	max-width: calc(100% - var(--group-selector-padding) - 48px);
+	max-width: calc(100% - (var(--group-selector-padding) * 3));
 }
 
 .selector-controls {
@@ -979,6 +1018,29 @@ body:not(.showGroupThumbs) .selector-controls {
 	top: 50%;
 	transform: translateY(-50%);
 	right: 2px;
+	display: flex;
+}
+
+body:not([lwtheme]) .groupSelector .close:not(:hover):not(:active),
+body[lwtheme] #groupSelector[brighttext] .groupSelector .close:not(:hover):not(:active) {
+	background-image: -moz-image-rect(var(--control-icons), 0, 80, 20, 60);
+}
+
+body:not([lwtheme]) .groupSelector .group-audio:not(:hover):not(:active),
+body[lwtheme] #groupSelector[brighttext] .groupSelector .group-audio:not(:hover):not(:active) {
+	background-image: -moz-image-rect(var(--control-icons), 80, 80, 100, 60);
+}
+
+@media (min-resolution: 1.1dppx) {
+	body:not([lwtheme]) .groupSelector .close:not(:hover):not(:active),
+	body[lwtheme] #groupSelector[brighttext] .groupSelector .close:not(:hover):not(:active) {
+		background-image: -moz-image-rect(var(--control-icons-2x), 0, 160, 40, 120);
+	}
+
+	body:not([lwtheme]) .groupSelector .group-audio:not(:hover):not(:active),
+	body[lwtheme] #groupSelector[brighttext] .groupSelector .group-audio:not(:hover):not(:active) {
+		background-image: -moz-image-rect(var(--control-icons-2x), 160, 160, 200, 120);
+	}
 }
 
 .groupSelector .undo {
@@ -1384,9 +1446,6 @@ body.DraggingTab .appTabIcon {
 #actions input:hover,
 #actions input.appTabIcon.activeAppTab,
 .search-result-group .tab.focus,
-.groupSelector:hover,
-.groupSelector.dragOver,
-.groupSelector.activeGroupItem,
 body.classic #classicbutton,
 body.grid #gridbutton,
 body.single #singlebutton,

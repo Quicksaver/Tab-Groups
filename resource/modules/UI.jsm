@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.39
+// VERSION 1.3.40
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -435,45 +435,53 @@ this.UI = {
 	},
 
 	observe: function(aSubject, aTopic, aData) {
-		switch(aSubject) {
-			case 'showTabOnUpdates':
-				this._noticeDismissed = false;
-				this.checkSessionRestore();
-				break;
+		switch(aTopic) {
+			case 'nsPref:changed':
+				switch(aSubject) {
+					case 'showTabOnUpdates':
+						this._noticeDismissed = false;
+						this.checkSessionRestore();
+						break;
 
-			case 'displayMode':
-				this.toggleMode();
-				break;
+					case 'displayMode':
+						this.toggleMode();
+						break;
 
-			case 'stackTabs':
-				for(let groupItem of GroupItems) {
-					if(groupItem.isStacked || groupItem.overflowing) {
-						groupItem.arrange();
-					}
+					case 'stackTabs':
+						for(let groupItem of GroupItems) {
+							if(groupItem.isStacked || groupItem.overflowing) {
+								groupItem.arrange();
+							}
+						}
+						break;
+
+					case 'showGroupThumbs':
+						this.toggleGroupThumbs();
+
+						// When toggling this preference, we want to reaarange the groups, and ensure the group selector shows the placholder title if necessary.
+						if(this.single) {
+							this._resize(true);
+							for(let groupItem of GroupItems) {
+								groupItem.setTitle(groupItem.getTitle());
+								groupItem.updateThumb();
+							}
+						}
+						break;
+
+					case 'gridDynamicSize':
+						if(this.grid) {
+							GroupItems.arrange();
+						}
+						break;
+
+					case 'showTabCounter':
+						document.body.classList[(Prefs.showTabCounter) ? 'add' : 'remove']('showTabCounter');
+						break;
 				}
 				break;
 
-			case 'showGroupThumbs':
-				this.toggleGroupThumbs();
-
-				// When toggling this preference, we want to reaarange the groups, and ensure the group selector shows the placholder title if necessary.
-				if(this.single) {
-					this._resize(true);
-					for(let groupItem of GroupItems) {
-						groupItem.setTitle(groupItem.getTitle());
-						groupItem.updateThumb();
-					}
-				}
-				break;
-
-			case 'gridDynamicSize':
-				if(this.grid) {
-					GroupItems.arrange();
-				}
-				break;
-
-			case 'showTabCounter':
-				document.body.classList[(Prefs.showTabCounter) ? 'add' : 'remove']('showTabCounter');
+			case objName+'-darktheme-changed':
+				this.useDarkTheme();
 				break;
 		}
 	},
@@ -514,6 +522,9 @@ this.UI = {
 			Watchers.addAttributeWatcher(gWindow.document.documentElement, 'lwtheme', this, false, false);
 			Watchers.addAttributeWatcher(gWindow[objName].$('nav-bar'), 'brighttext', this, false, false);
 			this.attrWatcher();
+
+			Observers.add(this, objName+'-darktheme-changed');
+			this.useDarkTheme();
 
 			// ___ search
 			Search.init();
@@ -650,6 +661,8 @@ this.UI = {
 		Watchers.removeAttributeWatcher(gWindow.document.documentElement, 'lwtheme', this, false, false);
 		Watchers.removeAttributeWatcher(gWindow[objName].$('nav-bar'), 'brighttext', this, false, false);
 
+		Observers.remove(this, objName+'-darktheme-changed');
+
 		// additional clean up
 		GroupOptionsUI.hide();
 		TabItems.uninit();
@@ -676,6 +689,10 @@ this.UI = {
 		this._reorderTabItemsOnShow = new Set();
 		this._reorderTabsOnHide = new Set();
 		this._frameInitialized = false;
+	},
+
+	useDarkTheme: function() {
+		toggleAttribute(document.body, 'darktheme', brightText.useDarkTheme());
 	},
 
 	goToPreferences: function(aOptions) {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.4
+// VERSION 1.7.5
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -456,14 +456,13 @@ this.GroupItem.prototype = {
 		if(UI.single) {
 			bounds = UI.getPageBounds();
 			bounds.width -= UICache.groupBorderWidth;
-			bounds.height -= UICache.groupBorderWidth;
 		} else {
 			bounds = new Rect((UI.classic) ? this.bounds : this._gridBounds);
 			bounds.width -= UICache.groupBorderWidth *2;
 			bounds.height -= UICache.groupBorderWidth *2;
 		}
 
-		// The following line takes 100ms longer on the first iniitalization in grid layout.
+		// The following line takes 100ms longer on the first initialization in grid layout.
 		// Because it's the first call to getting values from the stylesheet? I dunno...
 		bounds.width -= UICache.groupContentsMargin.x;
 		bounds.height -= UICache.groupContentsMargin.y;

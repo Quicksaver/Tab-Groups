@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.3.0
+// VERSION 2.3.1
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -83,7 +83,7 @@ this.Observers = {
 	},
 
 	notify: function(aTopic, aSubject, aData) {
-		if(aSubject == undefined) {
+		if(aSubject === undefined) {
 			aSubject = self;
 		}
 		Services.obs.notifyObservers(aSubject, aTopic, aData);
