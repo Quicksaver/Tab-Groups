@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.5
+// VERSION 1.7.6
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -869,8 +869,7 @@ this.GroupItem.prototype = {
 					else if(!e.target.classList.contains('close') // can also be tabs close button
 					&& this.expander != e.target) {
 						// Don't handle when clicking on the scrollbar of overflowing groups.
-						if(!this.overflowing
-						|| e.target != this.tabContainer
+						if(e.target != this.tabContainer
 						|| e.target.namespaceURI == e.originalTarget.namespaceURI) {
 							this.lastMouseDownTarget = e.target;
 							if(!this.childHandling
