@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.6
+// VERSION 1.7.7
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1902,6 +1902,7 @@ this.GroupItem.prototype = {
 		document.body.appendChild(tray);
 
 		tray.classList.add("expandedTray");
+		tray._groupItem = this;
 		tray.setAttribute('group', this.id);
 		Listeners.add(tray, 'dragover', this);
 

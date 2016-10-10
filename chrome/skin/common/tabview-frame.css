@@ -709,6 +709,7 @@ body:not(.classic) .undo {
 /* new group/tab items */
 
 .groupItem:not(.emptyGroup) .tab.create-new,
+.expandedTray .tab.create-new,
 body:not(.grid) #gridNewGroup {
 	display: none;
 }
