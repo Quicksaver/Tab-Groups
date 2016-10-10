@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.43
+// VERSION 1.3.44
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -18,7 +18,62 @@ this.Synthesizer = {
 		try {
 			e.preventDefault();
 			e.stopPropagation();
-			this.utils.sendWheelEvent(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ, window.WheelEvent.DOM_DELTA_LINE, 0, e.deltaY, e.deltaX, 0);
+			e.stopImmediatePropagation();
+
+			// This doesn't work a lot of time, I don't fully understand why, it seems like it's because the synthesized event
+			// fires before our cancelled event has finished, which interferes with the synthesized event actually acting;
+			// it does fire and is caught by the handlers though, it just doesn't scroll the element.
+			//this.utils.sendWheelEvent(e.clientX, e.clientY, e.deltaY, e.deltaX, e.deltaZ, window.WheelEvent.DOM_DELTA_LINE, 0, e.deltaY, e.deltaX, 0);
+
+			// So instead we're "scrolling manually"... Ugh...
+
+			// Which direction are we scrolling?
+			let delta = e.deltaY;
+			if(!delta) { return; }
+			delta = (delta < 0) ? -1 : 1;
+
+			let el = UI.groupSelector;
+
+			// If the group at the edge is already fully visible, show the next one.
+			let shift = UICache.groupSelectorSize;
+
+			// What's visible at the edge of the box? If it's only a partial group, show it fully.
+			if(LTR) {
+				if(delta > 0) {
+					if(el.scrollLeft == el.scrollLeftMax) { return; }
+					let fullWidth = (el.clientWidth + el.scrollLeft);
+					let partial = fullWidth % UICache.groupSelectorSize;
+					shift = UICache.groupSelectorSize - partial; console.log({ LTR, delta, max: el.scrollLeftMax, min: el.scrollLeftMin, width: el.clientWidth, scroll: el.scrollLeft, fullWidth, partial, shift });
+				}
+				else {
+					if(el.scrollLeft == el.scrollLeftMin) { return; }
+					let fullWidth = el.scrollLeft;
+					let partial = fullWidth % UICache.groupSelectorSize;
+					if(partial) {
+						shift = partial;
+					} console.log({ LTR, delta, max: el.scrollLeftMax, min: el.scrollLeftMin, width: el.clientWidth, scroll: el.scrollLeft, fullWidth, partial, shift });
+				}
+			}
+			else {
+				if(delta > 0) {
+					if(el.scrollLeft == el.scrollLeftMin) { return; }
+					let fullWidth = (el.clientWidth - el.scrollLeft);
+					let partial = fullWidth % UICache.groupSelectorSize;
+					shift = UICache.groupSelectorSize - partial; console.log({ LTR, delta, max: el.scrollLeftMax, min: el.scrollLeftMin, width: el.clientWidth, scroll: el.scrollLeft, fullWidth, partial, shift });
+				}
+				else {
+					if(el.scrollLeft == el.scrollLeftMax) { return; }
+					let fullWidth = 0 - el.scrollLeft;
+					let partial = fullWidth % UICache.groupSelectorSize;
+					if(partial) {
+						shift = partial;
+					} console.log({ LTR, delta, max: el.scrollLeftMax, min: el.scrollLeftMin, width: el.clientWidth, scroll: el.scrollLeft, fullWidth, partial, shift });
+				}
+				delta = 0 - delta;
+			}
+
+			shift *= delta;
+			el.scrollLeft += shift;
 		}
 		// We really only care about not blocking anything else that is supposed to run.
 		catch(ex) { Cu.reportError(ex); }
