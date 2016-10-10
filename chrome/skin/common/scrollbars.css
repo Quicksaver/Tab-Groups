@@ -45,4 +45,9 @@
 		display: none;
 	}
 
+	body:not([lwtheme]):not([darktheme]) #groupSelector scrollbar thumb,
+	body[lwtheme] #groupSelector[brighttext] scrollbar thumb {
+		background-color: rgba(245,245,245,0.65);
+	}
+
 }
