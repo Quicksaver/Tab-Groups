@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.40
+// VERSION 1.3.41
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -239,6 +239,12 @@ this.UI = {
 						break;
 
 					case this.singleNewGroupBtn:
+						this.setActive(GroupItems.newGroup());
+
+						// When creating a new group through the top plus button, it should stay visible.
+						this.scrollSelectorsToEnd();
+						break;
+
 					case this.gridNewGroupBtn:
 						this.setActive(GroupItems.newGroup());
 						break;
@@ -1981,6 +1987,13 @@ this.UI = {
 	clearShouldResizeItems: function() {
 		delete this._minimalRect;
 		delete this._feelsCramped;
+	},
+
+	// Scrolls the plus button in the group selectors into view.
+	scrollSelectorsToEnd: function() {
+		if(this.groupSelector.scrollLeftMax > this.groupSelector.scrollLeft) {
+			this.groupSelector.scrollLeft = this.groupSelector.scrollLeftMax;
+		}
 	},
 
 	// Exits TabView UI.
