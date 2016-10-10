@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.44
+// VERSION 1.3.45
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -772,26 +772,25 @@ this.UI = {
 		// (TMP) Reconnect tabs could have been disconnected in GroupItems.reconstitute.
 		TabItems.resumeReconnecting();
 
+		// Close any currently open groups to reset our main object.
+		for(let group of GroupItems) {
+			group.close();
+		}
+		GroupItems.nextID = 1;
+
 		let padding = Trenches.defaultRadius;
 		let welcomeWidth = 300;
 		let pageBounds = GroupItems.getSafeWindowBounds();
 
 		// ___ make a fresh groupItem
-		let box = new Rect(pageBounds);
-		box.width = Math.min(box.width * 0.667, pageBounds.width - (welcomeWidth + padding));
-		box.height = box.height * 0.667;
+		let bounds = new Rect(pageBounds);
+		bounds.width = Math.min(bounds.width * 0.667, pageBounds.width - (welcomeWidth + padding));
+		bounds.height *= 0.667;
 		if(RTL) {
-			box.left = pageBounds.left + welcomeWidth + 2 * padding;
+			bounds.left = pageBounds.left + welcomeWidth + (2 * padding);
 		}
 
-		for(let group of GroupItems) {
-			group.close();
-		}
-
-		let options = {
-			bounds: box,
-			immediately: true
-		};
+		let options = { bounds, immediately: true };
 		let groupItem = new GroupItem([], options);
 		for(let tab of Tabs.notPinned) {
 			if(!tab._tabViewTabItem) { continue; }
