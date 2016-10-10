@@ -16,6 +16,7 @@
 
 	scrollbar[orient="vertical"] {
 		-moz-margin-start: calc(0px - var(--scrollbar-width));
+		margin-bottom: 12px;
 		min-width: var(--scrollbar-width);
 		max-width: var(--scrollbar-width);
 	}
