@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.CatchRules = {
 	initialized: false,
@@ -10,6 +10,8 @@ this.CatchRules = {
 
 	receiveMessage: function(m) {
 		let tab = gBrowser.getTabForBrowser(m.target);
+		if(!tab) { return; }
+
 		let url = m.data;
 		for(let rule of this.rules) {
 			// This is likely not a new tab, so process it only if the user chose to catch all tabs.
@@ -23,6 +25,11 @@ this.CatchRules = {
 			}
 		}
 		tab._caughtOnce = true;
+	},
+
+	handleEvent: function(e) {
+		// SSWindowStateReady or SSWindowRestored
+		this.init();
 	},
 
 	init: function() {
@@ -75,6 +82,7 @@ this.CatchRules = {
 
 	uninit: function() {
 		if(!this.initialized) { return; }
+		this.initialized = false;
 
 		for(let tab of Tabs.all) {
 			delete tab._caughtOnce;
@@ -86,9 +94,22 @@ this.CatchRules = {
 };
 
 Modules.LOADMODULE = function() {
+	// Sometimes restoring a window's data doesn't happen right away at startup. Other times its session can be rewritten entirely.
+	if(Services.vc.compare(Services.appinfo.version, "51.0a1") < 0) {
+		Listeners.add(window, "SSWindowStateReady", CatchRules);
+	} else {
+		Listeners.add(window, "SSWindowRestored", CatchRules);
+	}
+
 	CatchRules.init();
 };
 
 Modules.UNLOADMODULE = function() {
+	if(Services.vc.compare(Services.appinfo.version, "51.0a1") < 0) {
+		Listeners.remove(window, "SSWindowStateReady", CatchRules);
+	} else {
+		Listeners.remove(window, "SSWindowRestored", CatchRules);
+	}
+
 	CatchRules.uninit();
 };
