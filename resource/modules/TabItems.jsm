@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.3
+// VERSION 1.3.4
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -576,21 +576,15 @@ this.TabItem.prototype = {
 		UI.setActive(this);
 	},
 
-	updateLabels: function(callback) {
-		if(!TabItems._tabsNeedingLabelsUpdate.has(this)) {
-			if(callback) {
-				callback();
-			}
-		} else {
-			this._updateLabels().then(() => {
-				if(callback) {
-					callback();
-				}
-			});
+	updateLabels: Task.async(function* () {
+		if(TabItems._tabsNeedingLabelsUpdate.has(this)) {
+			yield this._updateLabels();
 		}
-	},
+	}),
 
 	_updateLabels: function() {
+		TabItems._tabsNeedingLabelsUpdate.delete(this);
+
 		return new Promise((resolve, reject) => {
 			// Tab could have been closed in the meantime.
 			if(!this.tab) {
@@ -624,8 +618,6 @@ this.TabItem.prototype = {
 				}
 
 				this._sendToSubscribers("iconUpdated");
-
-				TabItems._tabsNeedingLabelsUpdate.delete(this);
 				resolve(true);
 			});
 
@@ -1248,9 +1240,7 @@ this.TabItems = {
 		this.paintingPaused--;
 		if(!this.isPaintingPaused()) {
 			// Start by fetching the updated labels immediately for each tab, so that those are always up-to-date.
-			for(let tabItem of this._tabsNeedingLabelsUpdate) {
-				tabItem._updateLabels();
-			}
+			this.flushLabelsUpdates();
 
 			// Ensure we override the heartbeat for staled tabs.
 			this.startHeartbeat(this._heartbeatTiming);
@@ -1261,6 +1251,16 @@ this.TabItems = {
 	// Returns a boolean indicating whether painting is paused or not.
 	isPaintingPaused: function() {
 		return this.paintingPaused > 0;
+	},
+
+	flushLabelsUpdates: function() {
+		let promises = [];
+
+		for(let tabItem of this._tabsNeedingLabelsUpdate) {
+			promises.push(tabItem._updateLabels());
+		}
+
+		return Promise.all(promises);
 	},
 
 	// Don't reconnect any new tabs until resume is called.

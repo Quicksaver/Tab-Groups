@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.5
+// VERSION 1.0.6
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -324,15 +324,11 @@ this.quickAccess = {
 			button.classList.add('quickaccess-activebutton');
 		}
 
-		// Tab items won't have these fields set/updated until it has been accessed.
-		// We need to force them to update so that we reflect the most up-to-date titles and favicons in the quick access panel.
-		tabItem.updateLabels(function() {
-			button.setAttribute('label', tabItem.tabTitle.textContent);
-			button.setAttribute('tooltiptext', tabItem.container.getAttribute('title'));
-			if(tabItem.fav._iconUrl) {
-				button.style.listStyleImage = 'url("'+tabItem.fav._iconUrl+'")';
-			}
-		});
+		button.setAttribute('label', tabItem.tabTitle.textContent);
+		button.setAttribute('tooltiptext', tabItem.container.getAttribute('title'));
+		if(tabItem.fav._iconUrl) {
+			button.style.listStyleImage = 'url("'+tabItem.fav._iconUrl+'")';
+		}
 
 		this.contents.appendChild(button);
 		this.items.push(button);
@@ -413,9 +409,12 @@ this.quickAccess = {
 					this.populateGroups();
 				}
 			} else {
-				if(this._lastSearch && term == this._lastSearch.term) { return; }
+				if(this._lastSearch) {
+					if(term == this._lastSearch.term) { return; }
+					this._lastSearch.cancel();
+				}
 
-				this._lastSearch = TabView._window[objName].Search.createSearchTabMatcher(term);
+				this._lastSearch = new TabView._window[objName].TabMatcher(term);
 				this._lastSearch.byParent = new Map();
 				this._lastSearch.orderedGroups = [];
 				this._lastSearch.activeTab = TabView._window[objName].UI._currentTab;
@@ -435,16 +434,12 @@ this.quickAccess = {
 			button.classList.add('quickaccess-activebutton');
 		}
 
-		// Tab items won't have these fields set/updated until it has been accessed.
-		// We need to force them to update so that we reflect the most up-to-date titles and favicons in the quick access panel.
 		if(tab.isATabItem) {
-			tab.updateLabels(function() {
-				button.setAttribute('label', tab.tabTitle.textContent);
-				button.setAttribute('tooltiptext', tab.container.getAttribute('title'));
-				if(tab.fav._iconUrl) {
-					button.style.listStyleImage = 'url("'+tab.fav._iconUrl+'")';
-				}
-			});
+			button.setAttribute('label', tab.tabTitle.textContent);
+			button.setAttribute('tooltiptext', tab.container.getAttribute('title'));
+			if(tab.fav._iconUrl) {
+				button.style.listStyleImage = 'url("'+tab.fav._iconUrl+'")';
+			}
 		}
 		else if(tab.isAnAppItem) {
 			button.setAttribute('label', tab.tab.label);

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.5
+// VERSION 1.0.6
 
 this.PinnedItems = {
 	get actions() { return $('actions'); },
@@ -123,13 +123,19 @@ this.PinnedItems = {
 
 	// Update apptab icons based on xulTabs which have been updated while the TabView hasn't been visible
 	flushUpdates: function() {
+		let promises = [];
+
 		for(let tab of this._delayedUpdates) {
-			this._updateIcon(tab);
+			promises.push(this._updateIcon(tab));
 		}
 		this._delayedUpdates.clear();
+
+		return Promise.all(promises);
 	},
 
 	updateIcon: function(tab) {
+		if(!tab.pinned) { return; }
+
 		if(!UI.isTabViewVisible()) {
 			this._delayedUpdates.add(tab);
 		} else {
@@ -138,7 +144,8 @@ this.PinnedItems = {
 	},
 
 	// Update images of any apptab icons that point to passed in xultab
-	_updateIcon: function(tab) {
+	_updateIcon: Task.async(function* (tab) {
+		// I don't think this can happen here, but leaving it in just for safety.
 		if(!tab.pinned) { return; }
 
 		if(this.icons.has(tab)) {
@@ -172,7 +179,7 @@ this.PinnedItems = {
 				icon.style.backgroundImage = "url('"+iconUrl+"')";
 			}
 		});
-	},
+	}),
 
 	// Gets the fav icon url for app tab.
 	getFavIconUrl: function(tab, callback) {

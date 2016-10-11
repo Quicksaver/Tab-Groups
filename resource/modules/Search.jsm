@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.1.0
+// VERSION 2.1.1
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -55,6 +55,13 @@ this.TabMatcher = function(term) {
 	this.term = term;
 	this.matches = null;
 	this.nonmatches = null;
+	this.cancelled = false;
+
+	// We need updated labels, urls and icons for our results.
+	this.promises = [];
+	this.promises.push(PinnedItems.flushUpdates());
+	this.promises.push(TabItems.flushLabelsUpdates());
+	this.ready = Promise.all(this.promises);
 
 	this.tabs = [];
 	for(let appItem of PinnedItems) {
@@ -66,6 +73,10 @@ this.TabMatcher = function(term) {
 };
 
 this.TabMatcher.prototype = {
+	cancel: function() {
+		this.cancelled = true;
+	},
+
 	// Given an array of <TabItem>s and <xul:tab>s returns a new array of tabs whose name matched the search term, sorted by lexical closeness.
 	_filterAndSortForMatches: function() {
 		let tabs = this.tabs.filter((tab) => {
@@ -122,23 +133,27 @@ this.TabMatcher.prototype = {
 	// The first two functions take two parameters: A <TabItem> and its integer index indicating the absolute rank of the <TabItem> in terms of match to the search term.
 	// The last function also takes two paramaters, but can be passed both <TabItem>s and <xul:tab>s and the index is offset by the number of matched tabs inside the window.
 	doSearch: function(handler) {
-		handler.clearSearch();
+		this.ready.then(() => {
+			if(this.cancelled) { return; }
 
-		let matches = this.matched();
-		matches.forEach(function(tab, i) {
-			handler.onMatch(tab, i);
-		});
+			handler.clearSearch();
 
-		if(handler.onUnmatch) {
-			let unmatched = this.unmatched();
-			unmatched.forEach(function(tab) {
-				handler.onUnmatch(tab);
+			let matches = this.matched();
+			matches.forEach(function(tab, i) {
+				handler.onMatch(tab, i);
 			});
-		}
 
-		if(handler.finishSearch) {
-			handler.finishSearch();
-		}
+			if(handler.onUnmatch) {
+				let unmatched = this.unmatched();
+				unmatched.forEach(function(tab) {
+					handler.onUnmatch(tab);
+				});
+			}
+
+			if(handler.finishSearch) {
+				handler.finishSearch();
+			}
+		});
 	},
 
 	// Given a pattern string, returns a score between 0 and 1 of how well that pattern matches the original string.
@@ -468,10 +483,6 @@ this.Search = {
 		}
 	},
 
-	createSearchTabMatcher: function(value) {
-		return new TabMatcher(value);
-	},
-
 	// Hides search mode.
 	hide: function(e) {
 		if(!this.inSearch) { return; }
@@ -505,8 +516,11 @@ this.Search = {
 			if(!this.inSearch) { return; }
 
 			let term = this.searchquery.value;
-			if(this._lastSearch && term == this._lastSearch.term) { return; }
-			this._lastSearch = this.createSearchTabMatcher(term);
+			if(this._lastSearch) {
+				if(term == this._lastSearch.term) { return; }
+				this._lastSearch.cancel();
+			}
+			this._lastSearch = new TabMatcher(term);
 			this._lastSearch.doSearch(this);
 		}, 300);
 	},
