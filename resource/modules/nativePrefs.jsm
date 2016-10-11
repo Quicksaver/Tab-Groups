@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 this.pageWatch = {
 	TMP: false,
+	SM: false,
 	listeners: new Set(),
 	captureChanges: false,
 	initialized: false,
@@ -55,9 +56,9 @@ this.pageWatch = {
 		for(let l of this.listeners) {
 			try {
 				if(l.observe) {
-					l.observe(aSubject, aTopic, aData);
+					l.observe(aSubject, 'pageWatch-change', aData);
 				} else {
-					l(aSubject, aTopic, aData);
+					l(aSubject, 'pageWatch-change', aData);
 				}
 			}
 			catch(ex) { Cu.reportError(ex); }
@@ -83,6 +84,13 @@ this.pageWatch = {
 	enableSessionRestore: function() {
 		// In case any of our dependencies failed to initialize before we need this, make sure it still "works".
 		if(this.sessionRestoreEnabled) { return; }
+
+		// If Session Manager is enabled, we don't dare mess with its preferences.
+		// Changing its settings is better done through SM's own options window.
+		if(this.SM) {
+			gSessionManager.openOptions();
+			return;
+		}
 
 		if(this.TMP && Prefs["sessions.manager"]) {
 			Prefs.onCloseBackup = Prefs["sessions.onClose"];
@@ -110,6 +118,9 @@ this.pageWatch = {
 
 		if(this.TMP && Prefs["sessions.manager"]) {
 			return Prefs["sessions.onClose"] != 2 && Prefs["sessions.onStart"] != 2;
+		}
+		if(this.SM && SessionManager.isSavingSession()) {
+			return true;
 		}
 		return this.kKeepingSession.has(Prefs.page);
 	},

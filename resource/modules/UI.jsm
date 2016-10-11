@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.47
+// VERSION 1.3.48
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -265,6 +265,13 @@ this.UI = {
 						break;
 
 					case this.sessionRestoreNotice:
+						// If Session Manager is enabled, we don't dare mess with its preferences.
+						// Changing its settings is better done through SM's own options window.
+						if(pageWatch.SM) {
+							gSessionManager.openOptions();
+							break;
+						}
+
 						this.goToPreferences({ jumpto: 'sessionRestore' });
 						break;
 
@@ -547,6 +554,10 @@ this.UI = {
 
 			case objName+'-darktheme-changed':
 				this.useDarkTheme();
+				break;
+
+			case 'pageWatch-change':
+				this.checkSessionRestore();
 				break;
 		}
 	},
