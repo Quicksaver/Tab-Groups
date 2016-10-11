@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.48
+// VERSION 1.3.49
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -475,12 +475,15 @@ this.UI = {
 			}
 			case 'TabMove':
 				if(!tab.pinned && GroupItems.size) {
-					let activeGroupItem = GroupItems.getActiveGroupItem();
-					if(activeGroupItem) {
+					let groupItem = tab._tabViewTabItem && tab._tabViewTabItem.parent;
+					if(!groupItem) {
+						groupItem = GroupItems.getActiveGroupItem();
+					}
+					if(groupItem) {
 						if(!this.isTabViewVisible() || this._isChangingVisibility) {
-							this.setReorderTabItemsOnShow(activeGroupItem);
+							this.setReorderTabItemsOnShow(groupItem);
 						} else {
-							activeGroupItem.reorderTabItemsBasedOnTabOrder();
+							groupItem.reorderTabItemsBasedOnTabOrder();
 						}
 					}
 				}

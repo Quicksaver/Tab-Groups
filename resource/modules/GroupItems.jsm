@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.9
+// VERSION 1.7.10
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2836,6 +2836,10 @@ this.GroupItems = {
 		let groupItem;
 		if(groupItemId) {
 			groupItem = this.groupItem(groupItemId);
+			//If tabs were moved, we need to make sure we don't override that move afterwards on reordering by tab item order.
+			if(UI._reorderTabItemsOnShow.has(groupItem)) {
+				groupItem.reorderTabItemsBasedOnTabOrder();
+			}
 			groupItem.add(tabItem, { dontSetActive: true });
 			groupItem.reorderTabsBasedOnTabItemOrder();
 		} else {
