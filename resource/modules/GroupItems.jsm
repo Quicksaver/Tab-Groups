@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.8
+// VERSION 1.7.9
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -447,7 +447,7 @@ this.GroupItem.prototype = {
 	},
 
 	// Returns a <Rect> for the groupItem's content area (which doesn't include the title, etc).
-	getContentBounds: function(justTabs) {
+	getContentBounds: function(withTitlebar) {
 		if(this.expanded) {
 			return new Rect(this.expanded.bounds);
 		}
@@ -466,10 +466,9 @@ this.GroupItem.prototype = {
 		// Because it's the first call to getting values from the stylesheet? I dunno...
 		bounds.width -= UICache.groupContentsMargin.x;
 		bounds.height -= UICache.groupContentsMargin.y;
-		bounds.height -= UICache.groupTitlebarHeight;
 
-		if(justTabs && this.isStacked) {
-			// We're just trying to better center the stacked tabs in the group.
+		// Center the tabs in the group itself, and not just the tabs area (as in, include the group's titlebar in these measures).
+		if(!withTitlebar) {
 			bounds.height -= UICache.groupTitlebarHeight;
 		}
 
@@ -1772,7 +1771,7 @@ this.GroupItem.prototype = {
 		}
 
 		let count = this.children.length;
-		let bounds = this.getContentBounds(true);
+		let bounds = this.getContentBounds();
 
 		// Check against our cached values if we need to re-calc anything.
 		let lastArrange = this._lastArrange;

@@ -1124,6 +1124,10 @@ body.single .titlebar .close {
 	display: none;
 }
 
+.groupItem.stackedGroup .titlebar > * {
+	z-index: 9;
+}
+
 body.single .group-options {
 	order: -1;
 }

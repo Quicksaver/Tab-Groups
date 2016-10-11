@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.2
+// VERSION 1.3.3
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -1428,12 +1428,16 @@ this.TabItems = {
 			figure();
 		}
 
-		if(rows == 1) {
-			let point = new Point(tabWidth, bounds.height);
+		if(rows == 1 || overflowing) {
+			let point = new Point(tabWidth, Math.floor(bounds.height / rows));
 			let validSize = this.calcValidSize(point, tileIcons);
-			tabWidth = validSize.x;
-			tabHeight = validSize.y;
-			totalHeight = tabHeight;
+			totalWidth = validSize.x * columns;
+			totalHeight = validSize.y * rows;
+			overflowing = (totalWidth > bounds.width || totalHeight > bounds.height);
+			if(!overflowing) {
+				tabWidth = validSize.x;
+				tabHeight = validSize.y;
+			}
 		}
 
 		let onlyIcons = tileIcons && (tabWidth < TabItems.minTabWidth || tabHeight < TabItems.minTabHeight);
@@ -1443,8 +1447,8 @@ this.TabItems = {
 		let favIconOffset = (!onlyIcons) ? this.getFavIconOffsetForWidth(tabWidth) : 0;
 		let fontSize = this.getFontSizeFromWidth(tabWidth);
 
-		tabWidth = Math.floor(tabWidth) - (tabPadding *2);
-		tabHeight = Math.floor(tabHeight) - (tabPadding *2);
+		tabWidth -= tabPadding *2;
+		tabHeight -= tabPadding *2;
 
 		return { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, favIconSize, favIconOffset, columns, rows, overflowing };
 	},

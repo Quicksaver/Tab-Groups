@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.46
+// VERSION 1.3.47
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -385,7 +385,7 @@ this.UI = {
 									break;
 								}
 							}
-							else if(node.classList.contains('expandedTray')) {
+							else if(node.classList && node.classList.contains('expandedTray')) {
 								group = node._groupItem;
 								break;
 							}
@@ -1000,7 +1000,7 @@ this.UI = {
 		if(!tabItem) { return; }
 
 		// There's no need to do anything, the active tab item is already visible for sure.
-		if(!tabItem.parent.overflowing) { return; }
+		if(!tabItem.parent.overflowing && !tabItem.parent.noThumbs) { return; }
 
 		tabItem.container.scrollIntoView();
 	},
