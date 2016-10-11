@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.12
+// VERSION 1.1.13
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -725,7 +725,7 @@ this.TabView = {
 		let btn = this.button;
 		if(!btn) { return; }
 
-		this.getGroupTitleForButton(inCustomize).then((title) => {
+		this.getGroupTitleForButton().then((title) => {
 			// In customize mode, the label is always the original.
 			if(title && !inCustomize) {
 				// Keep a backup of the label in case we need to revert it later.
