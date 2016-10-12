@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.13
+// VERSION 1.1.14
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -74,6 +74,9 @@ this.TabView = {
 
 				this._isFrameLoading = false;
 				this._window = this._iframe.contentWindow;
+
+				Listeners.add(this._window, 'tabviewshown', this);
+				Listeners.add(this._window, 'tabviewhidden', this);
 
 				Tabs.unlisten("TabShow", this);
 				Tabs.unlisten("TabClose", this);
@@ -279,9 +282,6 @@ this.TabView = {
 		}, Piggyback.MODE_BEFORE);
 
 		if(gTaskbarTabGroup) {
-			Listeners.add(window, 'tabviewshown', this);
-			Listeners.add(window, 'tabviewhidden', this);
-
 			Piggyback.add('TabView', gTaskbarTabGroup, 'newTab', function(tab) {
 				// Only add tabs to the taskbar preview area if they belong to the current group.
 				return !tab.hidden;
@@ -314,9 +314,6 @@ this.TabView = {
 		if(gTaskbarTabGroup) {
 			Piggyback.revert('TabView', gTaskbarTabGroup, 'newTab');
 			Piggyback.revert('TabView', gTaskbarTabGroup, 'removeTab');
-
-			Listeners.remove(window, 'tabviewshown', this);
-			Listeners.remove(window, 'tabviewhidden', this);
 		}
 
 		PageThumbs.removeExpirationFilter(this);
@@ -397,6 +394,8 @@ this.TabView = {
 		this.hide(true);
 
 		Listeners.remove(this._window, "tabviewframeinitialized", this);
+		Listeners.remove(this._window, 'tabviewshown', this);
+		Listeners.remove(this._window, 'tabviewhidden', this);
 		Listeners.remove(this._iframe, "DOMContentLoaded", this);
 
 		if(this._initialized) {
