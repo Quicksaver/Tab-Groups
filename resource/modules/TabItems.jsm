@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.5
+// VERSION 1.3.6
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -341,8 +341,14 @@ this.TabItem.prototype = {
 				}
 				groupItem.add(this);
 
+				// Mark this tab as active if it's currently selected.
+				if(!Tabs.selected.pinned && groupItem == GroupItems.getActiveGroupItem()) {
+					if(this.tab == Tabs.selected) {
+						groupItem.setActiveTab(this);
+					}
+				}
 				// restore the active tab for each group between browser sessions
-				if(tabData.active) {
+				else if(tabData.active) {
 					groupItem.setActiveTab(this);
 				}
 
