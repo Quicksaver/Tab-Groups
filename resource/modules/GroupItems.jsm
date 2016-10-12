@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.10
+// VERSION 1.7.11
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -899,7 +899,7 @@ this.GroupItem.prototype = {
 				this.lastMouseDownTarget = null;
 
 				let originalTarget = e.explicitOriginalTarget;
-				if(originalTarget
+				if(originalTarget && originalTarget.classList
 				&& (	originalTarget.classList.contains("close")
 					|| originalTarget.classList.contains("group-options")
 					|| originalTarget.classList.contains("group-audio")
@@ -919,7 +919,7 @@ this.GroupItem.prototype = {
 
 			case 'dragover':
 				// Obviously only need scroll when dragging and if there's something to actually scroll.
-				if(DraggingTab && this.overflowing) {
+				if(DraggingTab && (this.overflowing || this.noThumbs)) {
 					UI.scrollAreaWhileDragging(e, this.tabContainer);
 				}
 				else if(DraggingGroupSelector && e.target == this.selector) {
