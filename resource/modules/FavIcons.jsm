@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.0
+// VERSION 1.1.1
 
 this.FavIcons = {
 	waiting: new Set(),
@@ -283,7 +283,7 @@ this.FavIcons = {
 				if(deferred.color === null) {
 					deferred.reject();
 					for(let i = 0; i < this._iconsNeedingColor.length; i++) {
-						if(this._iconsNeedingColor[i] == iconUrl) { LOG('ok');
+						if(this._iconsNeedingColor[i] == iconUrl) {
 							this._iconsNeedingColor.splice(i, 1);
 							break;
 						}

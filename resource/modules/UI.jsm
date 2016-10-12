@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.49
+// VERSION 1.3.50
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -43,7 +43,7 @@ this.Synthesizer = {
 					if(el.scrollLeft == el.scrollLeftMax) { return; }
 					let fullWidth = (el.clientWidth + el.scrollLeft);
 					let partial = fullWidth % UICache.groupSelectorSize;
-					shift = UICache.groupSelectorSize - partial; console.log({ LTR, delta, max: el.scrollLeftMax, min: el.scrollLeftMin, width: el.clientWidth, scroll: el.scrollLeft, fullWidth, partial, shift });
+					shift = UICache.groupSelectorSize - partial;
 				}
 				else {
 					if(el.scrollLeft == el.scrollLeftMin) { return; }
@@ -51,7 +51,7 @@ this.Synthesizer = {
 					let partial = fullWidth % UICache.groupSelectorSize;
 					if(partial) {
 						shift = partial;
-					} console.log({ LTR, delta, max: el.scrollLeftMax, min: el.scrollLeftMin, width: el.clientWidth, scroll: el.scrollLeft, fullWidth, partial, shift });
+					}
 				}
 			}
 			else {
@@ -59,7 +59,7 @@ this.Synthesizer = {
 					if(el.scrollLeft == el.scrollLeftMin) { return; }
 					let fullWidth = (el.clientWidth - el.scrollLeft);
 					let partial = fullWidth % UICache.groupSelectorSize;
-					shift = UICache.groupSelectorSize - partial; console.log({ LTR, delta, max: el.scrollLeftMax, min: el.scrollLeftMin, width: el.clientWidth, scroll: el.scrollLeft, fullWidth, partial, shift });
+					shift = UICache.groupSelectorSize - partial;
 				}
 				else {
 					if(el.scrollLeft == el.scrollLeftMax) { return; }
@@ -67,7 +67,7 @@ this.Synthesizer = {
 					let partial = fullWidth % UICache.groupSelectorSize;
 					if(partial) {
 						shift = partial;
-					} console.log({ LTR, delta, max: el.scrollLeftMax, min: el.scrollLeftMin, width: el.clientWidth, scroll: el.scrollLeft, fullWidth, partial, shift });
+					}
 				}
 				delta = 0 - delta;
 			}
