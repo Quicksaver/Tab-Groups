@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.16
+// VERSION 1.1.17
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -78,8 +78,9 @@ this.TabView = {
 				Listeners.add(this._window, 'tabviewshown', this);
 				Listeners.add(this._window, 'tabviewhidden', this);
 
-				Tabs.unlisten("TabShow", this);
+				// We don't need these anymore.
 				Tabs.unlisten("TabClose", this);
+				Tabs.unlisten("TabSelect", this);
 
 				// Close the active group if it's empty and we got here by closing its last tab.
 				// Do this before actually showing TabView, so it's less confusing for the user, and easier on the browser as well.
@@ -97,6 +98,19 @@ this.TabView = {
 			case 'TabClose':
 				if(!this._window && !Tabs.visible.length) {
 					this.onCloseLastTab(e.target);
+				}
+				break;
+
+			case 'TabSelect':
+				// The user just somehow brought up a hidden tab, which means it's a tab from another group.
+				// We need to initialize the TabView frame, so that we can switch groups.
+				if(!this._window && e.target.__hidden) {
+					this._initFrame(() => {
+						// This is an async process, is it still the selected tab?
+						if(e.target != Tabs.selected) { return; }
+
+						this._window[objName].UI.onTabSelect(e.target);
+					});
 				}
 				break;
 
@@ -227,6 +241,7 @@ this.TabView = {
 		Listeners.add($('tabContextMenu'), "popupshowing", this);
 		Listeners.add(this.groupContextMenu, "popuphidden", this);
 		Tabs.listen("TabClose", this);
+		Tabs.listen("TabSelect", this);
 		Observers.add(this, objName+'-set-groups-defaults');
 
 		// Check if we should initialize the quick access panel, there's no point in doing it if it will never be used.
@@ -296,6 +311,12 @@ this.TabView = {
 			this.updateAeroPeek();
 		}
 
+		// Opening and closing tabs should only happen in the currently active group.
+		// But it's possible to select directly a hidden tab, through a Switch-to-tab action in the location bar for instance.
+		// We need to know which tabs are hidden after they've been selected (and thus unhidden), because only the TabView frame
+		// can switch groups properly in this case, and that isn't initialized at startup.
+		this.markHiddenTabs();
+
 		this._initialized = true;
 
 		// When updating from a 1.0.* version while tab view is visible, it wouldn't successfully hide it before deinitializing it.
@@ -336,7 +357,13 @@ this.TabView = {
 		Listeners.remove($('tabContextMenu'), "popupshowing", this);
 		Listeners.remove(this.groupContextMenu, "popuphidden", this);
 		Tabs.unlisten("TabClose", this);
+		Tabs.unlisten("TabSelect", this);
 		Observers.remove(this, objName+'-set-groups-defaults');
+
+		let tabs = Tabs.all;
+		for(let tab of tabs) {
+			delete tab.__hidden;
+		}
 
 		this._initialized = false;
 		this._deinitFrame();
@@ -379,9 +406,6 @@ this.TabView = {
 
 		this._iframe.setAttribute("src", "chrome://"+objPathString+"/content/tabview.xhtml");
 		this._deck.appendChild(this._iframe);
-
-		// We don't need this anymore.
-		Tabs.unlisten("TabClose", this);
 	},
 
 	_deinitFrame: function() {
@@ -398,9 +422,14 @@ this.TabView = {
 		Listeners.remove(this._window, 'tabviewhidden', this);
 		Listeners.remove(this._iframe, "DOMContentLoaded", this);
 
+		// We need this again.
 		if(this._initialized) {
-			Tabs.listen("TabShow", this);
 			Tabs.listen("TabClose", this);
+			Tabs.listen("TabSelect", this);
+
+			// The TabView frame can no longer properly switch groups when selecting hidden tabs (from other groups),
+			// so we need to make sure we handle those cases again.
+			this.markHiddenTabs();
 		}
 
 		this._deck = null;
@@ -414,9 +443,6 @@ this.TabView = {
 			this._iframe.remove();
 			this._iframe = null;
 		}
-
-		// We need this again.
-		Tabs.listen("TabClose", this);
 	},
 
 	isVisible: function() {
@@ -650,6 +676,14 @@ this.TabView = {
 	afterUndoCloseTab: function() {
 		if(this._window) {
 			this._window[objName].UI.restoredClosedTab = false;
+		}
+	},
+
+	// Marks tabs currently hidden, so that a TabSelect handler can still react appropriately to a new selected tab that was just un-hidden.
+	markHiddenTabs: function() {
+		let tabs = Tabs.all;
+		for(let tab of tabs) {
+			tab.__hidden = tab.hidden;
 		}
 	},
 
