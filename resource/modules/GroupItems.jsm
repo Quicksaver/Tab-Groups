@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.11
+// VERSION 1.7.12
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -28,6 +28,7 @@ this.GroupItem = function(listOfEls, options = {}) {
 	this.overflowing = false;
 	this.expanded = null;
 	this.hidden = false;
+	this.closing = false;
 	this.stale = 0;
 	this.childHandling = false;
 	this.fadeAwayUndoButtonDelay = 15000;
@@ -1084,6 +1085,7 @@ this.GroupItem.prototype = {
 	_unhide: function(options = {}) {
 		this._cancelFadeAwayUndoButtonTimer();
 		this.hidden = false;
+		this.closing = false;
 		this.destroyUndoButton();
 		this.setTrenches(this.bounds);
 
@@ -1154,6 +1156,8 @@ this.GroupItem.prototype = {
 	// Returns true if the groupItem has been closed, or false otherwise.
 	// A group could not have been closed due to a tab with an onUnload handler (that waits for user interaction).
 	tryToClose: function(options) {
+		this.closing = true;
+
 		// when "TabClose" event is fired, the browser tab is about to close and our item "close" event is fired. And then, the browser tab gets closed.
 		// In other words, the group "close" event is fired before all browser tabs in the group are closed.
 		// The below code would fire the group "close" event only after all browser tabs in that group are closed.
@@ -1495,12 +1499,6 @@ this.GroupItem.prototype = {
 			// if a blank tab is selected while restoring a tab the blank tab gets removed. we need to keep the group alive for the restored tab.
 			if(item.isRemovedAfterRestore) {
 				options.dontClose = true;
-			}
-
-			// If we just closed the active and last visible tab in the tab-bar.
-			// create and select a placeholder tab to prevent other tabs from being loaded unnecessarily.
-			if(UI._frameInitialized && !this.children.length && !Tabs.numPinned) {
-				gTabView.onCloseLastTab();
 			}
 
 			let closed = !options.dontClose && this.closeIfEmpty();

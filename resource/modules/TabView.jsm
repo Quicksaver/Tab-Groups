@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.15
+// VERSION 1.1.16
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -598,7 +598,13 @@ this.TabView = {
 		// giving the user a choise to keep using the same group.
 		// But if we're closing that new tab (really, any about:newtab or equivalent), we go into groups view.
 		let newTabUrl = Prefs.url || window.BROWSER_NEW_TAB_URL;
-		if(!tab || tab.linkedBrowser.currentURI.spec == newTabUrl) {
+		let openPlaceholder = !tab || tab.linkedBrowser.currentURI.spec == newTabUrl;
+		if(!openPlaceholder) {
+			// Skip opening a new tab and open the placeholder and show tab view if we're sure the active group is closing.
+			let activeGroup = this._window[objName].GroupItems.getActiveGroupItem();
+			openPlaceholder = activeGroup && activeGroup.closing;
+		}
+		if(openPlaceholder) {
 			// So that listeners inside TabView catch at the time the tab is opened but before it's assigned to our property here,
 			// as would happen when TabView is already initialized (the callback is synchronous).
 			this._closedLastVisibleTab = true;

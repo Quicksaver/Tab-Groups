@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.4
+// VERSION 1.3.5
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -1050,6 +1050,12 @@ this.TabItems = {
 		try {
 			let tabItem = tab._tabViewTabItem;
 			if(!tabItem) { return; }
+
+			// If we just closed the active and last visible tab in the tab-bar.
+			// create and select a placeholder tab to prevent other tabs from being loaded unnecessarily.
+			if(UI._frameInitialized && !Tabs.visible.length) {
+				gTabView.onCloseLastTab();
+			}
 
 			this.unregister(tabItem);
 			tabItem._sendToSubscribers("close", tabItem);
