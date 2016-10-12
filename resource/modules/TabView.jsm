@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.14
+// VERSION 1.1.15
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -824,6 +824,7 @@ Modules.LOADMODULE = function() {
 	Prefs.setDefaults({ url: defaultValue }, 'newtab', 'browser');
 
 	Modules.load('AllTabs');
+	Modules.load('compatibilityFix/windowFixes');
 	Modules.load('CatchRules');
 	Overlays.overlayWindow(window, 'TabView', TabView);
 };
@@ -832,6 +833,7 @@ Modules.UNLOADMODULE = function() {
 	Overlays.removeOverlayWindow(window, 'TabView');
 	Modules.unload('CatchRules');
 	Modules.unload('AllTabs');
+	Modules.unload('compatibilityFix/windowFixes');
 
 	delete window.TabView;
 };
