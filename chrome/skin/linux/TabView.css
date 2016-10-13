@@ -14,3 +14,40 @@
 	padding: 2px 6px;
 	max-width: 32px;
 }
+
+/* the button showing the current group's label needs some
+   help with adapting a similar style to icon based buttons */
+
+:-moz-any(#TabsToolbar, #nav-bar) #tabGroups-tabview-button.toolbarbutton-1[showGroupTitle] > .toolbarbutton-text {
+	height: 24px;
+	margin-inline-end: 0;
+	padding: 2px 6px;
+	border: 1px solid transparent;
+	border-radius: 2px;
+	transition-property: background-color, border-color;
+	transition-duration: 150ms;
+}
+
+#TabsToolbar #tabGroups-tabview-button[showGroupTitle] {
+	color: inherit;
+}
+
+:-moz-any(#TabsToolbar, #nav-bar) #tabGroups-tabview-button.toolbarbutton-1[showGroupTitle]:not([disabled=true]):hover > .toolbarbutton-text {
+	background: var(--toolbarbutton-hover-background);
+	background-clip: padding-box;
+	border-color: var(--toolbarbutton-hover-bordercolor);
+	box-shadow: var(--toolbarbutton-hover-boxshadow);
+}
+
+:-moz-any(#TabsToolbar, #nav-bar) #tabGroups-tabview-button.toolbarbutton-1[showGroupTitle]:not([disabled=true]):-moz-any([open],[checked],:hover:active) > .toolbarbutton-text {
+	background: var(--toolbarbutton-active-background);
+	background-clip: padding-box;
+	border-color: var(--toolbarbutton-active-bordercolor);
+	box-shadow: var(--toolbarbutton-active-boxshadow);
+	transition-duration: 10ms;
+}
+
+:-moz-any(#TabsToolbar, #nav-bar) #tabGroups-tabview-button.toolbarbutton-1[showGroupTitle][checked]:not(:active):hover > .toolbarbutton-text {
+	background-color: var(--toolbarbutton-checkedhover-backgroundcolor);
+	transition: background-color 150ms;
+}
