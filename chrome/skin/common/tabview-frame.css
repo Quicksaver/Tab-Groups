@@ -1473,7 +1473,12 @@ body.DraggingGroup .groupItem.dragOver .tab:not(.stacked):not(.onlyIcons) .favic
 }
 
 .groupItem:not(.thumbing) .tab:not(.stacked).focus,
-.expandedTray .tab.focus {
+.expandedTray .tab.focus,
+#actions input.appTabIcon.activeAppTab,
+body.classic #classicbutton,
+body.grid #gridbutton,
+body.single #singlebutton,
+body[searching] #searchbutton {
 	box-shadow: inset 0 0 0 1px var(--group-active-border-color);
 }
 
