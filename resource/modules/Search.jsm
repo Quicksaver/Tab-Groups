@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.1.1
+// VERSION 2.1.2
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -385,7 +385,7 @@ this.Search = {
 		if(UI.isTextField(e.target)) { return; }
 
 		// Don't start a search if a group's options dialog is already shown.
-		if(GroupOptionsUI.activeGroup) { return; }
+		if(GroupOptionsUI.activeOptions) { return; }
 
 		// / is used to activate the search feature so the key shouldn't be entered into the search box.
 		if(e.key == "\\") {
