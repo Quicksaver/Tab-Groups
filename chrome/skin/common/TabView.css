@@ -40,3 +40,8 @@ toolbar[brighttext] #tabGroups-tabview-button {
 #tabGroups-tabview-button[showGroupTitle][cui-areatype="toolbar"]:not([overflowedItem="true"]) > .toolbarbutton-icon {
 	display: none;
 }
+
+/* Compatibility with Tree Style Tab, make sure the button's text is visible with all themes */
+#TabsToolbar[treestyletab-mode]:not([treestyletab-tabbar-position="top"]) #tabGroups-tabview-button[showGroupTitle] {
+	color: var(--tst-tab-text) !important;
+}
