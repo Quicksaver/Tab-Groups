@@ -1276,6 +1276,10 @@ body:not(.single) .activeGroupItem .tab-counter {
 	opacity: 1;
 }
 
+html.thumbing .banner {
+	display: none;
+}
+
 #sessionRestoreNotice {
 	opacity: 1;
 	background-image: linear-gradient(#ffe13e, #ffc703);
