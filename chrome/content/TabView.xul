@@ -71,7 +71,7 @@
 
 	<menupopup id="alltabs-popup">
 		<menuitem id="objName-menu_tabview"
-			class="menuitem-iconic"
+			class="menuitem-iconic objName-icon"
 			key="objName-key_tabview"
 			label="&viewTabGroups.label;"
 			accesskey="&viewTabGroups.accesskey;"

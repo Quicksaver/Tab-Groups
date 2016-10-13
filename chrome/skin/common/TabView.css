@@ -9,12 +9,6 @@
 	max-width: 32em;
 }
 
-/* tabview menu item */
-
-#tabGroups-menu_tabview {
-	list-style-image: url(chrome://tabgroups-os/skin/tabview.png);
-}
-
 /* tabview toolbar button */
 
 .tabGroups-icon {
