@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.3
+// VERSION 1.7.4
 Modules.UTILS = true;
 
 // Keysets - handles editable keysets for the add-on
@@ -298,7 +298,9 @@ this.Keysets = {
 	// array of methods/occasions where a key could be reported as in/valid by mistake because it belongs to an add-on that hasn't been initialized yet
 	delayedOtherKeys: [
 		// Tile Tabs Function keys
-		function(aKey) { return aKey.id.startsWith('tiletabs-fkey-') && !aKey.hasModifiers; }
+		function(aKey) { return aKey.id.startsWith('tiletabs-fkey-') && !aKey.hasModifiers; },
+		// Tab Mix Plus keys that depend on its Session Manager settings finishing initializing
+		function(aKey) { return (aKey.id == 'key_tm-sm-saveone' || aKey.id == 'key_tm-sm-saveall') && (!pageWatch.initialized || !Prefs["sessions.manager"]); }
 	],
 
 	_flushing: new Set(),
