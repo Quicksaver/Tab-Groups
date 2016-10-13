@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.50
+// VERSION 1.3.51
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -596,6 +596,7 @@ this.UI = {
 
 			// Some things depend on the different FF versions.
 			toggleAttribute(document.body, 'FF48', Services.vc.compare(Services.appinfo.version, "48.0a1") >= 0);
+			toggleAttribute(document.body, 'FF50', Services.vc.compare(Services.appinfo.version, "50.0a1") >= 0);
 
 			// Try to adapt to different lwthemes.
 			Watchers.addAttributeWatcher(gWindow.document.documentElement, 'lwtheme', this, false, false);

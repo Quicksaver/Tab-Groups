@@ -485,6 +485,18 @@ body[FF48] .appTabIcon[busy][progress] {
 	background-image: url("chrome://global/skin/icons/loading.png");
 }
 
+@media (min-resolution: 1.1dppx) {
+	body[FF50] .tab[busy]:not([progress]) .throbber,
+	body[FF50] .appTabIcon[busy]:not([progress]) {
+		background-image: url("chrome://browser/skin/tabbrowser/connecting@2x.png");
+	}
+
+	body[FF50] .tab[busy][progress] .throbber,
+	body[FF50] .appTabIcon[busy][progress] {
+		background-image: url("chrome://global/skin/icons/loading@2x.png");
+	}
+}
+
 .tab-controls {
 	position: absolute;
 }
