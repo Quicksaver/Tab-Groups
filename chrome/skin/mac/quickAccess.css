@@ -9,7 +9,7 @@
 		background-image: url("chrome://browser/skin/tabbrowser/loading@2x.png");
 	}
 
-	.tabGroups-quickaccess[FF48] .loading {
+	.tabGroups-quickaccess[FF48]:not([FF50]) .loading {
 		background-image: url("chrome://global/skin/icons/loading@2x.png");
 	}
 }

@@ -30,6 +30,12 @@
 	background-image: url("chrome://global/skin/icons/loading.png");
 }
 
+@media (min-resolution: 1.1dppx) {
+	.tabGroups-quickaccess[FF50] .loading {
+		background-image: url("chrome://global/skin/icons/loading@2x.png");
+	}
+}
+
 .quickaccess-contents toolbarbutton,
 .quickaccess-button {
 	-moz-appearance: none;

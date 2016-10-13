@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.6
+// VERSION 1.0.7
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -488,6 +488,8 @@ this.quickAccess = {
 	onLoad: function() {
 		toggleAttribute(this.panel, 'FF48', Services.vc.compare(Services.appinfo.version, "48.0a1") >= 0);
 		toggleAttribute(this.view, 'FF48', Services.vc.compare(Services.appinfo.version, "48.0a1") >= 0);
+		toggleAttribute(this.panel, 'FF50', Services.vc.compare(Services.appinfo.version, "50.0a1") >= 0);
+		toggleAttribute(this.view, 'FF50', Services.vc.compare(Services.appinfo.version, "50.0a1") >= 0);
 
 		Listeners.add(this.panel, 'popupshowing', this);
 		Listeners.add(this.panel, 'popupshown', this);
@@ -511,6 +513,8 @@ this.quickAccess = {
 
 		removeAttribute(this.panel, 'FF48');
 		removeAttribute(this.view, 'FF48');
+		removeAttribute(this.panel, 'FF50');
+		removeAttribute(this.view, 'FF50');
 	}
 };
 
