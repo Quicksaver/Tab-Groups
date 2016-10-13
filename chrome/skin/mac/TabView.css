@@ -41,3 +41,8 @@
 	max-width: 18px;
 	margin: 0;
 }
+
+/* Tweak needed so the button label adapts to an appropriate height. */
+#tabGroups-tabview-button .toolbarbutton-text {
+	max-height: 1em;
+}
