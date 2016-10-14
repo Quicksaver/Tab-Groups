@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.51
+// VERSION 1.3.52
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -552,6 +552,10 @@ this.UI = {
 					case 'showTabCounter':
 						document.body.classList[(Prefs.showTabCounter) ? 'add' : 'remove']('showTabCounter');
 						break;
+
+					case 'forceBrightText':
+						this.attrWatcher();
+						break;
 				}
 				break;
 
@@ -575,7 +579,7 @@ this.UI = {
 	},
 
 	attrWatcher(obj, attr) {
-		let lwtheme = (!gWindow.DevEdition || !gWindow.DevEdition.isThemeCurrentlyApplied) && trueAttribute(gWindow.document.documentElement, 'lwtheme');
+		let lwtheme = !Prefs.forceBrightText && (!gWindow.DevEdition || !gWindow.DevEdition.isThemeCurrentlyApplied) && trueAttribute(gWindow.document.documentElement, 'lwtheme');
 		toggleAttribute(document.body, 'lwtheme', lwtheme);
 		toggleAttribute(this.groupSelector, 'brighttext', lwtheme && trueAttribute(gWindow[objName].$('nav-bar'), 'brighttext'));
 	},
@@ -601,6 +605,7 @@ this.UI = {
 			// Try to adapt to different lwthemes.
 			Watchers.addAttributeWatcher(gWindow.document.documentElement, 'lwtheme', this, false, false);
 			Watchers.addAttributeWatcher(gWindow[objName].$('nav-bar'), 'brighttext', this, false, false);
+			Prefs.listen('forceBrightText', this);
 			this.attrWatcher();
 
 			Observers.add(this, objName+'-darktheme-changed');
@@ -740,6 +745,7 @@ this.UI = {
 
 		Watchers.removeAttributeWatcher(gWindow.document.documentElement, 'lwtheme', this, false, false);
 		Watchers.removeAttributeWatcher(gWindow[objName].$('nav-bar'), 'brighttext', this, false, false);
+		Prefs.unlisten('forceBrightText', this);
 
 		Observers.remove(this, objName+'-darktheme-changed');
 

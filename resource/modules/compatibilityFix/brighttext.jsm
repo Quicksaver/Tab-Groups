@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.3
+// VERSION 1.1.4
 
 // TODO: create/adapt an actual native dark style, rather than reuse FT DeepDark's one.
 
@@ -51,10 +51,12 @@ this.brightText = {
 		// The user can choose to force a theme on the frame.
 		switch(Prefs.forceBrightText) {
 			case 1:
+				Styles.unload('brightText');
 				this.unload();
 				break;
 
 			case 2:
+				Styles.unload('brightText');
 				this.load();
 				break;
 
