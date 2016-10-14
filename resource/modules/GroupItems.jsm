@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.13
+// VERSION 1.7.14
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1141,21 +1141,20 @@ this.GroupItem.prototype = {
 			}
 		}
 
-		let closed = this.tryToClose();
+		let immediately = !UI.isTabViewVisible();
+		let closed = this.tryToClose(immediately);
 		if(!closed && createdGroup) {
 			// Remove the new group, if this group is no longer closed.
-			createdGroup.tryToClose({ immediately: true });
+			createdGroup.tryToClose();
 		}
 	},
 
 	// Close all tabs linked to children (tabItems), removes all children and close the groupItem.
 	// Parameters:
-	//   options - An object with optional settings for this call.
-	// Options:
-	//   immediately - (bool) if true, no animation will be used
+	//   immediately - (bool) if true, no animation will be used; defaults to true if not provided
 	// Returns true if the groupItem has been closed, or false otherwise.
 	// A group could not have been closed due to a tab with an onUnload handler (that waits for user interaction).
-	tryToClose: function(options) {
+	tryToClose: function(immediately = true) {
 		this.closing = true;
 
 		// when "TabClose" event is fired, the browser tab is about to close and our item "close" event is fired. And then, the browser tab gets closed.
@@ -1180,7 +1179,7 @@ this.GroupItem.prototype = {
 			}
 			return false;
 		} else {
-			this.close(options);
+			this.close({ immediately });
 			return true;
 		}
 	},
