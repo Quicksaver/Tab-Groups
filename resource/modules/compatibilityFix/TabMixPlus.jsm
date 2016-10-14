@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 // We try to use the styling defined in TMP's prefs in groups view as well.
 
@@ -146,8 +146,8 @@ this.TabMixPlus = {
 				}\n\
 				.tab-container:not(.noThumbs) .tab:not(.stacked):-moz-any('+bothSelectors+') .favicon {\n\
 					position: relative;\n\
-					top: 0;\n\
-					left: 0;\n\
+					top: 0 !important;\n\
+					left: 0 !important;\n\
 				}\n\
 			}';
 

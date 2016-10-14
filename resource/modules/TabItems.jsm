@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.6
+// VERSION 1.3.7
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -50,7 +50,9 @@ this.TabItem = function(tab, options = {}) {
 	this.container.addEventListener('dragstart', this, true);
 	this.container.addEventListener('dragover', this);
 	this.container.addEventListener('dragenter', this);
-	Watchers.addAttributeWatcher(this.tab, [ "busy", "progress", "soundplaying", "muted", "pending", "tabmix_pending", "tabmix_tabState" ], this, false, false);
+	Watchers.addAttributeWatcher(this.tab, [
+		"busy", "progress", "soundplaying", "muted", "pending", "tabmix_pending", "tabmix_tabState", "protected"
+	], this, false, false);
 
 	TabItems.register(this);
 
@@ -305,7 +307,8 @@ this.TabItem.prototype = {
 			case "pending":
 			case "tabmix_pending":
 			case "tabmix_tabState":
-				this.updatePending();
+			case "protected":
+				this.updateAttributes();
 				break;
 		}
 	},
@@ -373,7 +376,7 @@ this.TabItem.prototype = {
 
 		this.updateThrobber();
 		this.updateAudio();
-		this.updatePending();
+		this.updateAttributes();
 
 		this._reconnected = true;
 		this.save();
@@ -678,9 +681,10 @@ this.TabItem.prototype = {
 		}
 	},
 
-	updatePending: function() {
+	updateAttributes: function() {
 		toggleAttribute(this.container, "pending", this.tab.hasAttribute("pending") || this.tab.hasAttribute("tabmix_pending"));
 		toggleAttribute(this.container, "unread", this.tab.getAttribute("tabmix_tabState") == "unread");
+		toggleAttribute(this.container, "protected", this.tab.hasAttribute("protected"));
 	},
 
 	// Updates the tabitem's canvas.

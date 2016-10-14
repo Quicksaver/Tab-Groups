@@ -560,6 +560,11 @@ body[FF48] .appTabIcon[busy][progress] {
 	opacity: 0;
 }
 
+/* "protected" tabs from Tab Mix Plus can't be closed */
+.tab[protected] .close {
+	display: none;
+}
+
 /* Tab GroupItem */
 
 .groupItem,
