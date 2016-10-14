@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.12
+// VERSION 1.7.13
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1174,10 +1174,10 @@ this.GroupItem.prototype = {
 		}
 
 		if(this.children.length) {
+			this.closing = false;
 			if(this.hidden && !this.clickUndoButton()) {
 				this._unhide();
 			}
-
 			return false;
 		} else {
 			this.close(options);
