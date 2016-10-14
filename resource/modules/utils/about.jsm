@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.3
+// VERSION 1.2.4
 
 this.about = {
 	kNS: 'http://www.w3.org/1999/xhtml',
@@ -31,6 +31,9 @@ this.about = {
 	handleEvent: function(e) {
 		switch(e.type) {
 			case 'click':
+				// Clicking a "#" anchor seems to "reset" the page's location (FF51+), which in turn changes panes because of the categories handlers.
+				e.preventDefault();
+
 				switch(e.target) {
 					case this.openAddonsMgrLink:
 						this.openAddonsMgr();
@@ -422,6 +425,9 @@ this.promo = {
 	handleEvent: function(e) {
 		switch(e.type) {
 			case 'click':
+				// Clicking a "#" anchor seems to "reset" the page's location (FF51+), which in turn changes panes because of the categories handlers.
+				e.preventDefault();
+
 				switch(e.target) {
 					// User wants to close this promo, it will not be shown again, but remains visible for now so the user
 					// can decide whether this is just for this promo or for all (possible) future promos.
