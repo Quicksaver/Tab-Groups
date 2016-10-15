@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.2
+// VERSION 1.3.3
 
 // Class: Point - A simple point.
 // If a is a Point, creates a copy of it. Otherwise, expects a to be x, and creates a Point with it along with y.
@@ -346,6 +346,25 @@ this.Utils = {
 	merge: function(first, second) {
 		Array.forEach(second, el => Array.push(first, el));
 		return first;
+	},
+
+	sortReadable: function(a, b) {
+		let ax = [];
+		let bx = [];
+
+		a.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || ""]) });
+		b.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || ""]) });
+
+		while(ax.length && bx.length) {
+			let an = ax.shift();
+			let bn = bx.shift();
+			let nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
+			if(nn) {
+				return nn;
+			}
+		}
+
+		return ax.length - bx.length;
 	}
 };
 

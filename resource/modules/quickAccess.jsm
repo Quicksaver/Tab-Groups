@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.7
+// VERSION 1.0.8
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -298,7 +298,14 @@ this.quickAccess = {
 		}
 
 		let activeTab = TabView._window[objName].UI._currentTab;
-		let tabItems = groupItem.children;
+		let tabItems = groupItem.children.concat();
+
+		// This may need its own pref eventually, but I think it's good behavior to sort tabs in the same way as groups for now.
+		if(Prefs.sortGroupsByName) {
+			tabItems.sort(function(a, b) {
+				return Utils.sortReadable(a.tabTitle.textContent, b.tabTitle.textContent);
+			});
+		}
 		for(let tabItem of tabItems) {
 			this._createTabItem(tabItem, activeTab == tabItem.tab);
 		}

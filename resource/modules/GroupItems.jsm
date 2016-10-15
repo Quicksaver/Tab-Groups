@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.14
+// VERSION 1.7.15
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -3067,22 +3067,7 @@ this.GroupItems = {
 
 		// adapted from an answer found at http://stackoverflow.com/questions/15478954/sort-array-elements-string-with-numbers-natural-sort
 		groups.sort(function(a, b) {
-			let ax = [];
-			let bx = [];
-
-			a._title.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || ""]) });
-			b._title.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || ""]) });
-
-			while(ax.length && bx.length) {
-				let an = ax.shift();
-				let bn = bx.shift();
-				let nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
-				if(nn) {
-					return nn;
-				}
-			}
-
-			return ax.length - bx.length;
+			return Utils.sortReadable(a._title, b._title);
 		});
 
 		for(let groupItem of this) {
