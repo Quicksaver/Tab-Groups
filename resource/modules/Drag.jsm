@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.5.5
+// VERSION 2.5.6
 
 // This will be the GroupDrag object created when a group is dragged or resized.
 this.DraggingGroup = null;
@@ -1039,7 +1039,7 @@ this.TabDrag.prototype = {
 		}
 
 		Listeners.remove(this.container, 'dragend', this);
-		this.item.hidden = false;
+		this.item.hidden = this.item.isStacked && !this.item._inVisibleStack;
 		document.body.classList.remove('DraggingTab');
 
 		DraggingTab = null;
