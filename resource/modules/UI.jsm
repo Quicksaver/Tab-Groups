@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.53
+// VERSION 1.3.54
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -2284,6 +2284,10 @@ this.UICache = {
 
 		this.ghost('tabCanvasOffset', function() {
 			return parseInt(style.getPropertyValue('--canvas-border-width')) *2;
+		});
+
+		this.ghost('groupBorderColor', function() {
+			return style.getPropertyValue('--group-border-color');
 		});
 
 		this.ghost('groupSelectorSize', function() {

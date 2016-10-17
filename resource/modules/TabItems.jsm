@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.9
+// VERSION 1.3.10
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -705,6 +705,13 @@ this.TabItem.prototype = {
 				resolve();
 			});
 		});
+	},
+
+	getCanvasSize: function() {
+		let size = this.parent._lastTabSize;
+		let width = size.tabWidth - UICache.tabCanvasOffset;
+		let height = size.tabHeight - size.lineHeight - UICache.tabCanvasOffset;
+		return new Point(width, height);
 	},
 
 	// Turns the canvas into an image and shows that instead.
@@ -1529,10 +1536,7 @@ this.TabCanvas = function(tabItem) {
 
 this.TabCanvas.prototype = {
 	getSize: function() {
-		let size = this.tabItem.parent._lastTabSize;
-		let width = size.tabWidth - UICache.tabCanvasOffset;
-		let height = size.tabHeight - size.lineHeight - UICache.tabCanvasOffset;
-		return new Point(width, height);
+		return this.tabItem.getCanvasSize();
 	},
 
 	persist(aBrowser, forceStale) {

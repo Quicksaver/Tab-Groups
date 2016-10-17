@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.16
+// VERSION 1.7.17
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2053,25 +2053,89 @@ this.GroupItem.prototype = {
 		bounds.height -= UICache.groupTitlebarHeight;
 
 		// Keep the same aspect ratio in the canvas from the group dimensions, to avoid distortion.
-		let w = UICache.groupSelectorCanvasSize;
-		let h = UICache.groupSelectorCanvasSize;
+		let width = UICache.groupSelectorCanvasSize;
+		let height = UICache.groupSelectorCanvasSize;
 		let ratio = bounds.width / bounds.height;
 		if(ratio > 1) {
-			h /= ratio;
+			height /= ratio;
 		} else {
-			w *= ratio;
+			width *= ratio;
 		}
+		let xScale = width / bounds.width;
+		let yScale = height / bounds.height;
 
-		canvas.width = w;
-		canvas.height = h;
+		canvas.width = width;
+		canvas.height = height;
 
 		document.documentElement.classList.add('thumbing');
 		this.container.classList.add('thumbing');
 
 		let ctx = canvas.getContext('2d');
-		ctx.clearRect(0, 0, w, h);
-		ctx.scale(w / bounds.width, h / bounds.height);
+		ctx.clearRect(0, 0, width, height);
+		ctx.scale(xScale, yScale);
 		ctx.drawWindow(window, bounds.realLeft, bounds.realTop, bounds.width, bounds.height, 'rgb(255,255,255)');
+
+		// Try to draw the tab thumbnail borders, so that they better delimit the tabs (makes them pretty).
+		if(!this.stale && this.children.length && this._lastTabSize) {
+			ctx.strokeStyle = UICache.groupBorderColor;
+			ctx.lineWidth = 1;
+
+			// We want clear, crisp lines around the borders, so we can't scale down the lines as before.
+			ctx.scale(1/xScale, 1/yScale);
+
+			let tabWidth = this._lastTabSize.tabWidth + (this._lastTabSize.tabPadding *2);
+			let tabHeight = this._lastTabSize.tabHeight + (this._lastTabSize.tabPadding *2);
+
+			// We want the borders dimensions, which don't count in the canvas size.
+			let thumbSize = this.children[0].getCanvasSize();
+			let w = thumbSize.x + UICache.tabCanvasOffset;
+			let h = thumbSize.y + UICache.tabCanvasOffset;
+			w = Math.round(w * xScale);
+			h = Math.round(h * yScale);
+
+			let i = 0;
+			let row = 0;
+			let column = 0;
+
+			while(row < this._lastTabSize.rows) {
+				let yh = h;
+				let y = (tabHeight * row) + this._lastTabSize.tabPadding;
+				y = Math.round(y * yScale);
+
+				// Because of how the canvas is actually drawn, 1px lines may not appear as crisp as intended.
+				// In short, lines at odd pixels have to be drawn at half pixels (real screen pixels) to appear crips.
+				// See http://stackoverflow.com/questions/5679295/line-thickness-in-a-canvas-element
+				// This could use some improvement, by somehow adapting to the zoom factor (window.devicePixelRatio),
+				// which can cause some borders become blurry.
+				if(yh %2) {
+					yh -= 0.5;
+				}
+				y += 0.5;
+
+				while(i < this.children.length && column < this._lastTabSize.columns) {
+					let xw = w;
+					let x = (tabWidth * column);
+					if(RTL) {
+						x = bounds.width - x - tabWidth;
+					}
+					x += this._lastTabSize.tabPadding;
+					x = Math.round(x * xScale);
+
+					if(xw %2) {
+						xw -= 0.5;
+					}
+					x += 0.5;
+
+					ctx.strokeRect(x, y, xw, yh);
+
+					i++;
+					column++;
+				}
+
+				row++;
+				column = 0;
+			}
+		}
 
 		document.documentElement.classList.remove('thumbing');
 		this.container.classList.remove('thumbing');
