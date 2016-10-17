@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 // We try to use the styling defined in TMP's prefs in groups view as well.
 
@@ -56,6 +56,8 @@ this.TabMixPlus = {
 				bothSelectors += ',';
 			}
 
+			// Styling the favicons when tiling only icons needs the important tags to override their usual colors.
+
 			try {
 				let style = JSON.parse(Prefs["styles.unloadedTab"]);
 				if(style.italic || style.bold || style.underline || style.text) {
@@ -76,15 +78,19 @@ this.TabMixPlus = {
 
 					if(style.text) {
 						sscode += '\
-							.tab-container:not(.noThumbs) .tab[pending] .thumb {\n\
+							.tab-container:not(.noThumbs):not(.onlyIcons) .tab[pending] .thumb {\n\
 								box-shadow: 0 0 2px '+style.textColor+';\n\
 							}\n\
-							.tab-container:not(.noThumbs) .tab[pending] .tab-thumb-container {\n\
+							.tab-container:not(.noThumbs):not(.onlyIcons) .tab[pending] .tab-thumb-container {\n\
 								border-color: '+style.textColor+';\n\
 							}\n\
-							.tab[pending] .favicon-container {\n\
+							.tab-container:not(.onlyIcons) .tab[pending] .favicon-container {\n\
 								background-color: '+style.textColor+';\n\
-							}';
+							}\n\
+							.tab-container.onlyIcons .tab[pending] .favicon-container {\n\
+								border-color: '+style.textColor+' !important;\n\
+								box-shadow: inset 0 0 1px '+style.textColor+', 0 0 2px '+style.textColor+' !important;\n\
+							}\n';
 					}
 				}
 			}
@@ -116,15 +122,19 @@ this.TabMixPlus = {
 
 					if(style.text) {
 						sscode += '\
-							.tab-container:not(.noThumbs) .tab'+unloadedSelector+'[unread] .thumb {\n\
+							.tab-container:not(.noThumbs):not(.onlyIcons) .tab'+unloadedSelector+'[unread] .thumb {\n\
 								box-shadow: 0 0 2px '+style.textColor+';\n\
 							}\n\
-							.tab-container:not(.noThumbs) .tab'+unloadedSelector+'[unread] .tab-thumb-container {\n\
+							.tab-container:not(.noThumbs):not(.onlyIcons) .tab'+unloadedSelector+'[unread] .tab-thumb-container {\n\
 								border-color: '+style.textColor+';\n\
 							}\n\
-							.tab'+unloadedSelector+'[unread] .favicon-container {\n\
+							.tab-container:not(.onlyIcons) .tab'+unloadedSelector+'[unread] .favicon-container {\n\
 								background-color: '+style.textColor+';\n\
-							}';
+							}\n\
+							.tab-container.onlyIcons .tab[unread] .favicon-container {\n\
+								border-color: '+style.textColor+' !important;\n\
+								box-shadow: inset 0 0 1px '+style.textColor+', 0 0 2px '+style.textColor+' !important;\n\
+							}\n';
 					}
 				}
 			}
@@ -134,20 +144,20 @@ this.TabMixPlus = {
 		}
 
 		sscode += '\
-				.tab-container:not(.noThumbs) .tab:not(.stacked):-moz-any('+bothSelectors+') .favicon-container {\n\
+				.tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked):-moz-any('+bothSelectors+') .favicon-container {\n\
 					top: 0;\n\
 					width: 27px;\n\
 					height: 27px;\n\
 				}\n\
-				.tab-container:not(.noThumbs) .tab:not(.stacked):-moz-any('+bothSelectors+') .favicon-container:-moz-locale-dir(ltr) {\n\
+				.tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked):-moz-any('+bothSelectors+') .favicon-container:-moz-locale-dir(ltr) {\n\
 					left: 0;\n\
 					border-bottom-right-radius: 0.4em;\n\
 				}\n\
-				.tab-container:not(.noThumbs) .tab:not(.stacked):-moz-any('+bothSelectors+') .favicon-container:-moz-locale-dir(rtl) {\n\
+				.tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked):-moz-any('+bothSelectors+') .favicon-container:-moz-locale-dir(rtl) {\n\
 					right: 0;\n\
 					border-bottom-left-radius: 0.4em;\n\
 				}\n\
-				.tab-container:not(.noThumbs) .tab:not(.stacked):-moz-any('+bothSelectors+') .favicon {\n\
+				.tab-container:not(.noThumbs):not(.onlyIcons) .tab:not(.stacked):-moz-any('+bothSelectors+') .favicon {\n\
 					position: relative;\n\
 					top: 0 !important;\n\
 					left: 0 !important;\n\
