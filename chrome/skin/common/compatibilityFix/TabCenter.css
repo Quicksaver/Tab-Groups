@@ -3,11 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @-moz-document url("chrome://browser/content/browser.xul") {
-	#TabsToolbar > toolbarbutton#tabGroups-tabview-button {
+	#TabsToolbar:not([tabCenterInputFocused]) > toolbarbutton#tabGroups-tabview-button:not(#pin-button):not(#new-tab-button) {
 		display: -moz-box;
-	}
-
-	#TabsToolbar textbox#find-input[focused="true"].searchbar-textbox {
-		max-width: calc(100% - 130px);
 	}
 }

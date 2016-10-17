@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.0
+// VERSION 1.0.1
 
 this.TabCenter = {
 	id: 'tabcentertest1@mozilla.com',
@@ -67,6 +67,12 @@ this.TabCenter = {
 		}
 	},
 
+	get findInput() { return $('find-input'); },
+
+	attrWatcher: function() {
+		toggleAttribute($('TabsToolbar'), 'tabCenterInputFocused', trueAttribute($('find-input'), 'focused'));
+	},
+
 	init: function(justCreated) {
 		window.VerticalTabs._lastInputValue = '';
 
@@ -129,12 +135,32 @@ this.TabCenter = {
 		if(!justCreated) {
 			window.VerticalTabs.filtertabs();
 		}
+
+		let setupTextbox = () => {
+			Watchers.addAttributeWatcher(this.findInput, 'focused', this, false, false);
+			this.attrWatcher();
+		};
+
+		// Hide our button when Tab Center's find textbox is focused.
+		if(this.findInput) {
+			setupTextbox();
+		} else {
+			Piggyback.add('TabCenter', window.VerticalTabs, 'rearrangeXUL', () => {
+				setupTextbox();
+			}, Piggyback.MODE_AFTER);
+		}
 	},
 
 	uninit: function() {
 		Timers.cancel('TabCenter.filtertabs');
 		Piggyback.revert('TabCenter', window.VerticalTabs, 'filtertabs');
+		Piggyback.revert('TabCenter', window.VerticalTabs, 'rearrangeXUL');
 		delete window.VerticalTabs._lastInputValue;
+
+		if(this.findInput) {
+			Watchers.removeAttributeWatcher(this.findInput, 'focused', this, false, false);
+		}
+		removeAttribute($('TabsToolbar'), 'tabCenterInputFocused');
 
 		// TabCenter should show any tabs it wants to now.
 		window.VerticalTabs.filtertabs();
