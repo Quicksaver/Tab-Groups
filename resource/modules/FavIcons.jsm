@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.1
+// VERSION 1.1.2
 
 this.FavIcons = {
 	waiting: new Set(),
@@ -195,7 +195,17 @@ this.FavIcons = {
 
 	// Finding the dominant colors is controlled from inside TabItems' heartbeats, so both processes don't stack over one another.
 
-	_findDominantColor: function(iconUrl) {
+	_findDominantColor: Task.async(function* (iconUrl) {
+		TabItems.paintingNow();
+
+		// Preloading on a separate thread prevents flooding the main thread with that task,
+		// which could become become the heaviest step in the process, especially in non-e10s.
+		// (loading the icon in the img can take 100x as long in the main process for some reason...)
+		let preloaded = yield this._preloadIcon(iconUrl);
+		if(!preloaded) {
+			return false;
+		}
+
 		return new Promise((resolve, reject) => {
 			// The following was adapted from Margaret Leibovic's snippet posted at https://gist.github.com/leibovic/1017111
 
@@ -212,44 +222,36 @@ this.FavIcons = {
 				context.drawImage(icon, 0, 0);
 
 				// data is an array of a series of 4 one-byte values representing the rgba values of each pixel
-				let data = context.getImageData(0, 0, icon.height, icon.width).data;
+				let imageData = context.getImageData(0, 0, icon.height, icon.width);
 
 				// keep track of how many times a color appears in the image
-				let colorCount = new Map();
-				for(let i = 0; i < data.length; i += 4) {
-					// ignore transparent pixels
-					if(data[i+3] < 32) { continue; }
-
-					// Do some rounding, to get a "feel" of the icons rather than the precise rgb values in the image.
-					// This has the added bonus of having to loop through less entries in the checks below,
-					// so it seems to compensate for the extra calculations here to round the values.
-					let color = this._roundColor(data[i]) + "," + this._roundColor(data[i+1]) + "," + this._roundColor(data[i+2]);
-					// ignore white --- quicksaver: why?
-					//if(color == "255,255,255") { continue; }
-
-					colorCount.set(color, (colorCount.get(color) || 0) + 1);
-				}
-
-				let maxCount = 0;
-				let dominantColor = "";
-				for(let [ color, count ] of colorCount) {
-					if(count > maxCount) {
-						maxCount = count;
-						dominantColor = color;
+				let worker = new Worker('resource://'+objPathString+'/workers/findDominantColor.js');
+				worker.onmessage = (e) => {
+					if(e.data.iconUrl == iconUrl) {
+						let deferred = this.colors.get(iconUrl);
+						deferred.color = e.data.dominantColor;
+						deferred.resolve(e.data.dominantColor);
+						worker.terminate();
+						resolve(true);
 					}
-				}
-
-				let deferred = this.colors.get(iconUrl);
-				deferred.color = dominantColor;
-				deferred.resolve(dominantColor);
-				resolve(true);
+				};
+				worker.postMessage({ iconUrl, imageData });
 			});
 			icon.src = iconUrl;
 		});
-	},
+	}),
 
-	_roundColor: function(v) {
-		return Math.min(Math.round(v /8) *8, 255);
+	_preloadIcon: function(iconUrl) {
+		return new Promise((resolve, reject) => {
+			let worker = new Worker('resource://'+objPathString+'/workers/preloadIcon.js');
+			worker.onmessage = (e) => {
+				if(e.data.iconUrl == iconUrl) {
+					resolve(e.data.loaded);
+					worker.terminate();
+				}
+			};
+			worker.postMessage({ iconUrl });
+		});
 	},
 
 	_loadColorsStylesheet: function() {
@@ -262,6 +264,7 @@ this.FavIcons = {
 
 		for(let [ iconUrl, deferred ] of this.colors) {
 			let color = deferred.color;
+			if(!color) { continue; }
 
 			sscode += '\
 				html['+objName+'_UUID="'+_UUID+'"] .tab-container.onlyIcons .tab:not([busy]):not([progress]) .favicon-container[iconUrl="'+iconUrl+'"] {\n\

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.7
+// VERSION 1.3.8
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -1042,6 +1042,10 @@ this.TabItems = {
 				|| Date.now() - this._lastUpdateTime < this._heartbeatTiming;
 	},
 
+	paintingNow: function() {
+		this._lastUpdateTime = Date.now();
+	},
+
 	// Takes in a xul:tab, creates a TabItem for it and adds it to the scene.
 	link: function(tab, options) {
 		try {
@@ -1095,7 +1099,7 @@ this.TabItems = {
 	},
 
 	tabUpdated: function(tabItem) {
-		this._lastUpdateTime = Date.now();
+		this.paintingNow();
 		this.tabStaled(tabItem);
 	},
 
@@ -1161,17 +1165,19 @@ this.TabItems = {
 
 		// Do as many updates as we can fit into a "perceived" amount of time, which is tunable.
 		let accumTime = 0;
+		let now = Date.now();
+		let then;
 
 		let items = this._tabsWaitingForUpdate.getItems();
 		while(accumTime < this._maxTimeForUpdating && items.length) {
-			let updateBegin = Date.now();
+			then = now;
 
 			yield this._update(items.shift());
 
 			// Maintain a simple average of time for each tabitem update
 			// We can use this as a base by which to delay things like tab zooming, so there aren't any hitches.
-			let updateEnd = Date.now();
-			let deltaTime = updateEnd - updateBegin;
+			now = Date.now();
+			let deltaTime = now - then;
 			accumTime += deltaTime;
 		}
 
@@ -1180,15 +1186,15 @@ this.TabItems = {
 		let newColors = false;
 		items = FavIcons._iconsNeedingColor;
 		while(accumTime < this._maxTimeForUpdating && items.length) {
-			let updateBegin = Date.now();
+			then = now;
 
 			yield FavIcons._findDominantColor(items.shift());
 			newColors = true;
 
 			// Maintain a simple average of time for each favicon update
 			// We can use this as a base by which to delay things like tab zooming, so there aren't any hitches.
-			let updateEnd = Date.now();
-			let deltaTime = updateEnd - updateBegin;
+			now = Date.now();
+			let deltaTime = now - then;
 			accumTime += deltaTime;
 		}
 
