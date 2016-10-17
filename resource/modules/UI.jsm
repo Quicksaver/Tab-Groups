@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.52
+// VERSION 1.3.53
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1658,7 +1658,9 @@ this.UI = {
 
 		let focusedNode = $$(":focus")[0];
 		let inTextField = this.isTextField(focusedNode) && focusedNode != Search.searchquery;
-		if(inTextField || (Search.inSearch && (Prefs.searchMode == 'list' || e.key != "Enter")) || GroupOptionsUI.activeOptions) {
+		if(inTextField
+		|| (Search.inSearch && (Prefs.searchMode == 'list' || !(new Set([ "Enter", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight" ])).has(e.key)))
+		|| GroupOptionsUI.activeOptions) {
 			processBrowserKeys(e, focusedNode);
 			return;
 		}
@@ -1706,11 +1708,11 @@ this.UI = {
 			// If we're in a stacked group and it's expanded, or if we're in single view, we only need to check tabs in this group.
 			if(activeGroup.expanded || this.single) {
 				for(let child of activeGroup.children) {
-					if(!Search.inSearch || Search.matches.has(child)) {
-						let itemCenter = child.getBounds().center();
-						if(norm(itemCenter, myCenter)) {
-							siblings.set(child, itemCenter);
-						}
+					if(Search.inSearch && !Search.matches.has(child)) { continue; }
+
+					let itemCenter = child.getBounds().center();
+					if(norm(itemCenter, myCenter)) {
+						siblings.set(child, itemCenter);
 					}
 				}
 			}
@@ -1730,6 +1732,8 @@ this.UI = {
 					}
 
 					for(let child of groupItem.children) {
+						if(Search.inSearch && !Search.matches.has(child)) { continue; }
+
 						let itemCenter = child.getBounds().center();
 						if(norm(itemCenter, myCenter)) {
 							siblings.set(child, itemCenter);

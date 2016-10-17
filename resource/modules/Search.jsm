@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.1.2
+// VERSION 2.1.3
 
 // Implementation for the search functionality of Firefox Panorama.
 // Class: TabUtils - A collection of helper functions for dealing with both <TabItem>s and <xul:tab>s without having to worry which one is which.
@@ -488,7 +488,7 @@ this.Search = {
 		if(!this.inSearch) { return; }
 
 		// Only return focus to the previously active tab when exiting search mode if the search returned no results.
-		if(!this.currentItem && this._activeTab && !this._activeTab.parent.hidden) {
+		if((Prefs.searchMode == 'highlight' || !this.currentItem) && this._activeTab && !this._activeTab.parent.hidden) {
 			UI.setActive(this._activeTab);
 		}
 
