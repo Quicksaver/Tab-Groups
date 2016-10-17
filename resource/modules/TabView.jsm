@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.17
+// VERSION 1.1.18
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -630,6 +630,12 @@ this.TabView = {
 			let activeGroup = this._window[objName].GroupItems.getActiveGroupItem();
 			openPlaceholder = activeGroup && activeGroup.closing;
 		}
+		// With Tab Mix Plus, we first infer from some of its settings if the user wants to see a new tab (or any other tab) after closing the last tab.
+		// Meaning we bring up TabView without opening a new tab first.
+		if(!openPlaceholder) {
+			openPlaceholder = typeof(TabMixPlus) != 'undefined' && Prefs["loadOnNewTab.type"] != 4;
+		}
+
 		if(openPlaceholder) {
 			// So that listeners inside TabView catch at the time the tab is opened but before it's assigned to our property here,
 			// as would happen when TabView is already initialized (the callback is synchronous).
@@ -852,6 +858,7 @@ Modules.LOADMODULE = function() {
 
 	// We need to know what's the url for the new tab page, as other add-ons may override it.
 	// Even though this preference isn't used directly anymore, it still seems to be a valid reference point (so far).
+	// Some add-ons still use it, for example Tab Mix Plus.
 	let defaultBranch = Services.prefs.getDefaultBranch("browser.newtab.")
 	let defaultValue;
 	// Remember this preference went away in FF47 (I think), so this will throw because a default value doesn't actually exist.
