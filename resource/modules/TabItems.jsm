@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.8
+// VERSION 1.3.9
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -725,6 +725,7 @@ this.TabItems = {
 	tabPaddingRange: new Range(3,10),
 	faviconSizeRange: new Range(24,32),
 	faviconOffsetRange: new Range(3,5.5),
+	labelTopMarginRange: new Range(3,1),
 	_fragment: null,
 	_cachedThumbFragment: null,
 	_canvasFragment: null,
@@ -1342,6 +1343,7 @@ this.TabItems = {
 		this.widthPaddingRange = new Range(this.minTabWidthIcons +10, Math.round(this.tabWidth *1.5));
 		this.widthFaviconSizeRange = new Range(this.minTabWidthIcons +8, this.minTabWidth -8);
 		this.widthFaviconOffsetRange = new Range(this.minTabWidth +10, Math.round(this.tabWidth *1.5));
+		this.widthLabelTopMarginRange = new Range(this.minTabWidthIcons +8, this.minTabWidth -8);
 
 		this.tabHeight = this._getHeightForWidth(this.tabWidth);
 		this.minTabHeight = this._getHeightForWidth(this.minTabWidth);
@@ -1354,14 +1356,20 @@ this.TabItems = {
 
 	// Private method that returns the fontsize to use given the tab's width
 	getFontSizeFromWidth: function(width) {
-		let proportion = this.widthFontRange.proportion(width - this.getTabPaddingFromWidth(width), true);
+		let proportion = this.widthFontRange.proportion(width, true);
 		return this.fontSizeRange.scale(proportion);
 	},
 
 	// Private method that returns the favicon size to use given the tab's width if it's meant to tile icons only.
 	getFaviconSizeFromWidth: function(width) {
-		let proportion = this.widthFaviconSizeRange.proportion(width - this.getTabPaddingFromWidth(width), true);
+		let proportion = this.widthFaviconSizeRange.proportion(width, true);
 		return this.faviconSizeRange.scale(proportion);
+	},
+
+	// Returns the tab label's top margin to be used when the tab is tiling icons only.
+	getLabelTopMarginFromWidth: function(width) {
+		let proportion = this.widthLabelTopMarginRange.proportion(width, true);
+		return this.labelTopMarginRange.scale(proportion);
 	},
 
 	getTabPaddingFromWidth: function(width) {
@@ -1468,11 +1476,12 @@ this.TabItems = {
 		let controlsOffset = this.getControlsOffsetForPadding(tabPadding);
 		let favIconOffset = (!onlyIcons) ? this.getFavIconOffsetForWidth(tabWidth) : 0;
 		let fontSize = this.getFontSizeFromWidth(tabWidth);
+		let labelTopMargin = (onlyIcons) ? this.getLabelTopMarginFromWidth(tabWidth) : 0;
 
 		tabWidth -= tabPadding *2;
 		tabHeight -= tabPadding *2;
 
-		return { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, favIconSize, favIconOffset, columns, rows, overflowing };
+		return { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, labelTopMargin, favIconSize, favIconOffset, columns, rows, overflowing };
 	},
 
 	// Pass in a desired size, and receive a size based on proper title size and aspect ratio.

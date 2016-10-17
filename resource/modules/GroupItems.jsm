@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.15
+// VERSION 1.7.16
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1788,7 +1788,7 @@ this.GroupItem.prototype = {
 		}
 
 		this._lastTabSize = TabItems.arrange(count, bounds, this.tileIcons, cols);
-		let { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, favIconSize, favIconOffset, columns, overflowing } = this._lastTabSize;
+		let { tabWidth, tabHeight, tabPadding, controlsOffset, fontSize, labelTopMargin, favIconSize, favIconOffset, columns, overflowing } = this._lastTabSize;
 		let spaceWidth = tabWidth + (tabPadding *2);
 		let spaceHeight = tabHeight + (tabPadding *2);
 
@@ -1852,6 +1852,10 @@ this.GroupItem.prototype = {
 				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container.onlyIcons .favicon-container {\n\
 					width: '+favIconSize+'px;\n\
 					height: '+favIconSize+'px;\n\
+				}\n\
+				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-container.onlyIcons .tab-label,\n\
+				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-container.onlyIcons .tab-label {\n\
+					margin-top: '+labelTopMargin+'px;\n\
 				}\n';
 		} else {
 			sscode += '\

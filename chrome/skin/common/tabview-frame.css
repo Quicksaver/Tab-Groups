@@ -854,6 +854,10 @@ body.single:not(.showGroupThumbs) #singleNewGroup .create-new-border,
 
 /* Tab Items shown without thumbnails, tiling favicons instead */
 
+.tab-container.onlyIcons .thumb {
+	margin-top: 2px;
+}
+
 .tab-container.onlyIcons .tab-thumb {
 	display: none;
 }
