@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.4
+// VERSION 1.0.5
 
 // We try to use the styling defined in TMP's prefs in groups view as well.
 
@@ -78,16 +78,16 @@ this.TabMixPlus = {
 
 					if(style.text) {
 						sscode += '\
-							.tab-container:not(.noThumbs):not(.onlyIcons) .tab[pending] .thumb {\n\
+							.groupItem:not(.thumbing) .tab-container:not(.noThumbs):not(.onlyIcons) .tab[pending] .thumb {\n\
 								box-shadow: 0 0 2px '+style.textColor+';\n\
 							}\n\
-							.tab-container:not(.noThumbs):not(.onlyIcons) .tab[pending] .tab-thumb-container {\n\
+							.groupItem:not(.thumbing) .tab-container:not(.noThumbs):not(.onlyIcons) .tab[pending] .tab-thumb-container {\n\
 								border-color: '+style.textColor+';\n\
 							}\n\
-							.tab-container:not(.onlyIcons) .tab[pending] .favicon-container {\n\
+							.groupItem:not(.thumbing) .tab-container:not(.onlyIcons) .tab[pending] .favicon-container {\n\
 								background-color: '+style.textColor+';\n\
 							}\n\
-							.tab-container.onlyIcons .tab[pending] .favicon-container {\n\
+							.groupItem:not(.thumbing) .tab-container.onlyIcons .tab[pending] .favicon-container {\n\
 								border-color: '+style.textColor+' !important;\n\
 								box-shadow: inset 0 0 1px '+style.textColor+', 0 0 2px '+style.textColor+' !important;\n\
 							}\n';
@@ -122,16 +122,16 @@ this.TabMixPlus = {
 
 					if(style.text) {
 						sscode += '\
-							.tab-container:not(.noThumbs):not(.onlyIcons) .tab'+unloadedSelector+'[unread] .thumb {\n\
+							.groupItem:not(.thumbing) .tab-container:not(.noThumbs):not(.onlyIcons) .tab'+unloadedSelector+'[unread] .thumb {\n\
 								box-shadow: 0 0 2px '+style.textColor+';\n\
 							}\n\
-							.tab-container:not(.noThumbs):not(.onlyIcons) .tab'+unloadedSelector+'[unread] .tab-thumb-container {\n\
+							.groupItem:not(.thumbing) .tab-container:not(.noThumbs):not(.onlyIcons) .tab'+unloadedSelector+'[unread] .tab-thumb-container {\n\
 								border-color: '+style.textColor+';\n\
 							}\n\
-							.tab-container:not(.onlyIcons) .tab'+unloadedSelector+'[unread] .favicon-container {\n\
+							.groupItem:not(.thumbing) .tab-container:not(.onlyIcons) .tab'+unloadedSelector+'[unread] .favicon-container {\n\
 								background-color: '+style.textColor+';\n\
 							}\n\
-							.tab-container.onlyIcons .tab[unread] .favicon-container {\n\
+							.groupItem:not(.thumbing) .tab-container.onlyIcons .tab[unread] .favicon-container {\n\
 								border-color: '+style.textColor+' !important;\n\
 								box-shadow: inset 0 0 1px '+style.textColor+', 0 0 2px '+style.textColor+' !important;\n\
 							}\n';
