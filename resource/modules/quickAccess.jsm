@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.8
+// VERSION 1.0.9
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -331,11 +331,13 @@ this.quickAccess = {
 			button.classList.add('quickaccess-activebutton');
 		}
 
-		button.setAttribute('label', tabItem.tabTitle.textContent);
-		button.setAttribute('tooltiptext', tabItem.container.getAttribute('title'));
-		if(tabItem.fav._iconUrl) {
-			button.style.listStyleImage = 'url("'+tabItem.fav._iconUrl+'")';
-		}
+		tabItem.updateLabels().then(() => {
+			button.setAttribute('label', tabItem.tabTitle.textContent);
+			button.setAttribute('tooltiptext', tabItem.container.getAttribute('title'));
+			if(tabItem.fav._iconUrl) {
+				button.style.listStyleImage = 'url("'+tabItem.fav._iconUrl+'")';
+			}
+		});
 
 		this.contents.appendChild(button);
 		this.items.push(button);
