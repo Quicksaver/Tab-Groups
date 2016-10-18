@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.9
+// VERSION 1.0.10
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -164,11 +164,18 @@ this.quickAccess = {
 				if(trueAttribute(btn, 'showGroupTitle')) {
 					anchor = $ª(btn, 'toolbarbutton-text', 'class');
 				}
-			} else {
+			}
+			if(!btn || !btn.clientWidth || !btn.clientHeight) {
 				btn = this.PanelUIBtn;
 			}
 			if(!anchor) {
-				anchor = $ª(btn, 'toolbarbutton-icon', 'class') || btn;
+				if(btn && btn.clientWidth && btn.clientHeight) {
+					anchor = $ª(btn, 'toolbarbutton-icon', 'class') || btn;
+				} else {
+					// If we can't anchor the panel to either button, at least anchor it to the selected tab, so it doesn't float around.
+					anchor = Tabs.selected;
+					anchor.scrollIntoView();
+				}
 			}
 			this.panel.openPopup(anchor, 'bottomcenter topright', 0, 0, false, false);
 		} else {
