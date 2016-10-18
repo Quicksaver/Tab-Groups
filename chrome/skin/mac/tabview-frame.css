@@ -51,8 +51,3 @@ body.classic #actions {
 body.classic #actions:-moz-locale-dir(rtl) {
 	border-radius: 0 0 var(--item-border-radius) 0;
 }
-
-/* Prevent a misalignment of the button label. */
-#tabGroups-tabview-button[showGroupTitle] .toolbarbutton-text {
-	max-height: 0;
-}

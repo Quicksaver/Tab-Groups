@@ -41,3 +41,10 @@
 #tabGroups-tabview-button .toolbarbutton-text {
 	max-height: 1em;
 }
+
+/* Don't let the text stick too close to the borders,
+   but only if Tab Center isn't enabled, it already looks ok there. */
+#navigator-toolbox > #TabsToolbar #tabGroups-tabview-button[showGroupTitle] .toolbarbutton-text {
+	padding-left: 5px;
+	padding-right: 5px;
+}
