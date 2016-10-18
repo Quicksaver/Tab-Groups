@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 2.15.10
+// VERSION 2.15.11
 Modules.UTILS = true;
 
 // Overlays - to use overlays in my bootstraped add-ons. The behavior is as similar to what is described in https://developer.mozilla.org/en/XUL_Tutorial/Overlays as I could manage.
@@ -328,9 +328,22 @@ this.Overlays = {
 
 	scheduleAll: function(aWindow) {
 		callOnLoad(aWindow, () => {
-			aSync(() => {
-				this.overlayAll(aWindow);
-			});
+			if(aWindow.gBrowserInit && "delayedStartupFinished" in aWindow.gBrowserInit && !aWindow.gBrowserInit.delayedStartupFinished) {
+				let waitForDelayedStartup = (aSubject, aTopic) => {
+					if(aSubject == aWindow) {
+						Observers.remove(waitForDelayedStartup, 'browser-delayed-startup-finished');
+						aSync(() => {
+							this.overlayAll(aWindow);
+						});
+					}
+				};
+				Observers.add(waitForDelayedStartup, 'browser-delayed-startup-finished');
+			}
+			else {
+				aSync(() => {
+					this.overlayAll(aWindow);
+				});
+			}
 		});
 	},
 
