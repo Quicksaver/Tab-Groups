@@ -464,9 +464,9 @@ body.DraggingTab .tab * {
 	}
 }
 
-.tab-container:not(.onlyIcons) .tab.noFavicon:not([busy]):not([progress]) .favicon-container,
-.tab:not([busy]):not([progress]) .throbber,
-.tab:-moz-any([busy],[progress]) .favicon:not(.throbber) {
+.tab-container:not(.onlyIcons) .tab.noFavicon:not([busy]) .favicon-container,
+.tab:not([busy]) .throbber,
+.tab[busy] .favicon:not(.throbber) {
 	display: none;
 }
 
@@ -886,7 +886,7 @@ body.single:not(.showGroupThumbs) #singleNewGroup .create-new-border,
 	transform: translate(-50%, -50%);
 }
 
-.tab-container.onlyIcons .tab:not([busy]):not([progress]) .favicon-container {
+.tab-container.onlyIcons .tab:not([busy]) .favicon-container {
 	border-radius: 3px;
 	border: 1px solid var(--group-border-color);
 	box-shadow: var(--favicon-tile-shadow);

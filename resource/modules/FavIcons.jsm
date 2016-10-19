@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.2
+// VERSION 1.1.3
 
 this.FavIcons = {
 	waiting: new Set(),
@@ -267,7 +267,7 @@ this.FavIcons = {
 			if(!color) { continue; }
 
 			sscode += '\
-				html['+objName+'_UUID="'+_UUID+'"] .tab-container.onlyIcons .tab:not([busy]):not([progress]) .favicon-container[iconUrl="'+iconUrl+'"] {\n\
+				html['+objName+'_UUID="'+_UUID+'"] .tab-container.onlyIcons .tab:not([busy]) .favicon-container[iconUrl="'+iconUrl+'"] {\n\
 					border-color: rgb('+color+');\n\
 					background-image: linear-gradient(to bottom, rgba('+color+',0.1), rgba('+color+',0.4));\n\
 					box-shadow: inset 0 0 1px rgba('+color+',0.5), var(--favicon-tile-shadow);\n\

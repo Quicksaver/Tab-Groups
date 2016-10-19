@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.6
+// VERSION 1.0.7
 
 this.PinnedItems = {
 	get actions() { return $('actions'); },
@@ -152,19 +152,16 @@ this.PinnedItems = {
 			let icon = this.icons.get(tab);
 			let busy = tab.hasAttribute('busy');
 			let progress = tab.hasAttribute('progress');
-			if(busy || progress) {
+			toggleAttribute(icon, 'busy', busy);
+			toggleAttribute(icon, 'progress', progress);
+			if(busy) {
 				icon.style.backgroundImage = '';
-				toggleAttribute(icon, 'busy', busy);
-				toggleAttribute(icon, 'progress', progress);
 				return;
 			}
-			else {
-				removeAttribute(icon, 'busy');
-				removeAttribute(icon, 'progress');
-				// Show the previous icon if there was one, until it is updated (if necessary).
-				if(!icon.style.backgroundImage && icon._iconUrl) {
-					icon.style.backgroundImage = "url('"+icon._iconUrl+"')";
-				}
+
+			// Show the previous icon if there was one, until it is updated (if necessary).
+			if(!icon.style.backgroundImage && icon._iconUrl) {
+				icon.style.backgroundImage = "url('"+icon._iconUrl+"')";
 			}
 		}
 
@@ -175,7 +172,7 @@ this.PinnedItems = {
 			let icon = this.icons.get(tab);
 			icon._iconUrl = iconUrl;
 			icon.setAttribute('title', tab.getAttribute('label'));
-			if(!icon.hasAttribute('busy') && !icon.hasAttribute('progress')) {
+			if(!icon.hasAttribute('busy')) {
 				icon.style.backgroundImage = "url('"+iconUrl+"')";
 			}
 		});
