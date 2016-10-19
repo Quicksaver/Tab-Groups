@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.17
+// VERSION 1.7.18
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2781,6 +2781,9 @@ this.GroupItems = {
 		catch(ex) {
 			Cu.reportError(ex);
 		}
+
+		// Dispatch an event so other add-ons can react properly, i.e. when switching groups.
+		dispatch(gBrowser.tabContainer, { type: 'TabBarUpdated', cancelable: false });
 	},
 
 	// Sets active TabItem and GroupItem, and updates tab bar appropriately.
