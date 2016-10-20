@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.18
+// VERSION 1.7.19
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2196,6 +2196,8 @@ this.GroupItems = {
 	_heartbeatTiming: 250, // milliseconds between calls
 	_maxTimeForUpdating: 25, // milliseconds that consecutive updates can take
 	_activeGroupItem: null,
+	_lastVisibleGroup: null,
+	_tabBarUpdated: false,
 	_arrangePaused: false,
 	_arrangesPending: new Set(),
 	_lastArrange: null,
@@ -2250,6 +2252,15 @@ this.GroupItems = {
 	// set the top gutter separately, as the top of the window has its own extra chrome which makes a large top gutter unnecessary.
 	topGutter: 5,
 
+	handleEvent: function(e) {
+		switch(e.type) {
+			case 'TabShow':
+			case 'TabHide':
+				this._tabBarUpdated = true;
+				break;
+		}
+	},
+
 	// Function: init
 	init: function() {
 		this._lastActiveList = new MRUList();
@@ -2264,10 +2275,17 @@ this.GroupItems = {
 		this.minGroupRatio = this.minGroupWidth / this.minGroupHeight;
 		this.minGroupHeightRange = new Range(this.minGroupHeight, this.minGroupHeight * this.maxGroupRatio);
 		this.minGroupRatioRange = new Range(this.minGroupRatio, this.minGroupRatio * this.maxGroupRatio);
+
+		// Keep track of when we're switching groups, so that we dispatch the TabBarUpdated event accordingly.
+		Tabs.listen('TabShow', this);
+		Tabs.listen('TabHide', this);
 	},
 
 	// Function: uninit
 	uninit: function() {
+		Tabs.unlisten('TabShow', this);
+		Tabs.unlisten('TabHide', this);
+
 		for(let group of this) {
 			group.destroy();
 		}
@@ -2552,6 +2570,7 @@ this.GroupItems = {
 				let activeGroupItem = this.groupItem(activeGroupId);
 				if(activeGroupItem) {
 					UI.setActive(activeGroupItem);
+					this._lastVisibleGroup = this._activeGroupItem;
 				}
 			}
 
@@ -2653,6 +2672,10 @@ this.GroupItems = {
 
 		if(groupItem == this._activeGroupItem) {
 			this._activeGroupItem = null;
+		}
+
+		if(groupItem == this._lastVisibleGroup) {
+			this._lastVisibleGroup = null;
 		}
 
 		this._lastActiveList.remove(groupItem);
@@ -2773,6 +2796,10 @@ this.GroupItems = {
 		// called too soon
 		if(!window[objName] || !window[objName].UI) { return; }
 
+		// Ensure we fire the event every time we switch groups.
+		this._tabBarUpdated = this._activeGroupItem != this._lastVisibleGroup;
+		this._lastVisibleGroup = this._activeGroupItem;
+
 		let tabItems = this._activeGroupItem.children;
 		gBrowser.showOnlyTheseTabs(tabItems.map(item => item.tab));
 		try {
@@ -2783,7 +2810,10 @@ this.GroupItems = {
 		}
 
 		// Dispatch an event so other add-ons can react properly, i.e. when switching groups.
-		dispatch(gBrowser.tabContainer, { type: 'TabBarUpdated', cancelable: false });
+		// Only do this when at least one tab's visibility was changed.
+		if(this._tabBarUpdated) {
+			dispatch(gBrowser.tabContainer, { type: 'TabBarUpdated', cancelable: false });
+		}
 	},
 
 	// Sets active TabItem and GroupItem, and updates tab bar appropriately.
