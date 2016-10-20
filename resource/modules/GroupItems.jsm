@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.19
+// VERSION 1.7.20
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -2275,17 +2275,10 @@ this.GroupItems = {
 		this.minGroupRatio = this.minGroupWidth / this.minGroupHeight;
 		this.minGroupHeightRange = new Range(this.minGroupHeight, this.minGroupHeight * this.maxGroupRatio);
 		this.minGroupRatioRange = new Range(this.minGroupRatio, this.minGroupRatio * this.maxGroupRatio);
-
-		// Keep track of when we're switching groups, so that we dispatch the TabBarUpdated event accordingly.
-		Tabs.listen('TabShow', this);
-		Tabs.listen('TabHide', this);
 	},
 
 	// Function: uninit
 	uninit: function() {
-		Tabs.unlisten('TabShow', this);
-		Tabs.unlisten('TabHide', this);
-
 		for(let group of this) {
 			group.destroy();
 		}
@@ -2800,6 +2793,12 @@ this.GroupItems = {
 		this._tabBarUpdated = this._activeGroupItem != this._lastVisibleGroup;
 		this._lastVisibleGroup = this._activeGroupItem;
 
+		if(!this._tabBarUpdated) {
+			// We should still dispatch the TabBarUpdated event if the visibility of any tab has been changed.
+			Tabs.listen('TabShow', this);
+			Tabs.listen('TabHide', this);
+		}
+
 		let tabItems = this._activeGroupItem.children;
 		gBrowser.showOnlyTheseTabs(tabItems.map(item => item.tab));
 		try {
@@ -2808,6 +2807,9 @@ this.GroupItems = {
 		catch(ex) {
 			Cu.reportError(ex);
 		}
+
+		Tabs.unlisten('TabShow', this);
+		Tabs.unlisten('TabHide', this);
 
 		// Dispatch an event so other add-ons can react properly, i.e. when switching groups.
 		// Only do this when at least one tab's visibility was changed.
