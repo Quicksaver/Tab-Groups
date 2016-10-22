@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.10
+// VERSION 1.0.11
 
 this.__defineGetter__('PanelUI', function() { return window.PanelUI; });
 
@@ -41,6 +41,10 @@ this.quickAccess = {
 					this.searchbox.value = '';
 					this.searchbox.focus();
 				}
+				break;
+
+			case 'popuphidden':
+				removeAttribute(TabView.button, 'open');
 				break;
 
 			case 'ViewShowing':
@@ -172,11 +176,17 @@ this.quickAccess = {
 				if(btn && btn.clientWidth && btn.clientHeight) {
 					anchor = $ª(btn, 'toolbarbutton-icon', 'class') || btn;
 				} else {
+					btn = null;
 					// If we can't anchor the panel to either button, at least anchor it to the selected tab, so it doesn't float around.
 					anchor = Tabs.selected;
 					anchor.scrollIntoView();
 				}
 			}
+
+			if(btn == TabView.button) {
+				setAttribute(TabView.button, 'open', 'true');
+			}
+
 			this.panel.openPopup(anchor, 'bottomcenter topright', 0, 0, false, false);
 		} else {
 			this.panel.hidePopup();
@@ -509,6 +519,7 @@ this.quickAccess = {
 
 		Listeners.add(this.panel, 'popupshowing', this);
 		Listeners.add(this.panel, 'popupshown', this);
+		Listeners.add(this.panel, 'popuphidden', this);
 		Listeners.add(this.view, 'ViewShowing', this);
 		Listeners.add(this.view, 'ViewHiding', this);
 		Listeners.add(this.panelTextbox, 'keydown', this);
@@ -520,6 +531,7 @@ this.quickAccess = {
 	onUnload: function() {
 		Listeners.remove(this.panel, 'popupshowing', this);
 		Listeners.remove(this.panel, 'popupshown', this);
+		Listeners.remove(this.panel, 'popuphidden', this);
 		Listeners.remove(this.view, 'ViewShowing', this);
 		Listeners.remove(this.view, 'ViewHiding', this);
 		Listeners.remove(this.panelTextbox, 'keydown', this);
