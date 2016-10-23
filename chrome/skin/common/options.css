@@ -36,11 +36,19 @@ groupbox[data-category="paneHowTo"] .img-container {
 }
 
 groupbox[data-category="paneHowTo"] img {
+	border: 1px solid rgba(128,128,128,0.3);
+}
+
+page[FF49] groupbox[data-category="paneHowTo"] img {
 	/* so images shrink down if the preferences tab is too short */
 	flex: 1 1 auto;
 	width: 1px;
 	/* but don't let them extend past their original size */
 	max-width: -moz-max-content;
+}
+
+page[currentcategory="paneHowTo"] #main-footer {
+	visibility: collapse;
 }
 
 #paneSession-backup-warning {

@@ -44,15 +44,15 @@
 			<html:ul>
 				<html:li>
 					<html:p>&howto.single.description;</html:p>
-					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/singleview.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/singleview.png"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.grid.description;</html:p>
-					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/grid.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/grid.png"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.classic.description;</html:p>
-					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/freearrange.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/freearrange.png"/></html:p>
 				</html:li>
 			</html:ul>
 		</groupbox>
@@ -69,7 +69,7 @@
                     </html:li>
                     <html:li>
                         <html:p>&howto.create.step2b;</html:p>
-                        <html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/create.jpg"/></html:p>
+                        <html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/create.png"/></html:p>
                     </html:li>
                     <html:li><html:p>&howto.create.step3;</html:p></html:li>
                 </html:ol>
@@ -89,19 +89,19 @@
 			<html:ul>
 				<html:li>
 					<html:p>&howto.stack.description;</html:p>
-					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/stack.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/stack.png"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.list.description;</html:p>
-					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/list.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/list.png"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.icons.description;</html:p>
-					<!--<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/icons.jpg"/></html:p>-->
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/icons.png"/></html:p>
 				</html:li>
 				<html:li>
 					<html:p>&howto.thumbs.description2;</html:p>
-					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/thumbs.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/thumbs.png"/></html:p>
 				</html:li>
 			</html:ul>
 		</groupbox>
@@ -143,7 +143,7 @@
                 <html:p>&nbsp;</html:p>
                 <html:p>&howto.pinned.description2;</html:p>
                 <html:p>&howto.pinned.description3;</html:p>
-                <html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/pinned.jpg"/></html:p>
+                <html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/pinned.png"/></html:p>
             </html:div>
 		</groupbox>
 
@@ -156,7 +156,7 @@
 				</html:li>
 				<html:li>
 					<html:p>&howto.search.step4;</html:p>
-					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/search.jpg"/></html:p>
+					<html:p class="img-container"><html:img src="chrome://objPathString/skin/howto/search.png"/></html:p>
 				</html:li>
 			</html:ol>
 		</groupbox>
