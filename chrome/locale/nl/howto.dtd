@@ -17,7 +17,8 @@
 <!ENTITY howto.overflow.description "Tabbladminiaturen nemen ruimte in beslag. Als een groep niet groot genoeg is om alle tabbladen ervan weer te geven, kan deze worden gestapeld of gescrold.">
 <!ENTITY howto.stack.description "Tabbladen in een gestapelde groep worden boven op elkaar getoond. U kunt alleen met het actieve tabblad op de voorgrond werken. Onder deze stapel bevindt zich een voorbeeldknop waarop u kunt klikken om alle andere tabbladen te benaderen zonder de grootte van de groep te wijzigen.">
 <!ENTITY howto.list.description "In plaats daarvan kunt u ervoor kiezen alle tabbladen normaal weer te geven zonder ze te stapelen. Sommige ervan zullen worden verborgen, en u dient omlaag te scrollen om ze te benaderen.">
-<!ENTITY howto.thumbs.description "U kunt ook bepaalde groepen kiezen waarvoor geen tabbladminiaturen worden getoond. De tabbladen worden dan alleen met hun titels vermeld, en optioneel hun adressen. Dit gebeurt ook in gescrolde groepen die niet groot genoeg zijn om in minstens drie tabbladkolommen te passen, ongeacht of miniaturen zijn ingeschakeld.">
+<!ENTITY howto.icons.description "Als de tabbladen in een groep te klein worden voor hun miniaturen om nuttig te zijn, worden de pictogrammen ervan in tegels weergegeven. Dit kan per groep worden uitgeschakeld, zodat altijd of de volledige miniaturen, of tabbladen in een lijst worden weergegeven.">
+<!ENTITY howto.thumbs.description2 "U kunt ook bepaalde groepen kiezen waarin geen tabbladminiaturen worden weergegeven. De tabbladen worden dan alleen met hun titels en optioneel met hun adressen vermeld. Dit gebeurt ook in gescrollde groepen die niet groot genoeg zijn om minstens drie kolommen met miniaturen te laten passen, of twee groepen met pictogrammen, ongeacht of miniaturen zijn ingeschakeld of niet.">
 <!ENTITY howto.search.caption "Hoe doorzoek ik mijn tabbladen?">
 <!ENTITY howto.search.step1 "Ga naar de tabbladgroepenweergave.">
 <!ENTITY howto.search.step2a "Klik op de zoekknop aan de rechterkant van het venster om het zoekveld zichtbaar te maken, en begin dan met het typen van de naam van het tabblad dat u probeert te vinden.">
@@ -30,7 +31,7 @@
 <!ENTITY howto.resize.description4 "In rasterindeling wordt dit allemaal voor u gedaan; de groepen worden uitgestrekt, zodat uw tabbladen in zo veel mogelijk ruimte worden weergegeven.">
 <!ENTITY howto.rearrange.caption "Tabbladgroepen herschikken">
 <!ENTITY howto.rearrange.description "Klik en sleep op een leeg gebied langs de randen of onderkant van een groep om deze over het scherm te bewegen.">
-<!ENTITY howto.rearrange.description2 "In rasterindeling sleept u een groep boven een andere om ze van plaats te laten wisselen. Plaats uw meest belangrijke groepen (of die met de meeste tabbladen) bovenaan, aangezien deze doorgaans groter zijn dan die aan de onderkant.">
+<!ENTITY howto.rearrange.description3 "Plaats in rasterindeling de belangrijkste groepen of die met de meeste tabbladen aan de bovenkant, aangezien deze groepen meestal groter zijn dan die aan de onderkant.">
 <!ENTITY howto.name.caption "Tabbladgroepen een naam geven">
 <!ENTITY howto.name.description "Klik naast het potloodpictogram boven in een groep en typ hiervoor een naam in. Druk daarna op Enter, of klik op een ander gebied in het venster.">
 <!ENTITY howto.close.caption "Tabbladgroepen sluiten">

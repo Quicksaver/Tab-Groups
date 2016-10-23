@@ -1,0 +1,41 @@
+<!ENTITY moveToGroup.label "Déplacer vers le groupe">
+<!ENTITY moveToGroup.accesskey "D">
+<!ENTITY moveToNewGroup.label "Nouveau groupe">
+<!ENTITY viewTabGroups.label "Groupes d'onglets">
+<!ENTITY viewTabGroups.accesskey "G">
+<!ENTITY searchForTab.label "Rechercher un onglet...">
+<!ENTITY manageTabGroups.label "Gérer mes groupes">
+<!ENTITY manageTabGroups.tooltip "Ouvrir la vue des groupes pour organiser vos onglets et créer de nouveaux groupes">
+<!ENTITY buttonSearchTabs.label "Rechercher dans les groupes d'onglets">
+<!ENTITY buttonSearchMode.label "Basculer sur le mode liste">
+<!ENTITY buttonSearchClose.label "Ferme de terme de recherche">
+<!ENTITY buttonExitTabGroups.label "Sortir des groupes d'onglets">
+<!ENTITY buttonOptionsTabGroups.label "Changez vos préférences concernant les groupes d'onglets">
+<!ENTITY buttonHelpTabGroups.label "Comment utiliser les groupes d'onglets">
+<!ENTITY buttonClassic.label "Arrangement libre">
+<!ENTITY buttonGrid.label "Affichage en grille">
+<!ENTITY buttonSingle.label "Vue simple">
+<!ENTITY buttonNewGroup.label "Créer un nouveau groupe">
+<!ENTITY menuNewTab.label "Ouvrir un nouvel onglet">
+<!ENTITY menuNewTab.accesskey "t">
+<!ENTITY options.close.tooltip "Sauvegarder et revenir en arrière">
+<!ENTITY options.notapplicable.single "(non applicable en vue simple)">
+<!ENTITY options.title.tooltip "Nommer ce groupe d'onglet">
+<!ENTITY options.showThumbs.label "Montrer les miniatures des onglets">
+<!ENTITY options.showUrls.label "Montrer les adresses à la suite du titre de la page">
+<!ENTITY options.tileIcons.label "Icônes à la place des vignettes quand elles sont trop petites">
+<!ENTITY options.catchOnce.caption "Règle pour capturer les onglets dans ce groupe">
+<!ENTITY options.catchOnce.label "Capturer seulement les nouveaux onglets">
+<!ENTITY options.catchRules.placeholder1 "Insérer les expressions régulières pour les adresses web ici. Les onglets correspondants seront déplacés automatiquement dans ce groupe.">
+<!ENTITY options.catchRules.placeholder2 "Mettre une règle par ligne, il peut y en avoir autant que vous voulez.">
+<!ENTITY options.catchRules.placeholder3 "Examples:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - capture toutes les pages du dépôt du module complémentaire">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - capture les rapports de bug de Firefox">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - capture tout vos réseaux sociaux">
+<!ENTITY options.stackTabs.caption "Quand ce groupe a trop d'onglet...">
+<!ENTITY options.stackTabs.stack.label "Empiler le groupe">
+<!ENTITY options.stackTabs.list.label "Faire défiler le groupe">
+<!ENTITY sessionRestoreNotice.label "Vos onglets et groupes ne seront pas restaurés au prochain démarrage du navigateur. Cliquez ici pour la solution.">
+<!ENTITY sessionRestoreNotice.dismiss.tooltip "Ignorer cet avertissement jusqu'à ce que je redémarre le navigateur.">
+<!ENTITY sessionRestoreAutoChanged.label "Vos onglets et groupes seront automatiquement restaurés lors du prochain démarrage du navigateur.">
+<!ENTITY sessionRestorePrivate.label "Ceci est une fenêtre de navigation privée : vos onglets et groupes ne seront pas restaurés après fermeture de la fenêtre.">

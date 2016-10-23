@@ -10,11 +10,15 @@
 <!ENTITY opt.closeIfEmpty.tooltip "Um grupo é imediatamente descartado quando o seu último separador é fechado. Podes manter grupos vazios ao desactivar esta opção, ou simplesmente ao dar um nome ao grupo ou mudar alguma das suas opções.">
 <!ENTITY opt.showTabCounter.label "Mostrar número de separadores junto ao título do grupo">
 <!ENTITY opt.showTabCounter.tooltip "É mostrado um indicador ao topo do grupo, para que possas facilmente saber quantos separadores estão em cada grupo.">
+<!ENTITY opt.sortGroupsByName.label "Ordenar os grupos por nome em menus e paineis">
+<!ENTITY opt.sortGroupsByName.tooltip "Em sítios onde os grupos são listados, como o menu Mover para Grupo do separador ou o Painel de Acesso Rápido, estes são ordenados alfabeticamente em vez de na ordem em que os tenhas definido no modo de gestão de grupos.">
 <!ENTITY cat.defaults.label "Por defeito, os grupos devem...">
 <!ENTITY opt.showThumbs.label "Mostrar previsualizações dos separadores">
 <!ENTITY opt.showThumbs.tooltip "As previsualizações mostram o conteúdo de cada separador directamente no grupo. Ao desactivá-las, o grupo torna-se numa lista de separadores representados apenas pelo seu título e ícone.">
 <!ENTITY opt.showUrls.label "Mostrar endereços junto aos títulos das páginas">
 <!ENTITY opt.showUrls.tooltip "Para aproveitar o espaço ganho ao não mostrar previsualizações, podes mostrar o endereço de cada separador junto ao seu título.">
+<!ENTITY opt.tileIcons.label "Mostrar ícones das páginas quando as previsualizações são demasiado pequenas">
+<!ENTITY opt.tileIcons.tooltip "Mostra os ícones da página organizados nos grupos em vez das previsualizações quando estas se tornam demasiado pequenas para serem uteis. Isto permite mostrar muitos mais separadores em simultâneo numa área mais pequena.">
 <!ENTITY cat.stackTabs.label "Quando os grupos têm demasiados separadores...">
 <!ENTITY cat.stackTabs.tooltip "As previsualizações dos separadores ocupam espaço. Se o grupo não consegue mostrar todos os seus separadores por não ser largo o suficiente, podes...">
 <!ENTITY opt.stackTabs.label "Empilhar o grupo">
@@ -37,7 +41,7 @@
 <!ENTITY cat.clear.label "Limpar Grupos de Separadores">
 <!ENTITY opt.tabViewKeyset.label "Entrar e sair da vista de grupos">
 <!ENTITY opt.quickAccessKeyset.label "Abrir o painel de acesso rápido">
-<!ENTITY opt.nextGroupKeyset.label "Ir para o próximo gropo">
+<!ENTITY opt.nextGroupKeyset.label "Ir para o próximo grupo">
 <!ENTITY opt.previousGroupKeyset.label "Ir para o grupo anterior">
 <!ENTITY sessionRestore.caption "Manter os grupos de separadores entre reinícios">
 <!ENTITY sessionRestore.description "Para o Firefox se lembrar dos teus grupos de separadores, as tuas janelas e separadores têm de ser restaurados entre sessões. Caso contrário, terás de refazer os teus grupos de cada vez que feches e reinicies o navegador.">

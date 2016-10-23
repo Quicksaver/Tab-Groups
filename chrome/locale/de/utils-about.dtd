@@ -21,6 +21,6 @@
 <!ENTITY about.share "Teilen!">
 <!ENTITY about.friends "Seien Sie nicht der einzige mit einem guten Browser. Lassen Sie Ihre Freunde daran teilhaben!">
 <!ENTITY about.hidePromo "X">
-<!ENTITY about.hideThisPromo "show again when there's a new episode">
-<!ENTITY about.hideAllPromos "never show me promos like this">
-<!ENTITY about.clicktowatch "watch on YouTube">
+<!ENTITY about.hideThisPromo "nach Erscheinen einer neuen Ausgabe wieder anzeigen">
+<!ENTITY about.hideAllPromos "Werbefilme wie diesen nie anzeigen">
+<!ENTITY about.clicktowatch "auf Youtube ansehen">

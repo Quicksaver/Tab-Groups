@@ -7,6 +7,8 @@
 <!ENTITY manageTabGroups.label "Zarządzaj grupami">
 <!ENTITY manageTabGroups.tooltip "Otwórz widok grup, aby organizować swoje karty i tworzyć nowe grupy">
 <!ENTITY buttonSearchTabs.label "Szukaj kartę">
+<!ENTITY buttonSearchMode.label "Toggle list mode">
+<!ENTITY buttonSearchClose.label "Close this search term">
 <!ENTITY buttonExitTabGroups.label "Opuść grupy kart">
 <!ENTITY buttonOptionsTabGroups.label "Zmień ustawienia grup kart">
 <!ENTITY buttonHelpTabGroups.label "Jak używać grup kart">
@@ -14,11 +16,14 @@
 <!ENTITY buttonGrid.label "Układ siatki">
 <!ENTITY buttonSingle.label "Widok pojedynczy">
 <!ENTITY buttonNewGroup.label "Utwórz nową grupę">
+<!ENTITY menuNewTab.label "Otwórz nową kartę">
+<!ENTITY menuNewTab.accesskey "k">
 <!ENTITY options.close.tooltip "Zapisz i wróć">
 <!ENTITY options.notapplicable.single "(nie dotyczy widoku pojedynczego)">
 <!ENTITY options.title.tooltip "Nazwij tę grupę kart">
 <!ENTITY options.showThumbs.label "Pokaż miniaturki kart">
 <!ENTITY options.showUrls.label "Pokaż adresy obok tytułów stron">
+<!ENTITY options.tileIcons.label "Tile page icons when thumbnails are too small">
 <!ENTITY options.catchOnce.caption "Reguły chwytania kart do tej grupy">
 <!ENTITY options.catchOnce.label "Chwytaj tylko nowe kary">
 <!ENTITY options.catchRules.placeholder1 "Wstaw tutaj wyrażenia regularne dla adresów internetowych. Pasujące karty będą automatycznie przenoszone do tej grupy.">
@@ -34,13 +39,3 @@
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Zamknij to ostrzeżenie do ponownego uruchomienia przeglądarki">
 <!ENTITY sessionRestoreAutoChanged.label "Twoje karty i grupy będą automatycznie przywrócone po ponownym uruchomieniu przeglądarki!">
 <!ENTITY sessionRestorePrivate.label "To jest okno prywatne, twoje karty i grupy nie mogą być przywrócone, kiedy je zamkniesz.">
-<!ENTITY message.close "Zamknij tę wiadomość">
-<!ENTITY message.later.label "przypomnij mi później">
-<!ENTITY message.later.tooltip "Pokaż tę wiadomość ponownie w późniejszym czasie">
-<!ENTITY message.1 "Jestem pewien, że do teraz zauważyłeś wiele rozbudowanych zmian w Grupach Kart 2. Mam nadzieję, że wszystko działa dobrze, i że cieszą cię zwiększone doświadczenia.">
-<!ENTITY message.2 "Ale czy wiesz, że mój komputer uległ awarii wcześniej w tym roku?">
-<!ENTITY message.3 "Zgadza się. Większość tego, co widzisz zostało napisane na starej zapasowej maszynie, którą nadal miałem, i brzmi trochę jak kosiarka. Bardzo, bardzo powolna kosiarka...">
-<!ENTITY message.4 "Jeśli podoba ci się dodatek i cieszy cię każda nowa funkcja, proszę rozważ pomoc mnie w zakupie nowej stacji roboczej, poprzez wniesienie wkładu w kierunku aktywnego rozwoju dodatku.">
-<!ENTITY message.5 "Kliknij tutaj, aby dowiedzieć się jak każdy pojedynczy bit utrzymuje rozwój żywy.">
-<!ENTITY message.6 "Oczywiście, jeśli nie możesz to docenię miłą opinię na stronie głównej dodatku lub udostępnienie go wszystkim twoim znajomym. :)">
-<!ENTITY message.7 "Dziękuję za przeczytanie. Mam nadzieję, że cieszą cię Grupy Kart, i jak zwykle jeśli masz jakiś problem po prostu daj mi znać.">

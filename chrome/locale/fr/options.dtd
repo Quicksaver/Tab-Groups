@@ -1,0 +1,80 @@
+<!ENTITY pane.tabGroups.label "Groupes d'onglets.">
+<!ENTITY pane.session.label "Sauvegarder / restaurer">
+<!ENTITY opt.showGroupThumbs.label "Montrer les miniatures des groupes en vue simple">
+<!ENTITY opt.showGroupThumbs.tooltip "Cacher les aperçus de groupe laissera plus d'espace libre dans lequel afficher vos onglets, mais à la contrepartie de ne pouvoir distinguer les groupes qu'à leur seul nom.">
+<!ENTITY opt.gridDynamicSize.label "Utiliser le redimensionnement dynamique des groupes dans le mode grille">
+<!ENTITY opt.gridDynamicSize.tooltip1 "Le mode dynamique exploite toute la taille de votre fenêtre. Le groupe situé en haut aura de plus grandes dimensions que ceux situés en bas.">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Utilisez ceci à votre avantage en déplaçant vers le haut les groupes les plus importants, ou ceux qui ont le plus d'onglets.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "Si cette option est désactivée, tous les groupes auront les mêmes dimensions, avec uniquement les différences qui seraient nécessaires pour que tous apparaissent à l'écran.">
+<!ENTITY opt.closeIfEmpty.label "Fermer automatiquement les groupes vides">
+<!ENTITY opt.closeIfEmpty.tooltip "Un groupe est supprimé immédiatement après la fermeture de son dernier onglet. Vous pouvez garder un groupe vide en désactivant cette préférence, ou simplement en lui donnant un nom ou en changeant certaines de ses options.">
+<!ENTITY opt.showTabCounter.label "Afficher le nombre d'onglets à coté du titre du groupe">
+<!ENTITY opt.showTabCounter.tooltip "Un compteur est affiché en haut du groupe, afin que vous puissiez facilement savoir le nombre d'onglets contenus dans chaque groupe.">
+<!ENTITY opt.sortGroupsByName.label "Trier les groupes par titre dans les menus et panneaux.">
+<!ENTITY opt.sortGroupsByName.tooltip "Partout où les groupes sont listés, par exemple le menu &quot;déplacer vers le groupe&quot; d'un onglet ou le panneau d'accès rapide, ceux-ci sont triés dans l'ordre alphabétique, au lieu de l'odre dans lequel vous les avez placé dans la vue de gestion des groupes. Cette dernière n'est pas affectée par cette option.">
+<!ENTITY cat.defaults.label "Par défaut, les groupes doivent...">
+<!ENTITY opt.showThumbs.label "Montrer les miniatures des onglets">
+<!ENTITY opt.showThumbs.tooltip "Les miniatures montrent le contenu de chaque onglet directement dans le groupe. Les désactiver fait apparaître le groupe comme une liste d'onglets représentés uniquement par leur titre et leur icône.">
+<!ENTITY opt.showUrls.label "Montrer les adresses après les titres de page">
+<!ENTITY opt.showUrls.tooltip "Pour rentabiliser entièrement l’espace économisé en n'affichant pas les aperçus d'onglets, vous pouvez afficher l'adresse de l'onglet à côté de son titre.">
+<!ENTITY opt.tileIcons.label "Icônes sur les tuiles quand les vignettes sont trop petites">
+<!ENTITY opt.tileIcons.tooltip "Afficher l'icône de la page dans sa tuile à la place de la vignette quand elle devient trop petite pour être utile. Ceci vous permet d'avoir beaucoup plus d'onglets affichés simultanément dans une surface plus petite.">
+<!ENTITY cat.stackTabs.label "Quand les groupes ont trop d'onglets...">
+<!ENTITY cat.stackTabs.tooltip "Les miniatures d'onglet prennent de la place. Si le groupe ne peut pas afficher tout les onglets car il n'est pas assez large, vous pouvez...">
+<!ENTITY opt.stackTabs.label "Empiler le groupe">
+<!ENTITY opt.stackTabs.tooltip "Seuls les onglets actifs seront affichés, empilés les uns au dessus des autres. Vous pouvez toujours accéder à tous les onglets en cliquant sur le bouton &quot;étendre&quot; du groupe.">
+<!ENTITY opt.listTabs.label "Faire défiler le groupe">
+<!ENTITY opt.listTabs.tooltip "Certains de vos onglets seront masqués et vous devrez faire défiler le groupe accéder à ceux-ci. Notez que les groupes se comporteront toujours de cette manière en vue simple, quel que soit votre choix pour cette option.">
+<!ENTITY btn.setdefaults.label "Définir cette option pour tout les groupes">
+<!ENTITY btn.setdefaults.tooltip1 "Parce que les options ci-dessus sont appliquées par groupes, les changer ici affectera uniquement les nouveaux groupes.">
+<!ENTITY btn.setdefaults.tooltip2 "Ne cliquez ce bouton que si vous souhaitez écraser les options de tous les groupes avec les valeurs choisies ici. Sinon vous devrez les modifier manuellement pour chacun des groupes.">
+<!ENTITY cat.toolbarbutton.label "Bouton de barre d'outil">
+<!ENTITY opt.groupTitleInButton.label "Afficher le nom du groupe actif">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Sachez quel est le groupe actif, directement depuis la fenêtre principale, sans devoir réaliser la moindre action supplémentaire.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "Le bouton n'affichera que l'icône s'il est placé dans le panneau du menu principal, ou si vous n'avez qu'un seul groupe.">
+<!ENTITY opt.quickAccessButton.label "Cliquer pour ouvrir le panneau d'accès rapide">
+<!ENTITY opt.quickAccessButton.tooltip1 "Le panneau d'accès rapide vous permet de basculer rapidement entre les groupes et les onglets sans entrer dans la vue des groupes.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Désactiver ceci pour entrer dans la vue des groupes en cliquant le bouton.">
+<!ENTITY cat.keyboardshortcuts.label "Raccourcis clavier">
+<!ENTITY cat.backup.label "Sauvegarder vos groupes d'onglets">
+<!ENTITY cat.restore.label "Restaurer vos groupes d'onglets">
+<!ENTITY cat.clear.label "Vider groupes d'onglets">
+<!ENTITY opt.tabViewKeyset.label "Entrer et fermer la vue des groupes">
+<!ENTITY opt.quickAccessKeyset.label "Ouvrir le panneau d'accès rapide">
+<!ENTITY opt.nextGroupKeyset.label "Basculer vers le prochain groupe">
+<!ENTITY opt.previousGroupKeyset.label "Basculer vers le groupe précédent">
+<!ENTITY sessionRestore.caption "Conserver les groupes au redémarrage">
+<!ENTITY sessionRestore.description "Pour que Firefox se souvienne de vos groupes d'onglets, il doit restaurer vos fenêtres et onglets à chaque nouvelle session. Sinon, vous serez obligés de recréer vos groupe à chaque fois que vous redémarrez le navigateur">
+<!ENTITY sessionRestore.button.label "Montrer les fenêtres et onglets ouverts lors de ma précédente session au démarrage de Firefox">
+<!ENTITY sessionRestore.button.tooltip.a "Ceci est équivalent à la préférence &quot;Au démarrage de Firefox : afficher les derniers onglets et fenêtres utilisés&quot; des préférences de Firefox.">
+<!ENTITY sessionRestore.button.tooltip.b "Si vous changez cette option par après, vous perdrez vos groupes d'onglet au redémarrage du navigateur, jusqu'à ce que vous rétablissiez l'option ou cliqiuez ce bouton à nouveau.">
+<!ENTITY opt.noWarningsAboutSession.label "Ne pas m'avertir à propos de ceci dans la vue des groupes">
+<!ENTITY opt.noWarningsAboutSession.tooltip "Les notifications sont là pour vous rappeler que vous ne devriez pas fermer la fenêtre du navigateur si vous ne voulez pas perdre vos onglets et groupes. Ne les désactivez que si vous êtes sûr de ce que vous voulez.">
+<!ENTITY session.backup.button "Créer un fichier de sauvegarde">
+<!ENTITY session.backup.description "Exporte vos groupe d'onglets dans un fichier de sauvegarde par précaution, afin que vous puissiez les restaurer plus tard si nécessaire.">
+<!ENTITY session.backup.description2 "Suggestion : utiliser le nom de fichier et l'emplacement de sauvegarde par défaut ; lors que vous cliquez &quot;charger les groupes et onglets depuis...&quot; dessous, la sauvegarde apparaîtra directement dans le menu d'accès rapide.">
+<!ENTITY session.backup.autoloaded "Le fichier de sauvegarde est maintenant chargé. Merci de confirmer que vos groupes et onglets ont été restaurés correctement.">
+<!ENTITY session.backup.alldata.checkbox.label "Sauvegarder les données de session">
+<!ENTITY session.backup.alldata.checkbox.tooltip.a "Cette option peut être utile à l'avenir pour restaurer les groupes de ce fichier de sauvegarde. Sinon, vous serez seulement capable de restaurer les groupes et les onglets ouverts qu'ils contiennent.">
+<!ENTITY session.backup.alldata.checkbox.tooltip.b "Si vous n'avez pas besoin de conserver l'historique de navigation, formulaires ou autres données dans vos onglets, alors vous pouvez ignorer cette option.">
+<!ENTITY session.backup.alldata.caution.a "Attention ! Ceci va aussi exporter toutes vos données de session.">
+<!ENTITY session.backup.alldata.caution.b "Faites attention à qui peut accéder à ce fichier, car il contiendra des informations sur tous vos onglets, dont votre historique de navigation, saisies de formulaires, et d'autres informations privées et potentiellement sensibles.">
+<!ENTITY session.restore.button "Charger groupes et onglets depuis...">
+<!ENTITY session.restore.from.file "Fichier...">
+<!ENTITY session.restore.import.button "Importer les éléments sélectionnés dans cette fenêtre">
+<!ENTITY session.restore.import.tooltip.a "Après avoir pressé ce bouton, vous pourrez entrer dans la vue &quot;Groupe d'onglets&quot; et ranger le groupe fraîchement importé, comme habituellement.">
+<!ENTITY session.restore.import.tooltip.b "Notez que vous ne pouvez qu'importer des nouveaux groupes, et pas des onglets dans des groupes déjà existants. Ce qui signifie que vous pouvez vous retrouver avec des doublons si vous importez plusieurs fois le même groupe. Dans ce cas, rendez-vous simplement dans la vue &quot;Groupe d'onglets&quot; et fermez ceux que vous ne souhaitez pas conserver.">
+<!ENTITY session.restore.description "Chargez un fichier de sauvegarde qui contient les groupes d'onglets que vous souhaitez restaurer. Puis sélectionnez et choisissez quels groupes et onglets vous souhaitez. Ils seront chargé dans cette fenêtre, ainsi vous pourriez y accéder, les organiser et les personnaliser d'avantage.">
+<!ENTITY session.restore.invalid "Le fichier sélectionner est invalide, corrompu, ou ne contient aucune information concernant les groupes d'onglets.">
+<!ENTITY session.restore.finished "Les groupes sélectionnés ont été importés dans cette fenêtre. Maintenant rendez-vous dans le mode &quot;Groupe d'onglets&quot; pour y accéder.">
+<!ENTITY session.restore.list.check "Importer">
+<!ENTITY session.restore.list.items "Groupes et onglets">
+<!ENTITY session.clear.button "Vider les données de groupe">
+<!ENTITY session.clear.tooltip "Vous ne devriez jamais avoir besoin de faire ceci, car il est plus simple et plus sûr de vous rendre dans la vue &quot;Groupe d'onglets&quot; pour fermer les groupes dont vous ne voulez plus.">
+<!ENTITY session.clear.description.a "Supprimer toutes les données de groupes d'onglets de la session courante.">
+<!ENTITY session.clear.description.f "À n'utiliser que si vous savez ce que vous faîtes !">
+<!ENTITY session.clear.description.b "Réalisez une sauvegarde de vos groupes d'onglets au préalable">
+<!ENTITY session.clear.description.c "Ceci va recharger toutes vos fenêtres de navigateur et leurs onglets">
+<!ENTITY session.clear.description.g ", et retirer tous les onglets des groupes non actifs.">
+<!ENTITY session.clear.description.d "Attention : cette action ne peut pas être annulée !">
+<!ENTITY session.clear.description.e "Êtes-vous sûr de vouloir procéder à la suppression ?">

@@ -1,0 +1,26 @@
+<!ENTITY about.paneTitle "À propos">
+<!ENTITY about.version "Version {v}">
+<!ENTITY about.uptodate "Vous êtes à jour, bravo !">
+<!ENTITY about.needsupdate "Une mise à jour est disponible !">
+<!ENTITY about.description "Consultez ci-dessous les notes de versions et anomalies connues pour cette version. Contactez nous si vous rencontrez des anomalies ou si vous avez des suggestions pour les prochaines versions.">
+<!ENTITY about.descriptionB "Ce module vous est offert gratuitement, bien que nous fournissions un travail long et parfois difficile pour corriger les anomalies, ajouter des fonctionnalités ou s'assurer que tout continue à fonctionner à chaque nouvelle version de Firefox. Si vous appréciez ce module, merci de soutenir son développement. Comme l'indique le lien, « vous pouvez aider » !">
+<!ENTITY about.descriptionC "Regardez aussi le dernier épisode de ma série web à propos de la vie avec un Firefox, faite pour vous tous, les meilleurs utilisateurs dont un développeur peut rêver ! Dirigez votre curseur vers l’icône  sautillant dans le coin inférieur gauche de cette page.">
+<!ENTITY about.allVersions "Afficher les notes de toutes les précédentes versions">
+<!ENTITY about.notifyOnUpdates "M'afficher cet onglet à la prochaine mise à jour">
+<!ENTITY about.development "Statut du développement">
+<!ENTITY about.helpdevelopment "VOUS POUVEZ AIDER">
+<!ENTITY about.information "Plus d'informations">
+<!ENTITY about.home "Page web du module">
+<!ENTITY about.fullchangelog "Liste complète des modifications">
+<!ENTITY about.problems "Vous rencontrez un problème ?">
+<!ENTITY about.tech "Ouvrez un rapport d'anomalie sur la page de support, pour décrire le problème rencontré">
+<!ENTITY about.email "Ou envoyez-moi un e-mail à ce propos">
+<!ENTITY about.author "Plus à propos de l'auteur">
+<!ENTITY about.trymore "Essayez mes autres modules pour améliorer encore Firefox !">
+<!ENTITY about.profile "Vous pouvez les trouver sur mon profil.">
+<!ENTITY about.share "Partager !">
+<!ENTITY about.friends "Ne soyez pas le seul à profiter d'un navigateur génial. Partagez avec vos amis !">
+<!ENTITY about.hidePromo "X">
+<!ENTITY about.hideThisPromo "afficher à nouveau à la publication d'un nouvel épisode">
+<!ENTITY about.hideAllPromos "ne plus me montrer de promotion comme celle-ci">
+<!ENTITY about.clicktowatch "regarder sur YouTube">

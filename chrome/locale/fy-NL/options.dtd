@@ -10,11 +10,15 @@
 <!ENTITY opt.closeIfEmpty.tooltip "In groep wurd sluten sa gau as it lêste ljepblêd sluten is. Jo kinne in lege groep behâlde troch dizze opsje út te skeakeljen, of troch it simpel in namme te jaan of in pear opsjes te oan te passen.">
 <!ENTITY opt.showTabCounter.label "Toan oantal ljepblêden njonken de groepstitel">
 <!ENTITY opt.showTabCounter.tooltip "In yndikator wurdt boppe-oan toand, sa dat jo maklik sjen kinne hoe folle ljepblêden jo yn in groep hawwe.">
+<!ENTITY opt.sortGroupsByName.label "Sort groups by title in menus and panels">
+<!ENTITY opt.sortGroupsByName.tooltip "Anywhere groups are listed, such as the tab's Move to Group menu or the Quick Access Panel, they are sorted alphabetically instead of in the order you placed them in groups management view, which is unaffected by this option.">
 <!ENTITY cat.defaults.label "Standert moatte groepen…">
 <!ENTITY opt.showThumbs.label "Ljepblêdfoarbylden toane">
 <!ENTITY opt.showThumbs.tooltip "The thumbnails show the contents of each tab directly in the group. Disabling them turns the group into a list of tabs represented only by their title and icon.">
 <!ENTITY opt.showUrls.label "Show addresses next to page titles">
 <!ENTITY opt.showUrls.tooltip "To make full use of the space saved when not showing tab thumbnails, you can show the tab's location next to its title.">
+<!ENTITY opt.tileIcons.label "Tile page icons when thumbnails are too small">
+<!ENTITY opt.tileIcons.tooltip "Shows the page icons in a tile instead of the thumbnails when they become too small to be useful. This lets you have a lot more tabs displayed at the same time on a smaller area.">
 <!ENTITY cat.stackTabs.label "When groups have too many tabs...">
 <!ENTITY cat.stackTabs.tooltip "Tab thumbnails take up space. If the group can't show all of its tabs because it isn't large enough, you can...">
 <!ENTITY opt.stackTabs.label "Steapelje de groep">

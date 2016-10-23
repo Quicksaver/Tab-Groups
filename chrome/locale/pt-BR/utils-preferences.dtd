@@ -1,0 +1,13 @@
+<!ENTITY preferences.button "Preferências">
+<!ENTITY preferences.undo.label "Desfazer">
+<!ENTITY preferences.redo.label "Refazer">
+<!ENTITY preferences.undoredo.tooltip "Reverte rapidamente qualquer alteração feita às preferências do complemento, incluindo importar de um arquivo e restaurar as definições.">
+<!ENTITY preferences.import.label "Importar do arquivo...">
+<!ENTITY preferences.import.tooltip "Carrega as preferências do complemento guardadas em um arquivo no computador.">
+<!ENTITY preferences.export.label "Exportar para arquivo...">
+<!ENTITY preferences.export.tooltip "Guarda suas preferências do complemento em um arquivo externo como cópia de segurança.">
+<!ENTITY preferences.reset.label "Restaurar predefinições">
+<!ENTITY preferences.reset.tooltip.a "Todas as preferências são restauradas para os seus valores de origem, como se o complemento tivesse sido acabado de instalar.">
+<!ENTITY preferences.reset.tooltip.b "Colocações de botões em barras de ferramentas não são afetadas, para reverter essas use antes o botão Restaurar Predefinições na aba de Customização.">
+<!ENTITY preferences.jumpto.label "Ir para preferência...">
+<!ENTITY preferences.jumpto.tooltip "Digite uma palavra para encontrar uma preferência que a contenha.">

@@ -17,7 +17,8 @@
 <!ENTITY howto.overflow.description "As previsualizações dos separadores ocupam espaço. Se um grupo não for largo o suficiente para mostrar todos os seus separadores, este pode ser empilhado ou rolado.">
 <!ENTITY howto.stack.description "Os separadores num grupo empilhado são mostrados uns sobre os outros. Apenas podes interagir com o separador activo no topo. Abaixo dos separadores está um botão de expandir, que te permite aceder a todos os outros separadores sem teres de redimensionar o grupo.">
 <!ENTITY howto.list.description "Em alternativa, os separadores podem ser mostrados normalmente sem serem empilhados. Alguns deles estarão escondidos e terás de rolar o grupo para lhes aceder.">
-<!ENTITY howto.thumbs.description "Também podes escolher grupos especificos nos quais não queiras ver previsualizações dos separadores. Estes serão listados apenas com os títulos das páginas e opcionalmente com os seus endereços. Isto irá acontecer também em grupos rolados que não são largos o suficiente para mostrar pelo menos três colunas de separadores, independentemente se o grupo está definido para mostrar previsualizações ou não.">
+<!ENTITY howto.icons.description "Quando as previsualizações de separadores se tornam demasiado pequenas para serem úteis, são mostrados antes os ícones das páginas no grupo. Isto pode ser desactivado por grupo, para que mostre sempre ou as previsualizações inteiras ou os separadores numa lista.">
+<!ENTITY howto.thumbs.description2 "Também podes escolher grupos especificos nos quais não queiras ver previsualizações dos separadores. Estes serão listados apenas com os títulos das páginas e opcionalmente com os seus endereços. Isto irá acontecer também em grupos rolados que não são largos o suficiente para mostrar pelo menos três colunas de previsualizações, ou duas colunas de ícones, independentemente se o grupo está definido para mostrar previsualizações ou não.">
 <!ENTITY howto.search.caption "Como procuro por um separador?">
 <!ENTITY howto.search.step1 "Entra no modo Grupos de Separadores.">
 <!ENTITY howto.search.step2a "Prime o botão de pesquisa no lado direito da janela para ativar a caixa de pesquisa e insere o nome do separador que procuras.">
@@ -30,7 +31,7 @@
 <!ENTITY howto.resize.description4 "Na vista em grelha, isto é tudo feito por ti, os grupos serão esticados para mostrar os teus separadores no maior espaço possível.">
 <!ENTITY howto.rearrange.caption "Posicionar">
 <!ENTITY howto.rearrange.description "Clica e arrasta numa área vazia de um grupo para o moveres pelo ecrã.">
-<!ENTITY howto.rearrange.description2 "Na vista em grelha, larga um grupo sobre outro para que troquem de lugar. Colocar os teus grupos mais importantes, ou os que têm mais separadores, no topo já que esses normalmente serão maiores do que os colocados no fundo.">
+<!ENTITY howto.rearrange.description3 "Na vista em grelha, coloca os teus grupos mais importantes, ou os que têm mais separadores, no topo já que esses normalmente serão maiores do que os colocados no fundo.">
 <!ENTITY howto.name.caption "Nomear">
 <!ENTITY howto.name.description "Clica na área junto ao ícone do lápis no topo do grupo e escreve o nome para designá-lo. Depois basta premir Enter ou clicar numa outra área qualquer da janela.">
 <!ENTITY howto.close.caption "Fechar">

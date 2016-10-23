@@ -17,7 +17,8 @@
 <!ENTITY howto.overflow.description "分頁縮圖會佔用空間。若某群組並未大到所有分頁都可以顯示，它將會被堆疊或是捲動。">
 <!ENTITY howto.stack.description "在堆疊群組中的分頁會顯示在其他分頁之上。您只能與最上面的前景分頁互動。在這個堆疊之下，有一個預覽按鈕，您可以點選它來存取所有其他分頁而不必變更群組的大小。">
 <!ENTITY howto.list.description "相反地，您可以選擇顯示所有的分頁而不要堆疊。它們的其中一些將會被隱藏，然後您將需要向下捲動來存取它們。">
-<!ENTITY howto.thumbs.description "您也可以選擇特定的群組不要顯示分頁縮圖。此時分頁將只會列出它們的標題以及網址（可選）。這也會在捲動群組大小不足以讓至少三欄的分頁顯示時發生，而不論縮圖是否啟用。">
+<!ENTITY howto.icons.description "若群組中的分頁變得太小而使它們的縮圖無法使用的話，其圖示會在平鋪中顯示。這可以在每個群組中單獨停用，這樣它就可以總是顯示完整縮圖或是總是以分頁清單顯示。">
+<!ENTITY howto.thumbs.description2 "您可以選擇特定的群組不要顯示分頁縮圖。分頁將會僅列出它們的標題與（選擇性顯示）它們的網址。不論縮圖是否啟用，這將會在不足以顯示至少三欄縮圖，或是兩欄圖示的捲動群組中發生。">
 <!ENTITY howto.search.caption "我要如何在我的分頁間搜尋？">
 <!ENTITY howto.search.step1 "進入分頁群組檢視">
 <!ENTITY howto.search.step2a "點選在視窗右邊的搜尋按鈕，就會把您帶到搜尋框，然後您只需要開始鍵入您要尋找的分頁名稱。">
@@ -30,7 +31,7 @@
 <!ENTITY howto.resize.description4 "在網格佈局中，這一切都幫您做好了，群組將會盡可能地伸展以顯示您的分頁。">
 <!ENTITY howto.rearrange.caption "重新排列分頁群組">
 <!ENTITY howto.rearrange.description "在一個空的區域上點選並沿著群組的邊邊或底部拖曳來讓它在螢幕四周移動。">
-<!ENTITY howto.rearrange.description2 "在網格佈局中，把一個群組丟到另一個群組中以讓它們交換位置。將您最重要的群組，或是有最多分頁的群組放到底部，因為通常其會比在底部的群組大。">
+<!ENTITY howto.rearrange.description3 "在網格佈局中，將您最重要的群組，或是有最多分頁的群組放在最上面，這樣它們通常會比在底部的那些大。">
 <!ENTITY howto.name.caption "命名分頁群組">
 <!ENTITY howto.name.description "點選在群組頂部的鉛筆圖示，並輸入要給它的名字。然後只要按下 Enter 或在視窗其它區域點擊就可以了。">
 <!ENTITY howto.close.caption "關閉分頁群組">

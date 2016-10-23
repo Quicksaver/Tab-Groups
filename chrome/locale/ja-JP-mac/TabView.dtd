@@ -7,6 +7,8 @@
 <!ENTITY manageTabGroups.label "グループを管理">
 <!ENTITY manageTabGroups.tooltip "グループビューを開き、タブの整理や新規グループの作成をします">
 <!ENTITY buttonSearchTabs.label "タブグループを検索">
+<!ENTITY buttonSearchMode.label "リストモードを切り替える">
+<!ENTITY buttonSearchClose.label "この検索を閉じる">
 <!ENTITY buttonExitTabGroups.label "タブグループを終了">
 <!ENTITY buttonOptionsTabGroups.label "タブグループの設定を変更">
 <!ENTITY buttonHelpTabGroups.label "タブグループの使い方">
@@ -14,11 +16,14 @@
 <!ENTITY buttonGrid.label "グリッド表示">
 <!ENTITY buttonSingle.label "シングルビュー">
 <!ENTITY buttonNewGroup.label "新規グループを作成">
+<!ENTITY menuNewTab.label "新規タブを開く">
+<!ENTITY menuNewTab.accesskey "t">
 <!ENTITY options.close.tooltip "保存して戻ります">
 <!ENTITY options.notapplicable.single "(シングルビューでは適用されません)">
 <!ENTITY options.title.tooltip "このタブグループに別名を付けます">
 <!ENTITY options.showThumbs.label "タブのサムネイル画像を表示する">
 <!ENTITY options.showUrls.label "ページタイトルの隣にアドレスを表示する">
+<!ENTITY options.tileIcons.label "サムネイル画像が小さすぎる場合、ページアイコンをタイル状に表示する">
 <!ENTITY options.catchOnce.caption "タブをキャッチしてこのグループに加えるルール">
 <!ENTITY options.catchOnce.label "新規タブのみキャッチする">
 <!ENTITY options.catchRules.placeholder1 "Web アドレスの正規表現をここに挿入してください。マッチするタブを自動的にこのグループへ移動します。">
@@ -34,13 +39,3 @@
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "ブラウザを再起動するまで警告を表示しません">
 <!ENTITY sessionRestoreAutoChanged.label "タブとグループはブラウザの次回起動時に自動的に復元されます。">
 <!ENTITY sessionRestorePrivate.label "これはプライベートウインドウです。閉じると、タブとグループは破棄され復元できません。">
-<!ENTITY message.close "このメッセージを閉じる">
-<!ENTITY message.later.label "後で知らせる">
-<!ENTITY message.later.tooltip "別の時に再びこのメッセージを表示します">
-<!ENTITY message.1 "ご覧の通り、Tab Groups 2 では広範囲にわたって多くの変更があります。このバージョンのすべてがうまく動作し、楽しんで使っていただけることを期待しています。">
-<!ENTITY message.2 "しかし、今年前半、開発の途上で私のコンピュータにトラブルがありました。">
-<!ENTITY message.3 "あなたが見ているもののほとんどは、トラブルが起こった時に残っていた古いコンピュータ内のバックアップから書き直されたものです。まるで倉庫に眠っている古い芝刈り機のように、とても動作の遅いコンピュータでした。">
-<!ENTITY message.4 "このアドオンを気に入ってくださり、新しい機能を楽しんでいただけたら、新しいコンピュータを買うための支援をご検討ください。アドオンの開発継続のための寄付をお願いします。">
-<!ENTITY message.5 "ここをクリックすると、寄付によって開発がどのように維持されているかを知ることができます。">
-<!ENTITY message.6 "もちろん、寄付できなくても、アドオンのホームページでレビューを書いたり、ご友人に使ってもらったりすることでも結構です :)">
-<!ENTITY message.7 "お読みいただき、ありがとうございました。Tab Groups を楽しんでください。もし何か問題があればお知らせください。">

@@ -17,7 +17,8 @@
 <!ENTITY howto.overflow.description "标签页缩略图会占用很多空间。如果一个分组的空间不足以展示其所有标签页，它可以变为堆叠或滚动模式。">
 <!ENTITY howto.stack.description "堆叠模式中的分组会一层一层的叠放显示标签页。您只能看到和与在最上面的活动标签页互动。在堆叠下方还有一个预览按钮，您可以点击它以查看和访问里面的其他标签页，此时不会改变该分组的尺寸。">
 <!ENTITY howto.list.description "与此不同，您可以选择不堆叠并显示所有标签页。其中一部分将被隐藏，您必须向下滚动才能访问它们。">
-<!ENTITY howto.thumbs.description "您还可以选择特定分组不显示标签页缩略图。里面的标签页将只显示其标题（并可选显示其地址）。如果滚动的分组不足以显示最少的3个标签页，此模式也会出现，那时将无视缩略图选项的启用与否。">
+<!ENTITY howto.icons.description "如果组中的标签页空间太小，从而缩略图不够用，将使用它们的图标代替。这可以在各组中禁用，使其始终显示完整的缩略图或显示为标签页列表。">
+<!ENTITY howto.thumbs.description2 "您还可以为特定组选择不显示标签页缩略图。那么标签页仅列出其标题和地址（可选）。这也会在滚动组没有足够的空间显示至少三列缩略图或两列图标时使用，不论是否已启用缩略图。">
 <!ENTITY howto.search.caption "如何检索我的标签页？">
 <!ENTITY howto.search.step1 "进入标签页分组查看模式。">
 <!ENTITY howto.search.step2a "点击窗口右侧的搜索按钮打开搜索框，然后开始输入你想要查找的标签页的名称。">
@@ -30,7 +31,7 @@
 <!ENTITY howto.resize.description4 "在网格视图中，一切都会自动为您完成，所有分组将自动拉伸，以尽可能使用所有空间，展示您的所有标签页。">
 <!ENTITY howto.rearrange.caption "重新排列标签页分组">
 <!ENTITY howto.rearrange.description "在分组两侧或者底部的空白区域单击并拖动可以让分组在屏幕上移动。">
-<!ENTITY howto.rearrange.description2 "在网格视图中，拖放一个分组到另一个上面将交换两者的位置。将您最重要或具有最多标签页的分组放在顶部吧，通常那里比底部具有更多的可用空间。">
+<!ENTITY howto.rearrange.description3 "在网格视图中，您最重要的或者有最多标签页的组会被放在顶部，因为它们比底部具有更多空间。">
 <!ENTITY howto.name.caption "命名标签页分组">
 <!ENTITY howto.name.description "在标签页分组顶部的铅笔图标旁点击，然后为其输入一个名字。随后按下回车键或者在窗口外的其他区域单击即可。">
 <!ENTITY howto.close.caption "关闭标签页分组">

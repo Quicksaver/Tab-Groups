@@ -10,11 +10,15 @@
 <!ENTITY opt.closeIfEmpty.tooltip "Un grupo se descarta inmediatamente cuando se cierra su última pestaña. Puede mantener vacío un grupo deshabilitando esta preferencia, o simplemente dándole un nombre o cambiando algunas de sus opciones.">
 <!ENTITY opt.showTabCounter.label "Mostrar el número de pestañas junto al título del grupo">
 <!ENTITY opt.showTabCounter.tooltip "Se muestra un indicador en la parte superior del grupo, para que pueda saber fácilmente cuantas pestañas tiene en cada grupo.">
+<!ENTITY opt.sortGroupsByName.label "Ordenar grupos por título en menús y paneles">
+<!ENTITY opt.sortGroupsByName.tooltip "En cualquier parte en que se listen los grupos, como el menú 'Mover al grupo' de la pestaña o el 'Panel de acceso rápido', se ordenan alfabéticamente en lugar de en el orden en que los situó en la vista de gestión de grupos, que no está afectada por esta opción.">
 <!ENTITY cat.defaults.label "Por defecto, los grupos deben...">
 <!ENTITY opt.showThumbs.label "Mostrar miniaturas de pestañas">
 <!ENTITY opt.showThumbs.tooltip "Las miniaturas muestran los contenidos de cada pestaña directamente en el grupo. Deshabilitarlas convierte al grupo en una lista de pestañas representadas sólo por sus títulos e iconos.">
 <!ENTITY opt.showUrls.label "Mostrar direcciones junto a los títulos de páginas">
 <!ENTITY opt.showUrls.tooltip "Para hacer uso completo del espacio ganado cuando no se muestren las miniaturas de pestañas, puede mostrar la ubicación de la pestaña junto a su título.">
+<!ENTITY opt.tileIcons.label "Iconos de página en las losetas cuando las miniaturas sean demasiado pequeñas">
+<!ENTITY opt.tileIcons.tooltip "Muestra los iconos de página en las losetas en lugar de las miniaturas, cuando se vuelven demasiado pequeñas para se útiles. Esto le permite que se muestren muchas más pestañas al mismo tiempo en un área más pequeña.">
 <!ENTITY cat.stackTabs.label "Cuando los grupos tienen demasiadas pestañas...">
 <!ENTITY cat.stackTabs.tooltip "Las miniaturas de pestañas ocupan espacio. Si el grupo no puede mostrar todas sus pestañas por no ser suficientemente grande, puede...">
 <!ENTITY opt.stackTabs.label "Apilar el grupo">

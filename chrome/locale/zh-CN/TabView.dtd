@@ -7,6 +7,8 @@
 <!ENTITY manageTabGroups.label "管理我的分组">
 <!ENTITY manageTabGroups.tooltip "进入分组视图管理您的标签页与创建新分组">
 <!ENTITY buttonSearchTabs.label "搜索标签页分组">
+<!ENTITY buttonSearchMode.label "切换列表模式">
+<!ENTITY buttonSearchClose.label "关闭此搜索词">
 <!ENTITY buttonExitTabGroups.label "离开标签页分组">
 <!ENTITY buttonOptionsTabGroups.label "更改标签页分组首选项">
 <!ENTITY buttonHelpTabGroups.label "如何使用标签页分组">
@@ -14,11 +16,14 @@
 <!ENTITY buttonGrid.label "网格视图">
 <!ENTITY buttonSingle.label "单组视图">
 <!ENTITY buttonNewGroup.label "创建新分组">
+<!ENTITY menuNewTab.label "打开新标签页">
+<!ENTITY menuNewTab.accesskey "t">
 <!ENTITY options.close.tooltip "保存并返回">
 <!ENTITY options.notapplicable.single "(不适用单组视图)">
 <!ENTITY options.title.tooltip "命名此标签页分组">
 <!ENTITY options.showThumbs.label "显示标签页缩略图">
 <!ENTITY options.showUrls.label "在页面标题旁显示地址">
+<!ENTITY options.tileIcons.label "缩略图太小时平铺页面图标">
 <!ENTITY options.catchOnce.caption "捕获标签页到此分组的规则">
 <!ENTITY options.catchOnce.label "只捕获新的标签页">
 <!ENTITY options.catchRules.placeholder1 "在这里插入匹配网页地址的正则表达式。匹配的标签页将自动移动到此分组。">
@@ -34,13 +39,3 @@
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "在重启浏览器之前忽略此警告">
 <!ENTITY sessionRestoreAutoChanged.label "您的标签页和分组将在浏览器下次启动时自动恢复。">
 <!ENTITY sessionRestorePrivate.label "这是一个隐私窗口，在关闭它之前，您的标签页和分组不能被恢复。">
-<!ENTITY message.close "关闭此消息">
-<!ENTITY message.later.label "稍后提醒我">
-<!ENTITY message.later.tooltip "下一次仍显示此消息">
-<!ENTITY message.1 "到了现在，我很确定你已经注意到了 Tab Groups 2 中发生的显著变化。我希望一切都运转良好并且你喜欢增强的体验。">
-<!ENTITY message.2 "但你是否知道，我的电脑在今年早些时候坏掉了呢？">
-<!ENTITY message.3 "没错，你所见到的大多数体验都是我在一台老旧的备用机器上编写，还好我仍然有它。但它的声音像是一台割草机，还是一台很慢、很慢的割草机……">
-<!ENTITY message.4 "如果您喜欢这个附加组件的任何新功能，请考虑帮助我购买一台新的工作站，捐助一点，帮助附加组件保持继续开发。">
-<!ENTITY message.5 "点击这里了解维持继续开发的每一点滴。">
-<!ENTITY message.6 "当然，即便您无法帮忙，我也非常感谢。如果您能在附加组件的首页上留一条精彩评论，或者与你的所有朋友分享它，那也不错。:)">
-<!ENTITY message.7 "感谢您阅读这个，希望你喜欢 Tab Groups。如往常一样，如果你有或遇到任何问题，不妨告诉我。">

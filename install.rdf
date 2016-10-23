@@ -38,9 +38,9 @@
 		<em:localized>
 			<Description>
 				<em:locale>cs</em:locale>
-				<em:name>Tab Groups</em:name>
-				<em:description>Doplněk Tab Groups (Skupiny panelů) usnadňuje organizaci velkého počtu panelů. Pomocí grafického rozhraní je možné seskupovat související panely, přepínat mezi skupinami, a rychle vyhledat a přejít na konkrétní panel.</em:description>
-				<em:translator>v.ovcacik @ Babelzilla</em:translator>
+				<em:name>Skupiny Panelů</em:name>
+				<em:description>Skupiny panelů (Tab Groups) usnadňují organizaci velkého počtu panelů. Pomocí grafického rozhraní je možné seskupovat související panely, přepínat mezi skupinami, a rychle vyhledat a přejít na konkrétní panel.</em:description>
+				<em:translator>soucet, v.ovcacik @ Babelzilla</em:translator>
 			</Description>
 		</em:localized>
 		<em:localized>
@@ -57,6 +57,14 @@
 				<em:name>Tab Groups</em:name>
 				<em:description>Los grupos de pestañas de Tab Groups son una forma fácil de organizar muchas pestañas. Puede agrupar visualmente pestañas relacionadas, alternar entre grupos, y buscar rápidamente por todas sus pestañas para cambiar a una específica.</em:description>
 				<em:translator>strel</em:translator>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
+				<em:locale>fr</em:locale>
+				<em:name>Groupes d'Onglets</em:name>
+				<em:description>Les groupes d'onglets sont un moyen facile d'organiser vos onglets si vous en avez beaucoup. Vous pouvez rassembler visuellement les onglets par sujets, basculer d'un groupe à un autre, et effectuer une rechercher rapide à travers tous les onglets pour accéder à celui dont vous avez besoin.</em:description>
+				<em:translator>Arnaud Jacquemin http://arnaud-jacquemin.fr/, bart15, Charles Milette (https://charlesmilette.github.io), Olivier FEBWIN, repeer.org</em:translator>
 			</Description>
 		</em:localized>
 		<em:localized>
@@ -97,6 +105,14 @@
 				<em:name>Tab Groups</em:name>
 				<em:description>Grupy kart to prosty sposób, aby zorganizować wiele kart. Możesz wizualnie pogrupować powiązane karty, przełączać się pomiędzy grupami i szybko przeszukiwać wszystkie swoje karty, aby przełączyć się do konkretnej.</em:description>
 				<em:translator>fx4waldi @ Babelzilla</em:translator>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
+				<em:locale>pt-BR</em:locale>
+				<em:name>Grupos de Abas</em:name>
+				<em:description>Os Grupos de Abas são uma maneira fácil de organizar muitas abas. Você pode agrupar abas relacionadas visualmente, alternar entre grupos e procurar rapidamente por uma aba específica.</em:description>
+				<em:translator>Fernando Boaglio, Adriano Caheté (https://profolio.com.br?ref=babelzilla)</em:translator>
 			</Description>
 		</em:localized>
 		<em:localized>

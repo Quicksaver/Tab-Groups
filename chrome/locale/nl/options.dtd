@@ -10,11 +10,15 @@
 <!ENTITY opt.closeIfEmpty.tooltip "Een groep wordt meteen verwijderd zodra het laatste tabblad ervan is gesloten. U kunt een lege groep behouden door deze voorkeur uit te schakelen, of door de groep eenvoudig te benoemen of enkele opties ervan te wijzigen.">
 <!ENTITY opt.showTabCounter.label "Aantal tabbladen naast groepstitel tonen">
 <!ENTITY opt.showTabCounter.tooltip "Boven in de groep wordt een indicator getoond, zodat u makkelijk weet hoeveel tabbladen u in elke groep hebt.">
+<!ENTITY opt.sortGroupsByName.label "Groepen op titel sorteren in menu’s en panelen">
+<!ENTITY opt.sortGroupsByName.tooltip "Overal waar groepen worden vermeld, zoals in het tabbladmenu Verplaatsen naar groep of in het paneel voor snelle toegang, worden deze groepen alfabetisch gesorteerd in plaats van in de volgorde waarin u ze in de groepenbeheerweergave hebt toegevoegd, die niet door deze optie wordt beïnvloed.">
 <!ENTITY cat.defaults.label "Standaard moeten groepen…">
 <!ENTITY opt.showThumbs.label "Tabbladminiaturen tonen">
 <!ENTITY opt.showThumbs.tooltip "De miniaturen tonen de inhoud van elk tabblad direct in de groep. Uitschakelen hiervan wijzigt de groep naar een lijst met tabbladen die alleen door hun titel en pictogram worden voorgesteld.">
 <!ENTITY opt.showUrls.label "Adressen naast paginatitels tonen">
 <!ENTITY opt.showUrls.tooltip "Om volledig van de bespaarde ruimte gebruik te maken wanneer geen tabbladminiaturen worden getoond, kunt u de locatie van het tabblad naast de titel ervan laten tonen.">
+<!ENTITY opt.tileIcons.label "Paginapictogrammen naast elkaar tonen als miniaturen te klein zijn">
+<!ENTITY opt.tileIcons.tooltip "Toont de paginapictogrammen naast elkaar in plaats van de miniaturen wanneer ze te klein worden om nuttig te zijn. Hierdoor kunt u meer tabbladen tegelijk laten tonen in een kleiner gebied.">
 <!ENTITY cat.stackTabs.label "Als groepen te veel tabbladen bevatten…">
 <!ENTITY cat.stackTabs.tooltip "Tabbladminiaturen nemen ruimte in beslag. Als de groep niet alle tabbladen ervan kan tonen omdat deze niet groot genoeg is, kunt u…">
 <!ENTITY opt.stackTabs.label "De groep stapelen">

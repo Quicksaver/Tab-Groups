@@ -7,6 +7,8 @@
 <!ENTITY manageTabGroups.label "Administrar mis grupos">
 <!ENTITY manageTabGroups.tooltip "Entre en la vista de grupos para organizar sus pestañas y crear nuevos grupos">
 <!ENTITY buttonSearchTabs.label "Buscar grupos de pestañas">
+<!ENTITY buttonSearchMode.label "Accionar el modo de lista">
+<!ENTITY buttonSearchClose.label "Cerrar este criterio de búsqueda">
 <!ENTITY buttonExitTabGroups.label "Salir de grupos de pestañas">
 <!ENTITY buttonOptionsTabGroups.label "Cambiar preferencias de grupos de pestañas">
 <!ENTITY buttonHelpTabGroups.label "Cómo usar los grupos de pestañas">
@@ -14,11 +16,14 @@
 <!ENTITY buttonGrid.label "Disposición de parrilla">
 <!ENTITY buttonSingle.label "Vista única">
 <!ENTITY buttonNewGroup.label "Crear nuevo grupo">
+<!ENTITY menuNewTab.label "Abrir nueva pestaña">
+<!ENTITY menuNewTab.accesskey "p">
 <!ENTITY options.close.tooltip "Guarda y regresa">
 <!ENTITY options.notapplicable.single "(no aplicable en la vista única)">
 <!ENTITY options.title.tooltip "Dar nombre a este grupo de pestañas">
 <!ENTITY options.showThumbs.label "Mostrar miniaturas de pestañas">
 <!ENTITY options.showUrls.label "Mostrar direcciones junto a los títulos de las páginas">
+<!ENTITY options.tileIcons.label "Iconos de página en las pestañas cuando las miniaturas sean demasiado pequeñas">
 <!ENTITY options.catchOnce.caption "Reglas para captar pestañas hacia este grupo">
 <!ENTITY options.catchOnce.label "Captar sólo nuevas pestañas">
 <!ENTITY options.catchRules.placeholder1 "Inserte aquí expresiones regulares (regexp) para direcciones web. Las pestañas coincidentes se moverán automáticamente a este grupo.">
@@ -34,13 +39,3 @@
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Descartar esta advertencia hasta que reinicie el navegador">
 <!ENTITY sessionRestoreAutoChanged.label "Sus pestañas y grupos serán restaurados automáticamente la próxima vez que inicie el navegador.">
 <!ENTITY sessionRestorePrivate.label "Esta es una ventana privada, sus pestañas y grupos no se pueden restaurar una vez la cierre.">
-<!ENTITY message.close "Cerrar este mensaje">
-<!ENTITY message.later.label "Recordármelo más tarde">
-<!ENTITY message.later.tooltip "Mostrar de nuevo este mensaje en otro momento">
-<!ENTITY message.1 "Hasta ahora, estoy seguro de que habrá observado muchos de los extensos cambios en Tab Groups 2. Espero que todo esté funcionando bien y que esté disfrutando de la experiencia mejorada.">
-<!ENTITY message.2 "Pero, ¿sabía que mi computadora falló a comienzos de este año?">
-<!ENTITY message.3 "Así es. La mayoría de lo que ve fue escrito en una vieja máquina de respaldo que por casualidad aún tenía, una que suena como un cortacésped. Un cortacésped muy, muy lento...">
-<!ENTITY message.4 "Si le gusta el complemento y disfruta con alguna de sus nuevas características, por favor, considere ayudarme a comprar un nuevo equipo de trabajo, haciendo una contribución en interés del desarrollo activo del complemento.">
-<!ENTITY message.5 "Haga clic aquí para conocer cómo cada aportación, por pequeña que sea, mantiene vivo el desarrollo.">
-<!ENTITY message.6 "Por supuesto, si descarta esta opción, también apreciaría una buena revisión del complemento en su página principal, o que lo dé a conocer a sus amigos. :)">
-<!ENTITY message.7 "Gracias por llegar hasta aquí. Espero que disfrute de Tab Groups, y como es habitual, si tiene cualquier problema simplemente hágamelo saber.">

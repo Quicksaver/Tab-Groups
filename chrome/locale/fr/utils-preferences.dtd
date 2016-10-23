@@ -1,0 +1,13 @@
+<!ENTITY preferences.button "Préférences">
+<!ENTITY preferences.undo.label "Annuler">
+<!ENTITY preferences.redo.label "Rétablir">
+<!ENTITY preferences.undoredo.tooltip "Annuler rapidement les changements que vous avez appliqués aux préférences de ce module, dont l'import d'une sauvegarde ou la restauration des paramètres par défaut.">
+<!ENTITY preferences.import.label "Importer depuis un fichier...">
+<!ENTITY preferences.import.tooltip "Importez les préférences du module depuis un fichier précédemment exporté sur votre ordinateur.">
+<!ENTITY preferences.export.label "Exporter vers un fichier...">
+<!ENTITY preferences.export.tooltip "Sauvegardez vos préférences du module dans un fichier, que vous pourrez garder en lieu sûr.">
+<!ENTITY preferences.reset.label "Restaurer les les paramètres par défaut.">
+<!ENTITY preferences.reset.tooltip.a "Toutes les préférences que vous avez modifiées seront remplacées par leur valeurs par défaut, comme si vous veniez d'installer le module.">
+<!ENTITY preferences.reset.tooltip.b "L'emplacement des boutons dans les barre d'outil n'est pas concerné. Pour restaurer ceux-ci, utilisez le bouton &quot;Configuration par défaut&quot; de la vue &quot;Personnaliser&quot;">
+<!ENTITY preferences.jumpto.label "Aller à la préférence...">
+<!ENTITY preferences.jumpto.tooltip "Saisissez un mot pour accéderez à la première préférence qui le contient.">

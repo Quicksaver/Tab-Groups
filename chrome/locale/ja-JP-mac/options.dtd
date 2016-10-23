@@ -10,11 +10,15 @@
 <!ENTITY opt.closeIfEmpty.tooltip "最後のタブが閉じられると、そのグループはすぐに破棄されます。この設定を無効にするか、単にグループに別名を付けるかオプションを変更することで、空のグループを維持できます。">
 <!ENTITY opt.showTabCounter.label "グループ名の隣にタブの個数を表示する">
 <!ENTITY opt.showTabCounter.tooltip "グループ上部にインジケータが表示され、各グループに含まれるタブの個数を簡単に知ることができます。">
+<!ENTITY opt.sortGroupsByName.label "メニューとパネル内のグループをタイトル順に並べ替える">
+<!ENTITY opt.sortGroupsByName.tooltip "タブの [グループへ移動] メニューやクイックアクセスパネルなど、グループがリスト表示されるところで、グループの整理ビューの配置ではなく、アルファベット順に並べ替えます。">
 <!ENTITY cat.defaults.label "デフォルトでグループに表示...">
 <!ENTITY opt.showThumbs.label "タブのサムネイル画像を表示する">
 <!ENTITY opt.showThumbs.tooltip "グループ内の各タブの内容を直接サムネイル画像で表示します。この設定を無効にすると、タブのタイトルとアイコンのみのリスト表示になります。">
 <!ENTITY opt.showUrls.label "ページタイトルの隣にアドレスを表示する">
 <!ENTITY opt.showUrls.tooltip "タブのサムネイル画像を表示しないで画面全体を有効に使うため、タブのアドレスをタイトルの隣に表示します。">
+<!ENTITY opt.tileIcons.label "サムネイル画像が小さすぎる場合、ページアイコンをタイル状に並べる">
+<!ENTITY opt.tileIcons.tooltip "サムネイル画像が小さすぎる場合、サムネイルの代わりにページアイコンをタイル状に並べて表示します。これにより、小さな領域に多くのタブを同時に表示できます。">
 <!ENTITY cat.stackTabs.label "グループ内にタブが多い場合...">
 <!ENTITY cat.stackTabs.tooltip "タブのサムネイル画像は場所を取ります。グループ内にすべてのタブを表示できない場合の表示方法を指定します...">
 <!ENTITY opt.stackTabs.label "グループをスタック表示にする">

@@ -9,11 +9,13 @@ locale    tabgroups      en-US         chrome/locale/en-US/
 locale    tabgroups      cs            chrome/locale/cs/
 locale    tabgroups      de            chrome/locale/de/
 locale    tabgroups      es            chrome/locale/es/
+locale    tabgroups      fr            chrome/locale/fr/
 locale    tabgroups      fy-NL         chrome/locale/fy-NL/
 locale    tabgroups      ja-JP         chrome/locale/ja-JP/
 locale    tabgroups      ja-JP-mac     chrome/locale/ja-JP-mac/
 locale    tabgroups      nl            chrome/locale/nl/
 locale    tabgroups      pl            chrome/locale/pl/
+locale    tabgroups      pt-BR         chrome/locale/pt-BR/
 locale    tabgroups      pt-PT         chrome/locale/pt-PT/
 locale    tabgroups      sl            chrome/locale/sl/
 locale    tabgroups      zh-CN         chrome/locale/zh-CN/

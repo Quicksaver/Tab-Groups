@@ -1,28 +1,29 @@
 <!ENTITY howto.pane.label "Návod k použití">
-<!ENTITY howto.overview.a "Doplněk Tab Groups je skvělý nástroj pro uspořádání panelů do tematických skupin. Můžete mít například skupinu panelů týkající se vybírání dárku a pak další skupinu pro platby po Internetu. Zkuste si pro různé věci, které na Internetu běžně děláte, vytvořit skupiny a pomocí Tab Groups mezi nimi přepínejte. Jedná se o snadný způsob, jak si ve svých panelech udržet pořádek.">
-<!ENTITY howto.mode.caption "Seznámení se zobrazením skupin panelů">
-<!ENTITY howto.mode.description "Pro vstup do zobrazení skupin panelů buď klikněte na tlačítko na nástrojové liště nebo použijte klávesovou zkratku. Máte v něm k dispozici tři režimy zobrazení, mezi nimiž můžete libovolně přepínat kliknutím na ikonku po pravé straně:">
+<!ENTITY howto.overview.a "Doplněk Skupiny panelů je skvělý nástroj pro uspořádání panelů do tematických skupin. Můžete mít například skupinu panelů týkající se vybírání dárku a pak další skupinu pro platby po Internetu. Zkuste si pro různé věci, které na Internetu běžně děláte, vytvořit skupiny a pomocí Skupin panelů mezi nimi přepínejte. Jedná se o snadný způsob, jak si ve svých panelech udržet pořádek.">
+<!ENTITY howto.mode.caption "Seznámení se Zobrazením skupin">
+<!ENTITY howto.mode.description "Pro vstup do Zobrazení skupin buď klikněte na tlačítko na nástrojové liště nebo použijte klávesovou zkratku. Máte v něm k dispozici tři režimy zobrazení, mezi nimiž můžete libovolně přepínat kliknutím na ikonku po pravé straně:">
 <!ENTITY howto.single.description "Jednoskupinové zobrazení je výchozí režim. Je nejjednodušší k použití a je ideální v případě, že chcete své skupiny zobrazovat jednotlivě, ale ostatní mít po ruce.">
 <!ENTITY howto.grid.description "V tabulkovém rozložení se automaticky upravuje velikost skupin v závislosti na jejich počtu a volném místu, které je k dispozici.">
 <!ENTITY howto.classic.description "V režimu volného uspořádání si můžete své skupiny rozmístit a určit jim velikost dle libosti. Toto vizuální uspořádání můžete využít k plné spokojenosti, když pracujete s mnoha různými skupinami.">
 <!ENTITY howto.create.caption "Jak vytvořím skupinu panelů?">
-<!ENTITY howto.create.step0 "Když do zobrazení skupin panelů vstoupíte poprvé, uvidíte náhledy všech svých panelů v jedné skupině.">
+<!ENTITY howto.create.step0 "Když do Zobrazení skupin vstoupíte poprvé, uvidíte náhledy všech svých panelů v jedné skupině.">
 <!ENTITY howto.create.step1a "V jednoskupinovém zobrazení či tabulkovém rozložení jednoduše klikněte na tlačítko &quot;Vytvořit novou skupinu&quot; ve spodní části okna. Nemůžete jej přehlédnout.">
 <!ENTITY howto.create.step1b "V režimu volného uspořádání jednoduše přetáhněte jeden panel mimo skupinu, čímž se kolem něj vykreslí rámeček. Nebo můžete kliknout kamkoli do prázdného místa, podržet tlačítko myši stisknuté a tažením myši vytvořit libovolně velkou skupinu.">
 <!ENTITY howto.create.step2b "Můžete pokračovat a do této nové skupiny přidávat další panely nebo můžete vytvářet další skupiny.">
-<!ENTITY howto.create.step3 "Když jste hotovi, klikněte na nějaký panel pro opuštění zobrazení skupin panelů. Vrátíte se zpět do Firefoxu s tím, že panel, na který jste kliknuli, bude aktivní a viditelné budou pouze panely v této skupině.">
+<!ENTITY howto.create.step3 "Když jste hotovi, klikněte na nějaký panel pro opuštění Zobrazení skupin. Vrátíte se zpět do Firefoxu s tím, že panel, na který jste kliknuli, bude aktivní a viditelné budou pouze panely v této skupině.">
 <!ENTITY howto.switch.caption "Jak přepnu mezi skupinami panelů?">
-<!ENTITY howto.switch.description2 "Nemůže to být jednodušší. Vstupte do zobrazení skupin panelů a klikněte na panel, do kterého chcete přejít. Panel, na který jste kliknuli, bude aktivní a pouze panely v jeho skupině budou viditelné. Také můžete dvojkliknout do prázdného místa libovolné skupiny a přejdete do naposledy zvoleného panelu této skupiny.">
+<!ENTITY howto.switch.description2 "Nemůže to být jednodušší. Vstupte do Zobrazení skupin a klikněte na panel, do kterého chcete přejít. Panel, na který jste kliknuli, bude aktivní a pouze panely v jeho skupině budou viditelné. Také můžete dvojkliknout do prázdného místa libovolné skupiny a přejdete do naposledy zvoleného panelu této skupiny.">
 <!ENTITY howto.overflow.caption "Jaký je rozdíl mezi seštosovanými a rolovatelnými skupinami?">
 <!ENTITY howto.overflow.description "Náhledy vyžadují místo. Není-li skupina dost velká na to, aby byly vidět všechny její panely, musí být buď seštosovaná nebo rolovatelná.">
 <!ENTITY howto.stack.description "Panely v seštosované skupině jsou naskládány jeden na druhém. Pracovat můžete jenom s aktivním panelem navrchu. Pod tímto štosem panelů se nachází tlačítko pro náhled, po jehož kliknutí uvidíte všechny ostatní panely aniž abyste museli měnit velikost skupiny.">
 <!ENTITY howto.list.description "Nebo můžete místo toho stanovit, aby se všechny panely zobrazily normálně a ne ve štosu. Některé s nich tak nebudou vidět a pro jejich zobrazení budete muset odrolovat dolů.">
-<!ENTITY howto.thumbs.description "Také můžete vybrat konkrétní skupiny, ve kterých se nemají zobrazovat náhledy panelů. Panely pak budou uvedeny jen svými titulky a volitelně svými adresami. Takto se panely zobrazí i v rolovatelných skupinách, které nejsou dostatečně velké, aby se do nich vešli alespoň tři sloupce panelů, bez ohledu na to, zda jsou náhledy povoleny či ne.">
+<!ENTITY howto.icons.description "Pokud budou panely ve skupině zmenšeny natolik, že jejich náhledy budou nepoužitelné, budou namísto nich v dlaždicích zobrazeny ikony stránek. Toto chování je možné u jednotlivých skupin zakázat, aby se zobrazily buď plné náhledy, anebo místo nich panely jako seznam.">
+<!ENTITY howto.thumbs.description2 "Také můžete vybrat konkrétní skupiny, ve kterých se nemají zobrazovat náhledy panelů. Panely pak budou zobrazeny jako seznam: uvedeny budou jen svými titulky a volitelně svými adresami. Takto se panely zobrazí i v rolovatelných skupinách, které nejsou dostatečně velké, aby se do nich vešli alespoň tři sloupce panelů nebo dva sloupce ikon, bez ohledu na to, zda jsou náhledy povoleny či ne.">
 <!ENTITY howto.search.caption "Jak mohu prohledávat své panely?">
-<!ENTITY howto.search.step1 "Vstupte do zobrazení skupin panelů.">
+<!ENTITY howto.search.step1 "Vstupte do Zobrazení skupin.">
 <!ENTITY howto.search.step2a "Klikněte na ikonku lupy v pravém horním rohu okna. Ukáže se vyhledávací pole, do kterého zadejte název hledaného panelu.">
 <!ENTITY howto.search.step2b "Nebo jen název začněte zadávat a automaticky se započne vyhledávání.">
-<!ENTITY howto.search.step4 "Během vašeho zápisu se budou zvýrazňovat panely, které vyhovují vašemu hledání. Jednoduše pak klikněte na hledaný panel, čímž opustíte zobrazení skupin panelů a přejdete do tohoto panelu.">
+<!ENTITY howto.search.step4 "Během vašeho zápisu se budou zvýrazňovat panely, které vyhovují vašemu hledání. Jednoduše pak klikněte na hledaný panel, čímž opustíte Zobrazení skupin a přejdete do tohoto panelu.">
 <!ENTITY howto.organize.caption "Jak si mohu uspořádat své skupiny panelů?">
 <!ENTITY howto.organize.description1 "Skupiny panelů je možné snadno zvětšit či zmenšit, přeskupit a pojmenovat. Když už nějakou skupinu nepotřebujete, můžete ji zavřít a naráz se všech jejích panelů zbavit.">
 <!ENTITY howto.resize.caption "Změna velikosti skupin panelů">
@@ -30,13 +31,13 @@
 <!ENTITY howto.resize.description4 "V tabulkovém rozložení je o toto postaráno za vás: skupiny budou roztaženy tak, aby jejich panely využily veškeré dostupné místo.">
 <!ENTITY howto.rearrange.caption "Přeskupení skupin panelů">
 <!ENTITY howto.rearrange.description "Pro přesunutí skupiny klikněte do prázdného místa po stranách či ve spodní části skupiny a přetáhněte ji na jiné místo.">
-<!ENTITY howto.rearrange.description2 "V tabulkovém rozložení přetáhněte jednu skupinu nad jinou a uvolněte tlačítko myši, načež si tyto dvě skupiny vymění místo. Své nejdůležitější skupiny nebo skupiny s největším počtem panelů si umístěte nahoru, jelikož ty zpravidla bývají větší než ty dole.">
+<!ENTITY howto.rearrange.description3 "V tabulkovém rozložení si své nejdůležitější skupiny nebo skupiny s největším počtem panelů umístěte nahoru, jelikož ty zpravidla bývají větší než ty dole.">
 <!ENTITY howto.name.caption "Pojmenování skupin panelů">
 <!ENTITY howto.name.description "Klikněte vedle ikonky tušky v horní části skupiny a zadejte její název. Poté stiskněte klávesu Enter nebo klikněte kamkoli jinam do okna.">
 <!ENTITY howto.close.caption "Zavření skupin panelů">
 <!ENTITY howto.close.description1 "Každá skupina panelů má v pravém horním rohu tlačítko pro zavření, po jehož kliknutí se tato skupina zavře i se všemi jejími panely.">
-<!ENTITY howto.close.description2 "Při náhodném zavření skupiny je možné ji obnovit kliknutím na tlačítko &quot;Vrátit zavřenou skupinu&quot; před opuštěním zobrazení skupin panelů.">
+<!ENTITY howto.close.description2 "Při náhodném zavření skupiny je možné ji obnovit kliknutím na tlačítko &quot;Vrátit zavřenou skupinu&quot; před opuštěním Zobrazení skupin.">
 <!ENTITY howto.pinned.caption "Připnuté panely ve skupinách panelů">
 <!ENTITY howto.pinned.description2 "Připnuté panely nenáleží žádné skupině. Jsou reprezentovány ikonami jejich webů po pravé straně okna, a budou viditelné bez ohledu na to, jakou skupinu máte aktivní.">
-<!ENTITY howto.pinned.description3 "V zobrazení skupin panelů je možné panel připnout jeho přetažením do této oblasti. Stejně tak je možné jeho přetažením z této oblasti do libovolné skupiny jej odepnout.">
+<!ENTITY howto.pinned.description3 "V Zobrazení skupin je možné panel připnout jeho přetažením do této oblasti. Stejně tak je možné jeho přetažením z této oblasti do libovolné skupiny jej odepnout.">
 <!ENTITY howto.credits "Tato kapitola vychází z článku původně na support.mozilla.org, který sepsali tito lidé: ">

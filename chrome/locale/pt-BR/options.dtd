@@ -1,0 +1,80 @@
+<!ENTITY pane.tabGroups.label "Grupos de abas">
+<!ENTITY pane.session.label "Backup / Restauração">
+<!ENTITY opt.showGroupThumbs.label "Exibir grupo de miniaturas em visão única">
+<!ENTITY opt.showGroupThumbs.tooltip "Escondendo o grupo miniaturas deixará mais espaço para mostrar suas abas, em detrimento de contar com os grupos de nomes para distinguir e alternar entre eles.">
+<!ENTITY opt.gridDynamicSize.label "Use dynamic sizing of groups in grid layout">
+<!ENTITY opt.gridDynamicSize.tooltip1 "Uso dinâmico de dimensionamento dos grupos de layout de grade">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Use isso ao seu favor ao mover mais importantes grupos, ou aqueles com mais abas, em direção ao topo de slots.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "Com esta opção desativada, todos os grupos têm dimensões semelhantes, apenas com as diferenças necessárias para que todos eles possam caber na tela.">
+<!ENTITY opt.closeIfEmpty.label "Fechar automaticamente os grupos vazios">
+<!ENTITY opt.closeIfEmpty.tooltip "Um grupo é descartado imediatamente quando a última aba é fechada. Você pode manter um grupo vazio desativando com esta preferência, ou simplesmente dando-lhe um nome ou alterar algumas de suas opções.">
+<!ENTITY opt.showTabCounter.label "Mostrar o número de abas junto ao título do grupo">
+<!ENTITY opt.showTabCounter.tooltip "Um indicador é mostrado no topo do grupo, de modo que você pode facilmente saber quantas abas você tem em cada grupo.">
+<!ENTITY opt.sortGroupsByName.label "Classificar grupos por título em menus e painéis">
+<!ENTITY opt.sortGroupsByName.tooltip "Em qualquer lugar os grupos são listados, tais como a aba de Mover para o Grupo de menu ou do Painel de Acesso Rápido, eles são ordenados em ordem alfabética em vez de na ordem que você colocou-os na visão de grupos , que não é afetado por esta opção.">
+<!ENTITY cat.defaults.label "Por padrão, os grupos devem...">
+<!ENTITY opt.showThumbs.label "Mostrar aba de miniaturas">
+<!ENTITY opt.showThumbs.tooltip "As miniaturas mostram o conteúdo de cada aba diretamente no grupo. Desativando-os transforma o grupo em uma lista de abas representado apenas pelo seu título e o ícone.">
+<!ENTITY opt.showUrls.label "Mostrar endereços junto de títulos de página">
+<!ENTITY opt.showUrls.tooltip "Para fazer uso total do espaço salvo quando não mostrando a aba de miniaturas, você pode mostrar a aba de localização próximo ao título.">
+<!ENTITY opt.tileIcons.label "Alinhe os ícones de página quando as miniaturas forem pequenos demais">
+<!ENTITY opt.tileIcons.tooltip "Mostra os ícones de página em um bloco, em vez de miniaturas quando eles se tornam demasiado pequenos para serem úteis. Isso permite que você tenha muito mais abas exibidas ao mesmo tempo em uma área menor.">
+<!ENTITY cat.stackTabs.label "Quando os grupos têm muitas abas...">
+<!ENTITY cat.stackTabs.tooltip "A aba de miniaturas ocupa espaço. Se o grupo não pode mostrar todas as suas abas, porque ele não é grande o suficiente, você pode...">
+<!ENTITY opt.stackTabs.label "Empilhar o grupo">
+<!ENTITY opt.stackTabs.tooltip "Apenas a aba ativa será exibida, empilhados uns em cima dos outros. Você ainda pode acessar todas as abas clicando o grupo do botão expandir.">
+<!ENTITY opt.listTabs.label "Deslocar o grupo">
+<!ENTITY opt.listTabs.tooltip "Algumas abas serão escondidas e você vai ter que percorrer o grupo de acesso. Observe que os grupos sempre se comportam como este em visão única, independente do que você configurar aqui.">
+<!ENTITY btn.setdefaults.label "Definir estas opções para todos os grupos">
+<!ENTITY btn.setdefaults.tooltip1 "Porque as opções acima são aplicadas por grupo, mudando-los aqui só afetará os novos grupos criados a partir deste ponto em diante.">
+<!ENTITY btn.setdefaults.tooltip2 "Só clique neste botão se você deseja substituir as opções de todos os grupos existentes com os valores definidos aqui. Caso contrário, você precisará definir manualmente ou alterá-las em cada grupo individual.">
+<!ENTITY cat.toolbarbutton.label "Barra De Ferramentas">
+<!ENTITY opt.groupTitleInButton.label "Mostra o nome do grupo ativo">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Certifique-se de que o grupo está ativo, diretamente a partir da janela principal sem ter de efetuar qualquer ação.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "O botão mostrará o ícone que se encontra no menu principal do painel, ou se você tiver apenas um grupo.">
+<!ENTITY opt.quickAccessButton.label "Clique para abrir o painel de acesso rápido">
+<!ENTITY opt.quickAccessButton.tooltip1 "O painel de acesso rápido permite que você alterne rapidamente entre grupos e abas sem ter de entrar na visão de introduzir grupos.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Desativar para entrar na visão de grupos quando clicar no botão.">
+<!ENTITY cat.keyboardshortcuts.label "Atalhos de teclado">
+<!ENTITY cat.backup.label "Cópia de segurança de seus grupos de abas">
+<!ENTITY cat.restore.label "Guia restaurar grupos">
+<!ENTITY cat.clear.label "Limpar aba de grupos">
+<!ENTITY opt.tabViewKeyset.label "Entrar e sair de grupos de vista">
+<!ENTITY opt.quickAccessKeyset.label "Abrir o painel de acesso rápido">
+<!ENTITY opt.nextGroupKeyset.label "Mudar para o próximo grupo">
+<!ENTITY opt.previousGroupKeyset.label "Mudar para o grupo anterior">
+<!ENTITY sessionRestore.caption "Manter grupos de abas entre as reinicializações">
+<!ENTITY sessionRestore.description "Para o Firefox se lembrar a sua aba de grupos, que precisa restaurar as janelas e separadores entre as sessões. Caso contrário, você vai ter que refazer a grupos cada vez que você fechar e reabrir o navegador.">
+<!ENTITY sessionRestore.button.label "Mostrar minhsa janelas e abas usadas da última vez, quando o Firefox iniciar.">
+<!ENTITY sessionRestore.button.tooltip.a "Isso é o mesmo que alterar a preferência 'Quando o Firefox iniciar' para 'Mostrar minhas janelas e abas usadas da última vez' no Firefox.">
+<!ENTITY sessionRestore.button.tooltip.b "Se você alterar essa opção depois, você perderá os seus grupos de abas, quando você reiniciar o navegador, até que você a altere novamente ou até que você pressione este botão novamente.">
+<!ENTITY opt.noWarningsAboutSession.label "Não me avisar sobre isso na visão de grupos">
+<!ENTITY opt.noWarningsAboutSession.tooltip "As notificações estão lá para lembrá-lo de que você não deve fechar a janela do navegador, se você não quiser perder suas abas e grupos. Desative-os apenas se tiver a certeza de que é o que você deseja.">
+<!ENTITY session.backup.button "Criar arquivo de backup">
+<!ENTITY session.backup.description "Exportar o seu grupo de abas em um arquivo de backup para manter seguro, para que você possa restaurá-los em um momento posterior, se necessário.">
+<!ENTITY session.backup.description2 "Sugestão: utilize o nome predefinido da pasta e a localização para guardar; quando clicar em 'Carregar grupos e abas de...', abaixo, a cópia de segurança irá aparecer diretamente no menu de acesso rápido.">
+<!ENTITY session.backup.autoloaded "O arquivo salvo foi carregado abaixo. Por favor, confirme que seus grupos e abas foram restaurados corretamente.">
+<!ENTITY session.backup.alldata.checkbox.label "Sessão de cópia de segurança de dados">
+<!ENTITY session.backup.alldata.checkbox.tooltip.a "Isso pode ser útil para mais tarde, quando a restauração de grupos partir do arquivo de backup. Caso contrário, você vai apenas ser capaz de restaurar os próprios grupos e os abas que estão abertos no momento.">
+<!ENTITY session.backup.alldata.checkbox.tooltip.b "Se você não se preocupa em preservar a aba de histórico, formas ou quaisquer outros dados a partir de suas abas, você não precisa disso.">
+<!ENTITY session.backup.alldata.caution.a "Atenção! Isto exportará todos os dados de sua sessão.">
+<!ENTITY session.backup.alldata.caution.b "Ser cauteloso de quem tem acesso a este arquivo, que irá conter informações de todos os seus guias, incluindo a página histórico, dados de formulário, e outras privada e informações potencialmente confidenciais.">
+<!ENTITY session.restore.button "Carregar grupos e abas de...">
+<!ENTITY session.restore.from.file "Arquivo...">
+<!ENTITY session.restore.import.button "Importar itens selecionados para esta janela">
+<!ENTITY session.restore.import.tooltip.a "Depois de pressionar esse botão, você pode entrar na visão grupos de abas e organizar o recém-importados grupos, como de costume.">
+<!ENTITY session.restore.import.tooltip.b "Note que você só pode importar novos grupos, você não pode importar abas em grupos já existentes. Isso significa que você pode facilmente acabar com grupos duplicados se você importar o mesmo grupo duas vezes. Neste caso, basta ir na visão de grupo de abas e fechar a que você não quer.">
+<!ENTITY session.restore.description "Carregar uma pasta de cópia de segurança que contém os grupos de abas que você deseja restaurar. Em seguida, escolher quais os grupos e as abas que você deseja. Eles serão carregados na janela, assim você pode acessar, organizar e personalizar-los como qualquer outro.">
+<!ENTITY session.restore.invalid "O arquivo selecionado é inválido, danificado ou não contém qualquer informação de grupo de abas.">
+<!ENTITY session.restore.finished "Os grupos selecionados foram importados para esta janela. Entre na visão de grupos de abas agora para acessá-los como qualquer outro grupo.">
+<!ENTITY session.restore.list.check "Importar">
+<!ENTITY session.restore.list.items "Grupos e abas">
+<!ENTITY session.clear.button "Limpar dados de grupos">
+<!ENTITY session.clear.tooltip "Você nunca precisará fazer isso, é apenas mais simples e mais seguro para entrar na visão de grupos de abas e fechar qualquer dos grupos que você não quer.">
+<!ENTITY session.clear.description.a "Desmarcar todos os grupos de dados da sessão atual.">
+<!ENTITY session.clear.description.f "Só faça isso se você souber o que está fazendo!">
+<!ENTITY session.clear.description.b "Faça um backup de seus grupos e abas antes de prosseguir.">
+<!ENTITY session.clear.description.c "Isto irá recarregar todas as janelas do navegador e suas abas visíveis">
+<!ENTITY session.clear.description.g ", e remover todas as abas em grupos não ativos.">
+<!ENTITY session.clear.description.d "Aviso: esta ação não pode ser desfeita!">
+<!ENTITY session.clear.description.e "Tem certeza de que deseja continuar?">

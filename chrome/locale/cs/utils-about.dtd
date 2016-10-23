@@ -14,13 +14,13 @@
 <!ENTITY about.fullchangelog "Úplný seznam změn">
 <!ENTITY about.problems "Máte potíže?">
 <!ENTITY about.tech "Popište svůj problém na stránkách podpory">
-<!ENTITY about.email "Nebo mi jej pošlete emailem">
+<!ENTITY about.email "Nebo mi jej pošlete e-mailem">
 <!ENTITY about.author "Více od tohoto autora">
 <!ENTITY about.trymore "Vyzkoušejte některý z mých dalších doplňků pro ještě lepší Firefox!">
 <!ENTITY about.profile "Naleznete je v mém profilu">
 <!ENTITY about.share "Podělte se!">
 <!ENTITY about.friends "Nebuďte jediní se skvělým prohlížečem. Pochlubte se přátelům!">
 <!ENTITY about.hidePromo "X">
-<!ENTITY about.hideThisPromo "zobrazit znovu až bude nová epizoda">
+<!ENTITY about.hideThisPromo "zobrazit znovu, až bude nová epizoda">
 <!ENTITY about.hideAllPromos "nikdy nezobrazovat takovéto reklamy">
 <!ENTITY about.clicktowatch "sledovat na YouTube">

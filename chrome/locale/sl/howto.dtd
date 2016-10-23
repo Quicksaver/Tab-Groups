@@ -17,7 +17,8 @@
 <!ENTITY howto.overflow.description "Sličice zavihkov zasedajo prostor. Če skupina ni dovolj velika za prikaz vseh njenih zavihkov, jo lahko postavite v sklad ali naredite pomično.">
 <!ENTITY howto.stack.description "Zavihki v skladu skupine so prikazani eden vrh drugega. Delate lahko samo z dejanim zavihkom na vrhu. Pod tem skladom je gumb za predogled, katerega lahko kliknete za dostop do vseh drugih zavihkov brez spreminjanja velikosti skupine.">
 <!ENTITY howto.list.description "Lahko pa tudi izberete običajni prikaz zavihkov brez sklada. Nekateri bodo skriti in za dostop do njih se boste morali pomakniti.">
-<!ENTITY howto.thumbs.description "Izberete lahko tudi določene skupine, katere ne prikazujejo sličic zavihkov. Zavihki bodo navedeni samo s svojimi nazivi in izbirno z naslovi. To se bo zgodilo v pomičnih skupinah, ki niso dovolj velike za vsaj tri stolpce zavihkov ne glede na to, ali so sličice omogočene ali ne.">
+<!ENTITY howto.icons.description "Če sličice skupine zavihkov postanejo premajhne, bodo prikazane njihove ikone. To lahko za posamezno skupino onemogočite, da prikažete sličice ali seznam zavihov.">
+<!ENTITY howto.thumbs.description2 "Izberete lahko tudi določene skupine, za katere ne želite prikazati sličic. Zavihki bodo prikazani samo s svojim nazivom in izbirno naslovom. To se bo zgodilo tudi v skupinah, ki zasedejo vsaj treh stolpcev sličic ali dveh stlpcev ikon n glede ali so sličice omogočene.">
 <!ENTITY howto.search.caption "Kako iščem po zavihkih?">
 <!ENTITY howto.search.step1 "Vstopite v pogled skupin zavihkov.">
 <!ENTITY howto.search.step2a "Kliknite na gumb za iskanje na desni strani okna, da prikažete iskalno polje in začnite tipkati ime zavihka.">
@@ -30,7 +31,7 @@
 <!ENTITY howto.resize.description4 "V mrežni razporeditvi se to zgodi samodejno. Skupine bodo raztegnjene, da se zavihki prikažejo na največji možni površini.">
 <!ENTITY howto.rearrange.caption "Preurejanje skupin zavihkov">
 <!ENTITY howto.rearrange.description "Kliknite in povlecite na prazno področje vzdolž leve, desne ali spodnje strani skupine, da jo premaknete po zaslonu.">
-<!ENTITY howto.rearrange.description2 "V mrežni razporeditvi spustite skupino v drugo, da si zamenjata mesti. Postavite najpomembnejše skupine ali tiste z največ zavihki na vrh, ker so običajno večje od tistih na dnu.">
+<!ENTITY howto.rearrange.description3 "V mrežni razpostavitvi postavite svoje najbolj pomembne skupine ali skupine z največ zavihki na vrh, kar so običajno večje od spodnjih.">
 <!ENTITY howto.name.caption "Poimenovanje skupin zavihkov">
 <!ENTITY howto.name.description "Kliknite poleg ikone svinčnika na vrhu skupine in zanjo vtipkajte ime. Pritisnite Enter ali kliknite na drugo področje okna.">
 <!ENTITY howto.close.caption "Zapiranje skupin zavihkov">

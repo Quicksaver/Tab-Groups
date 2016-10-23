@@ -1,0 +1,41 @@
+<!ENTITY moveToGroup.label "Mover para o grupo">
+<!ENTITY moveToGroup.accesskey "M">
+<!ENTITY moveToNewGroup.label "Novo grupo">
+<!ENTITY viewTabGroups.label "Grupo de abas">
+<!ENTITY viewTabGroups.accesskey "G">
+<!ENTITY searchForTab.label "Buscar por aba...">
+<!ENTITY manageTabGroups.label "Gerenciar meus grupos">
+<!ENTITY manageTabGroups.tooltip "Entrar na configuração de grupos para organizar suas abas e criar novos grupos">
+<!ENTITY buttonSearchTabs.label "Buscar grupo de abas">
+<!ENTITY buttonSearchMode.label "Alterar modo de lista">
+<!ENTITY buttonSearchClose.label "Fechar esse item de busca">
+<!ENTITY buttonExitTabGroups.label "Sair do grupo de abas">
+<!ENTITY buttonOptionsTabGroups.label "Alterar as preferências de grupo de abas">
+<!ENTITY buttonHelpTabGroups.label "Como usar o grupo de abas">
+<!ENTITY buttonClassic.label "Ajuste livre">
+<!ENTITY buttonGrid.label "Exibição em grade">
+<!ENTITY buttonSingle.label "Visão única">
+<!ENTITY buttonNewGroup.label "Criar novo grupo">
+<!ENTITY menuNewTab.label "Abrir nova aba">
+<!ENTITY menuNewTab.accesskey "t">
+<!ENTITY options.close.tooltip "Gravar e voltar">
+<!ENTITY options.notapplicable.single "(não aplicável em visão única)">
+<!ENTITY options.title.tooltip "Nomear essa aba de grupo">
+<!ENTITY options.showThumbs.label "Exibir miniaturas das abas">
+<!ENTITY options.showUrls.label "Mostrar endereços junto de títulos de página">
+<!ENTITY options.tileIcons.label "Alinhar ícones de página quando as miniaturas forem pequenos demais">
+<!ENTITY options.catchOnce.caption "Regras para pegar abas para este grupo">
+<!ENTITY options.catchOnce.label "Pegar somente novas abas">
+<!ENTITY options.catchRules.placeholder1 "Inserir expressões regulares aqui para endereços da web. As abas correspondentes serão movidas automaticamente para este grupo.">
+<!ENTITY options.catchRules.placeholder2 "Utilizar uma linha por regra, pode ser quantas você desejar.">
+<!ENTITY options.catchRules.placeholder3 "Examplos:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - pegar todas as páginas do repositório do complemento">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - pegar os relatórios de bugs do Firefox">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - pegar todas as suas páginas sociais">
+<!ENTITY options.stackTabs.caption "Quando este grupo tem muitas abas...">
+<!ENTITY options.stackTabs.stack.label "Empilhar esse grupo">
+<!ENTITY options.stackTabs.list.label "Scroll no grupo">
+<!ENTITY sessionRestoreNotice.label "Suas abas e grupos não serão restauradas na próxima vez que você iniciar o navegador! Clique aqui para corrigir.">
+<!ENTITY sessionRestoreNotice.dismiss.tooltip "Fechar este aviso até eu reiniciar o navegador">
+<!ENTITY sessionRestoreAutoChanged.label "Suas abas e grupos serão restaurados automaticamente na próxima vez que você iniciar o navegador.">
+<!ENTITY sessionRestorePrivate.label "Esta é uma janela privada, as suas abas e grupos não podem ser restaurados depois de fechá-lo.">

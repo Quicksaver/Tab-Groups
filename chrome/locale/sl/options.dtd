@@ -10,11 +10,15 @@
 <!ENTITY opt.closeIfEmpty.tooltip "Skupina se takoj zavrže, ko zaprete zadnji zavihek. Z onemogočanjem te možnosti, s poimenovanjem skupne ali s spreminjanjem njenih možnosti lahko ohranite prazno skupino.">
 <!ENTITY opt.showTabCounter.label "Prikaži število zavihkov poleg naziva skupine">
 <!ENTITY opt.showTabCounter.tooltip "Na vrhu skupine se prikaže kazalnik števila zavihkov v skupni.">
+<!ENTITY opt.sortGroupsByName.label "Razvrsti skupine po nazivu v menijih in na ploščah">
+<!ENTITY opt.sortGroupsByName.tooltip "Prikazane skupine (npr. v meniju zavihka Premakni v skupino ali na plošči za hiter dostop) bodo razvrščene po abecedi namesto v vrstnem redu postavitve.">
 <!ENTITY cat.defaults.label "Privzeto naj skupine …">
 <!ENTITY opt.showThumbs.label "prikažejo sličice zavihkov">
 <!ENTITY opt.showThumbs.tooltip "Sličice prikazujejo vsebino vsakega zavihka neposredno v skupini. Onemogočanje spremeni skupine v seznam zavihkov z njihovim nazivom in ikono.">
 <!ENTITY opt.showUrls.label "prikažejo naslove poleg nazivov strani">
 <!ENTITY opt.showUrls.tooltip "Za poln izkoristek prostora prihranjenega s skrivanjem sličic lahko poleg naziva zavihkov pokažete njihov naslov">
+<!ENTITY opt.tileIcons.label "Razpostavi ikone strani, ko so sličice premajhne">
+<!ENTITY opt.tileIcons.tooltip "Prikaži ikone strani v ploščici namesto sličic, ko so le-te premajhne. To vam omogoča prikaz večjega števila zavihkov na manjši površini.">
 <!ENTITY cat.stackTabs.label "Ko imajo skupine preveč zavihkov …">
 <!ENTITY cat.stackTabs.tooltip "Sličice zavihkov zasedajo prostor. Če skupina ne more prikazati vseh svojih zavihkov, ker ni dovolj velika, lahko …">
 <!ENTITY opt.stackTabs.label "zloži zavihke">

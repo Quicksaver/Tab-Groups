@@ -17,7 +17,8 @@
 <!ENTITY howto.overflow.description "Las miniaturas de pestañas ocupan espacio. Si un grupo no es suficientemente grande para que se muestren todas sus pestañas, se pueden o bien apilar o desplazar.">
 <!ENTITY howto.stack.description "Las pestañas en un grupo apilado se muestran una sobre otra. Sólo puede interactuar con la pestaña activa que esté en cabeza. A continuación de la pila, hay un botón de previsualización que puede pulsar para acceder a todas las demás pestañas sin cambiar el tamaño del grupo.">
 <!ENTITY howto.list.description "En su lugar, puede escoger mostrar todas las pestañas con normalidad, sin apilamiento. Algunas de ellas estarán ocultas y tendrá que desplazarse hacia abajo para acceder a ellas.">
-<!ENTITY howto.thumbs.description "También puede escoger grupos específicos en los que no mostrar miniaturas de pestañas. Las pestañas serán listadas sólo con sus títulos y opcionalmente con sus direcciones. Esto también ocurrirá en grupos desplazables que no sean suficientemente grandes para acomodar al menos tres columnas de pestañas, al margen de si las miniaturas están habilitadas o no.">
+<!ENTITY howto.icons.description "Si las pestañas en un grupo se vuelven demasiado pequeñas para que sus miniaturas sean útiles, sus iconos se mostrarán en las losetas en su lugar. Esto se puede deshabilitar por grupos, de forma que siempre mostrará o bien las miniaturas completas o las pestañas en una lista en su lugar.">
+<!ENTITY howto.thumbs.description2 "También puede elegir grupos específicos en los que no mostrar miniaturas de pestaña. Las pestañas se listarán sólo con sus títulos y opcionalmente sus direcciones. Esto también ocurrirá en grupos con desbordamiento (barras de desplazamiento) que no sean suficientemente grandes para ajustrar al menos tres columnas de miniaturas, o dos columnas de iconos, al margen de que las miniaturas estén o no habilitadas.">
 <!ENTITY howto.search.caption "¿Cómo busco entre mis pestañas?">
 <!ENTITY howto.search.step1 "Entre en la vista de grupos de pestañas.">
 <!ENTITY howto.search.step2a "Pulse el botón buscar en el lado derecho de la pantalla para sacar el recuadro de búsqueda, y luego simplemente comience a escribir el nombre de la pestaña que está tratando de encontrar.">
@@ -30,7 +31,7 @@
 <!ENTITY howto.resize.description4 "En la disposición de parrilla se hace todo esto de forma automática, los grupos se estirarán para mostrar sus pestañas aprovechando tanto espacio como sea posible.">
 <!ENTITY howto.rearrange.caption "Reorganizar grupos de pestañas">
 <!ENTITY howto.rearrange.description "Pulse y arrastre sobre un área vacía por los laterales o la parte inferior de un grupo, para moverlo por la pantalla.">
-<!ENTITY howto.rearrange.description2 "En la disposición de parrilla, suelte un grupo sobre otro para que intercambien sus posiciones. Sitúe sus grupos más importantes o aquellos con más pestañas en la parte superior, ya que habitualmente son más grandes que los de la parte inferior.">
+<!ENTITY howto.rearrange.description3 "En la disposición en parrilla, sitúe sus grupos más importantes, o aquellos con la mayoría de pestañas, en la parte superior, ya que habitualmente son más grandes que los que están en la parte inferior.">
 <!ENTITY howto.name.caption "Nombrar grupos de pestañas">
 <!ENTITY howto.name.description "Pulse junto al icono del lápiz, en la parte superior de un grupo, y escriba un nombre para él. Luego pulse Intro o haga clic sobre algún otro área de la ventana.">
 <!ENTITY howto.close.caption "Cerrar grupos de ventanas">

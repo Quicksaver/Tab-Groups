@@ -1,0 +1,43 @@
+<!ENTITY howto.pane.label "Como usar">
+<!ENTITY howto.overview.a "Abas de grupos são boas para o agrupamento de abas por tarefa. Por exemplo, você pode ter um grupo de abas relacionados com a procura de um presente e outro grupo para o pagamento de suas contas on-line. Tente criar grupos para as coisas que você normalmente faz online e usar a aba de grupos para alternar entre eles. É uma maneira fácil de manter tudo organizado.">
+<!ENTITY howto.mode.caption "Como posso trabalhar em visões de grupos?">
+<!ENTITY howto.mode.description "Para entrar na visão de grupos, clique no botão de barra de ferramentas, ou use o atalho do teclado. Lá, você tem três modos possíveis, alternar entre eles a qualquer momento através das setas de controle.">
+<!ENTITY howto.single.description "Único modo de exibição é o modo padrão. Ele é o mais simples de usar, e é perfeito para manter os grupos separados armazenados longe, mas sempre à mão.">
+<!ENTITY howto.grid.description "No layout de grade, seus grupos são automaticamente redimensionados de acordo com o número e a quantidade de espaço livre que existe.">
+<!ENTITY howto.classic.description "No arranjo livre, você pode posicionar e redimensionar os seus grupos à vontade dentro do espaço de trabalho. Você pode usar esse visual de organização a seu favor quando se trabalha vários grupos diferentes.">
+<!ENTITY howto.create.caption "Como faço para criar um grupo de abas?">
+<!ENTITY howto.create.step0 "Quando você entra em uma visão de grupos pela primeira vez, você vai ver pré-visualizações de miniaturas de todas as abas em um grupo.">
+<!ENTITY howto.create.step1a "Na visão única ou layout de grade, apenas clique no botão de Criar Novo Grupo na parte inferior. Você não pode errar.">
+<!ENTITY howto.create.step1b "No modo de arranje livre, para fazer um novo grupo, basta arrastar uma aba para fora do grupo que uma caixa será desenhado em torno dele. Ou você pode clicar e arrastar diretamente no espaço livre para desenhar um novo grupo com as dimensões que você deseja.">
+<!ENTITY howto.create.step2b "Você pode continuar a adicionar abas para que o novo grupo e você pode criar mais grupos.">
+<!ENTITY howto.create.step3 "Quando você estiver pronto, basta clicar em uma aba para sair do modo de exibição. Você vai voltar para o Firefox, a guia em que você clicou serão ativadas e as abas em que o grupo serão visíveis.">
+<!ENTITY howto.switch.caption "Como faço para alternar entre os grupos de abas?">
+<!ENTITY howto.switch.description2 "Não poderia ser mais simples. Basta digitar os grupos de aba exibir e, em seguida, clique no separador que pretende visualizar. A aba em que você clicou será ativa e as abas em que o grupo vai será visível. Você também pode clicar duas vezes em uma área vazia de qualquer grupo, você será direcionado para a última aba selecionada no grupo.">
+<!ENTITY howto.overflow.caption "Qual é a diferença entre o empilhamento e o deslocamento de grupos?">
+<!ENTITY howto.overflow.description "Abas de miniaturas ocupam espaço. Se um grupo não é grande o suficiente para todas as suas abas, para ser mostrado, não pode ser empilhados ou deslocado.">
+<!ENTITY howto.stack.description "Abas em um grupo empilhado são mostradas uma em cima da outra. Você só pode interagir com a aba ativa na parte superior. Abaixo desta pilha, existe um botão de pré-visualização, que você pode clicar para acessar a todas as outras abas, sem alterar o tamanho do grupo.">
+<!ENTITY howto.list.description "Em vez disso, você pode escolher para exibir todas as abas normalmente, sem empilhar. Alguns deles estarão escondidos e você terá que rolar para baixo para acessá-los.">
+<!ENTITY howto.icons.description "Se as abas em um grupo tornaram-se muito pequenas para as suas miniaturas, seus ícones serão mostrados em peças. Isso pode ser desabilitado por grupo, para que ele sempre irá mostrar o total de miniaturas ou de mostrar abas em uma lista.">
+<!ENTITY howto.thumbs.description2 "Você também pode escolher grupos específicos em que não apresentar a aba de miniaturas. As abas serão listadas com os respectivos títulos e, opcionalmente, os respectivos endereços. Isso vai acontecer bem nos grupos que não são grandes o suficiente para caber, pelo menos, três colunas de miniaturas, ou duas colunas de ícones, independentemente de miniaturas, sendo ativados ou não.">
+<!ENTITY howto.search.caption "Como fazer uma busca através das minhas abas?">
+<!ENTITY howto.search.step1 "Entrar na visão dos grupos de abas.">
+<!ENTITY howto.search.step2a "Clique no botão de pesquisa no lado direito da janela para exibir a caixa de procura e, em seguida, basta começar a digitar o nome da aba que você está tentando encontrar.">
+<!ENTITY howto.search.step2b "Ou simplesmente comece a digitar e uma pesquisa irá acontecer automaticamente.">
+<!ENTITY howto.search.step4 "Conforme você digita, as abas que correspondem à sua pesquisa serão destacadas. Basta clicar em uma aba para selecioná-la, você vai deixar de grupos de ver e ser levado para a aba.">
+<!ENTITY howto.organize.caption "Como faço para organizar meus grupos de abas?">
+<!ENTITY howto.organize.description1 "Os grupos de abas podem ser facilmente redimensionados, arrumados e nomeados. Quando fez um grupo, você pode fechá-lo e livrar-se de todas as suas abas de uma só vez.">
+<!ENTITY howto.resize.caption "Redimensionamento de grupos de abas">
+<!ENTITY howto.resize.description3 "No modeo de arranjo livre, clique e arraste na alça de redimensionamento no canto inferior direito de um grupo para torná-lo maior ou menor. Como você redimensionar o grupo, as suas abas ficarão maiores e menores.">
+<!ENTITY howto.resize.description4 "No layout de grade, tudo isso é feito para você, os grupos serão esticados para mostrar as suas abas com o máximo de espaço possível.">
+<!ENTITY howto.rearrange.caption "Reorganização de grupos de abas">
+<!ENTITY howto.rearrange.description "Clique e arraste em uma área vazia ao longo dos lados ou no fundo de um grupo para movê-lo pela tela.">
+<!ENTITY howto.rearrange.description3 "No layout de grade, coloque seus grupos mais importantes, ou aqueles com mais abas, na parte superior, como eles são geralmente maiores do que aqueles na parte inferior.">
+<!ENTITY howto.name.caption "Nomeação de grupos se abas">
+<!ENTITY howto.name.description "Clique em avançar para o ícone de lápis no topo de um grupo e digite um nome para ele. Em seguida, basta pressionar Enter ou clicar em alguma outra área da janela.">
+<!ENTITY howto.close.caption "Fechar grupos de abas">
+<!ENTITY howto.close.description1 "Cada aba de grupo tem um botão de fechar no canto superior direito. Ao clicar, ele fechará o grupo e todas as suas abas.">
+<!ENTITY howto.close.description2 "Se você fechar uma aba de grupo por acidente, você pode clicar em Anular o Grupo Fechar botão para restaurá-lo antes de sair.">
+<!ENTITY howto.pinned.caption "As abas fixas no grupos de abas">
+<!ENTITY howto.pinned.description2 "As abas fixas não pertencem a nenhum grupo. Elas são representados por seus ícones do site no lado direito na tela de grupos, e será visível, independentemente de qual grupo você tem ativo.">
+<!ENTITY howto.pinned.description3 "Você pode fixar uma aba na visão de grupos, arrastando-a para esta área. Da mesma forma, arraste uma aba para fora da área em qualquer outro grupo para deixar de ser fixa.">
+<!ENTITY howto.credits "Este painel é baseado em um artigo originalmente no support.mozilla.org escrito por estas belas pessoas:">

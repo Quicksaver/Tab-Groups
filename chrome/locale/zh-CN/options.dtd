@@ -10,11 +10,15 @@
 <!ENTITY opt.closeIfEmpty.tooltip "当一个分组的最后一个标签页被关闭时，该分组会被立即关闭。您可以禁用此选项以保留此类分组，给分组命名或修改其任意选项也可以保留分组。">
 <!ENTITY opt.showTabCounter.label "在分组标题旁显示标签页数量">
 <!ENTITY opt.showTabCounter.tooltip "在分组顶部显示标识，便于你轻松了解每个分组有多少标签页。">
+<!ENTITY opt.sortGroupsByName.label "在菜单和面板中按标题排序标签组">
+<!ENTITY opt.sortGroupsByName.tooltip "每当标签组列出时（无论是标签页的“移动到组”菜单，还是快速访问面板），它们按字母顺序排列，而不遵循您在组管理界面中的放置顺序。">
 <!ENTITY cat.defaults.label "默认情况下，分组应该...">
 <!ENTITY opt.showThumbs.label "显示标签页缩略图">
 <!ENTITY opt.showThumbs.tooltip "在分组中直接显示每个标签页内容的缩略图。禁用此项后分组中将显示标签页的标题和图标形成的列表。">
 <!ENTITY opt.showUrls.label "在页面标题旁显示地址">
 <!ENTITY opt.showUrls.tooltip "充分利用不显示标签页缩略图空出的空间，你可以在每个标签页标题旁显示标签页的地址。">
+<!ENTITY opt.tileIcons.label "缩略图太小时平铺页面图标">
+<!ENTITY opt.tileIcons.tooltip "当缩略图因太小而失去价值时，显示页面图标而非缩略图。这可以在更小的区域上显示更多的标签页。">
 <!ENTITY cat.stackTabs.label "分组有太多标签页时...">
 <!ENTITY cat.stackTabs.tooltip "标签页缩略图会占据很多空间。如果分组不能展示内部的所有标签页，此时应该...">
 <!ENTITY opt.stackTabs.label "堆叠显示">

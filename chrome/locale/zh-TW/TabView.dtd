@@ -7,6 +7,8 @@
 <!ENTITY manageTabGroups.label "管理我的群組">
 <!ENTITY manageTabGroups.tooltip "進入群組檢視以組織您的分頁並建立新群組">
 <!ENTITY buttonSearchTabs.label "搜尋分頁群組">
+<!ENTITY buttonSearchMode.label "切換清單模式">
+<!ENTITY buttonSearchClose.label "清除此搜尋字詞">
 <!ENTITY buttonExitTabGroups.label "結束分頁群組">
 <!ENTITY buttonOptionsTabGroups.label "變更分頁群組偏好設定">
 <!ENTITY buttonHelpTabGroups.label "如何使用分頁群組">
@@ -14,11 +16,14 @@
 <!ENTITY buttonGrid.label "網格顯示">
 <!ENTITY buttonSingle.label "單一檢視">
 <!ENTITY buttonNewGroup.label "建立新群組">
+<!ENTITY menuNewTab.label "開啟新分頁">
+<!ENTITY menuNewTab.accesskey "t">
 <!ENTITY options.close.tooltip "儲存並返回">
 <!ENTITY options.notapplicable.single "（不適用於單一檢視）">
 <!ENTITY options.title.tooltip "命名此分頁群組">
 <!ENTITY options.showThumbs.label "顯示分頁縮圖">
 <!ENTITY options.showUrls.label "在分頁標題後顯示網址">
+<!ENTITY options.tileIcons.label "當縮圖變得太小時平鋪頁面">
 <!ENTITY options.catchOnce.caption "將分頁捕捉到此群組中的規則">
 <!ENTITY options.catchOnce.label "僅捕捉新分頁">
 <!ENTITY options.catchRules.placeholder1 "在此插入網址的正規表達式。符合的分頁將會自動被移動到此群組中。">
@@ -34,13 +39,3 @@
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "忽略此警告直到我重新啟動瀏覽器">
 <!ENTITY sessionRestoreAutoChanged.label "您的分頁與群組將會在下次您啟動瀏覽器時回復。">
 <!ENTITY sessionRestorePrivate.label "這是一個隱私視窗，您的分頁與群組在您關閉它後將不會儲存。">
-<!ENTITY message.close "關閉此訊息">
-<!ENTITY message.later.label "稍後提醒我">
-<!ENTITY message.later.tooltip "以後再次顯示此訊息">
-<!ENTITY message.1 "到目前為止，我確定您已經注意到許多在 Tab Groups 2 中的豐富變化。我希望一切都運作良好，而您也正在享受更強化的體驗。">
-<!ENTITY message.2 "但您知道我的電腦在今年稍早故障了嗎？">
-<!ENTITY message.3 "那就對了。多數您看到的東西都是在一臺我仍擁有的舊的備用機器，一臺聽起來像是割草機的機器。非常，非常慢的割草機...">
-<!ENTITY message.4 "若您喜歡這個附加元件而且享受於任何新功能，請考慮協助我購買一臺新的工作站，來讓附加元件的積極開發更進一步。">
-<!ENTITY message.5 "在此點選以得知每一點力量如何讓開發者保持活躍。">
-<!ENTITY message.6 "當然，若您無法，我也會期待您在附加元件首頁上留下一篇好的 review，或是與您所有的朋友分享。:)">
-<!ENTITY message.7 "感謝您的閱讀。我希望您可以享受 Tab Groups，同時如果有任何問題也請讓我知道。">

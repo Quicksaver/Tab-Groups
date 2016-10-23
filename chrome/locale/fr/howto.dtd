@@ -1,0 +1,43 @@
+<!ENTITY howto.pane.label "Comment utiliser">
+<!ENTITY howto.overview.a "Les groupes d'onglets sont utiles pour grouper visuellement des onglets par tâche. Par exemple, vous pouvez avoir un groupe consacré à la recherche d'un cadeau, et un autre pour payer vos factures en ligne. Essayez de créer des groupes pour chaque chose que vous faîtes sur la toile et utilisez ce module pour basculer de l'un à l'autre. C'est un moyen facile de rester organisé.">
+<!ENTITY howto.mode.caption "Comment utiliser la vue des groupes d'onglets ?">
+<!ENTITY howto.mode.description "Pour entrer dans la vue « Groupes d'onglets », cliquer sur le bouton situer dans la barre d'outil, ou utilisez le raccourci clavier. Dans cette vue, trois modes vous sont proposés, vous pouvez passer de l'un à l'autre quand vous le souhaitez via le contrôleur situé sur la droite.">
+<!ENTITY howto.single.description "Le mode simple est le mode par défaut. C'est le plus facile à utiliser, et il est parfait pour garder différents groupes rangés et à portée de main.">
+<!ENTITY howto.grid.description "En mode grille, vos groupes sont automatiquement redimensionnés en fonction de combien sont ouverts et de la place disponible à l'écran.">
+<!ENTITY howto.classic.description "En mode de réorganisation libre, vous pouvez positionner et redimensionner vos groupes comme vous le souhaitez à l'intérieur de l'espace de travail. Vous pouvez utiliser cette organisation visuelle à votre avantage lorsque vous travaillez avec beaucoup de groupes.">
+<!ENTITY howto.create.caption "Comment puis-je créer un groupe d'onglets ?">
+<!ENTITY howto.create.step0 "Quand vous entrez dans la vue « Groupes d'onglets » pour la première fois, vous verrez les aperçus vignette de tous vos onglets en un seul groupe.">
+<!ENTITY howto.create.step1a "Dans les mode &quot;simple&quot; ou &quot;grille&quot;, cliquez simplement sur le bouton &quot;créer un nouveau groupe&quot; situé en bas. Vous ne pouvez pas le manquer.">
+<!ENTITY howto.create.step1b "En mode de réorganisation libre, pour créer un nouveau groupe, faites simplement glisser un onglet hors du groupe, une boîte se dessinera alors autour de celui-ci. Ou vous pouvez cliquer et glisser le curseur directement dans un espace libre pour dessiner un nouveau groupe aux dimensions de votre choix.">
+<!ENTITY howto.create.step2b "Vous pouvez continuer à ajouter des onglets à ce nouveau groupe et vous pouvez créer plus de groupes.">
+<!ENTITY howto.create.step3 "Quand vous avez fini, cliquez simplement sur un onglet pour sortir de la vue. Vous serez de retour dans Firefox, l'onglet sur lequel vous avez cliqué sera actif et seuls les onglets dans ce groupe seront visibles.">
+<!ENTITY howto.switch.caption "Comment puis-je commuter entre groupes d'onglets ?">
+<!ENTITY howto.switch.description2 "Commuter entre groupes est simple. Il suffit d'ouvrir la vue « Groupes d'onglets », puis de cliquer sur l'onglet que vous voulez afficher. L'onglet sur lequel vous avez cliqué sera actif et seuls les onglets du même groupe seront visibles. Vous pouvez aussi double cliquer dans une zone vide d'un groupe pour accéder au dernier onglet actif de celui-ci.">
+<!ENTITY howto.overflow.caption "Quelle est la différence entre les groupes empilés et défilants ?">
+<!ENTITY howto.overflow.description "Les vignettes d'onglets prennent de la place. Si un groupe n'est pas assez grand pour contenir les vignettes de tous ses onglets, ceux-ci seront empilés ou rendus défilants.">
+<!ENTITY howto.stack.description "Les onglets dans un groupe empilé seront affichés les uns au dessus des autres. Vous ne pourrez interagir qu'avec l'onglet situé en haut de la pile. Sous cette pile se situe un bouton de prévisualisation qui vous permettra de voir tous les autres onglets sans changer la taille du groupe.">
+<!ENTITY howto.list.description "Sinon, vous pouvez choisir d'afficher toutes les vignettes sans qu'elles ne s'empilent. Certaines seront cachées et vous devrez les faire défiler pour les consulter.">
+<!ENTITY howto.icons.description "Si les vignettes des onglets d'un groupe deviennent trop petites pour être utiles, leurs icônes seront affichés dans les titres à la place. Ceci peut être désactivé pour chaque groupe, afin qu'il affiche toujours les vignettes ou les onglets dans une listes.">
+<!ENTITY howto.thumbs.description2 "Vous pouvez aussi choisir des groupes spécifiques pour lesquels ne pas afficher de vignettes. Les onglets seront listés avec leurs titres uniquement, et optionnellement avec leurs adresses. Ceci se produira aussi avec les groupes défilants qui ne sont pas assez grands pour contenir au minimum 3 colonnes de vignettes, ou 2 colonnes d’icônes, indépendamment de l'activation ou non des vignettes.">
+<!ENTITY howto.search.caption "Comment puis-je rechercher dans mes onglets ?">
+<!ENTITY howto.search.step1 "Entrez dans la vue « Groupes d'onglets ».">
+<!ENTITY howto.search.step2a "Cliquez sur le bouton de recherche sur le côté droit de la fenêtre pour afficher la boîte de recherche, puis commencez simplement par saisir le nom de l'onglet que vous essayez de trouver.">
+<!ENTITY howto.search.step2b "Ou commencez simplement par taper et une recherche se fera automatiquement.">
+<!ENTITY howto.search.step4 "Au fur et à mesure que vous tapez, les onglets qui correspondent à votre recherche sont mis en surbrillance. Cliquez simplement sur un onglet pour le sélectionner et être de retour dans Firefox.">
+<!ENTITY howto.organize.caption "Comment puis-je organiser mes groupes d'onglets ?">
+<!ENTITY howto.organize.description1 "Les groupes d'onglets peuvent être facilement redimensionnés, réorganisés et nommés. Quand vous avez fini avec un groupe, vous pouvez le fermer et vous débarrasser de tous ses onglets en une seule fois.">
+<!ENTITY howto.resize.caption "Redimensionner les groupes d'onglets">
+<!ENTITY howto.resize.description3 "En mode de réorganisation libre, cliquez et glissez la poignée de redimensionnement située dans le coin inférieur droit d'un groupe pour le rendre plus grand ou plus petit. Pendant le redimensionnement du groupe, la taille des vignettes s'adaptera aussi en fonction de l'espace disponible.">
+<!ENTITY howto.resize.description4 "En mode grille, tout ceci se fait automatiquement pour vous : les groupes s'agrandiront autant que possible pour afficher tous vos onglets.">
+<!ENTITY howto.rearrange.caption "Réorganiser les groupes d'onglets">
+<!ENTITY howto.rearrange.description "Cliquez sur les côtés ou le bas d'un groupe et faites-le glisser vers une zone vide pour le déplacer sur l'écran.">
+<!ENTITY howto.rearrange.description3 "Dans l'affichage en grille, positionnez en haut vos groupes les plus importants, ou ceux qui ont le plus d'onglet, car ils sont généralement plus grands que ceux du bas.">
+<!ENTITY howto.name.caption "Nommer les groupes d'onglets">
+<!ENTITY howto.name.description "Cliquez à côté de l'icône crayon en haut d'un groupe et saisissez-lui un nom. Puis appuyez simplement sur Entrée ou cliquez sur d'autres zones de la fenêtre.">
+<!ENTITY howto.close.caption "Fermer les groupes d'onglets">
+<!ENTITY howto.close.description1 "Chaque groupe d'onglet a un bouton de fermeture dans le coin supérieur droit. Cliquer sur celui-ci ferme le groupe et tous ses onglets.">
+<!ENTITY howto.close.description2 "Si vous avez fermé un groupe d'onglets par accident, vous pouvez cliquer sur le bouton Annuler la fermeture du groupe pour le restaurer avant de quitter la vue.">
+<!ENTITY howto.pinned.caption "Onglets épinglés dans les groupes d'onglets">
+<!ENTITY howto.pinned.description2 "Les onglets épinglés n'appartiennent pas à un groupe en particulier. Ils sont représentés par l'icône de leur site sur le côté droit de chaque groupe d'onglets.">
+<!ENTITY howto.pinned.description3 "Vous pouvez épingler un onglet dans la vue &quot;groupe d'onglets&quot;, en le déplaçant dans cette zone. À l'inverse, glissez un onglet hors de cette zone vers n'importe quel groupe pour le dé-épingler.">
+<!ENTITY howto.credits "Cette page est inspirée d'un article initialement publié sur support.mozilla.org, écrit par ces sympathiques contributeurs :">

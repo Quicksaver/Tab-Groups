@@ -10,11 +10,15 @@
 <!ENTITY opt.closeIfEmpty.tooltip "當群組中的最後一個分頁被關閉，它會自動被丟棄。您可以透過停用此偏好設定，或是給它一個名稱，變更它的一些選項等讓空群組繼續存在。">
 <!ENTITY opt.showTabCounter.label "在群組標題後顯示分頁數量">
 <!ENTITY opt.showTabCounter.tooltip "群組頂部會顯示一個指示器，所以您就可以很容易地知道每個群組中有多少分頁。">
+<!ENTITY opt.sortGroupsByName.label "在選單與面板中按標題排序群組">
+<!ENTITY opt.sortGroupsByName.tooltip "在任何群組被列出的地方，像是分頁移動到群組選單或是快速存取面板中，它們將會按字母排序，而不是按您在群組管理檢視中的順序排序，其不會被此選項所影響。">
 <!ENTITY cat.defaults.label "群組預設應該要...">
 <!ENTITY opt.showThumbs.label "顯示分頁縮圖">
 <!ENTITY opt.showThumbs.tooltip "縮圖直接在群組中顯示了每個分頁的內容。停用它們以將群組轉換為僅顯示標題與圖示的分頁列表。">
 <!ENTITY opt.showUrls.label "在頁面標題後顯示網址">
 <!ENTITY opt.showUrls.tooltip "為了充份利用在未顯示分頁縮圖時的省下的空間，您可以在分頁標題後顯示其位置。">
+<!ENTITY opt.tileIcons.label "當縮圖太小時平鋪頁面圖示">
+<!ENTITY opt.tileIcons.tooltip "當圖示變得太小時，以平鋪而非縮圖的方式顯示頁面圖示。這會讓您可以在更小的空間中一次顯示更多的分頁。">
 <!ENTITY cat.stackTabs.label "當群組有太多分頁時...">
 <!ENTITY cat.stackTabs.tooltip "分頁縮圖會佔用空間。若群組因為不夠大而無法顯示所有分頁時，您可以...">
 <!ENTITY opt.stackTabs.label "堆疊群組">
@@ -36,7 +40,7 @@
 <!ENTITY cat.restore.label "復原分頁群組">
 <!ENTITY cat.clear.label "清除分頁群組">
 <!ENTITY opt.tabViewKeyset.label "進入與離開群組檢視">
-<!ENTITY opt.quickAccessKeyset.label "開啟快訴存取面板">
+<!ENTITY opt.quickAccessKeyset.label "開啟快速存取面板">
 <!ENTITY opt.nextGroupKeyset.label "切換到下一個群組">
 <!ENTITY opt.previousGroupKeyset.label "切換到上一個群組">
 <!ENTITY sessionRestore.caption "將分頁群組保留至跨越重新啟動">

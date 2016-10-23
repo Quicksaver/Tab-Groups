@@ -17,7 +17,8 @@
 <!ENTITY howto.overflow.description "Tab thumbnails take up space. If a group isn't large enough for all its tabs to be shown, it can either be stacked or scrolled.">
 <!ENTITY howto.stack.description "Tabs in a stacked group are shown on top of one another. You can only interact with the active tab on top. Below this stack, there is a preview button, which you can click to access all the other tabs without changing the size of the group.">
 <!ENTITY howto.list.description "Instead, you can choose to display all tabs normally without stacking. Some of them will be hidden and you will have to scroll down to access them.">
-<!ENTITY howto.thumbs.description "You can also choose specific groups in which to not show tab thumbnails. The tabs will be listed with only their titles and optionally their addresses. This will happen as well in scrolled groups that aren't large enough to fit at least three columns of tabs, regardless of thumbnails being enabled or not.">
+<!ENTITY howto.icons.description "If the tabs in a group become too small for their thumbnails to be useful, their icons will be shown in tiles instead. This can be disabled per-group, so that it will always either show the full thumbnails or show tabs in a list instead.">
+<!ENTITY howto.thumbs.description2 "You can also choose specific groups in which to not show tab thumbnails. The tabs will be listed with only their titles and optionally their addresses. This will happen as well in scrolled groups that aren't large enough to fit at least three columns of thumbnails, or two columns of icons, regardless of thumbnails being enabled or not.">
 <!ENTITY howto.search.caption "Wie durchsuche ich meine Tabs?">
 <!ENTITY howto.search.step1 "Wechseln Sie in die Tabgruppenansicht.">
 <!ENTITY howto.search.step2a "Klicken Sie auf die Suchschaltfläche am rechten Rand des Fensters, um das Suchfeld einzublenden und beginnen Sie dann damit, den Namen des gesuchten Tabs einzugeben.">
@@ -30,7 +31,7 @@
 <!ENTITY howto.resize.description4 "In grid layout, this is all done for you, the groups will be stretched to show your tabs in as much space as they can.">
 <!ENTITY howto.rearrange.caption "Tabgruppen neu anordnen">
 <!ENTITY howto.rearrange.description "Klicken Sie auf einen freien Bereich an den Seiten oder an der Unterseite einer Gruppe und ziehen Sie sie herum, um sie an eine andere Stelle auf dem Bildschirm zu befördern.">
-<!ENTITY howto.rearrange.description2 "In grid layout, drop a group over another to have them exchange places. Place your most important groups, or the ones with the most tabs, at the top as they are usually larger than the ones at the bottom.">
+<!ENTITY howto.rearrange.description3 "In grid layout, place your most important groups, or the ones with the most tabs, at the top as they are usually larger than the ones at the bottom.">
 <!ENTITY howto.name.caption "Tabgruppen benennen">
 <!ENTITY howto.name.description "Klicken Sie oben in einer Tabgruppe neben das Stiftsymbol und geben Sie einen Namen für die Gruppe ein. Drücken Sie anschließend einfach die Eingabetaste oder klicken Sie in einen anderen Bereich des Fensters.">
 <!ENTITY howto.close.caption "Tabgruppen schließen">
