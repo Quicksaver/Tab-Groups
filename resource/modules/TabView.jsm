@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.19
+// VERSION 1.1.20
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -771,21 +771,29 @@ this.TabView = {
 		if(!btn) { return; }
 
 		this.getGroupTitleForButton().then((title) => {
+			let prevLabel = btn.getAttribute('label');
+			let prevAttr = trueAttribute(btn, 'showGroupTitle');
+			let label;
+			let attr;
+
 			// In customize mode, the label is always the original.
 			if(title && !inCustomize) {
 				// Keep a backup of the label in case we need to revert it later.
 				if(!btn._label) {
 					btn._label = btn.getAttribute('label');
 				}
-				setAttribute(btn, 'label', title);
-			} else if(btn._label) {
-				setAttribute(btn, 'label', btn._label);
+				label = title;
 			}
+			else if(btn._label) {
+				label = btn._label;
+			}
+			attr = !!title;
 
-			if(title) {
-				setAttribute(btn, 'showGroupTitle', 'true');
-			} else {
-				removeAttribute(btn, 'showGroupTitle');
+			setAttribute(btn, 'label', label);
+			toggleAttribute(btn, 'showGroupTitle', attr);
+
+			if(prevLabel != label || prevAttr != attr) {
+				dispatch(btn, { type: 'ActiveGroupNameChanged', cancelable: false });
 			}
 		});
 	},
