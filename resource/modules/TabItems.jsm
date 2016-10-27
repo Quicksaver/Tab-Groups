@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.10
+// VERSION 1.3.11
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -597,14 +597,14 @@ this.TabItem.prototype = {
 		return new Promise((resolve, reject) => {
 			// Tab could have been closed in the meantime.
 			if(!this.tab) {
-				reject();
+				resolve(false);
 				return;
 			}
 
 			FavIcons.getFavIconUrlForTab(this.tab, (iconUrl) => {
 				// Add-on disabled or window/tab closed in the meantime.
 				if(typeof(TabItems) == 'undefined' || !this.tab) {
-					reject();
+					resolve(false);
 					return;
 				}
 
