@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.21
+// VERSION 1.1.22
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -765,7 +765,9 @@ this.TabView = {
 		if(button) {
 			let name = (Prefs.quickAccessButton) ? 'buttonQuickAccessTooltip' : 'buttonManageTooltip';
 			let tooltip = Strings.get('TabView', name);
-			setAttribute(button, 'tooltiptext', tooltip);
+			if(tooltip) {
+				setAttribute(button, 'tooltiptext', tooltip);
+			}
 		}
 	},
 
@@ -791,10 +793,15 @@ this.TabView = {
 			else if(btn._label) {
 				label = btn._label;
 			}
-			attr = !!title;
 
-			setAttribute(btn, 'label', label);
+			attr = !!title;
 			toggleAttribute(btn, 'showGroupTitle', attr);
+
+			if(label) {
+				setAttribute(btn, 'label', label);
+			} else {
+				label = prevLabel;
+			}
 
 			if(prevLabel != label || prevAttr != attr) {
 				dispatch(btn, { type: 'ActiveGroupNameChanged', cancelable: false });
