@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.1
+// VERSION 1.0.2
 
 this.TabCenter = {
 	id: 'tabcentertest1@mozilla.com',
@@ -79,9 +79,11 @@ this.TabCenter = {
 		Piggyback.add('TabCenter', window.VerticalTabs, 'filtertabs', function() {
 			// There's no need to re-filter the tabs if the correct ones are already showing.
 			// This saves precious cycles on startup, by not initializing TabView immediately.
+			let hidden_tab = $('filler-tab');
 			let find_input = $('find-input');
 			let input_value = find_input.value.toLowerCase();
 			if(!input_value && !this._lastInputValue) {
+				hidden_tab.setAttribute('hidden', 'true');
 				Timers.init('TabCenter.filtertabs', () => {
 					this.actuallyResizeTabs();
 				}, 300);
@@ -90,7 +92,6 @@ this.TabCenter = {
 
 			TabView._initFrame(() => {
 				Timers.init('TabCenter.filtertabs', () => {
-					let hidden_tab = $('filler-tab');
 					this._lastInputValue = input_value;
 
 					// If there's no filter term, show all the tabs in the current group.
@@ -112,12 +113,18 @@ this.TabCenter = {
 						tabs = Tabs.all;
 					}
 
-					let filteredTabs = tabs.filter((tab) => {
-						return tab.label.toLowerCase().match(input_value) || this.getUri(tab).spec.toLowerCase().match(input_value);
-					});
-					gBrowser.showOnlyTheseTabs(filteredTabs);
+					let hidden_counter = 0;
+					for(let tab of tabs) {
+						if(tab.label.toLowerCase().match(input_value) || this.getUri(tab).spec.toLowerCase().match(input_value)) {
+							tab.removeAttribute('hidden');
+						}
+						else {
+							tab.setAttribute('hidden', 'true');
+							hidden_counter++;
+						}
+					}
 
-					let hidden_counter = tabs.length - filteredTabs.length;
+					let hidden_counter = tabs.length - filtered;
 					let hidden_tab_label = hidden_tab.children[0];
 
 					if(hidden_counter > 0) {
