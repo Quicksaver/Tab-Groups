@@ -81,8 +81,6 @@ body.grid.groups-overflowing {
 body.single {
 	/* for single view, we need to exclude the group selector at the top and its borders */
 	--workspace-height: calc(100% - var(--group-selector-size) - var(--group-border-width));
-	/* it's kind of silly that I have to exclude borders here as well... am I missing something? */
-	--group-single-height: calc(100% - var(--group-border-width));
 }
 
 body.single:not(.showGroupThumbs) {
@@ -628,7 +626,7 @@ body.single .groupItem {
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: var(--group-single-height);
+	height: 100%;
 	border-top: none;
 	border-bottom: none;
 	-moz-border-start: none;
