@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.2
+// VERSION 1.0.3
 
 this.TabCenter = {
 	id: 'tabcentertest1@mozilla.com',
@@ -124,7 +124,6 @@ this.TabCenter = {
 						}
 					}
 
-					let hidden_counter = tabs.length - filtered;
 					let hidden_tab_label = hidden_tab.children[0];
 
 					if(hidden_counter > 0) {
