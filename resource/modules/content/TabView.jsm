@@ -2,7 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.0
+// VERSION 1.1.1
+
+XPCOMUtils.defineLazyModuleGetter(this, "PageThumbUtils", "resource://gre/modules/PageThumbUtils.jsm");
 
 this.TabView = {
 	// This module will only be initialized in frame scripts from windows that need it.
@@ -67,6 +69,11 @@ this.TabView = {
 				content.addEventListener("load", waitForLoad, true);
 				break;
 			}
+			case 'getContentSize': {
+				let [ width, height ] = PageThumbUtils.getContentSize(content);
+				Frames.message(frame, 'contentSize', { width, height });
+				break;
+			}
 		}
 	},
 
@@ -78,6 +85,7 @@ this.TabView = {
 		Frames.listen(frame, "isDocumentLoaded", this);
 		Frames.listen(frame, "isImageDocument", this);
 		Frames.listen(frame, "waitForDocumentLoad", this);
+		Frames.listen(frame, "getContentSize", this);
 	},
 
 	onFrameDeleted: function(frame) {
@@ -88,6 +96,7 @@ this.TabView = {
 		Frames.unlisten(frame, "isDocumentLoaded", this);
 		Frames.unlisten(frame, "isImageDocument", this);
 		Frames.unlisten(frame, "waitForDocumentLoad", this);
+		Frames.unlisten(frame, "getContentSize", this);
 	}
 };
 

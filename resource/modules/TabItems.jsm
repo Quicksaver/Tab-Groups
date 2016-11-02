@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.11
+// VERSION 1.3.12
 
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs", "resource://gre/modules/PageThumbs.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PageThumbsStorage", "resource://gre/modules/PageThumbs.jsm");
@@ -688,7 +688,7 @@ this.TabItem.prototype = {
 	},
 
 	// Updates the tabitem's canvas.
-	updateCanvas: function() {
+	updateCanvas: Task.async(function* () {
 		TabItems.tabUpdated(this);
 
 		// The canvas is only created when it is needed.
@@ -696,16 +696,12 @@ this.TabItem.prototype = {
 			new TabCanvas(this);
 		}
 
-		return new Promise((resolve, reject) => {
-			this.tabCanvas.update((painted) => {
-				if(painted) {
-					this._sendToSubscribers("painted");
-					this.hideCachedThumb();
-				}
-				resolve();
-			});
-		});
-	},
+		let painted = yield this.tabCanvas.update();
+		if(painted) {
+			this._sendToSubscribers("painted");
+			this.hideCachedThumb();
+		}
+	}),
 
 	getCanvasSize: function() {
 		let size = this.parent._lastTabSize;
@@ -1539,6 +1535,17 @@ this.TabCanvas.prototype = {
 		return this.tabItem.getCanvasSize();
 	},
 
+	getContentSize: function() {
+		return new Promise((resolve, reject) => {
+			let receiver = (m) => {
+				Messenger.unlistenBrowser(this.tab.linkedBrowser, 'contentSize', receiver);
+				resolve(m.data);
+			};
+			Messenger.listenBrowser(this.tab.linkedBrowser, 'contentSize', receiver);
+			Messenger.messageBrowser(this.tab.linkedBrowser, 'getContentSize');
+		});
+	},
+
 	persist(aBrowser, forceStale) {
 		// capture to file, thumbnail service does not persist automatically when rendering to canvas.
 		PageThumbs.shouldStoreThumbnail(aBrowser, (storeAllowed) => {
@@ -1611,72 +1618,93 @@ this.TabCanvas.prototype = {
 		});
 	},
 
-	update: function(callback) {
+	update: Task.async(function* () {
 		// If this canvas has started to be destroyed, stop it, it's better to update it than to create a new one.
 		if(this.destroying) {
 			this.destroying.reject();
 		}
 
-		let size = this.getSize();
-		let dimsChanged = !this.canvas.parentNode || this.canvas.width != size.x || this.canvas.height != size.y;
+		let canvas = this.canvas;
+		let browser = this.tab.linkedBrowser;
 
 		// Changing the dims of a canvas will clear it, so we don't want to do do this to a canvas we're currently displaying.
 		// So grab a new thumbnail at the new dims and then copy it over to the displayed canvas.
-		let canvas = this.canvas;
+		let size = this.getSize();
+		let dimsChanged = !this.canvas.parentNode || this.canvas.width != size.x || this.canvas.height != size.y;
 		if(dimsChanged) {
 			canvas = TabItems.canvasFragment();
 			canvas.width = size.x;
 			canvas.height = size.y;
 		}
+		let ctx = canvas.getContext('2d');
 
-		let browser = this.tab.linkedBrowser;
-		PageThumbs.captureToCanvas(browser, canvas, () => {
-			let hasHadThumb = this.tabItem._hasHadThumb;
-			let painted = !dimsChanged;
+		// We need to account for the size of the actual page when drawing its thumb, if it's smaller than the canvas we end up with black borders.
+		let contentSize = yield this.getContentSize();
+		let scaleX = 1;
+		let scaleY = 1;
+		if(size.x > contentSize.width && contentSize.width > 0) {
+			scaleX = Math.ceil(size.x / contentSize.width *1000) /1000;
+		}
+		if(size.y > contentSize.height && contentSize.height > 0) {
+			scaleY = Math.ceil(size.y / contentSize.height *1000) /1000;
+		}
+		if(scaleX != 1 || scaleY != 1) {
+			ctx.scale(scaleX, scaleY);
+		}
 
-			if(dimsChanged) {
-				// In non-e10s, many times the first canvas returned is completely black, probably because it tries to paint it too soon.
-				// I haven't been able to figure out if this a problem with how soon we are trying to paint, or a problem with PageThumbs itself,
-				// although it seems like snapshotCanvas in PageThumbUtils.createSnapshotThumbnail() is black already.
-				// This doesn't seem to happen in e10s with remote browsers.
-				// (This is not about local pages, but remote pages on non-remote browsers.)
-				// The toDataURL() call is a little expensive, so lets try to only use it when it can actually make a difference;
-				let isBlack =	!browser.isRemoteBrowser
-						&& !this.canvas.parentNode
-						&& !hasHadThumb
-						&& canvas.toDataURL() == UICache.blackCanvas(canvas);
-				if(!isBlack) {
-					// We only append the canvas to the DOM once we paint it, to avoid showing a black/blank canvas while it's being painted.
-					if(!this.canvas.parentNode) {
-						this.tabItem.thumb.appendChild(this.canvas);
-						this.tabItem._hasHadThumb = true;
-					}
-					this.canvas.width = size.x;
-					this.canvas.height = size.y;
-					try {
-						let ctx = this.canvas.getContext('2d');
-						ctx.drawImage(canvas, 0, 0);
-						painted = true;
-					}
-					catch(ex) {
-						// Can't draw if the canvas created by page thumbs isn't valid. This can happen during shutdown.
+		return new Promise((resolve, reject) => {
+			PageThumbs.captureToCanvas(browser, canvas, () => {
+				let ctx = this.canvas.getContext('2d');
+				let hasHadThumb = this.tabItem._hasHadThumb;
+				let painted = !dimsChanged;
+
+				if(dimsChanged) {
+					// In non-e10s, many times the first canvas returned is completely black, probably because it tries to paint it too soon.
+					// I haven't been able to figure out if this a problem with how soon we are trying to paint, or a problem with PageThumbs itself,
+					// although it seems like snapshotCanvas in PageThumbUtils.createSnapshotThumbnail() is black already.
+					// This doesn't seem to happen in e10s with remote browsers.
+					// (This is not about local pages, but remote pages on non-remote browsers.)
+					// The toDataURL() call is a little expensive, so lets try to only use it when it can actually make a difference;
+					let isBlack =	!browser.isRemoteBrowser
+							&& !this.canvas.parentNode
+							&& !hasHadThumb
+							&& canvas.toDataURL() == UICache.blackCanvas(canvas);
+					if(!isBlack) {
+						// We only append the canvas to the DOM once we paint it, to avoid showing a black/blank canvas while it's being painted.
+						if(!this.canvas.parentNode) {
+							this.tabItem.thumb.appendChild(this.canvas);
+							this.tabItem._hasHadThumb = true;
+						}
+						this.canvas.width = size.x;
+						this.canvas.height = size.y;
+						try {
+							ctx.drawImage(canvas, 0, 0);
+							painted = true;
+						}
+						catch(ex) {
+							// Can't draw if the canvas created by page thumbs isn't valid. This can happen during shutdown.
+						}
 					}
 				}
-			}
 
-			if(painted) {
-				// Force persist the first thumb we get, to avoid showing stored black thumbs.
-				// Even though we don't actually persist those, browser-ctrlTab.js always persists the first thumb of a tab when it is first restored,
-				// which, lucky us, can be black if it happens while we're in TabView.
-				// See https://dxr.mozilla.org/mozilla-central/source/browser/base/content/browser-ctrlTab.js#51.
-				let forceStale = !hasHadThumb;
-				this.persist(browser, forceStale);
-			}
-			if(callback) {
-				callback(painted);
-			}
+				// Make sure we reset the canvas scale factor, in case we had to change it above to consider the page's zoom.
+				if(scaleX != 1 || scaleY != 1) {
+					ctx.setTransform(1, 0, 0, 1, 0, 0);
+				}
+
+				if(painted) {
+					// Force persist the first thumb we get, to avoid showing stored black thumbs.
+					// Even though we don't actually persist those, browser-ctrlTab.js always persists the first thumb of a tab when it is first restored,
+					// which, lucky us, can be black if it happens while we're in TabView.
+					// See https://dxr.mozilla.org/mozilla-central/source/browser/base/content/browser-ctrlTab.js#51.
+					let forceStale = !hasHadThumb;
+					this.persist(browser, forceStale);
+				}
+
+				resolve(painted);
+			});
 		});
-	},
+	}),
 
 	toImage: function() {
 		// This is the basis of this deferred object, with accessor methods for resolving and rejecting its promise.
