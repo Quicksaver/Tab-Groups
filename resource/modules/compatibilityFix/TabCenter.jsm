@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.3
+// VERSION 1.0.4
 
 this.TabCenter = {
 	id: 'tabcentertest1@mozilla.com',
@@ -69,6 +69,14 @@ this.TabCenter = {
 
 	get findInput() { return $('find-input'); },
 
+	handleEvent: function(e) {
+		switch(e.type) {
+			case 'TabBarUpdated':
+				window.VerticalTabs.clearFind('tabGroupChange');
+				break;
+		}
+	},
+
 	attrWatcher: function() {
 		toggleAttribute($('TabsToolbar'), 'tabCenterInputFocused', trueAttribute($('find-input'), 'focused'));
 	},
@@ -115,7 +123,8 @@ this.TabCenter = {
 
 					let hidden_counter = 0;
 					for(let tab of tabs) {
-						if(tab.label.toLowerCase().match(input_value) || this.getUri(tab).spec.toLowerCase().match(input_value)) {
+						let label = tab.label || '';
+						if(label.toLowerCase().match(input_value) || this.getUri(tab).spec.toLowerCase().match(input_value)) {
 							tab.removeAttribute('hidden');
 						}
 						else {
@@ -142,6 +151,8 @@ this.TabCenter = {
 			window.VerticalTabs.filtertabs();
 		}
 
+		Tabs.listen('TabBarUpdated', this);
+
 		let setupTextbox = () => {
 			Watchers.addAttributeWatcher(this.findInput, 'focused', this, false, false);
 			this.attrWatcher();
@@ -163,6 +174,7 @@ this.TabCenter = {
 		Piggyback.revert('TabCenter', window.VerticalTabs, 'rearrangeXUL');
 		delete window.VerticalTabs._lastInputValue;
 
+		Tabs.unlisten('TabBarUpdated', this);
 		if(this.findInput) {
 			Watchers.removeAttributeWatcher(this.findInput, 'focused', this, false, false);
 		}
