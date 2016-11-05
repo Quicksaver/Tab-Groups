@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.22
+// VERSION 1.1.23
 
 this.__defineGetter__('gBrowser', function() { return window.gBrowser; });
 this.__defineGetter__('gTabViewDeck', function() { return $('tab-view-deck'); });
@@ -857,7 +857,10 @@ this.TabView = {
 	},
 
 	onLoad: function() {
-		migrate.migrateWidget();
+		// Can be removed after FF52
+		if(typeof(migrate) != 'undefined') {
+			migrate.migrateWidget();
+		}
 
 		window.SessionStore.promiseInitialized.then(() => {
 			if(UNLOADED) { return; }

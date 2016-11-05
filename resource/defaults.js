@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.4.22
+// VERSION 1.4.23
 
 objName = 'tabGroups';
 objPathString = 'tabgroups';
@@ -68,8 +68,8 @@ prefList = {
 
 	// for internal use
 	pageAutoChanged: false,
-	migratedWidget: false,
-	migratedPrefs: false,
+	migratedWidget: false, // remove after FF52
+	migratedPrefs: false, // remove after FF52
 	migratedKeysets: false
 };
 
@@ -158,7 +158,7 @@ function onStartup() {
 	Modules.load('Utils');
 	Modules.load('Storage');
 	Modules.load('nativePrefs');
-	Modules.load('migrate');
+	Modules.loadIf('migrate', Services.vc.compare(Services.appinfo.version, "52.0a1") < 0);
 	Modules.load('compatibilityFix/sandboxFixes');
 	Modules.load('keysets');
 
