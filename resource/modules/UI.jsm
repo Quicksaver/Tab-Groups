@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.55
+// VERSION 1.3.56
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -513,11 +513,6 @@ this.UI = {
 		switch(aTopic) {
 			case 'nsPref:changed':
 				switch(aSubject) {
-					case 'showTabOnUpdates':
-						this._noticeDismissed = false;
-						this.checkSessionRestore();
-						break;
-
 					case 'displayMode':
 						this.toggleMode();
 						break;

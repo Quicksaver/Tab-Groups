@@ -10,6 +10,7 @@
 
 <!ENTITY about.allVersions "Show notes from all previous versions">
 <!ENTITY about.notifyOnUpdates "Show me this tab on the next update">
+<!ENTITY about.silentUpdates "Don't notify me on the next update">
 
 <!ENTITY about.development "Development Status">
 <!ENTITY about.helpdevelopment "YOU CAN HELP">

@@ -2,26 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.4
+// VERSION 1.3.0
 
 this.about = {
 	kNS: 'http://www.w3.org/1999/xhtml',
-
-	_gNotifyOnUpdates: null,
-	get gNotifyOnUpdates() {
-		if(!this._gNotifyOnUpdates) {
-			this._gNotifyOnUpdates = $('notifyOnUpdates');
-		}
-		return this._gNotifyOnUpdates;
-	},
-
-	_gShowTabOnUpdates: null,
-	get gShowTabOnUpdates() {
-		if(!this._gShowTabOnUpdates) {
-			this._gShowTabOnUpdates = $('showTabOnUpdates');
-		}
-		return this._gShowTabOnUpdates;
-	},
 
 	get openAddonsMgrLink() { return $('openAddonsMgr'); },
 	get allVersionsLink() { return $('allVersions'); },
@@ -47,11 +31,6 @@ this.about = {
 
 			case 'mouseup':
 			case 'mouseover':
-				// are we mousing over the Show On Updates checkbox? That requires a specific action
-				if(e.target == this.gShowTabOnUpdates) {
-					this.disableNoticeShowOnUpdates();
-				}
-
 				// only do this for links and checkboxes
 				if(e.target.nodeName != 'a' && e.target.nodeName != 'html:a' && e.target.nodeName != 'checkbox') { return; }
 
@@ -60,11 +39,6 @@ this.about = {
 				}
 				break;
 		}
-	},
-
-	observe: function(aSubject, aTopic, aData) {
-		// we only listen for changes to the showTabOnUpdates preference here
-		this.disableNoticeShowOnUpdates();
 	},
 
 	init: function() {
@@ -82,9 +56,6 @@ this.about = {
 		setAttribute($('paneAbout-email'), 'href', addonUris.email);
 		setAttribute($('paneAbout-profile'), 'href', addonUris.profile);
 		setAttribute($('paneAbout-development'), 'href', addonUris.development);
-
-		// blink the "Show on updates" checkbox if necessary, so the user can easily notice it and disable them if he doesn't want them
-		this.noticeShowOnUpdates();
 
 		// check to see if there is a more recent version available
 		this.checkUpdates();
@@ -370,38 +341,6 @@ this.about = {
 				}
 			}
 		}, 'JSON');
-	},
-
-	noticeShowOnUpdates: function() {
-		// don't blink the checkbox if the user has noticed it previously
-		if(Prefs.userNoticedTabOnUpdates) { return; }
-
-		// or if the user has disabled show on updates already (which is a sign he noticed it of course)
-		if(!Prefs.showTabOnUpdates) {
-			Prefs.userNoticedTabOnUpdates = false;
-			return;
-		}
-
-		// or if the user manually opened the About tab
-		if(!PrefPanes.previousVersion) { return; }
-
-		// so this is apparently the first time the About pane has been shown automatically on an update,
-		// let's make sure the user knows this can easily be disabled
-		setAttribute(this.gNotifyOnUpdates, 'blink', 'true');
-
-		// if the mouse goes over the checkbox, or if the user toggles it, it's a good sign it has been noticed, so we can disable this from now on
-		Listeners.add(this.gShowTabOnUpdates, 'mouseover', this);
-		Prefs.listen('showTabOnUpdates', this);
-	},
-
-	disableNoticeShowOnUpdates: function() {
-		if(Prefs.userNoticedTabOnUpdates) { return; }
-		Prefs.userNoticedTabOnUpdates = true;
-
-		removeAttribute(this.gNotifyOnUpdates, 'blink');
-
-		Listeners.remove(this.gShowTabOnUpdates, 'mouseover', this);
-		Prefs.unlisten('showTabOnUpdates', this);
 	},
 
 	openAddonsMgr: function() {

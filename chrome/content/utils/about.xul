@@ -34,6 +34,7 @@
 	<prefpane id="mainPrefPane">
 		<preferences>
 			<preference id="pref-showTabOnUpdates" name="extensions.tabgroups.showTabOnUpdates" type="bool"/>
+			<preference id="pref-silentUpdates" name="extensions.tabgroups.silentUpdates" type="bool"/>
 		</preferences>
 
 		<hbox id="header-about" class="header" collapsed="true" data-category="paneAbout">
@@ -52,9 +53,10 @@
 			<html:div class="row">
 				<html:div id="general" class="main-column">
 					<hbox id="notifyOnUpdates" class="header">
-						<hbox class="notifyOnUpdates-checkbox-container">
-							<checkbox id="showTabOnUpdates" label="&about.notifyOnUpdates;" delayPreference="pref-showTabOnUpdates"/>
-						</hbox>
+						<vbox class="notifyOnUpdates-checkbox-container">
+                            <checkbox label="&about.silentUpdates;" delayPreference="pref-silentUpdates"/>
+                            <checkbox label="&about.notifyOnUpdates;" delayPreference="pref-showTabOnUpdates" dependson="!pref-silentUpdates"/>
+						</vbox>
 					</hbox>
 					<html:p>&about.description;</html:p>
 					<html:p>&about.descriptionB;</html:p>

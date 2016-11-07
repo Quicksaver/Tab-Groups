@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.15
+// VERSION 1.1.0
 Modules.UTILS = true;
 
 // PrefPanes - handles the preferences tab and all its contents for the add-on
@@ -35,7 +35,16 @@ this.PrefPanes = {
 	previousVersion: null,
 
 	observe: function(aSubject, aTopic, aData) {
-		this.initWindow(aSubject);
+		switch(aTopic) {
+			case 'pageshow':
+				this.initWindow(aSubject);
+				break;
+
+			case 'alertclickcallback':
+				this.closeToaster();
+				this.openWhenReady();
+				break;
+		}
 	},
 
 	register: function(aPane, aModules) {
@@ -130,18 +139,30 @@ this.PrefPanes = {
 		// if we're in a dev version, ignore all this
 		if(AddonData.version.includes('a') || AddonData.version.includes('b')) { return; }
 
-		// if we're updating from a version without this module, try to figure out the last version
-		if(Prefs.lastVersionNotify == '0' && STARTED == ADDON_UPGRADE && AddonData.oldVersion) {
-			Prefs.lastVersionNotify = AddonData.oldVersion;
+		if(STARTED == ADDON_UPGRADE) {
+			// if we're updating from a version without this module, try to figure out the last version
+			if(Prefs.lastVersionNotify == '0' && AddonData.oldVersion) {
+				Prefs.lastVersionNotify = AddonData.oldVersion;
+			}
+
+			// Don't show notifications if the user decided not to receive any,
+			// and make sure we notify the user when updating only; when installing for the first time do nothing.
+			if(!Prefs.silentUpdates && Prefs.lastVersionNotify != '0' && Services.vc.compare(Prefs.lastVersionNotify, AddonData.version) < 0) {
+				this.previousVersion = Prefs.lastVersionNotify;
+
+				// Show the about page directly, with the release notes, if the user chose to.
+				if(Prefs.showTabOnUpdates) {
+					this.openWhenReady();
+				}
+				// Otherwise show only the notification toaster message for now,
+				// it's much less intrusive for when you can't/don't want to check the notes.
+				else {
+					this.showToaster();
+				}
+			}
 		}
 
-		// now make sure we notify the user when updating only; when installing for the first time do nothing
-		if(Prefs.showTabOnUpdates && Prefs.lastVersionNotify != '0' && Services.vc.compare(Prefs.lastVersionNotify, AddonData.version) < 0) {
-			this.previousVersion = Prefs.lastVersionNotify;
-			this.openWhenReady();
-		}
-
-		// always set the pref to the current version, this also ensures only one notification tab will open per firefox session (and not one per window)
+		// always keep this flag up to date with the current version
 		if(Prefs.lastVersionNotify != AddonData.version) {
 			Prefs.lastVersionNotify = AddonData.version;
 		}
@@ -159,13 +180,37 @@ this.PrefPanes = {
 		if(isContent) { return; }
 
 		Messenger.unloadFromAll('utils/api');
+		Browsers.unregister(this, 'pageshow', this.chromeUri);
 
 		this.closeAll();
+	},
 
-		Styles.unload('PrefPanesHtmlFix');
-		Styles.unload('PrefPanesXulFix');
+	// Show the user a notification about the add-on having been updated.
+	showToaster: function() {
+		try {
+			let icon = "chrome://"+objPathString+"/skin/icon.png";
+			let title = Strings.get('utils-toaster', 'title');
+			let text = Strings.get('utils-toaster', 'line1', [ [ '$vx', AddonData.version ] ])+'\n'+Strings.get('utils-toaster', 'line2');
+			let name = 'toast-'+objName+'-updated';
 
-		Browsers.unregister(this, 'pageshow', this.chromeUri);
+			let alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+			alertsService.showAlertNotification(icon, title, text, true, "", this, name);
+		}
+		catch(ex) {
+			Cu.reportError(ex);
+		}
+	},
+
+	closeToaster: function() {
+		try {
+			let name = 'toast-'+objName+'-updated';
+
+			let alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+			alertsService.closeAlert(name);
+		}
+		catch(ex) {
+			Cu.reportError(ex);
+		}
 	},
 
 	// we have to wait for Session Store to finish, otherwise our tab will be overriden by a session-restored tab
@@ -174,7 +219,7 @@ this.PrefPanes = {
 		if(typeof(PrefPanes) == 'undefined') { return; }
 
 		// most recent window, if it doesn't exist yet it means we're still starting up, so give it a moment
-		var aWindow = window;
+		let aWindow = window;
 		if(!aWindow || !aWindow.SessionStore) {
 			aSync(() => { this.openWhenReady(); }, 500);
 			return;
@@ -182,7 +227,7 @@ this.PrefPanes = {
 
 		// SessionStore should have registered the window and initialized it, to ensure it doesn't overwrite our tab with any saved ones
 		// (ours will open in addition to session-saved tabs)
-		var state = JSON.parse(aWindow.SessionStore.getBrowserState());
+		let state = JSON.parse(aWindow.SessionStore.getBrowserState());
 		if(state.windows.length == 0) {
 			aSync(() => { this.openWhenReady(); }, 500);
 			return;
@@ -328,8 +373,8 @@ Modules.LOADMODULE = function() {
 		Prefs.setDefaults({
 			lastPrefPane: '',
 			lastVersionNotify: '0',
-			showTabOnUpdates: true,
-			userNoticedTabOnUpdates: false
+			showTabOnUpdates: false,
+			silentUpdates: false
 		});
 	}
 
