@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.0
+// VERSION 1.3.1
 
 this.migrate = {
 	migratorBackstage: null,
@@ -21,9 +21,6 @@ this.migrate = {
 
 	migratePrefs: function() {
 		if(!Prefs.migratedPrefs) {
-			if(Services.prefs.prefHasUserValue('browser.panorama.animate_zoom')) {
-				Prefs.animateZoom = Services.prefs.getBoolPref('browser.panorama.animate_zoom');
-			}
 			if(Services.prefs.prefHasUserValue('browser.panorama.session_restore_enabled_once')) {
 				Prefs.pageAutoChanged = Services.prefs.getBoolPref('browser.panorama.session_restore_enabled_once');
 			}
