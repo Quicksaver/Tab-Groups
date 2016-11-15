@@ -869,6 +869,7 @@ this.controllers = {
 				break;
 
 			case 'dragover':
+				// Change this to .includes() when removing compat for FF51-, currently uses a shim in FF52+
 				if(e.dataTransfer.types.contains("text/plain")) {
 					e.preventDefault();
 				}

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.2.3
+// VERSION 1.2.4
 Modules.UTILS = true;
 Modules.BASEUTILS = true;
 
@@ -47,7 +47,7 @@ this.Piggyback = {
 		var ids = aObj.__PiggybackIds ? aObj.__PiggybackIds.split(' ') : [];
 
 		// the same method can't be replaced more than once by the same aName (module)
-		if(aObj[aId] && aObj[aId][aName] && aObj[aId][aName][aMethod]) { return; }
+		if(aObj[aId] && aObj[aId].has(aName) && aObj[aId].get(aName).has(aMethod)) { return; }
 
 		var commander = aKeep || {
 			master: aMaster,
