@@ -1650,12 +1650,14 @@ body[searching="highlight"] #search-mode {
 	border-radius: 12px;
 }
 
-body[searching="highlight"] #search-close {
-	transform: translateX(-100%);
+body[searching="highlight"] #search-mode:-moz-locale-dir(ltr),
+body[searching="highlight"] #search-close:-moz-locale-dir(rtl) {
+	left: 0;
 }
 
-body[searching="highlight"] #search-mode {
-	transform: translateX(0);
+body[searching="highlight"] #search-mode:-moz-locale-dir(rtl),
+body[searching="highlight"] #search-close:-moz-locale-dir(ltr) {
+	right: 0;
 }
 
 body[searching="highlight"].searched .tab:not(.highlighted),
