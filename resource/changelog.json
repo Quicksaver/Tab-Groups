@@ -1,6 +1,20 @@
 {
-	"current":"2.1",
+	"current":"2.1.1",
 	"releases": {
+		"2.1.1":{
+			"date":"November 17, 2016",
+			"notes":[
+				["changed","When the add-on is automatically updated, it now shows a less intrusive notification toaster message linking to the release notes; as before, this can still be disabled above in this page"],
+				["updated","cs and pl locales"],
+				["bugfix","Compatibility with <a=https://testpilot.firefox.com/experiments/tab-center>Tab Center</a>, when filtering tabs, some could remain visible when they shouldn't be (full compatibility will be achieved by Tab Center itself with its next update)"],
+				["bugfix","The toolbar button label would sometimes show \"undefined\" (<a=https://github.com/Quicksaver/Tab-Groups/issues/451>issue #451</a>)"],
+				["bugfix","In single view, if a group only had one tab, that tab would be too large and would cause the group to scroll"],
+				["bugfix","When zooming in on a page, its thumbnail could have large black areas around it (<a=https://github.com/Quicksaver/Tab-Groups/issues/463>issue #463</a>)"],
+				["bugfix","(Firefox 52) compatibility fix for Firefox no longer having any groups migration code"],
+				["bugfix","(Firefox 52) in groups view, the close button of the search label would be out of place"],
+				["","Other minor fixes"]
+			]
+		},
 		"2.1":{
 			"date":"October 24, 2016",
 			"notes":[
