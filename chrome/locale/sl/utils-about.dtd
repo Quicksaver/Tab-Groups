@@ -7,6 +7,7 @@
 <!ENTITY about.descriptionC "Oglejte si tudi najnovejšo epizodo moje spletne serije življenja s Firefoxom, narejeno prav za vas, najpodpornejše uporabnike, ki si jih razvijalec lahko želi! Pomaknite se na skakajočo ikono v spodnjem kotu te strani. Ljubite, sovražite, delite jo.">
 <!ENTITY about.allVersions "Prikaži opombe iz vseh prejšnjih različic">
 <!ENTITY about.notifyOnUpdates "Prikaži ta zavihek ob naslednji posodobitvi">
+<!ENTITY about.silentUpdates "Ne obvesti me ob naslednji posodobitvi!">
 <!ENTITY about.development "Stanje razvoja">
 <!ENTITY about.helpdevelopment "LAHKO POMAGATE">
 <!ENTITY about.information "Več podatkov">

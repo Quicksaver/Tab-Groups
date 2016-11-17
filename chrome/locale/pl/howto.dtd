@@ -17,8 +17,8 @@
 <!ENTITY howto.overflow.description "Miniaturki kart zajmują miejsce. Jeśli grupa nie jest wystarczająco duża, aby pokazać wszystkie karty, mogą być one zarówno ułożone w stos lub przewijane.">
 <!ENTITY howto.stack.description "Karty ułożone w stos wyświetlane są jedna na drugiej. Możesz wchodzić w interakcje tylko z aktywną kartą na górze. Poniżej tego stosu, znajduje się przycisk podglądu, który możesz kliknąć, aby uzyskać dostęp do wszystkich innych kart bez zmiany wielkości grupy.">
 <!ENTITY howto.list.description "Zamiast tego możesz wybrać wyświetlanie wszystkich kart normalnie, bez układania. Niektóre z nich zostaną ukryte i będziesz musiał przewinąć w dół, aby uzyskać do nich dostęp.">
-<!ENTITY howto.icons.description "If the tabs in a group become too small for their thumbnails to be useful, their icons will be shown in tiles instead. This can be disabled per-group, so that it will always either show the full thumbnails or show tabs in a list instead.">
-<!ENTITY howto.thumbs.description2 "You can also choose specific groups in which to not show tab thumbnails. The tabs will be listed with only their titles and optionally their addresses. This will happen as well in scrolled groups that aren't large enough to fit at least three columns of thumbnails, or two columns of icons, regardless of thumbnails being enabled or not.">
+<!ENTITY howto.icons.description "Jeśli karty w grupie stają się zbyt małe, aby ich miniaturki były użyteczne, ich ikony będą pokazane na kafelkach. To może być wyłączone dla wybranej grupy, tak aby zawsze pokazywana była pełna miniaturka lub lista kart.">
+<!ENTITY howto.thumbs.description2 "Możesz również wybrać konkretne grupy, w których nie są pokazywane miniaturki kart. Karty będą wyświetlane w formie listy, tylko z ich tytułami oraz opcjonalnie z ich adresami. Stanie się tak również w przewijanych grupach, które nie są wystarczająco duże, aby zmieścić co najmniej trzy kolumny miniaturek lub dwie kolumny ikon, niezależnie od tego czy miniaturki są włączone czy nie.">
 <!ENTITY howto.search.caption "Jak mogę przeszukiwać moje karty?">
 <!ENTITY howto.search.step1 "Wejdź do widoku Grup kart.">
 <!ENTITY howto.search.step2a "Kliknij przycisk wyszukiwania po prawej stronie okna, aby otworzyć pole wyszukiwania, a następnie zacznij wpisywać nazwę karty, którą próbujesz znaleźć.">
@@ -31,7 +31,7 @@
 <!ENTITY howto.resize.description4 "W układzie siatki, to wszystko jest robione za ciebie, grupy będą rozciągnięte tak jak to możliwe, aby pokazać twoje karty.">
 <!ENTITY howto.rearrange.caption "Rozmieszczanie grup kart">
 <!ENTITY howto.rearrange.description "Kliknij i przeciągnij na pustym obszarze wzdłuż boków lub spodu grupy, aby przenosić ją po całym ekranie.">
-<!ENTITY howto.rearrange.description3 "In grid layout, place your most important groups, or the ones with the most tabs, at the top as they are usually larger than the ones at the bottom.">
+<!ENTITY howto.rearrange.description3 "W układzie siatki, umieścić swoje najważniejsze grupy lub te z większą ilością kart u góry, ponieważ są one zazwyczaj większe niż te na dole.">
 <!ENTITY howto.name.caption "Nazywanie grup kart">
 <!ENTITY howto.name.description "Kliknij obok ikony ołówka u góry grupy i wpisz nazwę dla niej. Następnie wystarczy nacisnąć Enter lub kliknąć w innym miejscu okna.">
 <!ENTITY howto.close.caption "Zamykanie grup kart">

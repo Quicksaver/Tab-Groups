@@ -7,6 +7,7 @@
 <!ENTITY about.descriptionC "Vea también el último episodio de mi serie web sobre la vida con Firefox, realizada para todos ustedes, ¡los usuarios más entusiastas que un desarrollador podría pedir! Simplemente señale el icono saltarín en la esquina inferior de su página. Ámelo. Ódielo. Compártalo.">
 <!ENTITY about.allVersions "Mostrar notas de todas las versiones anteriores">
 <!ENTITY about.notifyOnUpdates "Mostrarme esta pestaña en la próxima actualización">
+<!ENTITY about.silentUpdates "No me notifique las siguientes actualizaciones">
 <!ENTITY about.development "Estado del desarrollo">
 <!ENTITY about.helpdevelopment "USTED PUEDE AYUDAR">
 <!ENTITY about.information "Más información">

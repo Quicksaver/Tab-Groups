@@ -7,6 +7,7 @@
 <!ENTITY about.descriptionC "也請觀看在我的關於生活與 Firefox 網路系列中最新的一集，獻給在座的你們，最支持的使用者也可以問開發者問題！只要點選在本頁面底部角落的彈跳圖示，喜歡它。討厭它。分享它。">
 <!ENTITY about.allVersions "自先前的版本顯示註記">
 <!ENTITY about.notifyOnUpdates "在下次更新顯示這個分頁">
+<!ENTITY about.silentUpdates "下次更新時不要通知我">
 <!ENTITY about.development "開發狀態">
 <!ENTITY about.helpdevelopment "您可以幫忙">
 <!ENTITY about.information "更多資訊">

@@ -7,8 +7,8 @@
 <!ENTITY manageTabGroups.label "Zarządzaj grupami">
 <!ENTITY manageTabGroups.tooltip "Otwórz widok grup, aby organizować swoje karty i tworzyć nowe grupy">
 <!ENTITY buttonSearchTabs.label "Szukaj kartę">
-<!ENTITY buttonSearchMode.label "Toggle list mode">
-<!ENTITY buttonSearchClose.label "Close this search term">
+<!ENTITY buttonSearchMode.label "Przełącz tryb wyświetlania">
+<!ENTITY buttonSearchClose.label "Zamknij to wyszukiwanie">
 <!ENTITY buttonExitTabGroups.label "Opuść grupy kart">
 <!ENTITY buttonOptionsTabGroups.label "Zmień ustawienia grup kart">
 <!ENTITY buttonHelpTabGroups.label "Jak używać grup kart">
@@ -23,7 +23,7 @@
 <!ENTITY options.title.tooltip "Nazwij tę grupę kart">
 <!ENTITY options.showThumbs.label "Pokaż miniaturki kart">
 <!ENTITY options.showUrls.label "Pokaż adresy obok tytułów stron">
-<!ENTITY options.tileIcons.label "Tile page icons when thumbnails are too small">
+<!ENTITY options.tileIcons.label "Pokaż kafelki z ikonami stron, kiedy miniaturki są zbyt małe">
 <!ENTITY options.catchOnce.caption "Reguły chwytania kart do tej grupy">
 <!ENTITY options.catchOnce.label "Chwytaj tylko nowe kary">
 <!ENTITY options.catchRules.placeholder1 "Wstaw tutaj wyrażenia regularne dla adresów internetowych. Pasujące karty będą automatycznie przenoszone do tej grupy.">

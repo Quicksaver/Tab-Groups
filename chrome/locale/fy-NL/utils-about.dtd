@@ -7,6 +7,7 @@
 <!ENTITY about.descriptionC "Besjoch ek de lêste ôflevering fan de webserie oer it libben mei Firefox, makke foar jo, de meast entûsjaste brûker in ûntwikkeler winsket! Klik op gewoanwei op it springende ikoan yn de hoek fan dizze side. Mei der wol oer. Haatsje it. Diel it.">
 <!ENTITY about.allVersions "Opmerkingen fan alle eardere ferzjes toane">
 <!ENTITY about.notifyOnUpdates "Dit ljepblêd toane by de folgjende fernijing">
+<!ENTITY about.silentUpdates "Don't notify me on the next update">
 <!ENTITY about.development "Untwikkelingssteat">
 <!ENTITY about.helpdevelopment "JO KINNE HELPE">
 <!ENTITY about.information "Mear ynformaasje">

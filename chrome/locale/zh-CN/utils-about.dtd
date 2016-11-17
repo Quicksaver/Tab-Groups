@@ -7,6 +7,7 @@
 <!ENTITY about.descriptionC "来观看我与 Firefox 的 Web 生活的最新一集吧，一切为你，最贴近用户的开发者。只需找到本页角落的弹跳图标。无论你爱它，恨它，或分享它。">
 <!ENTITY about.allVersions "显示之前所有版本的更新日志">
 <!ENTITY about.notifyOnUpdates "下次更新时显示此标签页">
+<!ENTITY about.silentUpdates "下载更新时不再通知我">
 <!ENTITY about.development "开发状态">
 <!ENTITY about.helpdevelopment "帮助我">
 <!ENTITY about.information "更多信息">

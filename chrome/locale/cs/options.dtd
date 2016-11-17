@@ -1,8 +1,8 @@
 <!ENTITY pane.tabGroups.label "Skupiny panelů">
 <!ENTITY pane.session.label "Záloha / Obnova">
-<!ENTITY opt.showGroupThumbs.label "Zobrazit náhledy skupin v jednoskupinovém zobrazení">
+<!ENTITY opt.showGroupThumbs.label "V jednoskupinovém zobrazení zobrazit náhledy skupin">
 <!ENTITY opt.showGroupThumbs.tooltip "Při skrytí náhledů skupin bude k dispozici více místa pro panely, ovšem za cenu toho, že rozlišit jednotlivé skupiny budete moci jen podle jejich názvu.">
-<!ENTITY opt.gridDynamicSize.label "Použít dynamickou změnu velikosti skupin v tabulkovém rozložení">
+<!ENTITY opt.gridDynamicSize.label "V tabulkovém rozložení použít dynamickou změnu velikosti skupin">
 <!ENTITY opt.gridDynamicSize.tooltip1 "Dynamická změna velikosti plně využívá velikosti okna. Skupiny jsoucí výše budou mít větší rozměry než skupiny jsoucí níže.">
 <!ENTITY opt.gridDynamicSize.tooltip2 "Využijte toho tak, že přesunete důležitější skupiny nebo skupiny s velkým počtem panelů do vyšších pozic.">
 <!ENTITY opt.gridDynamicSize.tooltip3 "Při nezaškrtnutí této volby budou mít všechny skupiny stejné rozměry, pouze s případnými rozdíly nutnými k tomu, aby se všechny vešli na obrazovku.">

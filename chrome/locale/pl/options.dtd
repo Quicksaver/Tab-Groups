@@ -10,15 +10,15 @@
 <!ENTITY opt.closeIfEmpty.tooltip "Grupa jest zamykana natychmiast, gdy zostanie zamknięta ostatnia karta. Możesz zachować pustą grupę wyłączając to ustawienie, lub po prostu nazywając grupę, lub zmieniając niektóre jej opcje.">
 <!ENTITY opt.showTabCounter.label "Pokaż liczbę kart obok nazwy grupy">
 <!ENTITY opt.showTabCounter.tooltip "Wskaźnik jest wyświetlany w górnej części grupy, dzięki czemu możesz łatwo się dowiedzieć, ile kart masz w każdej grupie.">
-<!ENTITY opt.sortGroupsByName.label "Sortuj grupy wg tytułów w menu i w panelu">
+<!ENTITY opt.sortGroupsByName.label "Sortuj grupy wg tytułu w menu i panelach">
 <!ENTITY opt.sortGroupsByName.tooltip "Gdziekolwiek grupy znajdują się na liście, tak jak w menu karty Przenieś do grupy lub w Panelu szybkiego dostępu, będą one sortowane alfabetycznie, a nie w kolejności rozmieszczenia ich w widoku zarządzania grupami, który jest niezależny od tej opcji.">
-<!ENTITY cat.defaults.label "Domyślnie grupy powinny...">
+<!ENTITY cat.defaults.label "Domyślnie w grupach...">
 <!ENTITY opt.showThumbs.label "Pokaż miniaturki kart">
 <!ENTITY opt.showThumbs.tooltip "Miniaturki pokazują treść każdej karty bezpośrednio w grupie. Wyłączenie tego zmienia grupę w listę kart reprezentowaną tylko przez ich tytuł i ikonę.">
 <!ENTITY opt.showUrls.label "Pokaż adresy obok tytułów stron">
 <!ENTITY opt.showUrls.tooltip "Aby w pełni wykorzystać przestrzeń zachowaną przez nie pokazywanie miniaturek kart, obok tytułu karty może być wyświetlany jej adres.">
-<!ENTITY opt.tileIcons.label "Tile page icons when thumbnails are too small">
-<!ENTITY opt.tileIcons.tooltip "Shows the page icons in a tile instead of the thumbnails when they become too small to be useful. This lets you have a lot more tabs displayed at the same time on a smaller area.">
+<!ENTITY opt.tileIcons.label "Pokaż kafelki z ikonami stron, kiedy miniaturki są zbyt małe">
+<!ENTITY opt.tileIcons.tooltip "Pokazuje ikony stron na kafelkach zamiast miniaturek, gdy stają się zbyt małe, aby być użyteczne. To pozwala wyświetlać dużo więcej kart w tym samym czasie na mniejszym obszarze.">
 <!ENTITY cat.stackTabs.label "Kiedy grupy mają zbyt wiele kart...">
 <!ENTITY cat.stackTabs.tooltip "Miniaturki kart zajmują miejsce. Jeśli grupa nie może pokazać wszystkich swoich kart, ponieważ nie ma go wystarczająco dużo, możesz...">
 <!ENTITY opt.stackTabs.label "Utwórz stos">

@@ -7,6 +7,7 @@
 <!ENTITY about.descriptionC "あなたのために作成した Firefox で送る Web ライフについての最新のエピソードもご覧ください。このページ下部のアイコンをクリックするだけです。煮るなり焼くなり共有するなり、好きにしてください。">
 <!ENTITY about.allVersions "過去バージョンの更新履歴を表示する">
 <!ENTITY about.notifyOnUpdates "次回の更新時にこのタブを表示する">
+<!ENTITY about.silentUpdates "次回更新時に通知しない">
 <!ENTITY about.development "開発状況">
 <!ENTITY about.helpdevelopment "開発を支援する">
 <!ENTITY about.information "その他の情報">
