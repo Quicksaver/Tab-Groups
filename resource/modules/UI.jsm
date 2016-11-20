@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.57
+// VERSION 1.3.58
 
 // Used to scroll groups automatically, for instance when dragging a tab over a group's overflown edges.
 this.Synthesizer = {
@@ -1879,12 +1879,15 @@ this.UI = {
 				break;
 
 			case " ":
-				// Spacebar should expanded the active group if it's stacked.
-				activeGroupItem = GroupItems.getActiveGroupItem();
-				if(activeGroupItem && activeGroupItem.isStacked) {
-					activeGroupItem.expand();
+				if(!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+					// Spacebar should expanded the active group if it's stacked.
+					activeGroupItem = GroupItems.getActiveGroupItem();
+					if(activeGroupItem && activeGroupItem.isStacked) {
+						activeGroupItem.expand();
+					}
+					break;
 				}
-				break;
+				// no break; continue to default
 
 			default:
 				processBrowserKeys(e);
