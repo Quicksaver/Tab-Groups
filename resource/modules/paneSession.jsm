@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.11
+// VERSION 1.1.12
 
 this.paneSession = {
 	manualAction: false,
@@ -171,51 +171,53 @@ this.paneSession = {
 							extData: {}
 						};
 
-						try {
+						if(Array.isArray(win.tabs)) {
 							for(let tab of win.tabs) {
-								// don't save tab history, only the latest (current) visible entry
-								let i = tab.index -1;
-								let current = tab.entries[i];
+								try {
+									// don't save tab history, only the latest (current) visible entry
+									let i = tab.index -1;
+									let current = tab.entries[i];
 
-								let saveTab = {
-									entries: [ {
-										url: current.url,
-										title: current.title,
-										charset: current.charset,
-										ID: current.ID,
-										persist: current.persist
-									} ],
-									lastAccessed: "0",
-									hidden: tab.hidden,
-									attributes: {},
-									extData: {},
-									index: 1
-								};
+									let saveTab = {
+										entries: [ {
+											url: current.url,
+											title: current.title,
+											charset: current.charset,
+											ID: current.ID,
+											persist: current.persist
+										} ],
+										lastAccessed: "0",
+										hidden: tab.hidden,
+										attributes: {},
+										extData: {},
+										index: 1
+									};
 
-								if(tab.lastAccessed) {
-									saveTab.lastAccessed = tab.lastAccessed;
-								}
-								if(tab.pinned) {
-									saveTab.pinned = tab.pinned;
-								}
-								if(tab.extData) {
-									for(let x in tab.extData) {
-										saveTab.extData[x] = tab.extData[x];
+									if(tab.lastAccessed) {
+										saveTab.lastAccessed = tab.lastAccessed;
 									}
-								}
-								if(tab.attributes) {
-									for(let x in tab.attributes) {
-										saveTab.attributes[x] = tab.attributes[x];
+									if(tab.pinned) {
+										saveTab.pinned = tab.pinned;
 									}
-								}
-								if(tab.image) {
-									saveTab.image = tab.image;
-								}
+									if(tab.extData) {
+										for(let x in tab.extData) {
+											saveTab.extData[x] = tab.extData[x];
+										}
+									}
+									if(tab.attributes) {
+										for(let x in tab.attributes) {
+											saveTab.attributes[x] = tab.attributes[x];
+										}
+									}
+									if(tab.image) {
+										saveTab.image = tab.image;
+									}
 
-								winData.tabs.push(saveTab);
+									winData.tabs.push(saveTab);
+								}
+								catch(ex) { Cu.reportError(ex); }
 							}
 						}
-						catch(ex) { Cu.reportError(ex); }
 
 						if(win.extData) {
 							if(win.extData[Storage.kGroupIdentifier]) {
