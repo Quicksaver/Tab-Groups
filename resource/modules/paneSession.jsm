@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.12
+// VERSION 1.1.13
 
 this.paneSession = {
 	manualAction: false,
@@ -799,6 +799,12 @@ this.paneSession = {
 		// first make sure the TabView frame isn't initialized, we don't want it interfering
 		gWindow[objName].TabView._deinitFrame();
 
+		// If TMP is initialized, it could reverse the order of the imported tabs, we flip its preference temporarily to make sure it doesn't.
+		let restoreTMP = Prefs.openTabNext;
+		if(restoreTMP) {
+			Prefs.openTabNext = false;
+		}
+
 		// initialize window if necessary, just in case
 		Storage._scope.SessionStoreInternal.onLoad(gWindow);
 
@@ -855,12 +861,17 @@ this.paneSession = {
 			totalNumber: groupItems.totalNumber
 		});
 
+		// We can restore TMP's preferences now if it was flipped before.
+		if(restoreTMP) {
+			Prefs.openTabNext = true;
+		}
+
 		this.autoloadedNotice.hidden = true;
 		this.invalidNotice.hidden = true;
 		this.tabList.hidden = true;
 		this.importBtn.hidden = true;
 		this.importfinishedNotice.hidden = false;
-		this.importfinishedNotice.scrollIntoView()
+		this.importfinishedNotice.scrollIntoView();
 	},
 
 	restoreTab: function(win, tabData) {

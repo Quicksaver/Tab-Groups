@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.0.5
+// VERSION 1.0.6
 
 // We try to use the styling defined in TMP's prefs in groups view as well.
 
@@ -19,8 +19,11 @@ this.TabMixPlus = {
 			["styles.unloadedTab"]: defaults.getCharPref("styles.unloadedTab"),
 			["styles.unreadTab"]: defaults.getCharPref("styles.unreadTab"),
 
-			// These are to control the behavior when closing the last visible tab, in TabView.jsm
-			["loadOnNewTab.type"]: defaults.getIntPref("loadOnNewTab.type")
+			// This is to control the behavior when closing the last visible tab, in TabView.jsm
+			["loadOnNewTab.type"]: defaults.getIntPref("loadOnNewTab.type"),
+
+			// This is to make sure tabs are created in the appropriate order when importing from backups.
+			openTabNext: defaults.getBoolPref("openTabNext")
 		}, 'tabmix');
 
 		Prefs.listen("unloadedTab", this);
