@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.13
+// VERSION 1.1.14
 
 this.paneSession = {
 	manualAction: false,
@@ -90,9 +90,12 @@ this.paneSession = {
 
 			// tree handlers
 			case 'keydown':
-				switch(e.keyCode) {
-					case e.DOM_VK_SPACE:
-					case e.DOM_VK_RETURN:
+				switch(e.key) {
+					case " ":
+						e.preventDefault();
+						// no break; continue to "Enter"
+
+					case "Enter":
 						this.toggleRowChecked(this.tabList.currentIndex);
 						break;
 				}
@@ -124,7 +127,7 @@ this.paneSession = {
 		Listeners.add(this.clearBtn1, 'command', this);
 		Listeners.add(this.clearBtn2, 'command', this);
 		Listeners.add(this.clearBtn3, 'command', this);
-		Listeners.add(this.tabList, 'keydown', this);
+		Listeners.add(this.tabList, 'keydown', this, true);
 		Listeners.add(this.tabList, 'click', this);
 		Listeners.add(this.tabList, 'dblclick', this);
 	},
@@ -140,7 +143,7 @@ this.paneSession = {
 		Listeners.remove(this.clearBtn1, 'command', this);
 		Listeners.remove(this.clearBtn2, 'command', this);
 		Listeners.remove(this.clearBtn3, 'command', this);
-		Listeners.remove(this.tabList, 'keydown', this);
+		Listeners.remove(this.tabList, 'keydown', this, true);
 		Listeners.remove(this.tabList, 'click', this);
 		Listeners.remove(this.tabList, 'dblclick', this);
 	},
