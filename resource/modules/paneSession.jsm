@@ -92,6 +92,7 @@ this.paneSession = {
 			case 'keydown':
 				switch(e.key) {
 					case " ":
+						// Don't scroll the page when un/checking an item.
 						e.preventDefault();
 						// no break; continue to "Enter"
 
