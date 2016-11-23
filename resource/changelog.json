@@ -1,6 +1,17 @@
 {
-	"current":"2.1.1",
+	"current":"2.1.2",
 	"releases": {
+		"2.1.2":{
+			"date":"November 23, 2016",
+			"notes":[
+				["new","sv-SE locale"],
+				["bugfix","When entering groups view from a tab with the Developer Toolbox open or while in Responsive Design Mode, the tab thumbnails ratios would be wrong"],
+				["bugfix","When certain placeholder tabs were present, such as the Customize Firefox tab, manual backups would fail (<a=https://github.com/Quicksaver/Tab-Groups/issues/489>issue #489</a>)"],
+				["bugfix","A keyboard shortcut using the spacebar would not successfully exit groups view (<a=https://github.com/Quicksaver/Tab-Groups/issues/492>issue #492</a>)"],
+				["bugfix","Compatibility with <a=https://addons.mozilla.org/firefox/addon/tab-mix-plus/>Tab Mix Plus</a>, its option \"Open other tabs next to current one\" would cause tabs to be imported from backups in the reverse order (<a=https://github.com/Quicksaver/Tab-Groups/issues/495>issue #495</a>)"],
+				["bugfix","Pressing the spacebar to toggle items in the import list of the Backup & Restore page would scroll the page as well"]
+			]
+		},
 		"2.1.1":{
 			"date":"November 17, 2016",
 			"notes":[
