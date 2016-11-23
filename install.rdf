@@ -133,6 +133,14 @@
 		</em:localized>
 		<em:localized>
 			<Description>
+				<em:locale>sv-SE</em:locale>
+				<em:name>Tab Groups</em:name>
+				<em:description>Tab Groups är ett enkelt sätt att organisera många flikar. Du kan visuellt gruppera relaterade flikar, växla mellan grupper och snabbt söka igenom alla dina flikar för att byta till en specifik.</em:description>
+				<em:translator>Phoenix @ Babelzilla</em:translator>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
 				<em:locale>zh-CN</em:locale>
 				<em:name>Tab Groups</em:name>
 				<em:description>Tab Groups 可以助您轻松管理海量标签页。你可以可视化分组相关的标签页，在不同分组之间切换，以及快速搜索所有标签页并切换到指定的分组。</em:description>

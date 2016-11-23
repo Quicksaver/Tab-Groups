@@ -1,0 +1,43 @@
+<!ENTITY howto.pane.label "Användningshjälp">
+<!ENTITY howto.overview.a "Flikgrupper är utmärkta för att gruppera flikar efter olika uppgifter. Till exempel kanske du har en grupp med flikar för att leta presenter och en annan grupp för att betala dina räkningar. Försök att skapa grupper för saker du vanligtvis gör på nätet och använd flikgrupper för att växla mellan dem. Det är ett enkelt sätt att vara organiserad på.">
+<!ENTITY howto.mode.caption "Hur använder jag gruppvyn?">
+<!ENTITY howto.mode.description "För att gå till gruppvyn klickar du antingen på knappen i verktygsfältet eller använder kortkommandot. Det finns tre möjliga alternativ, växla mellan dem när som helst med knapparna till höger:">
+<!ENTITY howto.single.description "Enkel vy är standardläget. Det är lättast att använda och är perfekt för att lägga separata grupper åt sidan, men alltid ha dem till hands.">
+<!ENTITY howto.grid.description "I rutnätsvyn storleksändras dina grupper automatiskt enligt hur många du har och hur mycket ledigt utrymme det finns.">
+<!ENTITY howto.classic.description "I läget fri arrangering kan du positionera och storleksändra dina grupper som du vill inuti arbetsytan. Du kan använda denna visuella organisering till din fördel när du arbetar med många olika grupper.">
+<!ENTITY howto.create.caption "Hur skapar jag en flikgrupp?">
+<!ENTITY howto.create.step0 "När du går till gruppvyn för första gången ser du miniatyrförhandsvisningar av alla dina flikar i en grupp.">
+<!ENTITY howto.create.step1a "I enkel vy eller rutnätsvyn, klicka bara på knappen &quot;Skapa ny grupp&quot; längst ned. Du kan inte missa den.">
+<!ENTITY howto.create.step1b "För att skapa en ny grupp i läget fri arrangering, dra bara en flik ut ifrån grupp så kommer en låda ritas runt den. Eller så kan du klicka och dra direkt i det lediga utrymmet för att själv skapa en ny grupp med dimensionerna du vill ha.">
+<!ENTITY howto.create.step2b "Du kan fortsätta att lägga till flikar till den nya gruppen och du kan skapa fler grupper.">
+<!ENTITY howto.create.step3 "När du är klar klickar du bara på en flik för att stänga vyn. Du kommer att återvända till Firefox, fliken du klickade på kommer att vara aktiv och endast flikarna i denna grupp kommer att vara synliga.">
+<!ENTITY howto.switch.caption "Hur växlar jag mellan flikgrupper?">
+<!ENTITY howto.switch.description2 "Det kan inte bli enklare. Klicka bara på flikgruppsvyn, klicka sedan på fliken du vill se. Fliken du klickade på kommer att bli aktiv och endast flikarna i denna grupp kommer att synas. Du kan också dubbelklicka på ett tomt område i en grupp och du kommer att flyttas till den senast valda fliken i gruppen.">
+<!ENTITY howto.overflow.caption "Vad är skillnaden mellan staplade och rullande grupper?">
+<!ENTITY howto.overflow.description "Flikminiatyrer tar upp utrymme. Om en grupp inte är tillräckligt stor för alla dess flikar att synas, kan dem antingen staplas eller rullas.">
+<!ENTITY howto.stack.description "Flikar i en staplad grupp visas ovanpå varandra. Du kan endast interagera med den aktiva fliken längst upp. Nedanför denna stapel finns en förhandsvisningsknapp som du kan klicka på för att komma år alla andra flikar utan att ändra storleken på gruppen.">
+<!ENTITY howto.list.description "Istället kan du välja att visa alla flikar normalt utan att stapla dem. En del kommer att döljas och du måste rulla ned för att komma åt dem.">
+<!ENTITY howto.icons.description "Om flikarna i en grupp blir för små för deras miniatyrer ska vara användbara kommer deras ikoner att visas istället. Detta kan inaktiveras för varje grupp, så den kommer alltid visa antingen fullständiga miniatyrer eller flikar i en lista istället.">
+<!ENTITY howto.thumbs.description2 "Du kan också välja specifika grupper som inte ska visa flikminiatyrer. Flikarna kommer att listas med endast sina rubriker och, om det är valt, sina adresser. Detta kommer även att hända i rullade grupper som inte är tillräckligt stora att få plats med minst tre kolumner med miniatyrer, eller två kolumner med ikoner, oavsett om miniatyrer är aktiverade eller inte.">
+<!ENTITY howto.search.caption "Hur söker jag bland mina flikar?">
+<!ENTITY howto.search.step1 "Gå till flikgruppsvyn.">
+<!ENTITY howto.search.step2a "Klicka på sökknappen på höger sida om fönstret för att ta fram sökfältet och börja sedan skriva namnet på den flik du vill hitta.">
+<!ENTITY howto.search.step2b "Eller börja bara att skriva och en sökning kommer att göras automatiskt.">
+<!ENTITY howto.search.step4 "När du skriver kommer flikarna som överensstämmer med din sökning att markeras. Klicka bara på en flik för att markera den, du kommer att lämna gruppvyn och gå till fliken.">
+<!ENTITY howto.organize.caption "Hur organiserar jag mina flikgrupper?">
+<!ENTITY howto.organize.description1 "Flikgrupper kan lätt storleksändras, arrangeras och namnges. När du är klar med en grupp kan du stänga den och göra dig av med alla flikar på en gång.">
+<!ENTITY howto.resize.caption "Storleksändra flikgrupper">
+<!ENTITY howto.resize.description3 "I läget fri arrangering, klicka och dra i det nedre högra hörnet på en grupp för att göra det större eller mindre. När du storleksändrar gruppen kommer dess flikar bli större respektive mindre.">
+<!ENTITY howto.resize.description4 "I rutnätsvyn görs allt detta åt dig, grupperna kommer att sträckas ut för att visa dina flikar i så stort utrymme som möjligt.">
+<!ENTITY howto.rearrange.caption "Arrangera flikgrupper">
+<!ENTITY howto.rearrange.description "Klicka och dra i ett tomt område längst sidorna eller nederkanten på en grupp för att flytta runt den på skärmen.">
+<!ENTITY howto.rearrange.description3 "I rutnätsvyn, placera dina viktigaste grupper eller de med flest flikar längst upp, då de är vanligtvis större än dem längst ned.">
+<!ENTITY howto.name.caption "Namnge flikgrupper">
+<!ENTITY howto.name.description "Klicka bredvid pennikonen längst upp i en grupp och ange ett namn för den. Tryck sedan på Enter eller klicka någon annanstans i fönstret.">
+<!ENTITY howto.close.caption "Stäng flikgrupper">
+<!ENTITY howto.close.description1 "Varje flikgrupp har en stängningsknapp i det övre högra hörnet. Gruppen och dess flikar stängs när den klickas.">
+<!ENTITY howto.close.description2 "Om du råkar stänga en flikgrupp kan du klicka på knappen Ångra gruppstängning för att återställa den innan du fortsätter.">
+<!ENTITY howto.pinned.caption "Fastnålade flikar i flikgrupper">
+<!ENTITY howto.pinned.description2 "Fastnålade flikar tillhör inte någon grupp. De representeras av dess webbplatsikon på höger sida i gruppläget och kommer att synas oavsett vilken grupp som är aktiv.">
+<!ENTITY howto.pinned.description3 "Du kan fästa en flik i gruppvyn genom att dra den till detta område. Dra en flik utanför detta område till en annan grupp för att frigöra den.">
+<!ENTITY howto.credits "Denna panel är baserad på en artikel från support.mozilla.org, som skrevs av dessa fina människor:">

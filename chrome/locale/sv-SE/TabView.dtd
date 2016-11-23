@@ -1,0 +1,41 @@
+<!ENTITY moveToGroup.label "Flytta till grupp">
+<!ENTITY moveToGroup.accesskey "F">
+<!ENTITY moveToNewGroup.label "Ny grupp">
+<!ENTITY viewTabGroups.label "Flikgrupper">
+<!ENTITY viewTabGroups.accesskey "g">
+<!ENTITY searchForTab.label "Sök efter en flik...">
+<!ENTITY manageTabGroups.label "Hantera mina grupper">
+<!ENTITY manageTabGroups.tooltip "Öppna gruppvyn för att organisera dina flikar och skapa nya grupper">
+<!ENTITY buttonSearchTabs.label "Sök flikgrupper">
+<!ENTITY buttonSearchMode.label "Växla listläge">
+<!ENTITY buttonSearchClose.label "Stäng denna sökterm">
+<!ENTITY buttonExitTabGroups.label "Stäng flikgrupper">
+<!ENTITY buttonOptionsTabGroups.label "Ändra inställningarna för flikgrupper">
+<!ENTITY buttonHelpTabGroups.label "Hur man använder flikgrupper">
+<!ENTITY buttonClassic.label "Fri arrangering">
+<!ENTITY buttonGrid.label "Rutnätsvy">
+<!ENTITY buttonSingle.label "Enkel vy">
+<!ENTITY buttonNewGroup.label "Skapa ny grupp">
+<!ENTITY menuNewTab.label "Öppna ny flik">
+<!ENTITY menuNewTab.accesskey "f">
+<!ENTITY options.close.tooltip "Spara och gå tillbaka">
+<!ENTITY options.notapplicable.single "(fungerar inte i enkel vy)">
+<!ENTITY options.title.tooltip "Namnge denna flikgrupp">
+<!ENTITY options.showThumbs.label "Visa flikminiatyrer">
+<!ENTITY options.showUrls.label "Visa adresser bredvid sidrubriker">
+<!ENTITY options.tileIcons.label "Visa sidikoner när miniatyrer blir för små">
+<!ENTITY options.catchOnce.caption "Regler för att fånga flikar i denna grupp">
+<!ENTITY options.catchOnce.label "Fånga endast nya flikar">
+<!ENTITY options.catchRules.placeholder1 "Infoga reguljära uttryck för webbadresser här. Överensstämmande flikar kommer automatiskt flyttas till denna grupp.">
+<!ENTITY options.catchRules.placeholder2 "Använd en rad per regel, det kan finnas så många som du vill.">
+<!ENTITY options.catchRules.placeholder3 "Exempel:">
+<!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - fånga alla sidor i tilläggets utvecklingskatalog">
+<!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - fånga Firefox buggrapporter">
+<!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - fånga alla dina sociala sidor">
+<!ENTITY options.stackTabs.caption "När denna grupp har för många flikar...">
+<!ENTITY options.stackTabs.stack.label "Stapla gruppen">
+<!ENTITY options.stackTabs.list.label "Rulla gruppen">
+<!ENTITY sessionRestoreNotice.label "Dina flikar och grupper kommer inte återställas nästa gång du startar webbläsaren! Klicka här för att fixa det.">
+<!ENTITY sessionRestoreNotice.dismiss.tooltip "Stäng denna varning tills jag startar om webbläsaren">
+<!ENTITY sessionRestoreAutoChanged.label "Dina flikar och grupper kommer att återställas automatiskt nästa gång du startar webbläsaren.">
+<!ENTITY sessionRestorePrivate.label "Detta är ett privat fönster, dina flikar och grupper kan inte återställas när du har stängt det.">

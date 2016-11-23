@@ -1,0 +1,13 @@
+<!ENTITY preferences.button "Inställningar">
+<!ENTITY preferences.undo.label "Ångra">
+<!ENTITY preferences.redo.label "Gör om">
+<!ENTITY preferences.undoredo.tooltip "Återställ snabbt en ändring som har gjorts i tilläggets inställningar, inklusive importerade filer och återställning till standardvärden.">
+<!ENTITY preferences.import.label "Importera från fil...">
+<!ENTITY preferences.import.tooltip "Läs in tilläggsinställningar från en tidigare exporterad fil på din dator.">
+<!ENTITY preferences.export.label "Exportera till fil...">
+<!ENTITY preferences.export.tooltip "Spara dina tilläggsinställningar på en extern fil.">
+<!ENTITY preferences.reset.label "Standardvärden">
+<!ENTITY preferences.reset.tooltip.a "Alla inställningar återställs till sina standardvärden, som om tillägget precis har installerats.">
+<!ENTITY preferences.reset.tooltip.b "Placeringen av knappar på verktygsfältet påverkas inte, använd istället knappen &quot;Återställ standard&quot; i anpassningsvyn för att återställa dem.">
+<!ENTITY preferences.jumpto.label "Hoppa till inställning...">
+<!ENTITY preferences.jumpto.tooltip "Skriv ett ord och du kommer att förflyttas till den första inställningen som innehåller det.">

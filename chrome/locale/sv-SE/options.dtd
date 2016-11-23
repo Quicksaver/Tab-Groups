@@ -1,0 +1,80 @@
+<!ENTITY pane.tabGroups.label "Flikgrupper">
+<!ENTITY pane.session.label "Säkerhetskopiera / Återställ">
+<!ENTITY opt.showGroupThumbs.label "Visa gruppminiatyrer i enkel vy">
+<!ENTITY opt.showGroupThumbs.tooltip "När gruppminiatyrerna döljs kommer mer utrymme frigöras för att visa dina flikar, på bekostnad av att behöva förlita sig på gruppernas namn för att kunna särskilja och växla mellan dem.">
+<!ENTITY opt.gridDynamicSize.label "Använd dynamisk storleksändring för grupper i rutnätsvyn">
+<!ENTITY opt.gridDynamicSize.tooltip1 "Dynamisk storlek använder din fönsterstorlek full ut. Grupperna längst upp kommer att ha högre dimensioner gentemot de längst ned.">
+<!ENTITY opt.gridDynamicSize.tooltip2 "Använd detta till din fördel genom att flytta flera viktiga grupper, eller de grupper med fler flikar, längre upp.">
+<!ENTITY opt.gridDynamicSize.tooltip3 "När detta inaktiveras kommer alla grupper ha liknande dimensioner, med de enda nödvändiga skillnaderna för att få dem att få plats på skärmen.">
+<!ENTITY opt.closeIfEmpty.label "Stäng automatiskt alla tomma grupper">
+<!ENTITY opt.closeIfEmpty.tooltip "En grupp stängs omedelbart när dess sista flik stängs. Du kan behålla tomma grupper genom att inaktivera denna inställning, namnge dem eller ändra några av dess alternativ.">
+<!ENTITY opt.showTabCounter.label "Visa antalet flikar bredvid grupprubriken">
+<!ENTITY opt.showTabCounter.tooltip "En indikator visas längst upp i gruppen så du enkelt kan veta hur många flikar du har i varje grupp.">
+<!ENTITY opt.sortGroupsByName.label "Sortera grupper efter rubrik i menyer och paneler">
+<!ENTITY opt.sortGroupsByName.tooltip "Överallt där grupper listas, t.ex. i flikmenyn &quot;Flytta till grupp&quot; eller snabbåtkomstpanelen, sorteras de alfabetiskt istället för ordningen som du placerade dem i grupphanteringsvyn, vilket inte påverkas av detta alternativ.">
+<!ENTITY cat.defaults.label "Som standard bör grupper...">
+<!ENTITY opt.showThumbs.label "Visa flikminiatyrer">
+<!ENTITY opt.showThumbs.tooltip "Miniatyrerna visar varje fliks innehåll direkt i gruppen. Om de inaktiveras kommer grupperna listas med endast dess rubrik och ikon.">
+<!ENTITY opt.showUrls.label "Visa adresser bredvid sidrubriker">
+<!ENTITY opt.showUrls.tooltip "För att använda utrymmet full ut, när miniatyrer inte visas, kan du visa flikens plats bredvid dess rubrik.">
+<!ENTITY opt.tileIcons.label "Visa sidikoner när miniatyrer blir för små">
+<!ENTITY opt.tileIcons.tooltip "Visar sidikonerna i en ruta istället för miniatyrer när de blir för små att vara användbara. Detta låter dig se många fler flikar samtidigt i ett mindre område.">
+<!ENTITY cat.stackTabs.label "När grupper har för många flikar...">
+<!ENTITY cat.stackTabs.tooltip "Flikminiatyrer tar upp utrymme. Om gruppen inte kan visa alla sina flikar eftersom den inte är tillräckligt stor kan du...">
+<!ENTITY opt.stackTabs.label "Stapla gruppen">
+<!ENTITY opt.stackTabs.tooltip "Endast den aktiva fliken kommer att visas, staplad ovanpå de andra. Du kan fortfarande komma åt alla flikar genom att klicka på gruppens expanderingsknapp.">
+<!ENTITY opt.listTabs.label "Rulla gruppen">
+<!ENTITY opt.listTabs.tooltip "En del flikar kommer att visas och du måste rulla i gruppen för att komma åt dem. Observera att grupper alltid kommer att bete sig så här i enkel vy, oavsett vad du väljer här.">
+<!ENTITY btn.setdefaults.label "Ange dessa alternativ för alla grupper">
+<!ENTITY btn.setdefaults.tooltip1 "Eftersom alternativen ovan tillämpas enskilt för varje grupp kommer ändringar här endast påverka nya grupper som du skapar från och med nu.">
+<!ENTITY btn.setdefaults.tooltip2 "Klicka endast på denna knapp om du vill skriva över alternativen för alla befintliga grupper med alla angivna värden här. Annars måste du ändra inställningarna manuellt för varje individuell grupp.">
+<!ENTITY cat.toolbarbutton.label "Verktygsfältsknapp">
+<!ENTITY opt.groupTitleInButton.label "Visa namnet för den aktiva gruppen">
+<!ENTITY opt.groupTitleInButton.tooltip1 "Var säker på vilken grupp som är aktiv direkt från huvudfönstret utan att behöva göra någonting.">
+<!ENTITY opt.groupTitleInButton.tooltip2 "Knappen kommer fortfarande endast visa ikonen om den placeras i huvudmenyspanelen, eller om du endast har en grupp.">
+<!ENTITY opt.quickAccessButton.label "Klicka för att öppna snabbåtkomstpanelen">
+<!ENTITY opt.quickAccessButton.tooltip1 "Snabbåtkomstpanelen låter dig snabbt växla mellan grupper och flikar utan att gå in i gruppvyn.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Inaktivera detta för att gå i gruppvyn när knappen klickas.">
+<!ENTITY cat.keyboardshortcuts.label "Kortkommandon">
+<!ENTITY cat.backup.label "Säkerhetskopiera dina flikgrupper">
+<!ENTITY cat.restore.label "Återställ flikgrupper">
+<!ENTITY cat.clear.label "Rensa flikgrupper">
+<!ENTITY opt.tabViewKeyset.label "Öppna och stäng gruppvyn">
+<!ENTITY opt.quickAccessKeyset.label "Öppna snabbåtkomstpanelen">
+<!ENTITY opt.nextGroupKeyset.label "Växla till nästa grupp">
+<!ENTITY opt.previousGroupKeyset.label "Växla till föregående grupp">
+<!ENTITY sessionRestore.caption "Behåll flikgrupper vid omstarter">
+<!ENTITY sessionRestore.description "För att Firefox ska komma ihåg dina flikgrupper måste den återställa dina fönster och flikar mellan sessioner. Annars måste du göra om dina grupper varje gång du stänger och öppnar webbläsaren.">
+<!ENTITY sessionRestore.button.label "Visa mina fönster och flikar från senaste gången när Firefox startas">
+<!ENTITY sessionRestore.button.tooltip.a "Detta är detsamma som att ändra inställningen 'När Firefox startar' till 'Visa fönster och flikar från förra sessionen' i Firefox inställningar.">
+<!ENTITY sessionRestore.button.tooltip.b "Om du ändrar alternativet efteråt kommer du återigen förlora dina flikgrupper när du startar om webbläsaren, tills du ändrar tillbaka det eller tills du trycker på denna knapp igen.">
+<!ENTITY opt.noWarningsAboutSession.label "Varna inte mig om detta i gruppvyn">
+<!ENTITY opt.noWarningsAboutSession.tooltip "Aviseringarna finns för påminna dig om att du inte bör stänga webbläsarfönstret om du inte vill förlora dina flikar och grupper. Inaktivera dem endast om du är säker på att du vill göra det.">
+<!ENTITY session.backup.button "Skapa säkerhetskopia">
+<!ENTITY session.backup.description "Exportera dina flikgrupper till en säkerhetskopia så du kan återställa dem senare vid behov.">
+<!ENTITY session.backup.description2 "Förslag: Använd standardfilnamnet och sparplatsen; när du klickar på &quot;Läs in grupper och flikar från...&quot; nedan kommer säkerhetskopian att visas direkt i snabbåtkomstsmenyn.">
+<!ENTITY session.backup.autoloaded "Den sparade filen har lästs in nedan. Bekräfta att dina grupper och flikar har säkerhetskopierats korrekt.">
+<!ENTITY session.backup.alldata.checkbox.label "Säkerhetskopiera sessionsdata">
+<!ENTITY session.backup.alldata.checkbox.tooltip.a "Detta kan vara användbart senare när du ska återställa grupper från denna säkerhetskopia. Annars kommer du endast kunna återställa själva grupperna och vad flikarna för tillfället är öppnade i.">
+<!ENTITY session.backup.alldata.checkbox.tooltip.b "Om du inte bryr dig om att behålla flikhistorik, formulär eller någon annan data från dina flikar behöver du inte detta.">
+<!ENTITY session.backup.alldata.caution.a "Varning! Detta kommer även att exportera all aktuell sessionsdata.">
+<!ENTITY session.backup.alldata.caution.b "Var försiktig med vem som har åtkomst till denna fil, då den kommer innehålla information om alla dina flikar, inklusive sidhistorik, formulärdata samt annan privat och känslig information.">
+<!ENTITY session.restore.button "Läs in grupper och flikar från...">
+<!ENTITY session.restore.from.file "Fil...">
+<!ENTITY session.restore.import.button "Importera valda objekt till detta fönster">
+<!ENTITY session.restore.import.tooltip.a "När du klickar på denna knapp kan du öppna flikgruppsläget och arrangera de nyligen importerade grupperna som vanligt.">
+<!ENTITY session.restore.import.tooltip.b "Observera att du endast kan importera nya grupper, du kan inte importera flikar till befintliga grupper. Detta innebär att du kan få duplicerade grupper om du importerar samma grupp två gånger. Öppna i så fall flikgruppsläget och stäng dem som du inte vill ha.">
+<!ENTITY session.restore.description "Läs in en säkerhetskopia som innehåller de flikgrupper du vill återställa. Välj sedan vilka grupper och flikar du vill ha. De kommer att läsa in i detta fönster så du kan komma åt, arrangera och anpassa dem som vanligt.">
+<!ENTITY session.restore.invalid "Den valda filen är antingen ogiltig, trasig eller innehåller inte någon information om flikgrupper.">
+<!ENTITY session.restore.finished "De valda grupperna importerades in i detta fönster. Gå in i flikgruppsläget för att komma åt dem som andra grupper.">
+<!ENTITY session.restore.list.check "Importera">
+<!ENTITY session.restore.list.items "Grupper och flikar">
+<!ENTITY session.clear.button "Rensa gruppdata">
+<!ENTITY session.clear.tooltip "Du ska aldrig behöva göra detta, det är bara ett enklare och säkrare sätt att gå in i flikgruppsläget och stänga de grupper du inte vill ha.">
+<!ENTITY session.clear.description.a "Rensa all gruppdata från aktuell session.">
+<!ENTITY session.clear.description.f "Gör endast detta om du vet vad du håller på med!">
+<!ENTITY session.clear.description.b "Gör en säkerhetskopia av dina grupper innan du fortsätter.">
+<!ENTITY session.clear.description.c "Detta kommer att uppdatera alla dina webbläsarfönster och dess synliga flikar">
+<!ENTITY session.clear.description.g ", och ta bort alla flikar i inaktiva grupper.">
+<!ENTITY session.clear.description.d "Varning: Detta kan inte ångras!">
+<!ENTITY session.clear.description.e "Vill du verkligen fortsätta?">

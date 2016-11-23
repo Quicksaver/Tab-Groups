@@ -1,0 +1,27 @@
+<!ENTITY about.paneTitle "Om">
+<!ENTITY about.version "Version {v}">
+<!ENTITY about.uptodate "uppdaterad. Gratulerar!">
+<!ENTITY about.needsupdate "uppdatering tillgänglig!">
+<!ENTITY about.description "Kolla anteckningarna och kända fel för denna version nedan. Meddela mig om de fel du hittar eller om du har något förslag för framtida versioner.">
+<!ENTITY about.descriptionB "Tillägget är gratis, men att åtgärda problem, lägga in nya funktioner och se till att allting fungerar som det ska i varje ny version av Firefox är ansträngande ibland. Om du gillar tillägget kan du stöda dess fortsatta utveckling. Som länken säger; &quot;du kan hjälpa till&quot;!">
+<!ENTITY about.descriptionC "Titta även på den senaste episoden av min webbserie om livet med Firefox, gjord till er allihopa, de mest stödjande användare en utvecklare kan be om! Peka bara på den studsande ikonen längst ned på denna sida. Älska den. Hata den. Dela den.">
+<!ENTITY about.allVersions "Visa anteckningar från alla tidigare versioner">
+<!ENTITY about.notifyOnUpdates "Visa mig denna flik vid nästa uppdatering">
+<!ENTITY about.silentUpdates "Meddela inte mig vid nästa uppdatering">
+<!ENTITY about.development "Utvecklingsstatus">
+<!ENTITY about.helpdevelopment "DU KAN HJÄLPA TILL">
+<!ENTITY about.information "Mer information">
+<!ENTITY about.home "Tilläggets hemsida">
+<!ENTITY about.fullchangelog "Fullständig ändringslogg">
+<!ENTITY about.problems "Har du problem?">
+<!ENTITY about.tech "Öppna ett ärende på supportsidan som beskriver ditt problem">
+<!ENTITY about.email "Eller skicka ett e-postmeddelande om det">
+<!ENTITY about.author "Mer från upphovsmannen">
+<!ENTITY about.trymore "Prova en av mina andra tillägg för en ännu bättre Firefox-upplevelse!">
+<!ENTITY about.profile "Hitta dem i min profil">
+<!ENTITY about.share "Dela!">
+<!ENTITY about.friends "Var inte den enda med en toppenwebbläsare. Dela upplevelsen med dina vänner!">
+<!ENTITY about.hidePromo "X">
+<!ENTITY about.hideThisPromo "visa igen när en ny episod finns tillgänglig">
+<!ENTITY about.hideAllPromos "visa inte några fler videor som denna">
+<!ENTITY about.clicktowatch "titta på YouTube">

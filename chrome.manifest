@@ -18,6 +18,7 @@ locale    tabgroups      pl            chrome/locale/pl/
 locale    tabgroups      pt-BR         chrome/locale/pt-BR/
 locale    tabgroups      pt-PT         chrome/locale/pt-PT/
 locale    tabgroups      sl            chrome/locale/sl/
+locale    tabgroups      sv-SE         chrome/locale/sv-SE/
 locale    tabgroups      zh-CN         chrome/locale/zh-CN/
 locale    tabgroups      zh-TW         chrome/locale/zh-TW/
 
