@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.7.20
+// VERSION 1.7.21
 
 // Class: GroupItem - A single groupItem in the TabView window.
 // Parameters:
@@ -1862,14 +1862,7 @@ this.GroupItem.prototype = {
 				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-controls,\n\
 				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-controls {\n\
 					top: '+controlsOffset+'px;\n\
-				}\n\
-				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-controls:-moz-locale-dir(ltr),\n\
-				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-controls:-moz-locale-dir(ltr) {\n\
 					right: '+controlsOffset+'px;\n\
-				}\n\
-				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .tab-controls:-moz-locale-dir(rtl),\n\
-				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .tab-controls:-moz-locale-dir(rtl) {\n\
-					left: '+controlsOffset+'px;\n\
 				}\n\
 				html['+objName+'_UUID="'+_UUID+'"] #group'+this.id+' .favicon,\n\
 				html['+objName+'_UUID="'+_UUID+'"] .expandedTray[group="'+this.id+'"] .favicon {\n\
