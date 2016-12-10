@@ -826,6 +826,18 @@ body:-moz-any(.DraggingTab,.DraggingGroup) .tab.create-new,
 	-moz-margin-start: 2px;
 }
 
+.tab-container.noThumbs .tab-controls {
+	top: 8px;
+}
+
+.tab-container.noThumbs .tab-controls:-moz-locale-dir(ltr) {
+	right: 8px;
+}
+
+.tab-container.noThumbs .tab-controls:-moz-locale-dir(rtl) {
+	left: 8px;
+ }
+
 .tab-container.noThumbs .tab .tab-label {
 	text-align: start;
 	-moz-margin-end: 24px;
