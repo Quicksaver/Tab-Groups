@@ -1,6 +1,15 @@
 {
-	"current":"2.1.2",
+	"current":"2.1.3",
 	"releases": {
+		"2.1.3":{
+			"date":"December 12, 2016",
+			"notes":[
+				["update","cs and de (not yet complete) locales"],
+				["bugfix","The default keyboard shortcut to switch to previous group would not work, because pressing the Shift key switched the output character to a different one (in US keyboards only though, it still needs a better global default value) (<i=475>)"],
+				["bugfix","When disabling tab thumbnails in a group, the tabs close buttons would be positioned incorrectly (<i=504>)"],
+				["","Other minor fixes"]
+			]
+		},
 		"2.1.2":{
 			"date":"November 23, 2016",
 			"notes":[
