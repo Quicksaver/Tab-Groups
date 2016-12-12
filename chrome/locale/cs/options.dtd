@@ -24,7 +24,7 @@
 <!ENTITY opt.stackTabs.label "Naskládat panely na sebe">
 <!ENTITY opt.stackTabs.tooltip "Panely budou naskládány do štosu s aktivním panelem navrchu. Pro zobrazení všech panelů klikněte na tlačítko pod štosem.">
 <!ENTITY opt.listTabs.label "Rolovat skupinu">
-<!ENTITY opt.listTabs.tooltip "Některé panely nebudou vidět a pro jejich zobrazení budete muset odrolovat dolů. Povšimněte si, že v jednopanelovém zobrazení se takto chovají skupiny vždycky bez ohledu na to, co je zde nastaveno.">
+<!ENTITY opt.listTabs.tooltip "Některé panely nebudou vidět a pro jejich zobrazení budete muset odrolovat dolů. Povšimněte si, že v jednoskupinovém zobrazení se takto chovají skupiny vždycky bez ohledu na to, co je zde nastaveno.">
 <!ENTITY btn.setdefaults.label "Použít tato nastavení u všech skupin">
 <!ENTITY btn.setdefaults.tooltip1 "Jelikož se předvolby výše nastavují pro každou skupinu zvlášť, jejich změna zde ovlivní pouze nové skupiny vytvořené od této chvíle.">
 <!ENTITY btn.setdefaults.tooltip2 "Na toto tlačítko klikněte pouze tehdy, když chcete předvolby všech stávajících skupin přenastavit na hodnoty nastavené zde. Jinak je budete muset nastavit či změnit v každé jednotlivé skupině ručně.">

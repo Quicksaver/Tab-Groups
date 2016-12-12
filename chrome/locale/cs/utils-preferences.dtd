@@ -8,6 +8,6 @@
 <!ENTITY preferences.export.tooltip "Uloží vaše předvolby doplňku do externího souboru.">
 <!ENTITY preferences.reset.label "Obnovit výchozí">
 <!ENTITY preferences.reset.tooltip.a "Všechny předvolby budou vráceny na jejich výchozí hodnoty, jako by byl doplněk právě nainstalován.">
-<!ENTITY preferences.reset.tooltip.b "Umístění tlačítka na nástrojové liště zůstane nedotčeno. Pro jeho výchozí umístění použijte tlačítko &quot;Obnovit výchozí&quot; v panelu &quot;Přizpůsobení aplikace Firefox&quot;.">
+<!ENTITY preferences.reset.tooltip.b "Umístění tlačítka na nástrojové liště zůstane nedotčeno. Pro jeho výchozí umístění použijte tlačítko &quot;Obnovit výchozí&quot; v &quot;Přizpůsobení aplikace Firefox&quot;.">
 <!ENTITY preferences.jumpto.label "Přejít na předvolbu…">
 <!ENTITY preferences.jumpto.tooltip "Zapište slovo a přejdete na první předvolbu, která ho obsahuje.">

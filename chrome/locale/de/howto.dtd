@@ -1,6 +1,6 @@
 <!ENTITY howto.pane.label "Anleitung">
 <!ENTITY howto.overview.a "Tabgruppen sind gut dafür geeignet, Tabs nach Aufgaben zu sortieren. Zum Beispiel können Sie eine Tabgruppe für die Suche nach einem Geschenk und eine andere für das Bezahlen Ihrer Rechnungen haben. Erstellen Sie Gruppen für Dinge, die Sie häufig im Internet tun und verwenden Sie die Tabgruppen, um zwischen verschiedenen Aufgaben zu wechseln. So können Sie leicht den Überblick behalten.">
-<!ENTITY howto.mode.caption "How do I work in groups view?">
+<!ENTITY howto.mode.caption "Wie arbeite ich in der Gruppenansicht?">
 <!ENTITY howto.mode.description "To enter groups view, either click on the toolbar button, or use the keyboard shortcut. There, you have three possible modes, toggle between them at any time through the controllers on the right:">
 <!ENTITY howto.single.description "Single view is the default mode. It is the simplest to use, and it is perfect for keeping separate groups stored away but always at hand.">
 <!ENTITY howto.grid.description "In grid layout, your groups are automatically sized according to how many you have and how much free space there is.">

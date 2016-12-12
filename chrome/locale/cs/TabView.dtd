@@ -14,12 +14,12 @@
 <!ENTITY buttonHelpTabGroups.label "Jak používat skupiny panelů">
 <!ENTITY buttonClassic.label "Volné uspořádání">
 <!ENTITY buttonGrid.label "Tabulkové rozložení">
-<!ENTITY buttonSingle.label "Jednopanelové zobrazení">
+<!ENTITY buttonSingle.label "Jednoskupinové zobrazení">
 <!ENTITY buttonNewGroup.label "Vytvořit novou skupinu">
 <!ENTITY menuNewTab.label "Otevřít nový panel">
 <!ENTITY menuNewTab.accesskey "t">
 <!ENTITY options.close.tooltip "Uložit a vrátit se zpět">
-<!ENTITY options.notapplicable.single "(nelze použít v jednopanelovém zobrazení)">
+<!ENTITY options.notapplicable.single "(nelze použít v jednoskupinovém zobrazení)">
 <!ENTITY options.title.tooltip "Pojmenovat tuto skupinu panelů">
 <!ENTITY options.showThumbs.label "Zobrazit náhledy panelů">
 <!ENTITY options.showUrls.label "Vedle titulku stránky zobrazit její adresu">

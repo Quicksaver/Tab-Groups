@@ -13,7 +13,7 @@
 <!ENTITY opt.sortGroupsByName.label "Sort groups by title in menus and panels">
 <!ENTITY opt.sortGroupsByName.tooltip "Anywhere groups are listed, such as the tab's Move to Group menu or the Quick Access Panel, they are sorted alphabetically instead of in the order you placed them in groups management view, which is unaffected by this option.">
 <!ENTITY cat.defaults.label "By default, groups should...">
-<!ENTITY opt.showThumbs.label "Show tab thumbnails">
+<!ENTITY opt.showThumbs.label "Tab-Vorschaubilder anzeigen">
 <!ENTITY opt.showThumbs.tooltip "The thumbnails show the contents of each tab directly in the group. Disabling them turns the group into a list of tabs represented only by their title and icon.">
 <!ENTITY opt.showUrls.label "Show addresses next to page titles">
 <!ENTITY opt.showUrls.tooltip "To make full use of the space saved when not showing tab thumbnails, you can show the tab's location next to its title.">
