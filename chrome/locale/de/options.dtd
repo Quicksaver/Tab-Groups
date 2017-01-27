@@ -1,45 +1,45 @@
 <!ENTITY pane.tabGroups.label "Tabgruppen">
 <!ENTITY pane.session.label "Sichern / Wiederherstellen">
-<!ENTITY opt.showGroupThumbs.label "Show group thumbnails in single view">
+<!ENTITY opt.showGroupThumbs.label "Vorschaubilder der Gruppe in der Einzelansicht anzeigen">
 <!ENTITY opt.showGroupThumbs.tooltip "Hiding the group thumbnails will leave more room in which to show your tabs, at the expense of having to rely on the groups names to distinguish and switch between them.">
 <!ENTITY opt.gridDynamicSize.label "Use dynamic sizing of groups in grid layout">
 <!ENTITY opt.gridDynamicSize.tooltip1 "Dynamic size makes full use of your window size. The groups towards the top will have higher dimensions than those towards the bottom.">
 <!ENTITY opt.gridDynamicSize.tooltip2 "Use this to your advantage by moving more important groups, or those with more tabs, towards the top slots.">
 <!ENTITY opt.gridDynamicSize.tooltip3 "With this disabled, all groups will have similar dimensions, with only the necessary differences in order for them all to fit on screen.">
-<!ENTITY opt.closeIfEmpty.label "Automatically close empty groups">
+<!ENTITY opt.closeIfEmpty.label "Automatisch leere Gruppen schließen">
 <!ENTITY opt.closeIfEmpty.tooltip "A group is discarded immediately when its last tab is closed. You can keep an empty group by disabling this preference, or by simply giving it a name or changing some of its options.">
-<!ENTITY opt.showTabCounter.label "Show number of tabs next to group title">
-<!ENTITY opt.showTabCounter.tooltip "An indicator is shown at the top of the group, so you can easily know how many tabs you have in each group.">
-<!ENTITY opt.sortGroupsByName.label "Sort groups by title in menus and panels">
+<!ENTITY opt.showTabCounter.label "Die Anzahl der Tabs neben dem Gruppennamen anzeigen">
+<!ENTITY opt.showTabCounter.tooltip "Eine Anzeige am oberen Enden der Gruppe erscheint, damit Sie auf einfache Weise sehen, wie viele Tabs in einer Gruppe sind.">
+<!ENTITY opt.sortGroupsByName.label "Gruppen in Menüs und Leisten nach Titel sortieren">
 <!ENTITY opt.sortGroupsByName.tooltip "Anywhere groups are listed, such as the tab's Move to Group menu or the Quick Access Panel, they are sorted alphabetically instead of in the order you placed them in groups management view, which is unaffected by this option.">
-<!ENTITY cat.defaults.label "By default, groups should...">
+<!ENTITY cat.defaults.label "Standardmäßig sollen Gruppen...">
 <!ENTITY opt.showThumbs.label "Tab-Vorschaubilder anzeigen">
-<!ENTITY opt.showThumbs.tooltip "The thumbnails show the contents of each tab directly in the group. Disabling them turns the group into a list of tabs represented only by their title and icon.">
-<!ENTITY opt.showUrls.label "Show addresses next to page titles">
+<!ENTITY opt.showThumbs.tooltip "Die Vorschaubilder zeigen den Inhalt eines jeden Tabs direkt in der Gruppe. Sie zu deaktivieren ändert die Gruppe in eine Liste von Tabs, die nur durch ihren Titel und das Icon dargestellt werden.">
+<!ENTITY opt.showUrls.label "Adressen neben den Seitentiteln anzeigen">
 <!ENTITY opt.showUrls.tooltip "To make full use of the space saved when not showing tab thumbnails, you can show the tab's location next to its title.">
-<!ENTITY opt.tileIcons.label "Tile page icons when thumbnails are too small">
+<!ENTITY opt.tileIcons.label "Icons der Websites anzeigen, wenn die Vorschaubilder zu schmal sind">
 <!ENTITY opt.tileIcons.tooltip "Shows the page icons in a tile instead of the thumbnails when they become too small to be useful. This lets you have a lot more tabs displayed at the same time on a smaller area.">
-<!ENTITY cat.stackTabs.label "When groups have too many tabs...">
-<!ENTITY cat.stackTabs.tooltip "Tab thumbnails take up space. If the group can't show all of its tabs because it isn't large enough, you can...">
-<!ENTITY opt.stackTabs.label "Stack the group">
-<!ENTITY opt.stackTabs.tooltip "Only the active tab will be shown, stacked on top of the others. You can still access all the tabs by clicking the group's expand button.">
-<!ENTITY opt.listTabs.label "Scroll the group">
-<!ENTITY opt.listTabs.tooltip "Some of the tabs will be hidden and you will have to scroll the group to access them. Note that groups will always behave like this in single view, regardless of what you set here.">
-<!ENTITY btn.setdefaults.label "Set these options for all groups">
+<!ENTITY cat.stackTabs.label "Wenn Gruppen zu viele Tabs haben...">
+<!ENTITY cat.stackTabs.tooltip "Die Vorschaubilder verbrauchen viel Platz. Wenn die Gruppe nicht alle seiner Tabs anzeigen kann, weil sie zu klein ist, können Sie...">
+<!ENTITY opt.stackTabs.label "Die Gruppe stapeln">
+<!ENTITY opt.stackTabs.tooltip "Nur der aktive Tab wird angezeigt, gestapelt auf den anderen. Sie können auf alle anderen Tabs zugreifen, indem Sie auf die Erweiterungsschaltfläche klicken.">
+<!ENTITY opt.listTabs.label "Durch die Gruppe scrollen">
+<!ENTITY opt.listTabs.tooltip "Einige der Registerkarten werden ausgeblendet und Sie müssen durch die Gruppe scrollen, um auf sie zuzugreifen. Beachten Sie, dass Gruppen sich immer wie in der Einzelansicht verhalten, unabhängig davon, was Sie hier einstellen.">
+<!ENTITY btn.setdefaults.label "Diese Einstellungen für alle Gruppen übernehmen">
 <!ENTITY btn.setdefaults.tooltip1 "Because the options above are applied per-group, changing them here will only affect new groups you create from this point onward.">
 <!ENTITY btn.setdefaults.tooltip2 "Only click this button if you want to override the options of all existing groups with the values set here. Otherwise you'll have to manually set or change them in each individual group.">
 <!ENTITY cat.toolbarbutton.label "Toolbar Button">
-<!ENTITY opt.groupTitleInButton.label "Show the name of the active group">
+<!ENTITY opt.groupTitleInButton.label "Den Namen der aktiven Gruppe anzeigen">
 <!ENTITY opt.groupTitleInButton.tooltip1 "Be sure of which group is active, directly from the main window without having to perform any action.">
 <!ENTITY opt.groupTitleInButton.tooltip2 "The button will still only show the icon if it's placed in the main menu panel, or if you have only one group.">
 <!ENTITY opt.quickAccessButton.label "Click to open the quick access panel">
 <!ENTITY opt.quickAccessButton.tooltip1 "The quick access panel lets you quickly switch between groups and tabs without having to enter groups view.">
-<!ENTITY opt.quickAccessButton.tooltip2 "Disable this to enter groups view when clicking the button.">
+<!ENTITY opt.quickAccessButton.tooltip2 "Deaktivieren Sie dies um in die Gruppenansicht zu gelangen, wenn die Schaltfläche gedrückt wird.">
 <!ENTITY cat.keyboardshortcuts.label "Tastaturkürzel">
 <!ENTITY cat.backup.label "Tabgruppen sichern">
 <!ENTITY cat.restore.label "Tabgruppen wiederherstellen">
 <!ENTITY cat.clear.label "Tabgruppen entfernen">
-<!ENTITY opt.tabViewKeyset.label "Enter and exit groups view">
+<!ENTITY opt.tabViewKeyset.label "Öffnen und Schließen der Gruppenansicht">
 <!ENTITY opt.quickAccessKeyset.label "Open quick access panel">
 <!ENTITY opt.nextGroupKeyset.label "Zur nächsten Gruppe wechseln">
 <!ENTITY opt.previousGroupKeyset.label "Zur vorherigen Gruppe wechseln">
@@ -48,8 +48,8 @@
 <!ENTITY sessionRestore.button.label "Fenster und Tabs der letzten Sitzung anzeigen, wenn Firefox startet">
 <!ENTITY sessionRestore.button.tooltip.a "Dies macht das gleiche, als wenn Sie die Option „Wenn Firefox gestartet wird”  in den Firefox-Einstellungen auf „Fenster und Tabs der letzten Sitzung anzeigen“ stellen.">
 <!ENTITY sessionRestore.button.tooltip.b "Wenn Sie diese Einstellung dort nachträglich ändern, verlieren Sie Ihre Tabgruppen beim Neustarten des Browsers erneut, bis Sie sie zurückändern oder wieder auf diese Schaltfläche klicken.">
-<!ENTITY opt.noWarningsAboutSession.label "Don't warn me about this in groups view">
-<!ENTITY opt.noWarningsAboutSession.tooltip "The notifications are there to remind you that you shouldn't close the browser window if you don't want to lose your tabs and groups. Disable them only if you're sure that's what you want.">
+<!ENTITY opt.noWarningsAboutSession.label "In der Gruppenansicht mich nicht davor warnen">
+<!ENTITY opt.noWarningsAboutSession.tooltip "Diese Benachrichtigungen sind dazu da, um Sie daran zu erinnern, dass Sie ihr Browser-Fenster nicht schließen sollten, falls sie ihre Tabs und Gruppen nicht verlieren wollen. Deaktivieren Sie diese nur, wenn Sie wissen, was Sie wollen.">
 <!ENTITY session.backup.button "Backup-Datei erstellen">
 <!ENTITY session.backup.description "Exportieren Sie Ihre Tabgruppen sicherheitshalber in eine Sicherungsdatei, damit Sie sie später gegebenenfalls wiederherstellen können.">
 <!ENTITY session.backup.description2 "Suggestion: use the default file name and save location; when clicking 'Load Groups and Tabs from...' below, the backup will appear directly in the quick access menu.">
@@ -59,8 +59,8 @@
 <!ENTITY session.backup.alldata.checkbox.tooltip.b "Wenn es Sie nicht stört, dass Tabverlauf, Formulare und andere Daten von Ihren Tabs gespeichert werden, müssen Sie dies nicht tun.">
 <!ENTITY session.backup.alldata.caution.a "Warnung! Dies exportiert alle Daten der aktuellen Sitzung.">
 <!ENTITY session.backup.alldata.caution.b "Achten Sie darauf, wer Zugriff auf diese Datei hat. Sie enthält Daten Ihrer Tabs wie die Surf-Chronik, Formulardaten und andere pivate, potentiell sensible Daten.">
-<!ENTITY session.restore.button "Load Groups and Tabs From...">
-<!ENTITY session.restore.from.file "File...">
+<!ENTITY session.restore.button "Lade Gruppen und Tabs aus...">
+<!ENTITY session.restore.from.file "Datei...">
 <!ENTITY session.restore.import.button "Ausgewählte Elemente in dieses Fenster kopieren">
 <!ENTITY session.restore.import.tooltip.a "Nachdem Sie auf diese Schaltfläche geklickt haben, können Sie in den Tabgruppen-Modus wechseln und die neu importierten Gruppen wie gewohnt anordnen.">
 <!ENTITY session.restore.import.tooltip.b "Bitte beachten Sie, dass Sie nur neue Gruppen importieren können. Wenn Sie die gleiche Gruppe zweimal importieren, existiert diese anschließend entsprechend doppelt. In diesem Fall können Sie in den Tabgruppen-Modus wechseln und die nicht benötigten Gruppen schließen.">

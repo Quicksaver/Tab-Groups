@@ -3,38 +3,38 @@
 <!ENTITY moveToNewGroup.label "Neue Gruppe">
 <!ENTITY viewTabGroups.label "Tabgruppen">
 <!ENTITY viewTabGroups.accesskey "G">
-<!ENTITY searchForTab.label "Search for a tab...">
-<!ENTITY manageTabGroups.label "Manage my groups">
-<!ENTITY manageTabGroups.tooltip "Enter groups view to organize your tabs and create new groups">
+<!ENTITY searchForTab.label "Suche nach einem Tab...">
+<!ENTITY manageTabGroups.label "Meine Gruppen verwalten">
+<!ENTITY manageTabGroups.tooltip "In die Gruppenansicht wechseln um Tabs zu ordnen und neue Gruppen zu erstellen">
 <!ENTITY buttonSearchTabs.label "Nach Tabgruppen suchen">
 <!ENTITY buttonSearchMode.label "Toggle list mode">
-<!ENTITY buttonSearchClose.label "Close this search term">
+<!ENTITY buttonSearchClose.label "Diese Suche schließen">
 <!ENTITY buttonExitTabGroups.label "Tabgruppen schließen">
 <!ENTITY buttonOptionsTabGroups.label "Tabgruppen-Einstellungen ändern">
 <!ENTITY buttonHelpTabGroups.label "Wie man Tabgruppen verwendet">
 <!ENTITY buttonClassic.label "Free arrange">
 <!ENTITY buttonGrid.label "Grid display">
-<!ENTITY buttonSingle.label "Single view">
-<!ENTITY buttonNewGroup.label "Create new group">
-<!ENTITY menuNewTab.label "Open new tab">
+<!ENTITY buttonSingle.label "Einzelansicht">
+<!ENTITY buttonNewGroup.label "Eine neue Gruppe erstellen">
+<!ENTITY menuNewTab.label "Einen neuen Tab öffnen">
 <!ENTITY menuNewTab.accesskey "t">
-<!ENTITY options.close.tooltip "Save and go back">
-<!ENTITY options.notapplicable.single "(not applicable in single view)">
-<!ENTITY options.title.tooltip "Name this tab group">
-<!ENTITY options.showThumbs.label "Show tab thumbnails">
-<!ENTITY options.showUrls.label "Show addresses next to page titles">
-<!ENTITY options.tileIcons.label "Tile page icons when thumbnails are too small">
+<!ENTITY options.close.tooltip "Speichern und zurück">
+<!ENTITY options.notapplicable.single "(nicht in der Einzelansicht anwendbar)">
+<!ENTITY options.title.tooltip "Diese Tab-Grupppe benennen">
+<!ENTITY options.showThumbs.label "Vorschaubilder der Tabs anzeigen">
+<!ENTITY options.showUrls.label "Addressen neben den Seiten-Titeln anzeigen">
+<!ENTITY options.tileIcons.label "Icons der Websites anzeigen, wenn die Vorschaubilder zu schmal sind">
 <!ENTITY options.catchOnce.caption "Rules to catch tabs into this group">
 <!ENTITY options.catchOnce.label "Catch only new tabs">
 <!ENTITY options.catchRules.placeholder1 "Insert regular expressions for web addresses here. Matching tabs will be moved automatically to this group.">
 <!ENTITY options.catchRules.placeholder2 "Use one line per rule, there can be as many as you want.">
-<!ENTITY options.catchRules.placeholder3 "Examples:">
+<!ENTITY options.catchRules.placeholder3 "Beispiele:">
 <!ENTITY options.catchRules.placeholder4 "github\.com/Quicksaver/Tab-Groups - catch all pages in the add-on's repository">
 <!ENTITY options.catchRules.placeholder5 "bugzilla\.mozilla\.org - catch Firefox bug reports">
 <!ENTITY options.catchRules.placeholder6 "(facebook|twitter|youtube)\.com - catch all your social pages">
-<!ENTITY options.stackTabs.caption "When this group has too many tabs...">
-<!ENTITY options.stackTabs.stack.label "Stack the group">
-<!ENTITY options.stackTabs.list.label "Scroll the group">
+<!ENTITY options.stackTabs.caption "Wenn diese Gruppe zu viele Tabs hat...">
+<!ENTITY options.stackTabs.stack.label "Die Gruppe stapeln">
+<!ENTITY options.stackTabs.list.label "Durch die Gruppe scrollen">
 <!ENTITY sessionRestoreNotice.label "Ihre Tabs und Gruppen werden beim nächsten Browserstart nicht wiederhergestellt! Klicken Sie hier, um das zu ändern.">
 <!ENTITY sessionRestoreNotice.dismiss.tooltip "Diese Warnung bis zum nächsten Neustart des Browsers unterdrücken">
 <!ENTITY sessionRestoreAutoChanged.label "Ihre Tabs und Gruppen werden automatisch beim nächsten Browserstart wiederhergestellt.">
