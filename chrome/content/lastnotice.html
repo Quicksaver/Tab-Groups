@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<style>
+		.body {
+			font-family: "Helvetica Neue", Helvetica, sans-serif;
+			font-size: 18px;
+			padding: 5em 0;
+			background: linear-gradient(to bottom, rgb(250,252,250), rgb(245,247,245));
+			background-attachment: fixed;
+		}
+		p {
+			max-width: 1200px;
+			margin: 1.5em auto;
+		}
+		.addon {
+			font-weight: bold;
+			text-decoration: underline;
+		}
+		.italic {
+			font-style: italic;
+		}
+		.tldr {
+			font-size: 28px;
+			text-align: center;
+		}
+		.sectionstart {
+			margin-top: 5em;
+		}
+	</style>
+</head>
+
+<body class="body">
+<p class="tldr"><img src="./addonicons.png"/>
+<p class="tldr">I cannot continue working on my add-ons anymore. I'm sorry, but it's time.</p>
+
+<p class="sectionstart">Some time ago, <a target="_blank" href="https://blog.mozilla.org/addons/2015/08/21/the-future-of-developing-firefox-add-ons/">Mozilla announced WebExtensions</a> as the future of Firefox add-ons. At the time, it was not fully clear to me what this would mean for my add-ons, I was optimistic in that they would at least keep working in some way, but over this past year it became clear that this is not the case.</p>
+
+<p>WebExtensions are great for adding functionality to the browser, and without a doubt are versatile and easy to use. However, manipulation of the browser window's interface and functionality will be extremely limited by definition, and even if it wasn't, the implementation of such abilities is nearly impossible to achieve in WebExtensions.</p>
+
+<p class="sectionstart">Four out of five of my add-ons rely heavily on these abilities: <span class="addon"><a target="_blank" href="https://addons.mozilla.org/firefox/addon/findbar-tweak/">FindBar Tweak</a></span>, <span class="addon"><a target="_blank" href="https://addons.mozilla.org/firefox/addon/the-fox-only-better/">Beyond Australis</a></span>, <span class="addon"><a target="_blank" href="https://addons.mozilla.org/firefox/addon/omnisidebar/">OmniSidebar</a></span> and <span class="addon"><a target="_blank" href="https://addons.mozilla.org/firefox/addon/puzzle-toolbars/">Puzzle Bars</a></span>. From all of those, probably only FBT's <span class="italic">Find All</span> feature could work as a WebExtension; I wrote it following the suggestion of several users at the time, I have never used it myself, I don't think I've clicked that button a single time since; in fact I keep that feature disabled in my main profile and only really use it when someone reports a problem with it.</p>
+
+<p><span class="addon"><a target="_blank" href="https://addons.mozilla.org/firefox/addon/tab-groups-panorama/">Tab Groups</a></span> has a shot. I took on this project after it was decided to remove the built-in Tab Groups from Firefox, as I thought it could be a good and fun learning experience; it hasn't been, if anything it's been stressful and time-consuming. I don't really use groups outside of my development profile, with my browsing habits I only find them useful to a point, they're helpful for my development/coding workflow, but I've used them <span class="italic">maybe</span> twice in my main profile during normal browsing.</p>
+
+<p>Its core functionality and basic workflow probably can be made into a WebExtension, but only after an almost complete rewrite of the code (with some major work done on Firefox's side as well!), and still stripped down of at least some of its features. Many of the new groups features I've wanted to add since the beginning are impossible though, for the same reason as I mentioned above: they either don't fit the scope of what can be allowed through WebExtensions or their implementation would be far too complex to do on my own.</p>
+
+<p class="sectionstart">I have fought for keeping the current system working together with WebExtensions, not only to keep all of my add-ons alive, but also because I believe a can-do-whatever-you-want extension system like exists today is the best quality Firefox has over other browsers. Unfortunately I've failed to convince them of this, as have they failed to convince me of the benefits they expect to achieve with a WebExtensions-only system.</p>
+
+<p>To their merit, as far as I'm concerned, everyone at Mozilla involved with WebExtensions, and even those that aren't, have discussed every fine point on the subject <span class="italic">ad nauseum</span>. To those I say thank you for putting up with me and sharing your in-depth views on the issue over these past few months, I appreciate that a project of this magnitude demands an incredible effort, and that the ultimate goal is only a better product for everyone. I'm sure it's no surprise to you that I don't agree with a WebExtensions-only world, but I hope that over our talks I have made clear my reasons for that, and that at no point did I bear anyone any ill-will; as I keep saying despite my skepticism, prove me wrong.</p>
+
+<p>(For those who have not followed these discussions, if you care about my full opinion on the subject, you can find my posts spread out over forums and mailing lists all around.)</p>
+
+<p class="sectionstart">Still, what most prompts me to write this is how left out this all makes me feel. The category of extensions I am most interested in, which all my add-ons belong to, is discarded both in principle and by the impossibility of implementing them in an acceptable way in WebExtensions. Beyond losing what I have worked for so hard in the past few years, it's seeing all that work categorized as irrelevant and undesirable to the point that it's categorically ruled out in the new system. To be frank, I did not expect this to happen with Mozilla, ever, regardless of their motivations for adopting this strategy.</p>
+
+<p class="sectionstart">So let's sum up. My only available path forward is to spend the better part of a year, probably more, on the tedious and stressful task of rewriting one of my add-ons and part of another, both of which will result in only already existing functionality that brings me no gain and in which I have no personal interest, to retain maybe a third of my current user-base, in favor of a system that will exist for reasons with which I don't agree, with further development of novel features being subject to a bottleneck on Mozilla's side rather than on myself.</p>
+
+<p>Adding to that, Firefox and my add-ons are not my life, by themselves they don't and will never support me by far, nor am I a Mozilla paid employee who can spend his (full-)time working on his add-ons and on Firefox itself to add the ability to support them (because I also don't expect, or even want, anyone at Mozilla to do my work for me, as that kinda defeats the point of them being <span class="italic">my</span> add-ons, that's the whole thing that lured me in to this add-ons world in the first place).</p>
+
+<p>Oh, by the way, I already did all that. It took me <a target="_blank" href="https://addons.mozilla.org/firefox/addon/findbar-tweak/versions/2">a year and a half of extensive rewritting to make my add-ons e10s/multiprocess compatible</a>, something that is being rolled out <a target="_blank" href="https://wiki.mozilla.org/Electrolysis#Add-ons_Schedule">only now</a>, all with the prospect of a long-lasting life for them. And the WebExtensions announcement was made not two months after. "Demotivating" doesn't quite cover it...</p>
+
+<p class="sectionstart">No, that's not going to happen.</p>
+
+<p class="sectionstart">These are the last updates to my add-ons. They will cease working <a target="_blank" href="https://blog.mozilla.org/addons/2016/11/23/add-ons-in-2017/">with Firefox 57 next November</a>. By then hopefully some alternatives appear. My code is up on Github, so anyone interested can fork it. If there's some need for me to do some transition work on your behalf, for instance to migrate users from my add-ons to yours, I'm only an e-mail away.</p>
+
+<p>I apologize to every single one of my users for not being able to keep the promises I have made you since I started. You have all been incredibly supportive, I have the most awesome users I could have ever asked for. I only hope you understand that I don't have the availability to continue past this point. And quite frankly, seeing the add-ons I care most about being left out like this, I don't really have the will to do it either; their part in making my browser behave as awesome as it does now is what really brought me so far.</p>
+
+<p>I am also happy to have been part of an amazing community. Thank you so much to everyone, at Mozilla, fellow add-on developers and everyone else, who has helped me, taught me, and made me feel included over these years. Awesome people!</p>
+
+<p class="sectionstart">For over a decade I have supported and defended Mozilla and Firefox (<a target="_blank" href="https://www.youtube.com/playlist?list=PLkWzvZH7LixZFCvGT2lt1MCzSST6Yetld">sometimes in weird ways</a>). I truly hope this is a move in which they succeed, as the alternative won't be a pleasant outcome to anyone in the online world, and I wish I could be a part of it and help construct and hone it to the outstanding platform they intend it to become. It's unfortunate that we have such divergent paths, I remain pessimistic about Mozilla's current strategy, so I must make a new one for myself. Still, I wish the best of luck to everyone there; I'm still afraid you'll need it.</p>
+
+<p class="sectionstart">Onwards!</p>
+
+<p class="sectionstart">Quicksaver - Luís Miguel</p>
+</body>
+<html>

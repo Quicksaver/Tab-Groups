@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.3.1
+// VERSION 1.3.2
 
 this.about = {
 	kNS: 'http://www.w3.org/1999/xhtml',
@@ -74,7 +74,7 @@ this.about = {
 		this.shareLinks();
 
 		// fetch the development hours data and show it
-		this.api();
+		//this.api();
 
 		// these are so we can click html links in a xul window without their outline becoming permanent (until clicking another link)
 		Listeners.add(window, 'mouseup', this);
@@ -474,10 +474,10 @@ Modules.LOADMODULE = function() {
 	// Everything is self-contained within the add-on, no remote connections are made what-so-ever.
 	// The promo is an image/banner that links to an outside YouTube page where the user can see the video,
 	// this behavior is clearly described in the promo itself.
-	promo.init();
+	//promo.init();
 };
 
 Modules.UNLOADMODULE = function() {
 	about.uninit();
-	promo.uninit();
+	//promo.uninit();
 };

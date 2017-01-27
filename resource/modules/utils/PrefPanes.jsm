@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// VERSION 1.1.0
+// VERSION 1.1.1
 Modules.UTILS = true;
 
 // PrefPanes - handles the preferences tab and all its contents for the add-on
@@ -128,7 +128,7 @@ this.PrefPanes = {
 		if(isContent) { return; }
 
 		// we set the add-on status in the API webpage from within the add-on itself
-		Messenger.loadInAll('utils/api');
+		//Messenger.loadInAll('utils/api');
 
 		// always add the about pane to the preferences dialog, it should be the last category in the list
 		this.register('utils/about', { paneAbout: 'utils/about' });
@@ -160,6 +160,46 @@ this.PrefPanes = {
 					this.showToaster();
 				}
 			}
+
+			// It's important that all users know this will likely be the last update to the add-on, and that there is a definitive date for when it will stop working.
+			// I'm using a preference common to all my add-ons, rather than one specific to this add-on, so that users with more than one of mine don't see multiple notices needlessly when updating.
+			Prefs.setDefaults({ lastnotice: false }, 'quicksaver');
+			if(!Prefs.lastnotice) {
+				// we have to wait for Session Store to finish, otherwise our tab will be overriden by a session-restored tab
+				let wait = () => {
+					// Another add-on could have shown the notice already.
+					if(Prefs.lastnotice) { return; }
+
+					// in theory, the add-on could be disabled inbetween aSync calls
+					if(typeof(PrefPanes) == 'undefined') { return; }
+
+					// most recent window, if it doesn't exist yet it means we're still starting up, so give it a moment
+					let aWindow = window;
+					if(!aWindow || !aWindow.SessionStore) {
+						aSync(wait, 500);
+						return;
+					}
+
+					// SessionStore should have registered the window and initialized it, to ensure it doesn't overwrite our tab with any saved ones
+					// (ours will open in addition to session-saved tabs)
+					let state = JSON.parse(aWindow.SessionStore.getBrowserState());
+					if(state.windows.length == 0) {
+						aSync(wait, 500);
+						return;
+					}
+
+					// also ensure the window is fully initialized before trying to open a new tab
+					if(!aWindow.gBrowserInit || !aWindow.gBrowserInit.delayedStartupFinished) {
+						aSync(wait, 500);
+						return;
+					}
+
+					Prefs.lastnotice = true;
+					aWindow.gBrowser.selectedTab = aWindow.gBrowser.addTab("chrome://"+objPathString+"/content/lastnotice.html");
+					aWindow.gBrowser.selectedTab.loadOnStartup = true; // for Tab Mix Plus
+				};
+				wait();
+			}
 		}
 
 		// always keep this flag up to date with the current version
@@ -179,7 +219,7 @@ this.PrefPanes = {
 
 		if(isContent) { return; }
 
-		Messenger.unloadFromAll('utils/api');
+		//Messenger.unloadFromAll('utils/api');
 		Browsers.unregister(this, 'pageshow', this.chromeUri);
 
 		this.closeAll();
